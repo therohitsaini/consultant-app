@@ -11,13 +11,8 @@ import {
 } from '@shopify/polaris';
 import { useState, useCallback } from 'react';
 import { EditIcon, DuplicateIcon, DeleteIcon } from '@shopify/polaris-icons';
-function IndexTableList() {
-  const [itemStrings, setItemStrings] = useState([
-    'All',
-    'chat',
-    'voice call',
-    'video call',
-  ]);
+function IndexTableList( {itemStrings, sortOptions ,consultantsFalbackData, setConsultants} ) {
+ 
   const tabs = itemStrings.map((item, index) => ({
     content: item,
     index,
@@ -26,22 +21,7 @@ function IndexTableList() {
     isLocked: index === 0,
   }));
   const [selected, setSelected] = useState(0);
-  const sortOptions = [
-    { label: 'Name', value: 'name asc', directionLabel: 'A-Z' },
-    { label: 'Name', value: 'name desc', directionLabel: 'Z-A' },
-    { label: 'Email Id', value: 'emailId asc', directionLabel: 'A-Z' },
-    { label: 'Email Id', value: 'emailId desc', directionLabel: 'Z-A' },
-    { label: 'Contact', value: 'contact asc', directionLabel: 'Ascending' },
-    { label: 'Contact', value: 'contact desc', directionLabel: 'Descending' },
-    { label: 'Profession', value: 'profession asc', directionLabel: 'A-Z' },
-    { label: 'Profession', value: 'profession desc', directionLabel: 'Z-A' },
-    { label: 'Experience', value: 'experience asc', directionLabel: 'Ascending' },
-    { label: 'Experience', value: 'experience desc', directionLabel: 'Descending' },
-    { label: 'Conversion Fees', value: 'conversionFees asc', directionLabel: 'Ascending' },
-    { label: 'Conversion Fees', value: 'conversionFees desc', directionLabel: 'Descending' },
-    { label: 'Status', value: 'status asc', directionLabel: 'A-Z' },
-    { label: 'Status', value: 'status desc', directionLabel: 'Z-A' },
-  ];
+ 
   const [sortSelected, setSortSelected] = useState(['name asc']);
   const { mode, setMode } = useSetIndexFiltersMode();
   const onHandleCancel = () => {
@@ -55,76 +35,20 @@ function IndexTableList() {
   );
   const handleQueryValueRemove = useCallback(() => setQueryValue(''), []);
 
-  const [consultants, setConsultants] = useState([
-    {
-      id: '1',
-      name: 'John Doe',
-      emailId: 'john.doe@example.com',
-      contact: '+1 234-567-8900',
-      profession: 'Business Consultant',
-      experience: '5 years',
-      conversionFees: '$500',
-      isActive: true,
-      type: 'voice call',
-    },
-    {
-      id: '2',
-      name: 'Jane Smith',
-      emailId: 'jane.smith@example.com',
-      contact: '+1 234-567-8901',
-      profession: 'Marketing Consultant',
-      experience: '8 years',
-      conversionFees: '$750',
-      isActive: true,
-      type: 'chat',
-    },
-    {
-      id: '3',
-      name: 'Robert Johnson',
-      emailId: 'robert.johnson@example.com',
-      contact: '+1 234-567-8902',
-      profession: 'IT Consultant',
-      experience: '3 years',
-      conversionFees: '$400',
-      isActive: false,
-      type: 'voice call',
-    },
-    {
-      id: '4',
-      name: 'Emily Davis',
-      emailId: 'emily.davis@example.com',
-      contact: '+1 234-567-8903',
-      profession: 'Finance Consultant',
-      experience: '6 years',
-      conversionFees: '$600',
-      isActive: true,
-      type: 'chat',
-    },
-    {
-      id: '5',
-      name: 'Michael Brown',
-      emailId: 'michael.brown@example.com',
-      contact: '+1 234-567-8904',
-      profession: 'HR Consultant',
-      experience: '7 years',
-      conversionFees: '$650',
-      isActive: true,
-      type: 'video call',
-    },
-  ]);
+ 
 
-  const toggleStatus = useCallback((id) => {
-    setConsultants((prevConsultants) =>
-      prevConsultants.map((consultant) =>
-        consultant.id === id
-          ? { ...consultant, isActive: !consultant.isActive }
-          : consultant
-      )
-    );
-  }, []);
+  // const toggleStatus = useCallback((id) => {
+  //   setConsultants((prevConsultants) =>
+  //     prevConsultants.map((consultant) =>
+  //       consultant.id === id
+  //         ? { ...consultant, isActive: !consultant.isActive }
+  //         : consultant
+  //     )
+  //   );
+  // }, []);
 
-  // Filter consultants based on selected tab and search query
-  const filteredConsultants = consultants.filter((consultant) => {
+  // Filter consultantsFalbackData based on selected tab and search query
+  const filteredConsultants = consultantsFalbackData?.filter((consultant) => {
     // Filter by tab
     let matchesTab = true;
     if (selected !== 0) {
@@ -147,12 +71,12 @@ function IndexTableList() {
   });
   const resourceName = {
     singular: 'consultant',
-    plural: 'consultants',
+    plural: 'consultantsFalbackData',
   };
 
-  const rowMarkup = filteredConsultants.map(
+  const rowMarkup = filteredConsultants?.map(
     (
-      { id, name, emailId, contact, profession, experience, conversionFees, isActive },
+      { id, name, emailId, phone, profession, experience, conversionFees, isActive },
       index,
     ) => (
       <IndexTable.Row
@@ -171,7 +95,7 @@ function IndexTableList() {
           </Text>
         </IndexTable.Cell>
         <IndexTable.Cell>{emailId}</IndexTable.Cell>
-        <IndexTable.Cell>{contact}</IndexTable.Cell>
+        <IndexTable.Cell>{phone}</IndexTable.Cell>
         <IndexTable.Cell>{profession}</IndexTable.Cell>
         <IndexTable.Cell>{experience}</IndexTable.Cell>
         <IndexTable.Cell>
@@ -192,7 +116,7 @@ function IndexTableList() {
             <input
               type="checkbox"
               checked={isActive}
-              onChange={() => toggleStatus(id)}
+              // onChange={() => toggleStatus(id)}
               style={{
                 opacity: 0,
                 width: 0,
@@ -244,7 +168,7 @@ function IndexTableList() {
         sortOptions={sortOptions}
         sortSelected={sortSelected}
         queryValue={queryValue}
-        queryPlaceholder="Search consultants"
+        queryPlaceholder="Search consultantsFalbackData"
         onQueryChange={handleFiltersQueryChange}
         onQueryClear={() => setQueryValue('')}
         onSort={setSortSelected}
@@ -267,7 +191,7 @@ function IndexTableList() {
         condensed={useBreakpoints().smDown}
         selectable={false}
         resourceName={resourceName}
-        itemCount={filteredConsultants.length}
+        itemCount={filteredConsultants?.length}
         headings={[
           { title: 'Sr. No.' },
           { title: 'Name' },

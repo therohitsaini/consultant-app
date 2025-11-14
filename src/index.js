@@ -6,13 +6,17 @@ import reportWebVitals from './reportWebVitals';
 import '@shopify/polaris/build/esm/styles.css';
 import { AppProvider } from '@shopify/polaris';
 import en from "@shopify/polaris/locales/en.json";
+import { Provider } from 'react-redux';
+import { store } from './components/Redux/store/store';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <AppProvider i18n={en}>
-      <App />
+      <Provider store={store}>
+        <App />
+      </Provider>
     </AppProvider>
   </React.StrictMode>
 );

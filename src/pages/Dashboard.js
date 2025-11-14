@@ -1,9 +1,12 @@
 import { Layout, Banner, BlockStack, CalloutCard, Page, Grid, LegacyCard, Text, Box } from '@shopify/polaris';
 import { ConfettiIcon, ExternalIcon } from '@shopify/polaris-icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SetupGuideNew } from '../components/dashboard/SetupGuide';
 import { AppStatus } from '../components/dashboard/AppStatus';
 import LanguageSelector from '../components/dashboard/LanguageSelecter';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUsers } from '../components/Redux/slices/UserSlices';
+import { fetchConsultants } from '../components/Redux/slices/ConsultantSlices';
 
 function Dashboard() {
     const [isBannerVisible, setIsBannerVisible] = useState(true);
@@ -41,8 +44,18 @@ function Dashboard() {
 
     // Duplicate list for infinite loop
     const loopedApps = [...apps, ...apps];
+    const dispatch = useDispatch();
+    const { users, loading } = useSelector((state) => state.users);
+    const { consultants, loading: consultantLoading } = useSelector((state) => state.consultants);
+    useEffect(() => {
+        dispatch(fetchConsultants());
+    }, [dispatch]);
 
-
+    useEffect(() => {
+        dispatch(fetchUsers());
+    }, [dispatch]);
+    console.log("consultants", consultants);
+    console.log(loading);
     return (
         <Page
             title="Dashboard"
@@ -97,7 +110,7 @@ function Dashboard() {
                                         </div>
                                         <div style={{ flex: 1 }}>
                                             <Text variant="headingLg" as="h2" fontWeight="bold">
-                                                0
+                                                {users.data?.length}
                                             </Text>
                                             <Text variant="bodyMd" as="p" tone="subdued">
                                                 Total Clients
@@ -155,7 +168,7 @@ function Dashboard() {
                                         </div>
                                         <div style={{ flex: 1 }}>
                                             <Text variant="headingLg" as="h2" fontWeight="bold">
-                                                0
+                                                {consultants.findConsultant?.length}
                                             </Text>
                                             <Text variant="bodyMd" as="p" tone="subdued">
                                                 Total Consultations
