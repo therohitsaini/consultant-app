@@ -8,6 +8,7 @@ import LanguageSelector from '../components/dashboard/LanguageSelecter';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUsers } from '../components/Redux/slices/UserSlices';
 import { fetchConsultants } from '../components/Redux/slices/ConsultantSlices';
+import { apps } from '../components/FallbackData/FallbackData';
 
 // Component to display animated count with motion
 function AnimatedCount({ value }) {
@@ -60,37 +61,10 @@ function AnimatedCount({ value }) {
 function Dashboard() {
     const [isBannerVisible, setIsBannerVisible] = useState(true);
 
-    const apps = [
-        {
-            name: "Easy Language Translate",
-            image: "./images/apps-img/app1.png",
-        },
-        {
-            name: "Blokr Country Redirect & Block",
-            image: "./images/apps-img/app2.png",
-        },
-        {
-            name: "Smart Zipcode Validator",
-            image: "./images/apps-img/app3.png",
-        },
-        {
-            name: "Badgio: Product Label & Badges",
-            image: "./images/apps-img/app4.png",
-        },
-        {
-            name: "Jobo Bundle",
-            image: "./images/apps-img/app5.png",
-        },
-        {
-            name: "Stylo Store: Theme Sections",
-            image: "./images/apps-img/app6.png",
-        },
-        {
-            name: "AptBook : Appointment Booking",
-            image: "./images/apps-img/app7.png",
-        },
-    ];
-
+    const params = new URLSearchParams(window.location.search);
+    console.log("params", params);
+    const host = params.get("host");
+    console.log("host", host);
     // Duplicate list for infinite loop
     const loopedApps = [...apps, ...apps];
     const dispatch = useDispatch();
@@ -110,18 +84,19 @@ function Dashboard() {
     }, [dispatch]);
     console.log("consultants", consultants);
     console.log(loading);
+    
     return (
         <Page
-            title="Dashboard"
-            primaryAction={<LanguageSelector />}
-            secondaryActions={[
-                {
-                    content: 'Publish App',
-                    external: true,
-                    icon: ExternalIcon,
-                },
-            ]}
-        >
+                title="Dashboard"
+                primaryAction={<LanguageSelector />}
+                secondaryActions={[
+                    {
+                        content: 'Publish App',
+                        external: true,
+                        icon: ExternalIcon,
+                    },
+                ]}
+            >
 
             <Layout>
 

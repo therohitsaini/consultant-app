@@ -93,6 +93,7 @@ function IndexTableList({
   return (
     <LegacyCard>
       <IndexFilters
+        
         sortOptions={sortOptions}
         sortSelected={sortSelected}
         queryValue={queryValue}

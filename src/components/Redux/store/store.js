@@ -5,5 +5,7 @@ export const store = configureStore({
     reducer: {
         users: userReducer,
         consultants: consultantReducer,
+        // deletedConsultant: deletedConsultantReducer,    
+        
     },
 });

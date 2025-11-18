@@ -1,28 +1,15 @@
-import { Banner, Layout, Page, BlockStack, Grid, LegacyCard, Text, ButtonGroup, Button } from '@shopify/polaris';
+import { Banner, Layout, Page, BlockStack, Grid, LegacyCard, Text, ButtonGroup, Button, Thumbnail } from '@shopify/polaris';
 import { ConfettiIcon, ExternalIcon, PlusIcon, EditIcon, DuplicateIcon, DeleteIcon } from '@shopify/polaris-icons';
 import { useEffect, useState, useCallback, useMemo, Fragment } from 'react';
 import IndexTableList from '../components/consultant-list/IndexTableList';
 import { IndexTable } from '@shopify/polaris';
-import { fetchConsultants } from '../components/Redux/slices/ConsultantSlices';
+import { deleteConsultantById, fetchConsultants } from '../components/Redux/slices/ConsultantSlices';
 import { useDispatch, useSelector } from 'react-redux';
 import { UserAlert } from '../components/AlertModel/UserAlert';
+import { headings, itemStrings, sortOptions } from '../components/FallbackData/FallbackData';
+import { Toast, ToastModel } from '../components/AlertModel/Tost';
 
-const sortOptions = [
-    { label: 'Name', value: 'name asc', directionLabel: 'A-Z' },
-    { label: 'Name', value: 'name desc', directionLabel: 'Z-A' },
-    { label: 'Email _id', value: 'email asc', directionLabel: 'A-Z' },
-    { label: 'Email _id', value: 'email desc', directionLabel: 'Z-A' },
-    { label: 'Contact', value: 'contact asc', directionLabel: 'Ascending' },
-    { label: 'Contact', value: 'contact desc', directionLabel: 'Descending' },
-    { label: 'Profession', value: 'profession asc', directionLabel: 'A-Z' },
-    { label: 'Profession', value: 'profession desc', directionLabel: 'Z-A' },
-    { label: 'Experience', value: 'experience asc', directionLabel: 'Ascending' },
-    { label: 'Experience', value: 'experience desc', directionLabel: 'Descending' },
-    { label: 'Conversion Fees', value: 'conversionFees asc', directionLabel: 'Ascending' },
-    { label: 'Conversion Fees', value: 'conversionFees desc', directionLabel: 'Descending' },
-    { label: 'Status', value: 'status asc', directionLabel: 'A-Z' },
-    { label: 'Status', value: 'status desc', directionLabel: 'Z-A' },
-];
+
 
 
 function ConsultantList() {
@@ -31,29 +18,21 @@ function ConsultantList() {
     const [queryValue, setQueryValue] = useState('');
     const [sortValue, setSortValue] = useState(['name asc']);
     const [isUserAlertVisible, setIsUserAlertVisible] = useState(false);
-
-    const itemStrings = [
-        'All',
-        'chat',
-        'voice call',
-        'video call',
-    ];
-
     const [consultantsIdSelected, setConsultantsIdSelected] = useState([]);
+    const [consultantId, setConsultantId] = useState(null);
+    const [active, setActive] = useState(false);
+    const [toastContent, setToastContent] = useState('');
+    const [isRefreshed, setIsRefreshed] = useState(false);
     const dispatch = useDispatch();
     const { consultants, loading: consultantLoading } = useSelector((state) => state.consultants);
 
-    // State for filtering and sorting
 
 
     useEffect(() => {
         dispatch(fetchConsultants());
     }, [dispatch]);
 
-    // Get consultants data from Redux or fallback
     const consultantsData = consultants?.findConsultant || []
-
-    // Filter consultants based on selected tab and search query
     const filteredConsultants = useMemo(() => {
         if (!consultantsData) return [];
 
@@ -101,7 +80,6 @@ function ConsultantList() {
                 aValue = String(aValue || '').toLowerCase();
                 bValue = String(bValue || '').toLowerCase();
             }
-
             if (direction === 'asc') {
                 return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
             } else {
@@ -112,16 +90,42 @@ function ConsultantList() {
         return sorted;
     }, [filteredConsultants, sortValue]);
 
-    // Handle consultant row click
     const handleConsultantClick = useCallback((_id) => {
         console.log("consultant _id", _id);
     }, []);
 
     // Handle edit button click
     const handleEdit = useCallback((_id) => {
-        console.log("consultant _id", _id);
+        setConsultantId(_id);
         setIsUserAlertVisible(true);
     }, []);
+
+
+    /** Delete Consultant api */
+    const handleDelete = async () => {
+        try {
+            const url = `http://localhost:5001/api-consultant/delete-consultant/${consultantId}`;
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            console.log("response", response);
+            if (response.ok) {
+                console.log("Consultant deleted successfully");
+                setActive(true);
+                setToastContent("Consultant deleted successfully");
+                setIsUserAlertVisible(false);
+                setIsRefreshed((prev) => !prev);
+
+            } else {
+                console.log("Failed to delete consultant");
+            }
+        } catch (error) {
+            console.error('Error deleting consultant:', error);
+        }
+    }
 
     // Render row function for consultants
     const renderConsultantRow = useCallback((consultant, index) => {
@@ -140,10 +144,19 @@ function ConsultantList() {
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
+                    <Thumbnail
+
+                        source={"../images/flag/teamdefault.png"}
+                        size="small"
+                    />
+                </IndexTable.Cell>
+                <IndexTable.Cell>
                     <Text variant="bodyMd" as="span">
                         {fullname}
                     </Text>
                 </IndexTable.Cell>
+
+
                 <IndexTable.Cell>{email}</IndexTable.Cell>
                 <IndexTable.Cell>{displayPhone}</IndexTable.Cell>
                 <IndexTable.Cell>{profession}</IndexTable.Cell>
@@ -165,8 +178,7 @@ function ConsultantList() {
                     >
                         <input
                             type="checkbox"
-                            checked={consultantStatus
-                            }
+                            checked={consultantStatus}
                             onChange={() => {
                                 // Handle status toggle if needed
                                 setConsultantsIdSelected((prevConsultants) =>
@@ -222,30 +234,32 @@ function ConsultantList() {
                         />
 
                         <Button variant="tertiary" icon={DuplicateIcon} accessibilityLabel="Duplicate consultant" />
-                        <Button variant="tertiary" icon={DeleteIcon} tone="critical" accessibilityLabel="Delete consultant" />
+                        <Button variant="tertiary"
+                            icon={DeleteIcon} tone="critical" accessibilityLabel="Delete consultant"
+                            onClick={(e) => {
+                                e.stopPropagation(); // Row click trigger avoid
+                                handleEdit(_id);
+                            }}
+                        />
                     </ButtonGroup>
                 </IndexTable.Cell>
             </IndexTable.Row>
         );
-    }, [handleConsultantClick, handleEdit, setConsultantsIdSelected]);
+    }, [handleConsultantClick, handleEdit, setConsultantsIdSelected, isRefreshed]);
 
-    const headings = [
-        { title: 'Sr. No.' },
-        { title: 'Name' },
-        { title: 'Email _id' },
-        { title: 'Contact' },
-        { title: 'Profession' },
-        { title: 'Experience' },
-        { title: 'Conversion Fees', alignment: 'end' },
-        { title: 'Status' },
-        { title: 'Action' },
-    ];
 
- 
+
 
     return (
         <Fragment>
-            <UserAlert isUserAlertVisible={isUserAlertVisible} setIsUserAlertVisible={setIsUserAlertVisible} />
+            <UserAlert
+                isUserAlertVisible={isUserAlertVisible}
+                setIsUserAlertVisible={setIsUserAlertVisible}
+                handleDelete={handleDelete}
+                consultantId={consultantId}
+
+            />
+            <ToastModel active={active} setActive={setActive} toastContent={toastContent} />
             <Page
                 title="Consultant List"
                 primaryAction={{

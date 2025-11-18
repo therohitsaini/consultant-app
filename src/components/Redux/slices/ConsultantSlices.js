@@ -7,12 +7,19 @@ export const fetchConsultants = createAsyncThunk("consultants/fetch", async () =
     return response.data;
 });
 
+export const deleteConsultantById = createAsyncThunk("consultants/delete", async (id) => {
+    const response = await axios.delete(`http://localhost:5001/api-consultant/delete-consultant/${id}`);
+    return response.data;
+});
+
+
 const consultantSlice = createSlice({
     name: "consultants",
     initialState: {
         consultants: [],
         loading: false,
         error: null,
+        deletedConsultant: null,
     },
 
     extraReducers: (builder) => {
@@ -25,6 +32,17 @@ const consultantSlice = createSlice({
                 state.consultants = action.payload;
             })
             .addCase(fetchConsultants.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
+            .addCase(deleteConsultantById.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(deleteConsultantById.fulfilled, (state, action) => {
+                state.loading = false;
+                state.deletedConsultant = action.payload;
+            })
+            .addCase(deleteConsultantById.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
             });
