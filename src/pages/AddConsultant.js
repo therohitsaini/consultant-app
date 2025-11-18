@@ -1,94 +1,56 @@
-import { Banner, Layout, Page, BlockStack, LegacyCard, FormLayout, TextField, Tag, LegacyStack, Text, Select } from '@shopify/polaris';
+import { Banner, Layout, Page, BlockStack, LegacyCard, FormLayout, TextField, Tag, LegacyStack, Text, Select, Button, Spinner } from '@shopify/polaris';
 import { ConfettiIcon, ExternalIcon } from '@shopify/polaris-icons';
 import { useState, useCallback } from 'react';
+import axios from 'axios';
 
 
 
 function AddConsultant() {
     // Banner
     const [isBannerVisible, setIsBannerVisible] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState('');
+    const [submitSuccess, setSubmitSuccess] = useState(false);
 
-    // Full Name
-    const [fullName, setFullName] = useState('');
+    // Single state object for all form fields
+    const [formData, setFormData] = useState({
+        fullName: '',
+        email: '',
+        password: '',
+        phoneNumber: '',
+        profession: '',
+        specialization: '',
+        licenseIdNumber: '',
+        yearOfExperience: '',
+        chargingPerMinute: '',
+        languages: [],
+        displayName: '',
+        gender: 'male',
+        houseNumber: '',
+        streetArea: '',
+        landmark: '',
+        address: '',
+        pincode: '',
+        dateOfBirth: '',
+        pancardNumber: '',
+    });
 
-    const handleFullNameChange = useCallback(
-        (newValue) => setFullName(newValue),
-        [],
-    );
-
-    // Email
-    const [email, setEmail] = useState('');
-
-    const handleEmailChange = useCallback(
-        (newValue) => setEmail(newValue),
-        [],
-    );
-
-    // Password
-    const [password, setPassword] = useState('');
-
-    const handlePasswordChange = useCallback(
-        (newValue) => setPassword(newValue),
-        [],
-    );
-
-    // Phone Number
-    const [phoneNumber, setPhoneNumber] = useState('');
-
-    const handlePhoneNumberChange = useCallback(
-        (newValue) => setPhoneNumber(newValue),
-        [],
-    );
-
-    // Profession
-    const [profession, setProfession] = useState('');
-
-    const handleProfessionChange = useCallback(
-        (newValue) => setProfession(newValue),
-        [],
-    );
-
-    // Specialization
-    const [specialization, setSpecialization] = useState('');
-
-    const handleSpecializationChange = useCallback(
-        (newValue) => setSpecialization(newValue),
-        [],
-    );
-
-    // License / ID Number
-    const [licenseIdNumber, setLicenseIdNumber] = useState('');
-
-    const handleLicenseIdNumberChange = useCallback(
-        (newValue) => setLicenseIdNumber(newValue),
-        [],
-    );
-
-    // Year of Experience
-    const [yearOfExperience, setYearOfExperience] = useState('');
-
-    const handleYearOfExperienceChange = useCallback(
-        (newValue) => setYearOfExperience(newValue),
-        [],
-    );
-
-
-    // Charging per minute
-    const [chargingPerMinute, setChargingPerMinute] = useState('');
-
-    const handleChargingPerMinuteChange = useCallback(
-        (newValue) => setChargingPerMinute(newValue),
-        [],
-    );
-
-
-    // add your consultant language
-
+    // Language tags
     const availableTags = ['English', 'French', 'Hindi', 'Japanese', 'Russian', 'Shona', 'Sesotho', 'Spanish', 'Tajik'];
     const [textFieldValue, setTextFieldValue] = useState('');
-    const [selectedTags, setSelectedTags] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
 
+    // Generic handler for form field changes
+    const handleFieldChange = useCallback((fieldName) => {
+        return (value) => {
+            setFormData((prev) => ({
+                ...prev,
+                [fieldName]: value,
+            }));
+        };
+    }, []);
+
+    // Language tag handlers
     const handleTextFieldChange = useCallback(
         (value) => {
             setTextFieldValue(value);
@@ -102,31 +64,37 @@ function AddConsultant() {
     }, []);
 
     const handleTagSelect = useCallback((tag) => {
-        if (!selectedTags.includes(tag)) {
-            setSelectedTags((prev) => [...prev, tag]);
+        if (!formData.languages.includes(tag)) {
+            setFormData((prev) => ({
+                ...prev,
+                languages: [...prev.languages, tag],
+            }));
         }
         setTextFieldValue('');
         setShowDropdown(false);
-    }, [selectedTags]);
+    }, [formData.languages]);
 
     const handleRemoveTag = useCallback((tagToRemove) => {
-        setSelectedTags((prev) => prev.filter((tag) => tag !== tagToRemove));
+        setFormData((prev) => ({
+            ...prev,
+            languages: prev.languages.filter((tag) => tag !== tagToRemove),
+        }));
     }, []);
 
     // Filter tags based on search input
     const filteredTags = availableTags.filter((tag) => {
         const matchesSearch = textFieldValue.length === 0 || tag.toLowerCase().includes(textFieldValue.toLowerCase());
-        const notSelected = !selectedTags.includes(tag);
+        const notSelected = !formData.languages.includes(tag);
         return matchesSearch && notSelected;
     });
 
     const verticalContentMarkup = (
         <BlockStack gap="200">
-            {selectedTags.length > 0 && (
+            {formData.languages.length > 0 && (
                 <BlockStack gap="100">
                     <Text variant="bodySm" tone="subdued" fontWeight="medium">Selected Tags:</Text>
                     <LegacyStack spacing="extraTight" alignment="center" wrap>
-                        {selectedTags.map((tag) => (
+                        {formData.languages.map((tag) => (
                             <Tag key={tag} onRemove={() => handleRemoveTag(tag)}>
                                 {tag}
                             </Tag>
@@ -177,77 +145,50 @@ function AddConsultant() {
     );
 
 
-    // Display Name
-    const [displayName, setDisplayName] = useState('');
-    const handleDisplayNameChange = useCallback(
-        (newValue) => setDisplayName(newValue),
-        [],
-    );
 
-
-    // Gender
-    const [selectedGender, setSelectedGender] = useState('male');
-
-    const handleGenderChange = useCallback(
-        (value) => setSelectedGender(value),
-        [],
-    );
-
-    const options = [
+    const genderOptions = [
         { label: 'Male', value: 'male' },
         { label: 'Female', value: 'female' },
         { label: 'Other', value: 'other' },
     ];
 
+    console.log(formData);
+    // POST API function to submit form data
+    const submitConsultantData = useCallback(async () => {
+        setIsSubmitting(true);
+        setSubmitError('');
+        setSubmitSuccess(false);
 
-    // House Number
-    const [houseNumber, setHouseNumber] = useState('');
-    const handleHouseNumberChange = useCallback(
-        (newValue) => setHouseNumber(newValue),
-        [],
-    );
-
-    // Street Area
-    const [streetArea, setStreetArea] = useState('');
-    const handleStreetAreaChange = useCallback(
-        (newValue) => setStreetArea(newValue),
-        [],
-    );
-
-    // Landmark
-    const [landmark, setLandmark] = useState('');
-    const handleLandmarkChange = useCallback(
-        (newValue) => setLandmark(newValue),
-        [],
-    );
-
-    // Address
-    const [address, setAddress] = useState('');
-    const handleAddressChange = useCallback(
-        (newValue) => setAddress(newValue),
-        [],
-    );
-
-    // Pincode
-    const [pincode, setPincode] = useState('');
-    const handlePincodeChange = useCallback(
-        (newValue) => setPincode(newValue),
-        [],
-    );
-
-    // Date of Birth
-    const [dateOfBirth, setDateOfBirth] = useState('');
-    const handleDateOfBirthChange = useCallback(
-        (newValue) => setDateOfBirth(newValue),
-        [],
-    );
-
-    // Pancard Number
-    const [pancardNumber, setPancardNumber] = useState('');
-    const handlePancardNumberChange = useCallback(
-        (newValue) => setPancardNumber(newValue),
-        [],
-    );
+        try {
+            const response = await fetch('http://localhost:5001/api-consultant/add-consultant', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                // body: JSON.stringify(formData),
+                // body: formData,
+                body: JSON.stringify(formData),
+            });
+            console.log(formData);
+            if (response.ok) {
+                setSubmitSuccess(true);
+                setTextFieldValue('');
+                setFormData({});
+            }
+            else {
+                setSubmitError('Failed to submit consultant data. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error submitting consultant data:', error);
+            setSubmitError(
+                error.response?.data?.message ||
+                error.message ||
+                'Failed to submit consultant data. Please try again.'
+            );
+        } finally {
+            setIsSubmitting(false);
+        }
+    }, [formData]);
 
 
     return (
@@ -289,8 +230,8 @@ function AddConsultant() {
                                 {/* Full Name */}
                                 <TextField
                                     label="Full Name"
-                                    value={fullName}
-                                    onChange={handleFullNameChange}
+                                    value={formData.fullName}
+                                    onChange={handleFieldChange('fullName')}
                                     autoComplete="off"
                                 />
 
@@ -298,8 +239,8 @@ function AddConsultant() {
                                 <TextField
                                     label="Email"
                                     type="email"
-                                    value={email}
-                                    onChange={handleEmailChange}
+                                    value={formData.email}
+                                    onChange={handleFieldChange('email')}
                                     autoComplete="email"
                                 />
 
@@ -307,8 +248,8 @@ function AddConsultant() {
                                 <TextField
                                     label="Password"
                                     type="password"
-                                    value={password}
-                                    onChange={handlePasswordChange}
+                                    value={formData.password}
+                                    onChange={handleFieldChange('password')}
                                     autoComplete="off"
                                 />
 
@@ -319,24 +260,24 @@ function AddConsultant() {
                                 <TextField
                                     label="Phone Number"
                                     type="tel"
-                                    value={phoneNumber}
-                                    onChange={handlePhoneNumberChange}
+                                    value={formData.phoneNumber}
+                                    onChange={handleFieldChange('phoneNumber')}
                                     autoComplete="off"
                                 />
 
                                 {/* Profession */}
                                 <TextField
                                     label="Profession"
-                                    value={profession}
-                                    onChange={handleProfessionChange}
+                                    value={formData.profession}
+                                    onChange={handleFieldChange('profession')}
                                     autoComplete="off"
                                 />
 
                                 {/* Specialization */}
                                 <TextField
                                     label="Specialization"
-                                    value={specialization}
-                                    onChange={handleSpecializationChange}
+                                    value={formData.specialization}
+                                    onChange={handleFieldChange('specialization')}
                                     autoComplete="off"
                                 />
 
@@ -346,24 +287,24 @@ function AddConsultant() {
                                 {/* License / ID Number */}
                                 <TextField
                                     label="License / ID Number"
-                                    value={licenseIdNumber}
-                                    onChange={handleLicenseIdNumberChange}
+                                    value={formData.licenseIdNumber}
+                                    onChange={handleFieldChange('licenseIdNumber')}
                                     autoComplete="off"
                                 />
 
                                 {/* Year of Experience */}
                                 <TextField
                                     label="Year of Experience"
-                                    value={yearOfExperience}
-                                    onChange={handleYearOfExperienceChange}
+                                    value={formData.yearOfExperience}
+                                    onChange={handleFieldChange('yearOfExperience')}
                                     autoComplete="off"
                                 />
 
                                 {/* Charging per minute */}
                                 <TextField
                                     label="Charging par minute"
-                                    value={chargingPerMinute}
-                                    onChange={handleChargingPerMinuteChange}
+                                    value={formData.chargingPerMinute}
+                                    onChange={handleFieldChange('chargingPerMinute')}
                                     autoComplete="off"
                                 />
 
@@ -407,49 +348,49 @@ function AddConsultant() {
                                 {/* Display Name */}
                                 <TextField
                                     label="Display Name"
-                                    value={displayName}
-                                    onChange={handleDisplayNameChange}
+                                    value={formData.displayName}
+                                    onChange={handleFieldChange('displayName')}
                                     autoComplete="off"
                                 />
                                 {/* Gender */}
                                 <Select
                                     label="Gender"
-                                    options={options}
-                                    onChange={handleGenderChange}
-                                    value={selectedGender}
+                                    options={genderOptions}
+                                    onChange={handleFieldChange('gender')}
+                                    value={formData.gender}
                                 />
 
                                 {/* House Number */}
                                 <TextField
                                     label="House Number"
-                                    value={houseNumber}
-                                    onChange={handleHouseNumberChange}
+                                    value={formData.houseNumber}
+                                    onChange={handleFieldChange('houseNumber')}
                                     autoComplete="off"
                                 />
                             </FormLayout.Group>
                             <FormLayout.Group>
 
-                                {/* House Number */}
+                                {/* Street Area */}
                                 <TextField
                                     label="Street Area"
-                                    value={streetArea}
-                                    onChange={handleStreetAreaChange}
+                                    value={formData.streetArea}
+                                    onChange={handleFieldChange('streetArea')}
                                     autoComplete="off"
                                 />
 
                                 {/* Landmark */}
                                 <TextField
                                     label="Landmark"
-                                    value={landmark}
-                                    onChange={handleLandmarkChange}
+                                    value={formData.landmark}
+                                    onChange={handleFieldChange('landmark')}
                                     autoComplete="off"
                                 />
 
                                 {/* Address */}
                                 <TextField
                                     label="Address"
-                                    value={address}
-                                    onChange={handleAddressChange}
+                                    value={formData.address}
+                                    onChange={handleFieldChange('address')}
                                     autoComplete="off"
                                 />
 
@@ -459,9 +400,9 @@ function AddConsultant() {
                                 {/* Pincode */}
                                 <TextField
                                     label="Pincode"
-                                    value={pincode}
+                                    value={formData.pincode}
                                     type="number"
-                                    onChange={handlePincodeChange}
+                                    onChange={handleFieldChange('pincode')}
                                     autoComplete="off"
                                 />
 
@@ -469,21 +410,45 @@ function AddConsultant() {
                                 <TextField
                                     label="Date of Birth"
                                     type="date"
-                                    value={dateOfBirth}
-                                    onChange={handleDateOfBirthChange}
+                                    value={formData.dateOfBirth}
+                                    onChange={handleFieldChange('dateOfBirth')}
                                     autoComplete="off"
                                 />
 
                                 {/* Pancard Number */}
                                 <TextField
                                     label="Pancard Number"
-                                    value={pancardNumber}
-                                    onChange={handlePancardNumberChange}
+                                    value={formData.pancardNumber}
+                                    onChange={handleFieldChange('pancardNumber')}
                                     autoComplete="off"
                                 />
 
                             </FormLayout.Group>
                         </FormLayout>
+                        <div style={{ marginTop: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                            <Button
+                                primary
+                                onClick={submitConsultantData}
+                                loading={isSubmitting}
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? 'Submitting...' : 'Submit'}
+                            </Button>
+                        </div>
+                        {submitError && (
+                            <div style={{ marginTop: '16px' }}>
+                                <Banner tone="critical" onDismiss={() => setSubmitError('')}>
+                                    <p>{submitError}</p>
+                                </Banner>
+                            </div>
+                        )}
+                        {submitSuccess && (
+                            <div style={{ marginTop: '16px' }}>
+                                <Banner tone="success" onDismiss={() => setSubmitSuccess(false)}>
+                                    <p>Consultant added successfully!</p>
+                                </Banner>
+                            </div>
+                        )}
                     </LegacyCard>
                 </Layout.Section>
 

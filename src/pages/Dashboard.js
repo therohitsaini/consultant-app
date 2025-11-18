@@ -1,12 +1,61 @@
 import { Layout, Banner, BlockStack, CalloutCard, Page, Grid, LegacyCard, Text, Box } from '@shopify/polaris';
 import { ConfettiIcon, ExternalIcon } from '@shopify/polaris-icons';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { animate } from 'framer-motion';
 import { SetupGuideNew } from '../components/dashboard/SetupGuide';
 import { AppStatus } from '../components/dashboard/AppStatus';
 import LanguageSelector from '../components/dashboard/LanguageSelecter';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUsers } from '../components/Redux/slices/UserSlices';
 import { fetchConsultants } from '../components/Redux/slices/ConsultantSlices';
+
+// Component to display animated count with motion
+function AnimatedCount({ value }) {
+    const targetValue = value || 0;
+    const [displayValue, setDisplayValue] = useState(targetValue);
+    const [isAnimating, setIsAnimating] = useState(false);
+    const prevValueRef = useRef(targetValue);
+
+    useEffect(() => {
+        if (value === undefined || value === null) {
+            setDisplayValue(0);
+            return;
+        }
+
+        const startValue = prevValueRef.current;
+        prevValueRef.current = value;
+
+        // Only animate if value changed
+        if (startValue !== value) {
+            setIsAnimating(true);
+            const controls = animate(startValue, value, {
+                duration: 1.5,
+                ease: [0.16, 1, 0.3, 1],
+                onUpdate: (latest) => {
+                    setDisplayValue(Math.round(latest));
+                },
+                onComplete: () => {
+                    setIsAnimating(false);
+                },
+            });
+
+            return () => controls.stop();
+        }
+    }, [value]);
+
+    return (
+        <span
+            key={value}
+            style={{
+                display: 'inline-block',
+                transform: isAnimating ? 'scale(1.1)' : 'scale(1)',
+                transition: 'transform 0.3s ease-out',
+            }}
+        >
+            {displayValue}
+        </span>
+    );
+}
 
 function Dashboard() {
     const [isBannerVisible, setIsBannerVisible] = useState(true);
@@ -47,6 +96,11 @@ function Dashboard() {
     const dispatch = useDispatch();
     const { users, loading } = useSelector((state) => state.users);
     const { consultants, loading: consultantLoading } = useSelector((state) => state.consultants);
+    
+    // Get target values
+    const userCount = users?.data?.length || 0;
+    const consultantCount = consultants?.findConsultant?.length || 0;
+    
     useEffect(() => {
         dispatch(fetchConsultants());
     }, [dispatch]);
@@ -110,7 +164,7 @@ function Dashboard() {
                                         </div>
                                         <div style={{ flex: 1 }}>
                                             <Text variant="headingLg" as="h2" fontWeight="bold">
-                                                {users.data?.length}
+                                                <AnimatedCount value={userCount} />
                                             </Text>
                                             <Text variant="bodyMd" as="p" tone="subdued">
                                                 Total Clients
@@ -168,7 +222,7 @@ function Dashboard() {
                                         </div>
                                         <div style={{ flex: 1 }}>
                                             <Text variant="headingLg" as="h2" fontWeight="bold">
-                                                {consultants.findConsultant?.length}
+                                                <AnimatedCount value={consultantCount} />
                                             </Text>
                                             <Text variant="bodyMd" as="p" tone="subdued">
                                                 Total Consultations
