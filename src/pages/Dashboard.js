@@ -2,6 +2,8 @@ import { Layout, Banner, BlockStack, CalloutCard, Page, Grid, LegacyCard, Text, 
 import { ConfettiIcon, ExternalIcon } from '@shopify/polaris-icons';
 import { useEffect, useState, useRef } from 'react';
 import { animate } from 'framer-motion';
+import { TitleBar } from '@shopify/app-bridge-react';
+import { useAppBridge } from '../components/createContext/AppBridgeContext';
 import { SetupGuideNew } from '../components/dashboard/SetupGuide';
 import { AppStatus } from '../components/dashboard/AppStatus';
 import LanguageSelector from '../components/dashboard/LanguageSelecter';
@@ -60,11 +62,16 @@ function AnimatedCount({ value }) {
 
 function Dashboard() {
     const [isBannerVisible, setIsBannerVisible] = useState(true);
-
+    
+    // App Bridge instance - Shopify frame ke saath kaam karne ke liye
+    const app = useAppBridge();
+    
+    // Get host from URL (for debugging)
     const params = new URLSearchParams(window.location.search);
-    console.log("params", params);
     const host = params.get("host");
-    console.log("host", host);
+    console.log("Dashboard - Host from URL:", host);
+    console.log("Dashboard - App Bridge instance:", app);
+
     // Duplicate list for infinite loop
     const loopedApps = [...apps, ...apps];
     const dispatch = useDispatch();
@@ -86,7 +93,12 @@ function Dashboard() {
     console.log(loading);
     
     return (
-        <Page
+        <>
+            {/* App Bridge TitleBar - Shopify frame mein title bar dikhane ke liye */}
+            {app && (
+                <TitleBar title="Dashboard" />
+            )}
+            <Page
                 title="Dashboard"
                 primaryAction={<LanguageSelector />}
                 secondaryActions={[
@@ -162,11 +174,12 @@ function Dashboard() {
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
-                                            fontSize: '24px'
+                                            fontSize: '24px',
+                                            // color: 'red'
                                         }}>
                                             📈
                                         </div>
-                                        <div style={{ flex: 1 }}>
+                                        <div style={{ flex: 1 , color: 'red'}}>
                                             <Text variant="headingLg" as="h2" fontWeight="bold">
                                                 0%
                                             </Text>
@@ -269,6 +282,7 @@ function Dashboard() {
 
             </Layout>
         </Page>
+        </>
     );
 }
 

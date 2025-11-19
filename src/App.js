@@ -1,4 +1,5 @@
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { AppBridgeProvider } from "./components/createContext/AppBridgeContext";
 import LayoutFrame from "./pages/LayoutFrame";
 import Dashboard from "./pages/Dashboard";
 import ConsultantList from "./pages/ConsultantList";
@@ -7,9 +8,8 @@ import Pricing from "./pages/Pricing";
 import Faq from "./pages/Faq";
 
 function App() {
-// const location= useLocation();
-
   return (
+    <AppBridgeProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LayoutFrame><Dashboard /></LayoutFrame>} />
@@ -20,6 +20,7 @@ function App() {
           <Route path="/faq" element={<LayoutFrame><Faq /></LayoutFrame>} />
         </Routes>
       </BrowserRouter>
+    </AppBridgeProvider>
   );
 }
 
