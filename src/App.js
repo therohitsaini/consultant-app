@@ -6,6 +6,7 @@ import ConsultantList from "./pages/ConsultantList";
 import AddConsultant from "./pages/AddConsultant";
 import Pricing from "./pages/Pricing";
 import Faq from "./pages/Faq";
+import AddConsultant2 from "./pages/AddConsultant2";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/dashboard" element={<LayoutFrame><Dashboard /></LayoutFrame>} />
           <Route path="/consultant-list" element={<LayoutFrame><ConsultantList /></LayoutFrame>} />
           <Route path="/add-consultant" element={<LayoutFrame><AddConsultant /></LayoutFrame>} />
+          <Route path="/add-consultant2" element={<LayoutFrame><AddConsultant2 /></LayoutFrame>} />
           <Route path="/pricing" element={<LayoutFrame><Pricing /></LayoutFrame>} />
           <Route path="/faq" element={<LayoutFrame><Faq /></LayoutFrame>} />
         </Routes>

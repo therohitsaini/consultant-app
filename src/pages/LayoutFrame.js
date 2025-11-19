@@ -226,6 +226,13 @@ function LayoutFrame({ children }) {
                         selected: location.pathname === '/faq',
                         onClick: () => handleNavigation('/faq'),
                     },
+                    {
+                        label: 'Add Consultant',
+                        icon: CashDollarIcon,
+                        url: '/add-consultant2',
+                        selected: location.pathname === '/add-consultant2',
+                        onClick: () => handleNavigation('/add-consultant2'),
+                    },
                 ]}
                 action={{
                     icon: ChatIcon,

@@ -7,7 +7,7 @@ export function UserAlert({ isUserAlertVisible, setIsUserAlertVisible, handleDel
     setIsUserAlertVisible(false);
   }
 
-  console.log("consultantId", consultantId);
+
 
   return (
     <Modal

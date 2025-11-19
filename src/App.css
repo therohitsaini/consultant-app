@@ -36,3 +36,6 @@
     transform: rotate(360deg);
   }
 }
+.Polaris-LegacyCard {
+  overflow: visible !important;
+}

@@ -30,7 +30,7 @@ function ConsultantList() {
 
     useEffect(() => {
         dispatch(fetchConsultants());
-    }, [dispatch]);
+    }, [dispatch, isRefreshed]);
 
     const consultantsData = consultants?.findConsultant || []
     const filteredConsultants = useMemo(() => {
@@ -101,7 +101,6 @@ function ConsultantList() {
     }, []);
 
 
-    /** Delete Consultant api */
     const handleDelete = async () => {
         try {
             const url = `http://localhost:5001/api-consultant/delete-consultant/${consultantId}`;
@@ -111,9 +110,7 @@ function ConsultantList() {
                     'Content-Type': 'application/json',
                 },
             });
-            console.log("response", response);
             if (response.ok) {
-                console.log("Consultant deleted successfully");
                 setActive(true);
                 setToastContent("Consultant deleted successfully");
                 setIsUserAlertVisible(false);
@@ -129,12 +126,10 @@ function ConsultantList() {
 
     // Render row function for consultants
     const renderConsultantRow = useCallback((consultant, index) => {
-        const { _id,
-            fullname, email, phone, contact, profession, experience,
-            fees, consultantStatus
+        const { _id, fullname, email, phone, contact, profession, experience, fees, consultantStatus
         } = consultant;
         const displayPhone = phone || contact;
-
+        console.log("consultant", consultant.profileImage);
         return (
 
             <IndexTable.Row onClick={() => handleConsultantClick(_id)} _id={_id} key={_id} position={index}>
@@ -144,11 +139,17 @@ function ConsultantList() {
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
+
                     <Thumbnail
 
-                        source={"../images/flag/teamdefault.png"}
+                        source={
+                            consultant?.profileImage
+                                ? `${consultant.profileImage.replace(/\\/g, "/")}`
+                                : "/images/flag/teamdefault.png"
+                        }
                         size="small"
                     />
+
                 </IndexTable.Cell>
                 <IndexTable.Cell>
                     <Text variant="bodyMd" as="span">
@@ -223,16 +224,8 @@ function ConsultantList() {
                 </IndexTable.Cell>
                 <IndexTable.Cell>
                     <ButtonGroup>
-                        <Button
-                            variant="tertiary"
-                            icon={EditIcon}
-                            accessibilityLabel="Edit consultant"
-                            onClick={(e) => {
-                                e.stopPropagation(); // Row click trigger avoid
-                                handleEdit(_id);
-                            }}
-                        />
 
+                        <Button variant="tertiary" url='/add-consultant' icon={EditIcon} accessibilityLabel="Edit consultant" />
                         <Button variant="tertiary" icon={DuplicateIcon} accessibilityLabel="Duplicate consultant" />
                         <Button variant="tertiary"
                             icon={DeleteIcon} tone="critical" accessibilityLabel="Delete consultant"
@@ -294,7 +287,6 @@ function ConsultantList() {
                         </Layout.Section>
                     )}
 
-
                     <Layout.Section>
                         <IndexTableList
                             itemStrings={itemStrings}
@@ -309,7 +301,6 @@ function ConsultantList() {
                             onSortChange={setSortValue}
                         />
                     </Layout.Section>
-
                 </Layout>
             </Page>
         </Fragment>
