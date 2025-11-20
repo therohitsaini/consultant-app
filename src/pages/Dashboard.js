@@ -149,11 +149,11 @@ function Dashboard() {
                                         }}>
                                             👥
                                         </div>
-                                        <div style={{ flex: 1 }}>
+                                        <div style={{ flex: 1 , color: 'red'}}>
                                             <Text variant="headingLg" as="h2" fontWeight="bold">
                                                 <AnimatedCount value={userCount} />
                                             </Text>
-                                            <Text variant="bodyMd" as="p" tone="subdued">
+                                            <Text variant="bodyMd" as="p" tone="subdued" style={{ }}>
                                                 Total Clients
                                             </Text>
                                         </div>

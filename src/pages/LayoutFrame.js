@@ -317,6 +317,15 @@ function LayoutFrame({ children }) {
 
     return (
         <div style={{ height: '500px' }}>
+            <ui-nav-menu>
+                <a href="/" rel="home">Home</a>
+                <a href="/dashboard">Dashboard</a>
+                <a href="/consultant-list">Consultant List</a>
+                <a href="/add-consultant">Add Consultant</a>
+                <a href="/add-consultant2">Add Consultant 2</a>
+                <a href="/pricing">Pricing</a>
+                <a href="/faq">Faq</a>
+            </ui-nav-menu>
             <Frame
                 logo={logo}
                 topBar={topBarMarkup}
