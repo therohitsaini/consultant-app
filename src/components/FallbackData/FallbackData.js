@@ -67,3 +67,12 @@ export const apps = [
         image: "./images/apps-img/app7.png",
     },
 ];
+
+
+export const availableTags = ['English', 'French', 'Hindi', 'Japanese', 'Russian', 'Shona', 'Sesotho', 'Spanish', 'Tajik'];
+
+export const genderOptions = [
+    { label: 'Male', value: 'male' },
+    { label: 'Female', value: 'female' },
+    { label: 'Other', value: 'other' },
+];

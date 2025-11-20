@@ -2,6 +2,7 @@ import { Banner, Layout, Page, BlockStack, LegacyCard, FormLayout, TextField, Ta
 import { ConfettiIcon, ExternalIcon } from '@shopify/polaris-icons';
 import { useState, useCallback, useRef } from 'react';
 import axios from 'axios';
+import { availableTags, genderOptions } from '../components/FallbackData/FallbackData';
 
 
 
@@ -40,7 +41,6 @@ function AddConsultant() {
         pancardNumber: '',
     });
     // Language tags
-    const availableTags = ['English', 'French', 'Hindi', 'Japanese', 'Russian', 'Shona', 'Sesotho', 'Spanish', 'Tajik'];
     const [textFieldValue, setTextFieldValue] = useState('');
     const [showDropdown, setShowDropdown] = useState(false);
 
@@ -166,11 +166,7 @@ function AddConsultant() {
 
 
 
-    const genderOptions = [
-        { label: 'Male', value: 'male' },
-        { label: 'Female', value: 'female' },
-        { label: 'Other', value: 'other' },
-    ];
+
 
 
     const handleFileButtonClick = useCallback(() => {
@@ -186,14 +182,10 @@ function AddConsultant() {
         if (profileFile) {
             form.append("profileImage", profileFile);
         }
-
-        // Add all form fields to FormData
         Object.keys(formData).forEach((key) => {
             const value = formData[key];
-            // Skip empty values and profileImage (already handled above)
             if (value !== '' && value !== null && value !== undefined && key !== 'profileImage') {
                 if (Array.isArray(value)) {
-                    // For arrays, stringify them
                     form.append(key, JSON.stringify(value));
                 } else {
                     form.append(key, value);
@@ -251,6 +243,9 @@ function AddConsultant() {
             setIsSubmitting(false);
         }
     }, [formData, profileFile]);
+
+
+    
 
 
     return (

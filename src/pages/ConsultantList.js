@@ -1,6 +1,7 @@
 import { Banner, Layout, Page, BlockStack, Grid, LegacyCard, Text, ButtonGroup, Button, Thumbnail } from '@shopify/polaris';
 import { ConfettiIcon, ExternalIcon, PlusIcon, EditIcon, DuplicateIcon, DeleteIcon } from '@shopify/polaris-icons';
 import { useEffect, useState, useCallback, useMemo, Fragment } from 'react';
+import { useNavigate } from 'react-router-dom';
 import IndexTableList from '../components/consultant-list/IndexTableList';
 import { IndexTable } from '@shopify/polaris';
 import { deleteConsultantById, fetchConsultants } from '../components/Redux/slices/ConsultantSlices';
@@ -8,11 +9,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { UserAlert } from '../components/AlertModel/UserAlert';
 import { headings, itemStrings, sortOptions } from '../components/FallbackData/FallbackData';
 import { Toast, ToastModel } from '../components/AlertModel/Tost';
+import axios from 'axios';
 
 
 
 
 function ConsultantList() {
+    const navigate = useNavigate();
     const [isBannerVisible, setIsBannerVisible] = useState(true);
     const [selectedTab, setSelectedTab] = useState(0);
     const [queryValue, setQueryValue] = useState('');
@@ -26,7 +29,7 @@ function ConsultantList() {
     const dispatch = useDispatch();
     const { consultants, loading: consultantLoading } = useSelector((state) => state.consultants);
 
-
+    console.log("consultants________", consultants);
 
     useEffect(() => {
         dispatch(fetchConsultants());
@@ -94,12 +97,34 @@ function ConsultantList() {
         console.log("consultant _id", _id);
     }, []);
 
-    // Handle edit button click
+    // Handle edit button click - navigate to add-consultant with ID
     const handleEdit = useCallback((_id) => {
+        navigate(`/add-consultant?id=${_id}`);
+    }, [navigate]);
+
+    // Handle delete confirmation
+    const handleDeleteClick = useCallback((_id) => {
         setConsultantId(_id);
         setIsUserAlertVisible(true);
     }, []);
 
+
+    const handleToggle = async (id) => {
+        try {
+            const response = await axios.put(`http://localhost:5001/api-consultant/api-consultant-update-status/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (response.ok) {
+                dispatch(fetchConsultants());
+                setIsRefreshed((prev) => !prev);
+            }
+        } catch (err) {
+            console.error("Failed to update");
+        }
+    };
 
     const handleDelete = async () => {
         try {
@@ -129,7 +154,7 @@ function ConsultantList() {
         const { _id, fullname, email, phone, contact, profession, experience, fees, consultantStatus
         } = consultant;
         const displayPhone = phone || contact;
-        console.log("consultant", consultant.profileImage);
+
         return (
 
             <IndexTable.Row onClick={() => handleConsultantClick(_id)} _id={_id} key={_id} position={index}>
@@ -169,6 +194,7 @@ function ConsultantList() {
                 </IndexTable.Cell>
                 <IndexTable.Cell>
                     <label
+                        onClick={() => handleToggle(_id)}
                         style={{
                             position: 'relative',
                             display: 'inline-block',
@@ -181,13 +207,11 @@ function ConsultantList() {
                             type="checkbox"
                             checked={consultantStatus}
                             onChange={() => {
-                                // Handle status toggle if needed
-                                setConsultantsIdSelected((prevConsultants) =>
-                                    prevConsultants.map((c) =>
-                                        c._id === _id ? { ...c, consultantStatus: !c.consultantStatus } : c
-                                    )
-                                );
+                                console.log("Clicked ID:", _id);
+
                             }}
+
+
                             style={{
                                 opacity: 0,
                                 width: 0,
@@ -224,21 +248,31 @@ function ConsultantList() {
                 </IndexTable.Cell>
                 <IndexTable.Cell>
                     <ButtonGroup>
-
-                        <Button variant="tertiary" url='/add-consultant' icon={EditIcon} accessibilityLabel="Edit consultant" />
-                        <Button variant="tertiary" icon={DuplicateIcon} accessibilityLabel="Duplicate consultant" />
-                        <Button variant="tertiary"
-                            icon={DeleteIcon} tone="critical" accessibilityLabel="Delete consultant"
+                        <Button
+                            variant="tertiary"
+                            icon={EditIcon}
+                            accessibilityLabel="Edit consultant"
                             onClick={(e) => {
                                 e.stopPropagation(); // Row click trigger avoid
                                 handleEdit(_id);
+                            }}
+                        />
+                        <Button variant="tertiary" icon={DuplicateIcon} accessibilityLabel="Duplicate consultant" />
+                        <Button
+                            variant="tertiary"
+                            icon={DeleteIcon}
+                            tone="critical"
+                            accessibilityLabel="Delete consultant"
+                            onClick={(e) => {
+                                e.stopPropagation(); // Row click trigger avoid
+                                handleDeleteClick(_id);
                             }}
                         />
                     </ButtonGroup>
                 </IndexTable.Cell>
             </IndexTable.Row>
         );
-    }, [handleConsultantClick, handleEdit, setConsultantsIdSelected, isRefreshed]);
+    }, [handleConsultantClick, handleEdit, handleDeleteClick, isRefreshed]);
 
 
 
