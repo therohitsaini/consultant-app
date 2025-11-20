@@ -13,8 +13,6 @@ function App() {
     <AppBridgeProvider>
       <BrowserRouter>
         <Routes>
-
-
             <Route path="/" element={<LayoutFrame><Dashboard /></LayoutFrame>} />
             <Route path="/dashboard" element={<LayoutFrame><Dashboard /></LayoutFrame>} />
             <Route path="/consultant-list" element={<LayoutFrame><ConsultantList /></LayoutFrame>} />

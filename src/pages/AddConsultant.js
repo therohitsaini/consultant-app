@@ -1,8 +1,9 @@
 import { Banner, Layout, Page, BlockStack, LegacyCard, FormLayout, TextField, Tag, DropZone, LegacyStack, Text, Select, Button, Spinner, Grid } from '@shopify/polaris';
 import { ConfettiIcon, ExternalIcon } from '@shopify/polaris-icons';
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { availableTags, genderOptions } from '../components/FallbackData/FallbackData';
+import { useSearchParams } from 'react-router-dom';
 
 
 
@@ -43,6 +44,12 @@ function AddConsultant() {
     // Language tags
     const [textFieldValue, setTextFieldValue] = useState('');
     const [showDropdown, setShowDropdown] = useState(false);
+
+    // Get consultant ID from URL query parameter
+    const [searchParams] = useSearchParams();
+    const consultantId = searchParams.get('id');
+    
+    console.log("consultantId from query params:", consultantId);
 
     const handleFieldChange = useCallback((fieldName) => {
         return (value) => {
@@ -165,10 +172,6 @@ function AddConsultant() {
     );
 
 
-
-
-
-
     const handleFileButtonClick = useCallback(() => {
         fileInputRef.current?.click();
     }, []);
@@ -244,9 +247,18 @@ function AddConsultant() {
         }
     }, [formData, profileFile]);
 
-
-    
-
+    const getConsultantById = async () => {
+        const response = await fetch(`http://localhost:5001/api-consultant/consultantid/${consultantId}`);
+        const {consultant} = await response.json();
+        console.log("responseData", consultant);
+        if(response.ok){
+           
+        }
+       
+    }
+    useEffect(() => {
+        getConsultantById();
+    }, []);
 
     return (
         <Page
@@ -323,7 +335,7 @@ function AddConsultant() {
                                     </Grid.Cell>
                                     {/* Profile Image */}
                                     <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-                                       
+
                                         <div style={{ width: 200, height: 'auto', margin: 'auto', }}>
                                             <input
                                                 ref={fileInputRef}
