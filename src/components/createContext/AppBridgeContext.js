@@ -26,6 +26,7 @@ export const AppBridgeProvider = ({ children }) => {
     return host;
   };
 
+
   const host = getHost();
   const apiKey = process.env.REACT_APP_SHOPIFY_API_KEY;
   console.log("apiKey",apiKey)
