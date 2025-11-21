@@ -16,13 +16,11 @@ function AddConsultant() {
     const [profileFile, setProfileFile] = useState(null);
     const [profileImageUrl, setProfileImageUrl] = useState(null);
     const [profileImagePreview, setProfileImagePreview] = useState(null);
-    const [consultantDetails, setConsnsultantDetails] = useState({
-        email: ""
-    })
-    const[updateIsTrue, setUpdateIsTrue] = useState(false);
+    const [consultantDetails, setConsultantDetails] = useState(null)
+    const [updateIsTrue, setUpdateIsTrue] = useState(false);
     const fileInputRef = useRef(null);
 
-    
+
 
     // Single state object for all form fields
     const [formData, setFormData] = useState({
@@ -50,7 +48,7 @@ function AddConsultant() {
     // Language tags
     const [textFieldValue, setTextFieldValue] = useState('');
     const [showDropdown, setShowDropdown] = useState(false);
-
+    console.log("formData,", formData)
     // Get consultant ID from URL query parameter
     const [searchParams] = useSearchParams();
     const consultantId = searchParams.get('id');
@@ -237,26 +235,90 @@ function AddConsultant() {
     }, [formData, profileFile]);
 
     const getConsultantById = async () => {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/consultantid/${consultantId}`);
-        const { consultant } = await response.json();
-        console.log("responseData", consultant);
-        if (response.ok) {
-            setConsnsultantDetails(consultant)
-        }
+        if (!consultantId) return;
 
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/consultantid/${consultantId}`);
+            const data = await response.json();
+            console.log("responseData", data);
+
+            if (response.ok && data.consultant) {
+                setConsultantDetails(data.consultant);
+            }
+        } catch (error) {
+            console.error('Error fetching consultant:', error);
+        }
     }
-    useEffect(() => {
-        getConsultantById();
-    }, []);
-
 
     useEffect(() => {
-        if (consultantDetails) {
-            // setFormData({
-            //     email: consultantDetails.email,
-            // });
+        if (consultantId) {
+            getConsultantById();
         }
+    }, [consultantId]);
 
+
+    useEffect(() => {
+        if (consultantDetails && consultantDetails.email) {
+            // Format dateOfBirth if it's a Date object or ISO string
+            let formattedDateOfBirth = '';
+            if (consultantDetails.dateOfBirth) {
+                const date = new Date(consultantDetails.dateOfBirth);
+                if (!isNaN(date.getTime())) {
+                    // Format as YYYY-MM-DD for input field
+                    formattedDateOfBirth = date.toISOString().split('T')[0];
+                } else {
+                    formattedDateOfBirth = consultantDetails.dateOfBirth;
+                }
+            }
+
+            // Populate formData when consultantDetails is loaded
+            setFormData({
+                fullName: consultantDetails.fullname || consultantDetails.fullName || '',
+                email: consultantDetails.email || '',
+                password: consultantDetails.password || '',
+                phoneNumber: consultantDetails.phone || consultantDetails.phoneNumber || consultantDetails.contact || '',
+                profession: consultantDetails.profession || '',
+                profileImage: consultantDetails.profileImage || '',
+                specialization: consultantDetails.specialization || '',
+                licenseIdNumber: consultantDetails.licenseNo || consultantDetails.licenseIdNumber || '',
+                yearOfExperience: consultantDetails.experience || consultantDetails.yearOfExperience || '',
+                chargingPerMinute: consultantDetails.fees || consultantDetails.chargingPerMinute || '',
+                languages: Array.isArray(consultantDetails.language)
+                    ? consultantDetails.language
+                    : Array.isArray(consultantDetails.languages)
+                        ? consultantDetails.languages
+                        : [],
+                displayName: consultantDetails.displayName || '',
+                gender: consultantDetails.gender || 'male',
+                houseNumber: consultantDetails.houseNumber || '',
+                streetArea: consultantDetails.streetArea || '',
+                landmark: consultantDetails.landmark || '',
+                address: consultantDetails.address || '',
+                pincode: consultantDetails.pincode || '',
+                dateOfBirth: formattedDateOfBirth,
+                pancardNumber: consultantDetails.pan_cardNumber || consultantDetails.pancardNumber || '',
+            });
+
+            // Set profile image preview if available
+            if (consultantDetails.profileImage) {
+                // Convert Windows path (backslashes) to forward slashes
+                let imagePath = consultantDetails.profileImage.replace(/\\/g, "/");
+                
+                // If path doesn't start with http, prepend backend host URL
+                if (!imagePath.startsWith('http')) {
+                    const backendHost = process.env.REACT_APP_BACKEND_HOST || 'http://localhost:5001';
+                    // Remove trailing slash from backend host if present
+                    const baseUrl = backendHost.replace(/\/$/, '');
+                    // Remove leading slash from image path if present
+                    imagePath = imagePath.replace(/^\//, '');
+                    imagePath = `${baseUrl}/${imagePath}`;
+                }
+                
+                console.log('Profile image URL:', imagePath);
+                setProfileImageUrl(imagePath);
+                setProfileImagePreview(imagePath);
+            }
+        }
     }, [consultantDetails])
 
     return (
