@@ -62,25 +62,27 @@ function AnimatedCount({ value }) {
 
 function Dashboard() {
     const [isBannerVisible, setIsBannerVisible] = useState(true);
-    
+
     const app = useAppBridge();
-    
+
     // Get host from URL (for debugging)
     const params = new URLSearchParams(window.location.search);
     const host = params.get("host");
+    const adminId = params.get("adminId");
+    console.log("adminId", adminId);
 
     useEffect(() => {
-        localStorage.setItem('doamin_V_id',"690c374f605cb8b946503ccb");
+        localStorage.setItem('doamin_V_id', "690c374f605cb8b946503ccb");
     }, []);
 
-    
+
 
     // Duplicate list for infinite loop
     const loopedApps = [...apps, ...apps];
     const dispatch = useDispatch();
     const { users, loading } = useSelector((state) => state.users);
     const { consultants, loading: consultantLoading } = useSelector((state) => state.consultants);
-    
+
     // Get target values
     const userCount = users?.data?.length || 0;
     const consultantCount = consultants?.findConsultant?.length || 0;
@@ -98,7 +100,7 @@ function Dashboard() {
     }, [dispatch]);
     console.log("consultants", consultants);
     console.log(loading);
-    
+
     return (
         <>
             {/* App Bridge TitleBar - Shopify frame mein title bar dikhane ke liye */}
@@ -117,178 +119,178 @@ function Dashboard() {
                 ]}
             >
 
-            <Layout>
+                <Layout>
 
-                { /* Banner */}
-                {isBannerVisible && (
+                    { /* Banner */}
+                    {isBannerVisible && (
+                        <Layout.Section>
+                            <Banner
+                                title="Welcome to Consultant Management System"
+                                tone="info"
+                                onDismiss={() => setIsBannerVisible(false)}
+                                icon={ConfettiIcon}
+                            >
+                                <BlockStack gap="200">
+                                    <p>Manage your consultants efficiently and track their performance.</p>
+                                    <p>Add new consultants, update their status, and monitor consultations.</p>
+                                </BlockStack>
+                            </Banner>
+                        </Layout.Section>
+                    )}
+
+                    { /* Stats Cards */}
                     <Layout.Section>
-                        <Banner
-                            title="Welcome to Consultant Management System"
-                            tone="info"
-                            onDismiss={() => setIsBannerVisible(false)}
-                            icon={ConfettiIcon}
-                        >
-                            <BlockStack gap="200">
-                                <p>Manage your consultants efficiently and track their performance.</p>
-                                <p>Add new consultants, update their status, and monitor consultations.</p>
-                            </BlockStack>
-                        </Banner>
+                        <Grid>
+                            <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 3, xl: 3 }}>
+                                <LegacyCard>
+                                    <Box padding="400">
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                            <div style={{
+                                                width: '48px',
+                                                height: '48px',
+                                                borderRadius: '50%',
+                                                backgroundColor: '#E3F2FD',
+                                                border: '2px solid #2196F3',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                fontSize: '24px'
+                                            }}>
+                                                👥
+                                            </div>
+                                            <div style={{ flex: 1, color: 'red' }}>
+                                                <Text variant="headingLg" as="h2" fontWeight="bold">
+                                                    <AnimatedCount value={userCount} />
+                                                </Text>
+                                                <Text variant="bodyMd" as="p" tone="subdued" style={{}}>
+                                                    Total Clients
+                                                </Text>
+                                            </div>
+                                        </div>
+                                    </Box>
+                                </LegacyCard>
+                            </Grid.Cell>
+                            <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 3, xl: 3 }}>
+                                <LegacyCard>
+                                    <Box padding="400">
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                            <div style={{
+                                                width: '48px',
+                                                height: '48px',
+                                                borderRadius: '50%',
+                                                backgroundColor: '#FFF3E0',
+                                                border: '2px solid #FF9800',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                fontSize: '24px',
+                                                // color: 'red'
+                                            }}>
+                                                📈
+                                            </div>
+                                            <div style={{ flex: 1, color: 'red' }}>
+                                                <Text variant="headingLg" as="h2" fontWeight="bold">
+                                                    0%
+                                                </Text>
+                                                <Text variant="bodyMd" as="p" tone="subdued">
+                                                    Conversion Rate
+                                                </Text>
+                                            </div>
+                                        </div>
+                                    </Box>
+                                </LegacyCard>
+                            </Grid.Cell>
+                            <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 3, xl: 3 }}>
+                                <LegacyCard>
+                                    <Box padding="400">
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                            <div style={{
+                                                width: '48px',
+                                                height: '48px',
+                                                borderRadius: '50%',
+                                                backgroundColor: '#F3E5F5',
+                                                border: '2px solid #9C27B0',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                fontSize: '24px'
+                                            }}>
+                                                💼
+                                            </div>
+                                            <div style={{ flex: 1 }}>
+                                                <Text variant="headingLg" as="h2" fontWeight="bold">
+                                                    <AnimatedCount value={consultantCount} />
+                                                </Text>
+                                                <Text variant="bodyMd" as="p" tone="subdued">
+                                                    Total Consultations
+                                                </Text>
+                                            </div>
+                                        </div>
+                                    </Box>
+                                </LegacyCard>
+                            </Grid.Cell>
+                            <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 3, xl: 3 }}>
+                                <LegacyCard>
+                                    <Box padding="400">
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                                            <div style={{
+                                                width: '48px',
+                                                height: '48px',
+                                                borderRadius: '50%',
+                                                backgroundColor: '#FFEBEE',
+                                                border: '2px solid #F44336',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                fontSize: '24px'
+                                            }}>
+                                                💰
+                                            </div>
+                                            <div style={{ flex: 1, color: 'green' }}>
+                                                <Text variant="headingLg" as="h2" fontWeight="bold">
+                                                    ₹0.00
+                                                </Text>
+                                                <Text variant="bodyMd" as="p" tone="subdued">
+                                                    Total Revenue
+                                                </Text>
+                                            </div>
+                                        </div>
+                                    </Box>
+                                </LegacyCard>
+                            </Grid.Cell>
+                        </Grid>
                     </Layout.Section>
-                )}
 
-                { /* Stats Cards */}
-                <Layout.Section>
-                    <Grid>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 3, xl: 3 }}>
-                            <LegacyCard>
-                                <Box padding="400">
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                        <div style={{
-                                            width: '48px',
-                                            height: '48px',
-                                            borderRadius: '50%',
-                                            backgroundColor: '#E3F2FD',
-                                            border: '2px solid #2196F3',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            fontSize: '24px'
-                                        }}>
-                                            👥
-                                        </div>
-                                        <div style={{ flex: 1 , color: 'red'}}>
-                                            <Text variant="headingLg" as="h2" fontWeight="bold">
-                                                <AnimatedCount value={userCount} />
-                                            </Text>
-                                            <Text variant="bodyMd" as="p" tone="subdued" style={{ }}>
-                                                Total Clients
-                                            </Text>
-                                        </div>
-                                    </div>
-                                </Box>
-                            </LegacyCard>
-                        </Grid.Cell>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 3, xl: 3 }}>
-                            <LegacyCard>
-                                <Box padding="400">
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                        <div style={{
-                                            width: '48px',
-                                            height: '48px',
-                                            borderRadius: '50%',
-                                            backgroundColor: '#FFF3E0',
-                                            border: '2px solid #FF9800',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            fontSize: '24px',
-                                            // color: 'red'
-                                        }}>
-                                            📈
-                                        </div>
-                                        <div style={{ flex: 1 , color: 'red'}}>
-                                            <Text variant="headingLg" as="h2" fontWeight="bold">
-                                                0%
-                                            </Text>
-                                            <Text variant="bodyMd" as="p" tone="subdued">
-                                                Conversion Rate
-                                            </Text>
-                                        </div>
-                                    </div>
-                                </Box>
-                            </LegacyCard>
-                        </Grid.Cell>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 3, xl: 3 }}>
-                            <LegacyCard>
-                                <Box padding="400">
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                        <div style={{
-                                            width: '48px',
-                                            height: '48px',
-                                            borderRadius: '50%',
-                                            backgroundColor: '#F3E5F5',
-                                            border: '2px solid #9C27B0',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            fontSize: '24px'
-                                        }}>
-                                            💼
-                                        </div>
-                                        <div style={{ flex: 1 }}>
-                                            <Text variant="headingLg" as="h2" fontWeight="bold">
-                                                <AnimatedCount value={consultantCount} />
-                                            </Text>
-                                            <Text variant="bodyMd" as="p" tone="subdued">
-                                                Total Consultations
-                                            </Text>
-                                        </div>
-                                    </div>
-                                </Box>
-                            </LegacyCard>
-                        </Grid.Cell>
-                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 3, xl: 3 }}>
-                            <LegacyCard>
-                                <Box padding="400">
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                        <div style={{
-                                            width: '48px',
-                                            height: '48px',
-                                            borderRadius: '50%',
-                                            backgroundColor: '#FFEBEE',
-                                            border: '2px solid #F44336',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            fontSize: '24px'
-                                        }}>
-                                            💰
-                                        </div>
-                                        <div style={{ flex: 1, color: 'green'}}>
-                                            <Text variant="headingLg" as="h2" fontWeight="bold">
-                                                ₹0.00
-                                            </Text>
-                                            <Text variant="bodyMd" as="p" tone="subdued">
-                                                Total Revenue
-                                            </Text>
-                                        </div>
-                                    </div>
-                                </Box>
-                            </LegacyCard>
-                        </Grid.Cell>
-                    </Grid>
-                </Layout.Section>
+                    { /* App Status */}
+                    <Layout.Section>
+                        <AppStatus />
+                    </Layout.Section>
 
-                { /* App Status */}
-                <Layout.Section>
-                    <AppStatus />
-                </Layout.Section>
+                    { /* Setup Guide */}
+                    <Layout.Section>
+                        <SetupGuideNew />
+                    </Layout.Section>
 
-                { /* Setup Guide */}
-                <Layout.Section>
-                    <SetupGuideNew />
-                </Layout.Section>
-
-                { /* CalloutCard */}
-                <Layout.Section>
-                    <CalloutCard
-                        title="Manage Your Consultants Effectively"
-                        illustration="/jqv_intro.png"
-                        primaryAction={{
-                            content: 'View All Consultants',
-                            url: '/consultant-list',
-                        }}
-                    >
-                        <p>
-                            Access your consultant list to view, edit, and manage all your consultants.
-                            Track their availability, status, and consultation history in one place.
-                        </p>
-                    </CalloutCard>
-                </Layout.Section>
+                    { /* CalloutCard */}
+                    <Layout.Section>
+                        <CalloutCard
+                            title="Manage Your Consultants Effectively"
+                            illustration="/jqv_intro.png"
+                            primaryAction={{
+                                content: 'View All Consultants',
+                                url: '/consultant-list',
+                            }}
+                        >
+                            <p>
+                                Access your consultant list to view, edit, and manage all your consultants.
+                                Track their availability, status, and consultation history in one place.
+                            </p>
+                        </CalloutCard>
+                    </Layout.Section>
 
 
-            </Layout>
-        </Page>
+                </Layout>
+            </Page>
         </>
     );
 }
