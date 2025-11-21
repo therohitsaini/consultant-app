@@ -16,6 +16,9 @@ function AddConsultant() {
     const [profileFile, setProfileFile] = useState(null);
     const [profileImageUrl, setProfileImageUrl] = useState(null);
     const [profileImagePreview, setProfileImagePreview] = useState(null);
+    const [consultantDetails, setConsnsultantDetails] = useState({
+        email: ""
+    })
     const fileInputRef = useRef(null);
 
     // Single state object for all form fields
@@ -48,8 +51,8 @@ function AddConsultant() {
     // Get consultant ID from URL query parameter
     const [searchParams] = useSearchParams();
     const consultantId = searchParams.get('id');
-    
-    console.log("consultantId from query params:", consultantId);
+
+    console.log("consultantDetails", consultantDetails)
 
     const handleFieldChange = useCallback((fieldName) => {
         return (value) => {
@@ -210,28 +213,6 @@ function AddConsultant() {
             if (response.ok) {
                 setSubmitSuccess(true);
                 setTextFieldValue('');
-                // setFormData({
-                //     fullName: '',
-                //     email: '',
-                //     password: '',
-                //     phoneNumber: '',
-                //     profession: '',
-                //     profileImage: '',
-                //     specialization: '',
-                //     licenseIdNumber: '',
-                //     yearOfExperience: '',
-                //     chargingPerMinute: '',
-                //     languages: [],
-                //     displayName: '',
-                //     gender: 'male',
-                //     houseNumber: '',
-                //     streetArea: '',
-                //     landmark: '',
-                //     address: '',
-                //     pincode: '',
-                //     dateOfBirth: '',
-                //     pancardNumber: '',
-                // });
                 setProfileFile(null);
                 setProfileImageUrl(null);
             } else {
@@ -248,17 +229,27 @@ function AddConsultant() {
     }, [formData, profileFile]);
 
     const getConsultantById = async () => {
-        const response = await fetch(`http://localhost:5001/api-consultant/consultantid/${consultantId}`);
-        const {consultant} = await response.json();
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/consultantid/${consultantId}`);
+        const { consultant } = await response.json();
         console.log("responseData", consultant);
-        if(response.ok){
-           
+        if (response.ok) {
+            setConsnsultantDetails(consultant)
         }
-       
+
     }
     useEffect(() => {
         getConsultantById();
     }, []);
+
+
+    useEffect(() => {
+        if (consultantDetails) {
+            // setFormData({
+            //     email: consultantDetails.email,
+            // });
+        }
+
+    }, [consultantDetails])
 
     return (
         <Page

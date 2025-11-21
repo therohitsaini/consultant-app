@@ -28,6 +28,7 @@ export const AppBridgeProvider = ({ children }) => {
 
   const host = getHost();
   const apiKey = process.env.REACT_APP_SHOPIFY_API_KEY;
+  console.log("apiKey",apiKey)
 
   // Create App Bridge instance
   const app = useMemo(() => {

@@ -2,13 +2,15 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 // API call using createAsyncThunk
+
+
 export const fetchConsultants = createAsyncThunk("consultants/fetch", async () => {
-    const response = await axios.get("http://localhost:5001/api-consultant/api-find-consultant");
+    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/api-find-consultant`);
     return response.data;
 });
 
 export const deleteConsultantById = createAsyncThunk("consultants/delete", async (id) => {
-    const response = await axios.delete(`http://localhost:5001/api-consultant/delete-consultant/${id}`);
+    const response = await axios.delete(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/delete-consultant/${id}`);
     return response.data;
 });
 

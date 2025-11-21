@@ -29,7 +29,6 @@ function ConsultantList() {
     const dispatch = useDispatch();
     const { consultants, loading: consultantLoading } = useSelector((state) => state.consultants);
 
-    console.log("consultants________", consultants);
 
     useEffect(() => {
         dispatch(fetchConsultants());
@@ -111,13 +110,15 @@ function ConsultantList() {
 
     const handleToggle = async (id) => {
         try {
-            const response = await axios.put(`http://localhost:5001/api-consultant/api-consultant-update-status/${id}`, {
+            const response = await axios.put(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/api-consultant-update-status/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
-            if (response.ok) {
+            console.log("___", response.status)
+            if (response.status === 200) {
+                console.log("active is on ")
                 dispatch(fetchConsultants());
                 setIsRefreshed((prev) => !prev);
             }
@@ -128,7 +129,7 @@ function ConsultantList() {
 
     const handleDelete = async () => {
         try {
-            const url = `http://localhost:5001/api-consultant/delete-consultant/${consultantId}`;
+            const url = `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/delete-consultant/${consultantId}`;
             const response = await fetch(url, {
                 method: 'DELETE',
                 headers: {
@@ -157,7 +158,7 @@ function ConsultantList() {
 
         return (
 
-            <IndexTable.Row onClick={() => handleConsultantClick(_id)} _id={_id} key={_id} position={index}>
+            <IndexTable.Row _id={_id} key={_id} position={index}>
                 <IndexTable.Cell>
                     <Text as="span" alignment="start" variant="bodyMd" fontWeight="bold" numeric>
                         {index + 1}
