@@ -7,44 +7,42 @@ function AppNavigation() {
   const location = useLocation();
   const app = useAppBridge();
 
-  // Define your navigation items here
-  // Update these paths to match your React Router routes
-  const navigationItems = [
-    {
-      label: 'Dashboard',
-      destination: '/dashboard',
-    },
-    {
-      label: 'Consultant List',
-      destination: '/consultant-list',
-    },
-    {
-      label: 'Add Consultant',
-      destination: '/add-consultant',
-    },
-    {
-      label: 'Pricing',
-      destination: '/pricing',
-    },
-    {
-      label: 'FAQ',
-      destination: '/faq',
-    },
-  ];
-
   // Debug logging
   useEffect(() => {
     console.log('AppNavigation - App Bridge instance:', app);
-    console.log('AppNavigation - Navigation items:', navigationItems);
     console.log('AppNavigation - Current location:', location.pathname);
+    console.log('AppNavigation - Navigation items:', navigationItems);
+    
+    // Check if NavMenu element exists in DOM
+    setTimeout(() => {
+      const navMenuElement = document.querySelector('ui-nav-menu');
+      console.log('AppNavigation - NavMenu DOM element:', navMenuElement);
+      if (navMenuElement) {
+        console.log('AppNavigation - NavMenu children:', navMenuElement.children);
+      } else {
+        console.warn('AppNavigation - NavMenu element not found in DOM');
+      }
+    }, 1000);
   }, [app, location.pathname]);
 
-  // Always render NavMenu - it will only work when App Bridge is initialized
-  // Shopify will handle the rendering in the admin sidebar
+  // NavMenu component - Shopify will handle rendering in admin sidebar
+  // Using both navigationLinks prop and children for maximum compatibility
+  const navigationItems = [
+    { label: 'Dashboard', destination: '/dashboard' },
+    { label: 'Consultant List', destination: '/consultant-list' },
+    { label: 'Add Consultant', destination: '/add-consultant' },
+    { label: 'Pricing', destination: '/pricing' },
+    { label: 'FAQ', destination: '/faq' },
+  ];
+
   return (
-    <NavMenu
-      navigationLinks={navigationItems}
-    />
+    <NavMenu navigationLinks={navigationItems}>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/consultant-list">Consultant List</a>
+      <a href="/add-consultant">Add Consultant</a>
+      <a href="/pricing">Pricing</a>
+      <a href="/faq">FAQ</a>
+    </NavMenu>
   );
 }
 
