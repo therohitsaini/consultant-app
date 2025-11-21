@@ -1,11 +1,8 @@
 module.exports = {
     plugins: {
       autoprefixer: {},
-      'postcss-preset-env': {
-        features: {
-          'calc': false,
-        },
-      },
+      // Remove postcss-preset-env to avoid calc processing errors
+      // It was causing issues with Shopify Polaris CSS
     },
   };
   
