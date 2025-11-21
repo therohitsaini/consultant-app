@@ -4,10 +4,27 @@ import axios from "axios";
 // API call using createAsyncThunk
 
 
-export const fetchConsultants = createAsyncThunk("consultants/fetch", async () => {
-    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/api-find-consultant`);
-    return response.data;
-});
+export const fetchConsultants = createAsyncThunk(
+    "consultants/fetch",
+    async () => {
+        const response = await axios.get(
+            `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/api-find-consultant`,
+            {
+                headers: {
+                    "Cache-Control": "no-cache",
+                    "Pragma": "no-cache",
+                    "Expires": "0",
+                },
+                params: {
+                    _t: Date.now(), // extra cache-buster
+                },
+            }
+        );
+
+        return response.data;
+    }
+);
+
 
 export const deleteConsultantById = createAsyncThunk("consultants/delete", async (id) => {
     const response = await axios.delete(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/delete-consultant/${id}`);

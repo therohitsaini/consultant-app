@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AppBridgeProvider } from "./components/createContext/AppBridgeContext";
+import { NavMenu } from "@shopify/app-bridge-react";
 import LayoutFrame from "./pages/LayoutFrame";
 import Dashboard from "./pages/Dashboard";
 import ConsultantList from "./pages/ConsultantList";
@@ -11,6 +12,31 @@ import AddConsultant2 from "./pages/AddConsultant2";
 function App() {
   return (
     <AppBridgeProvider>
+      {/* NavMenu adds menu items to Shopify admin sidebar */}
+      <NavMenu
+        navigationLinks={[
+          {
+            label: "Dashboard",
+            destination: "/dashboard",
+          },
+          {
+            label: "Consultant List",
+            destination: "/consultant-list",
+          },
+          {
+            label: "Add Consultant",
+            destination: "/add-consultant",
+          },
+          {
+            label: "Pricing",
+            destination: "/pricing",
+          },
+          {
+            label: "FAQ",
+            destination: "/faq",
+          },
+        ]}
+      />
       <BrowserRouter>
         <Routes>
             <Route path="/" element={<LayoutFrame><Dashboard /></LayoutFrame>} />

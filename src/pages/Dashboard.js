@@ -63,14 +63,17 @@ function AnimatedCount({ value }) {
 function Dashboard() {
     const [isBannerVisible, setIsBannerVisible] = useState(true);
     
-    // App Bridge instance - Shopify frame ke saath kaam karne ke liye
     const app = useAppBridge();
     
     // Get host from URL (for debugging)
     const params = new URLSearchParams(window.location.search);
     const host = params.get("host");
-    console.log("Dashboard - Host from URL:", host);
-    console.log("Dashboard - App Bridge instance:", app);
+
+    useEffect(() => {
+        localStorage.setItem('doamin_V_id',"690c374f605cb8b946503ccb");
+    }, []);
+
+    
 
     // Duplicate list for infinite loop
     const loopedApps = [...apps, ...apps];
@@ -81,7 +84,11 @@ function Dashboard() {
     // Get target values
     const userCount = users?.data?.length || 0;
     const consultantCount = consultants?.findConsultant?.length || 0;
-    
+    console.log("Dashboard - Host from URL:", host);
+    console.log("Dashboard - App Bridge instance:", app);
+
+
+
     useEffect(() => {
         dispatch(fetchConsultants());
     }, [dispatch]);

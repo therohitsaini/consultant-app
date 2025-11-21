@@ -19,7 +19,10 @@ function AddConsultant() {
     const [consultantDetails, setConsnsultantDetails] = useState({
         email: ""
     })
+    const[updateIsTrue, setUpdateIsTrue] = useState(false);
     const fileInputRef = useRef(null);
+
+    
 
     // Single state object for all form fields
     const [formData, setFormData] = useState({
@@ -52,6 +55,11 @@ function AddConsultant() {
     const [searchParams] = useSearchParams();
     const consultantId = searchParams.get('id');
 
+    useEffect(() => {
+        if (consultantId) {
+            setUpdateIsTrue(true);
+        }
+    }, [consultantId]);
     console.log("consultantDetails", consultantDetails)
 
     const handleFieldChange = useCallback((fieldName) => {
@@ -204,7 +212,7 @@ function AddConsultant() {
         }
 
         try {
-            const response = await fetch(`http://localhost:5001/api-consultant/add-consultant`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/add-consultant`, {
                 method: 'POST',
                 body: form,
             });
@@ -254,7 +262,7 @@ function AddConsultant() {
     return (
         <Page
             backAction={{ content: 'Consultant List', url: '/consultant-list' }}
-            title="Add Consultant settings"
+            title={updateIsTrue ? 'Update Consultant settings' : 'Add Consultant settings'}
             secondaryActions={[
                 {
                     content: 'Publish App',
@@ -269,7 +277,7 @@ function AddConsultant() {
                 {isBannerVisible && (
                     <Layout.Section>
                         <Banner
-                            title="Hi om suman. Welcome To: Your Shopify Store"
+                            title="Hi Admin. Welcome To: Your Shopify Store"
                             tone="info"
                             onDismiss={() => setIsBannerVisible(false)}
                             icon={ConfettiIcon}
