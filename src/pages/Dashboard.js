@@ -244,7 +244,7 @@ function Dashboard() {
                                         }}>
                                             💰
                                         </div>
-                                        <div style={{ flex: 1 }}>
+                                        <div style={{ flex: 1, color: 'green'}}>
                                             <Text variant="headingLg" as="h2" fontWeight="bold">
                                                 ₹0.00
                                             </Text>
