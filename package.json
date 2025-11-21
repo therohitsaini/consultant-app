@@ -6,7 +6,7 @@
     "@reduxjs/toolkit": "^2.10.1",
     "@shopify/app-bridge": "^3.7.10",
     "@shopify/app-bridge-react": "^4.2.7",
-    "@shopify/polaris": "^13.9.5",
+    "@shopify/polaris": "^12.27.0",
     "@shopify/react-i18n": "^7.14.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
