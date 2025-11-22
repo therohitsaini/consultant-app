@@ -3,7 +3,7 @@ import { ConfettiIcon, ExternalIcon } from '@shopify/polaris-icons';
 import { useEffect, useState, useRef } from 'react';
 import { animate } from 'framer-motion';
 import { TitleBar } from '@shopify/app-bridge-react';
-import { useAppBridge as useAppBridgeContext } from '../components/createContext/AppBridgeContext';
+import { useAppBridge } from '../components/createContext/AppBridgeContext';
 import { SetupGuideNew } from '../components/dashboard/SetupGuide';
 import { AppStatus } from '../components/dashboard/AppStatus';
 import LanguageSelector from '../components/dashboard/LanguageSelecter';
@@ -63,8 +63,8 @@ function AnimatedCount({ value }) {
 function Dashboard() {
     const [isBannerVisible, setIsBannerVisible] = useState(true);
 
-    // Use custom hook that works on both localhost and Shopify admin
-    const app = useAppBridgeContext();
+    // Use official App Bridge hook from @shopify/app-bridge-react
+    const app = useAppBridge();
 
     // Get host from URL (for debugging)
     const params = new URLSearchParams(window.location.search);

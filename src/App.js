@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { AppBridgeProvider } from "./components/createContext/AppBridgeContext";
+import AppBridgeProvider from "./components/createContext/AppBridgeProvider";
 import LayoutFrame from "./pages/LayoutFrame";
 import Dashboard from "./pages/Dashboard";
 import ConsultantList from "./pages/ConsultantList";

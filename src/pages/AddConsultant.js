@@ -303,7 +303,7 @@ function AddConsultant() {
             if (consultantDetails.profileImage) {
                 // Convert Windows path (backslashes) to forward slashes
                 let imagePath = consultantDetails.profileImage.replace(/\\/g, "/");
-                
+
                 // If path doesn't start with http, prepend backend host URL
                 if (!imagePath.startsWith('http')) {
                     const backendHost = process.env.REACT_APP_BACKEND_HOST || 'http://localhost:5001';
@@ -313,7 +313,7 @@ function AddConsultant() {
                     imagePath = imagePath.replace(/^\//, '');
                     imagePath = `${baseUrl}/${imagePath}`;
                 }
-                
+
                 console.log('Profile image URL:', imagePath);
                 setProfileImageUrl(imagePath);
                 setProfileImagePreview(imagePath);
