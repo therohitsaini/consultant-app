@@ -226,7 +226,7 @@ function ConsultantList() {
                                 left: 0,
                                 right: 0,
                                 bottom: 0,
-                                backgroundColor: consultantStatus ? 'var(--p-color-bg-fill-brand)' : 'var(--p-color-bg-fill-selected)',
+                                // backgroundColor: consultantStatus ? 'var(--p-color-bg-fill-brand)' : 'var(--p-color-bg-fill-selected)',
                                 borderRadius: '11px',
                                 transition: 'background-color 0.2s ease',
                             }}
