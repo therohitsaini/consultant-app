@@ -30,10 +30,8 @@ export const headings = [
 ];
 
 export const itemStrings = [
-    'All',
-    'chat',
-    'voice call',
-    'video call',
+
+   
 ];
 
 
