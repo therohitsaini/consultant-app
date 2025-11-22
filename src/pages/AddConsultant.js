@@ -210,7 +210,7 @@ function AddConsultant() {
         }
 
         try {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/add-consultant`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/add-consultant/${"690c374f605cb8b946503ccb"}`, {
                 method: 'POST',
                 body: form,
             });

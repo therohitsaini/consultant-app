@@ -8,7 +8,7 @@ export const fetchConsultants = createAsyncThunk(
     "consultants/fetch",
     async () => {
         const response = await axios.get(
-            `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/api-find-consultant`,
+            `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/api-find-consultant/${"690c374f605cb8b946503ccb"}`,
             {
                 headers: {
                     "Cache-Control": "no-cache",
