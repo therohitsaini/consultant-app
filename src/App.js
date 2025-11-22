@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import AppBridgeProvider from "./components/createContext/AppBridgeProvider";
+import AppNavigation from "./components/AppNavigation";
 import LayoutFrame from "./pages/LayoutFrame";
 import Dashboard from "./pages/Dashboard";
 import ConsultantList from "./pages/ConsultantList";
@@ -13,6 +14,8 @@ function App() {
   return (
     <AppBridgeProvider>
       <BrowserRouter>
+        {/* NavMenu MUST be at App level, outside Routes, for Shopify admin to detect */}
+        <AppNavigation />
         <Routes>
             <Route path="/" element={<LayoutFrame><Dashboard /></LayoutFrame>} />
             <Route path="/dashboard" element={<LayoutFrame><Dashboard /></LayoutFrame>} />

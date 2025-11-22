@@ -28,15 +28,12 @@ import {
 } from '@shopify/polaris-icons';
 import { useState, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { NavMenu } from '@shopify/app-bridge-react';
-import { useAppBridge } from '../components/createContext/AppBridgeContext';
 import Dashboard from './Dashboard';
 import Footer from './Footer';
 
 function LayoutFrame({ children }) {
     const navigate = useNavigate();
     const location = useLocation();
-    const app = useAppBridge(); // Get App Bridge instance
     const defaultState = useRef({
         emailFieldValue: 'dharma@jadedpixel.com',
         nameFieldValue: 'Jaded Pixel',
@@ -187,14 +184,6 @@ function LayoutFrame({ children }) {
         navigate(path);
     }, [navigate]);
 
-    // Handle NavMenu clicks to use React Router (SPA) and avoid full reload
-    const handleMenuClick = useCallback((e, href) => {
-        e.preventDefault();
-        if (href !== location.pathname) {
-            navigate(href);
-        }
-    }, [navigate, location.pathname]);
-
     const navigationMarkup = (
         <Navigation location={location.pathname}>
             <Navigation.Section
@@ -328,36 +317,21 @@ function LayoutFrame({ children }) {
 
     return (
         <div style={{ height: '500px' }}>
-            <Frame
-                logo={logo}
-                topBar={topBarMarkup}
-                navigation={navigationMarkup}
-                showMobileNavigation={mobileNavigationActive}
-                onNavigationDismiss={toggleMobileNavigationActive}
-                skipToContentTarget={skipToContentRef}
-            >
-                {/* App Bridge NavMenu - only render when app is embedded in Shopify admin */}
-                {app && (
-                    <NavMenu>
-                        {/* first child: rel="home" required, not shown as link */}
-                        <a href="/" rel="home" onClick={(e) => handleMenuClick(e, "/")}>Home</a>
-                        
-                        {/* other links must be <a href="...">. Intercept clicks */}
-                        <a href="/dashboard" onClick={(e) => handleMenuClick(e, "/dashboard")}>Dashboard</a>
-                        <a href="/consultant-list" onClick={(e) => handleMenuClick(e, "/consultant-list")}>Consultant List</a>
-                        <a href="/add-consultant" onClick={(e) => handleMenuClick(e, "/add-consultant")}>Add Consultant</a>
-                        <a href="/pricing" onClick={(e) => handleMenuClick(e, "/pricing")}>Pricing</a>
-                        <a href="/faq" onClick={(e) => handleMenuClick(e, "/faq")}>Faq</a>
-                    </NavMenu>
-                )}
-
-                {contextualSaveBarMarkup}
-                {loadingMarkup}
-                {pageMarkup}
-                {toastMarkup}
-                {modalMarkup}
-            </Frame>
-        </div>
+                <Frame
+                    logo={logo}
+                    topBar={topBarMarkup}
+                    navigation={navigationMarkup}
+                    showMobileNavigation={mobileNavigationActive}
+                    onNavigationDismiss={toggleMobileNavigationActive}
+                    skipToContentTarget={skipToContentRef}
+                >
+                    {contextualSaveBarMarkup}
+                    {loadingMarkup}
+                    {pageMarkup}
+                    {toastMarkup}
+                    {modalMarkup}
+                </Frame>
+            </div>
     );
 }
 

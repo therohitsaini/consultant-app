@@ -39,6 +39,9 @@ export default function AppBridgeProvider({ children }) {
         window.shopify = {};
       }
       window.shopify.app = app;
+      console.log('✅ App Bridge app instance set globally for NavMenu');
+    } else {
+      console.warn('⚠️ App Bridge app instance is null - NavMenu may not work');
     }
   }, [app]);
 
