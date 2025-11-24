@@ -6,7 +6,7 @@ import axios from "axios";
 
 export const fetchConsultants = createAsyncThunk(
     "consultants/fetch",
-    async () => {
+    async (shop_id) => {
         const response = await axios.get(
             `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/api-find-consultant/${"690c374f605cb8b946503ccb"}`,
             {

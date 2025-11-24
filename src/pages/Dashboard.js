@@ -151,7 +151,7 @@ function Dashboard() {
                                                 height: '48px',
                                                 borderRadius: '50%',
                                                 backgroundColor: '#E3F2FD',
-                                                border: '2px solid #2196F3',
+                                                border: '2px solid rgb(185, 14, 71)',
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
