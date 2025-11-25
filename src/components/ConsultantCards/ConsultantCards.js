@@ -9,14 +9,15 @@ function ConsultantCards() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { consultants, loading } = useSelector((state) => state.consultants);
+    const params = new URLSearchParams(window.location.search);
+    const consultantId = params.get('customerId');
+    console.log("consultantId_______", consultantId);
     useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const consultantId = params.get('customerId');
-        console.log("consultantId", consultantId);
-    }, []);
-    const [searchParams] = useSearchParams();
-    const consultantId = searchParams.get('consultantId');
-    console.log("consultantId", consultantId);
+        const client_id = localStorage.getItem('client_u_Identity', consultantId);
+    }, [consultantId]);
+    // const [searchParams] = useSearchParams();
+    // const consultantId = searchParams.get('consultantId');
+    // console.log("consultantId", consultantId);
 
     const shop_id = "690c374f605cb8b946503ccb"
 
@@ -28,7 +29,7 @@ function ConsultantCards() {
 
     // Get consultants array from API response (handle both direct array and findConsultant structure)
     const consultantsList = consultants?.findConsultant || consultants || [];
-    
+
     // Map API data to component format
     const mappedConsultants = consultantsList.map((consultant) => {
         // Parse language array (it's stored as stringified array)
@@ -209,123 +210,132 @@ function ConsultantCards() {
                         <p>No consultants found.</p>
                     </div>
                 ) : (
-                    mappedConsultants.map((consultant) => (
-                    <div key={consultant.id} className="col-lg-4 col-md-6 col-sm-12">
-                        <div
-                            className="card shadow-sm border-0 consultant-card"
-                            onClick={() => navigate(`/view-profile`)}
-                            style={{ cursor: 'pointer' }}
-                        >
-                            <div className="card-body p-4">
-                                {/* Profile Section */}
-                                <div className="flex align-items-start mb-3">
-                                    {/* Profile Image */}
-                                    <div className="me-3 position-relative flex-shrink-0">
-                                        <img
-                                            src={consultant.image || '/images/flag/teamdefault.png'}
-                                            alt={consultant.name}
-                                            className="rounded-circle profile-image"
-                                            onError={(e) => {
-                                                e.target.src = '/images/flag/teamdefault.png';
-                                            }}
-                                        />
-                                        {consultant.isActive && (
-                                            <span className="active-status-dot"></span>
-                                        )}
-                                    </div>
+                    mappedConsultants.map((consultant) => {
+                        const shop_id = "690c374f605cb8b946503ccb";
+                        const consultant_id = consultant.id;
 
-                                    {/* Name and Details */}
-                                    <div className="flex-grow-1">
-                                        <div className="flex align-items-center gap-2 mb-2">
-                                            <h5 className="card-title mb-0 fw-bold consultant-name">
-                                                {consultant.name}
-                                            </h5>
-                                            <span className="experience-badge">
-                                                {consultant.experience}+ Years of Experience
-                                            </span>
-                                        </div>
-                                        <p className="mb-2 consultant-profession">
-                                            {consultant.profession}
-                                        </p>
-                                        <div className="flex align-items-center gap-2 flex-wrap">
-                                            <div className="rating-stars">
-                                                {renderStars(consultant.rating)}
+                        return (
+                            <div key={consultant.id} className="col-lg-4 col-md-6 col-sm-12">
+                                <div
+                                    className="card shadow-sm border-0 consultant-card"
+                                    onClick={() => navigate(`/view-profile/${shop_id}/${consultant_id}`)}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <div className="card-body p-4">
+                                        {/* Profile Section */}
+                                        <div className="flex align-items-start mb-3">
+                                            {/* Profile Image */}
+                                            <div className="me-3 position-relative flex-shrink-0">
+                                                <img
+                                                    src={consultant.image || '/images/flag/teamdefault.png'}
+                                                    alt={consultant.name}
+                                                    className="rounded-circle profile-image"
+                                                    onError={(e) => {
+                                                        e.target.src = '/images/flag/teamdefault.png';
+                                                    }}
+                                                />
+                                                {consultant.isActive && (
+                                                    <span className="active-status-dot"></span>
+                                                )}
                                             </div>
-                                            <span className="rating-text">
-                                                {consultant.rating}
-                                            </span>
-                                            <span className="testimonials-text">
-                                                ({consultant.testimonials} testimonials)
-                                            </span>
+
+                                            {/* Name and Details */}
+                                            <div className="flex-grow-1">
+                                                <div className="flex align-items-center gap-2 mb-2">
+                                                    <h5 className="card-title mb-0 fw-bold consultant-name">
+                                                        {consultant.name}
+                                                    </h5>
+                                                    <span className="experience-badge">
+                                                        {consultant.experience}+ Years of Experience
+                                                    </span>
+                                                </div>
+                                                <p className="mb-2 consultant-profession">
+                                                    {consultant.profession}
+                                                </p>
+                                                <div className="flex align-items-center gap-2 flex-wrap">
+                                                    <div className="rating-stars">
+                                                        {renderStars(consultant.rating)}
+                                                    </div>
+                                                    <span className="rating-text">
+                                                        {consultant.rating}
+                                                    </span>
+                                                    <span className="testimonials-text">
+                                                        ({consultant.testimonials} testimonials)
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
+
+                                        {/* Divider */}
+                                        <hr className="card-divider" />
+
+                                        {/* Information Section */}
+                                        <div className="mb-0">
+                                            <p className="mb-2 consultant-info">
+                                                <strong>Speaks:</strong> {consultant.languages.join(', ')}
+                                            </p>
+                                            <div className="mb-0">
+                                                <strong className="consultant-info d-block mb-2">Calling Options:</strong>
+                                                <div className="calling-options">
+                                                    <button
+                                                        className="calling-option-btn chat-btn"
+
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            navigate(`/user-chat?consultantId=${consultant.id}`);
+                                                        }}
+
+                                                    >
+                                                        <div className="calling-option-content">
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                            </svg>
+                                                            <span className="calling-option-label">Chat</span>
+                                                        </div>
+                                                        <span className="calling-option-price">INR {consultant.chatPrice.toLocaleString()}</span>
+                                                    </button>
+                                                    <button
+                                                        className="calling-option-btn audio-btn"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleCallingOption('audio', consultant.id, consultant.audioPrice);
+                                                        }}
+                                                    >
+                                                        <div className="calling-option-content">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-phone-icon lucide-phone">
+                                                                <path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384" />
+                                                            </svg>
+                                                            <span className="calling-option-label">Audio</span>
+                                                        </div>
+                                                        <span className="calling-option-price">INR {consultant.audioPrice.toLocaleString()}</span>
+                                                    </button>
+                                                    <button
+                                                        className="calling-option-btn video-btn"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleCallingOption('video', consultant.id, consultant.videoPrice);
+                                                        }}
+                                                    >
+                                                        <div className="calling-option-content">
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M23 7L16 12L23 17V7Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                                <path d="M14 5H3C1.9 5 1 5.9 1 7V17C1 18.1 1.9 19 3 19H14C15.1 19 16 18.1 16 17V7C16 5.9 15.1 5 14 5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                            </svg>
+                                                            <span className="calling-option-label">Video</span>
+                                                        </div>
+                                                        <span className="calling-option-price">INR {consultant.videoPrice.toLocaleString()}</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
-
-                                {/* Divider */}
-                                <hr className="card-divider" />
-
-                                {/* Information Section */}
-                                <div className="mb-0">
-                                    <p className="mb-2 consultant-info">
-                                        <strong>Speaks:</strong> {consultant.languages.join(', ')}
-                                    </p>
-                                    <div className="mb-0">
-                                        <strong className="consultant-info d-block mb-2">Calling Options:</strong>
-                                        <div className="calling-options">
-                                            <button
-                                                className="calling-option-btn chat-btn"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleCallingOption('chat', consultant.id, consultant.chatPrice);
-                                                }}
-                                            >
-                                                <div className="calling-option-content">
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                    </svg>
-                                                    <span className="calling-option-label">Chat</span>
-                                                </div>
-                                                <span className="calling-option-price">INR {consultant.chatPrice.toLocaleString()}</span>
-                                            </button>
-                                            <button
-                                                className="calling-option-btn audio-btn"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleCallingOption('audio', consultant.id, consultant.audioPrice);
-                                                }}
-                                            >
-                                                <div className="calling-option-content">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-phone-icon lucide-phone">
-                                                        <path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384" />
-                                                    </svg>
-                                                    <span className="calling-option-label">Audio</span>
-                                                </div>
-                                                <span className="calling-option-price">INR {consultant.audioPrice.toLocaleString()}</span>
-                                            </button>
-                                            <button
-                                                className="calling-option-btn video-btn"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleCallingOption('video', consultant.id, consultant.videoPrice);
-                                                }}
-                                            >
-                                                <div className="calling-option-content">
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M23 7L16 12L23 17V7Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                        <path d="M14 5H3C1.9 5 1 5.9 1 7V17C1 18.1 1.9 19 3 19H14C15.1 19 16 18.1 16 17V7C16 5.9 15.1 5 14 5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                    </svg>
-                                                    <span className="calling-option-label">Video</span>
-                                                </div>
-                                                <span className="calling-option-price">INR {consultant.videoPrice.toLocaleString()}</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
                             </div>
-                        </div>
-                    </div>
-                    ))
+                        )
+                    }
+
+                    )
                 )}
             </div>
         </div>

@@ -25,6 +25,14 @@ export const fetchConsultants = createAsyncThunk(
     }
 );
 
+/**
+ * get consultant with shop id and consultant id
+ */
+export const fetchConsultantById = createAsyncThunk("consultants/fetchById", async ({ shop_id, consultant_id }) => {
+    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/consultant-by-shop-id-and-consultant-id/${shop_id}/${consultant_id}`);
+    return response.data;
+});
+
 
 export const deleteConsultantById = createAsyncThunk("consultants/delete", async (id) => {
     const response = await axios.delete(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/delete-consultant/${id}`);
@@ -36,6 +44,7 @@ const consultantSlice = createSlice({
     name: "consultants",
     initialState: {
         consultants: [],
+        consultantOverview: null,
         loading: false,
         error: null,
         deletedConsultant: null,
@@ -62,6 +71,17 @@ const consultantSlice = createSlice({
                 state.deletedConsultant = action.payload;
             })
             .addCase(deleteConsultantById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
+            .addCase(fetchConsultantById.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchConsultantById.fulfilled, (state, action) => {
+                state.loading = false;
+                state.consultantOverview = action.payload;
+            })
+            .addCase(fetchConsultantById.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
             });

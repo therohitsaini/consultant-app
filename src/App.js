@@ -15,7 +15,8 @@ import TabNavigation from "./components/ConsultantDashboard/TabNavigation";
 import UsersPage from "./components/ConsultantDashboard/UsersPage";
 import ChatsPage from "./components/ConsultantDashboard/ChatsPage";
 import VideoCallingPage from "./components/ConsultantDashboard/VideoCallingPage";
-import ChatBox from "./components/ClientDashbord/ChatBox";
+import UserChat from "./components/ClientDashbord/UserChat";
+import LoginForm from "./components/ConsultantDashboard/LoginForm";
 
 function App() {
   const app = useAppBridge();
@@ -48,12 +49,14 @@ function App() {
         <Route path="/pricing" element={<LayoutFrame><Pricing /></LayoutFrame>} />
         <Route path="/faq" element={<LayoutFrame><Faq /></LayoutFrame>} />
         <Route path="/consultant-cards" element={<ConsultantCards />} />
-        <Route path="/view-profile/:id" element={<ViewProfile />} />
+        <Route path="/view-profile/:shop_id/:consultant_id" element={<ViewProfile />} />
         <Route path="/consultant-dashboard" element={<TabNavigation />} />
         <Route path="/users-page/*" element={<TabNavigation />} />
         <Route path="/chats/*" element={<TabNavigation />} />
         <Route path="/video/calling/page" element={<VideoCallingPage />} />
-        <Route path="/chat" element={<ChatBox />} />
+        <Route path="/user-chat" element={<UserChat />} />
+        <Route path="/login" element={<LoginForm />} />
+
         
 
 

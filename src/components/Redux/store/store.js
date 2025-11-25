@@ -6,6 +6,6 @@ export const store = configureStore({
         users: userReducer,
         consultants: consultantReducer,
         // deletedConsultant: deletedConsultantReducer,    
-        
+
     },
 });

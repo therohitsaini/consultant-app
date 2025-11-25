@@ -1,161 +1,51 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './ConsultantCards.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchConsultantById } from '../Redux/slices/ConsultantSlices';
 
 function ViewProfile() {
-    const { id } = useParams();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    // const shop_id = "690c374f605cb8b946503ccb";
+    // const consultant_id = "691dbba35e388352e3203b0b";
 
-    // Sample consultant data (in real app, this would come from API)
-    const consultants = [
-        {
-            id: 1,
-            name: 'Arlene McCoy',
-            image: '/images/team/t1.jpg',
-            profession: 'Psychologist - Adult, Adolescent',
-            languages: ['Hindi', 'English'],
-            experience: 12,
-            rating: 4.5,
-            testimonials: 23,
-            startingPrice: 1200,
-            chatPrice: 800,
-            audioPrice: 1200,
-            videoPrice: 1500,
-            expertise: ['Depression', 'Anxiety', 'Family', 'Couple'],
-            isActive: true,
-            about: 'Arlene McCoy is a licensed psychologist with over 12 years of experience in helping individuals, couples, and families navigate through life\'s challenges. She specializes in treating depression, anxiety disorders, and relationship issues. Her compassionate approach and evidence-based techniques have helped hundreds of clients achieve better mental health and well-being.',
-            education: 'Ph.D. in Clinical Psychology, Master\'s in Counseling Psychology',
-            certifications: ['Licensed Clinical Psychologist', 'Certified Family Therapist', 'Cognitive Behavioral Therapy Specialist'],
-            reviews: [
-                { name: 'Rajesh Kumar', rating: 5, comment: 'Excellent therapist! Helped me overcome my anxiety.', date: '2 weeks ago' },
-                { name: 'Priya Sharma', rating: 5, comment: 'Very understanding and professional. Highly recommend!', date: '1 month ago' },
-                { name: 'Amit Patel', rating: 4, comment: 'Good experience overall. Would visit again.', date: '2 months ago' }
-            ]
-        },
-        {
-            id: 2,
-            name: 'Kalabhairavar',
-            image: '/images/team/t2.jpg',
-            profession: 'Vedic, Numerology',
-            languages: ['Tamil', 'English'],
-            experience: 10,
-            rating: 4.8,
-            testimonials: 45,
-            startingPrice: 800,
-            chatPrice: 500,
-            audioPrice: 800,
-            videoPrice: 1000,
-            expertise: ['Vedic Astrology', 'Numerology', 'Palmistry'],
-            isActive: false,
-            about: 'Kalabhairavar is a renowned Vedic astrologer and numerologist with over 10 years of experience. He combines traditional Vedic wisdom with modern interpretations to provide accurate predictions and guidance.',
-            education: 'Master\'s in Vedic Astrology, Certified Numerologist',
-            certifications: ['Certified Vedic Astrologer', 'Professional Numerologist'],
-            reviews: [
-                { name: 'Suresh Nair', rating: 5, comment: 'Very accurate predictions!', date: '1 week ago' },
-                { name: 'Lakshmi Devi', rating: 5, comment: 'Excellent guidance and remedies.', date: '3 weeks ago' }
-            ]
-        },
-        {
-            id: 3,
-            name: 'Nivansh',
-            image: '/images/team/t3.jpg',
-            profession: 'Vedic, Numerology, Vastu',
-            languages: ['Hindi', 'Bhojpuri'],
-            experience: 8,
-            rating: 4.7,
-            testimonials: 32,
-            startingPrice: 1000,
-            chatPrice: 600,
-            audioPrice: 1000,
-            videoPrice: 1200,
-            expertise: ['Vastu', 'Numerology', 'Feng Shui'],
-            isActive: true,
-            about: 'Nivansh specializes in Vastu Shastra, Numerology, and Feng Shui. With 8 years of experience, he helps clients create harmonious living and working spaces.',
-            education: 'Diploma in Vastu Shastra, Certified Feng Shui Consultant',
-            certifications: ['Vastu Consultant', 'Feng Shui Expert'],
-            reviews: [
-                { name: 'Vikram Singh', rating: 5, comment: 'Great Vastu consultation!', date: '2 weeks ago' }
-            ]
-        },
-        {
-            id: 4,
-            name: 'Sahaskrit',
-            image: '/images/team/t4.jpg',
-            profession: 'Vedic, Face Reading',
-            languages: ['Hindi', 'English'],
-            experience: 15,
-            rating: 4.9,
-            testimonials: 67,
-            startingPrice: 1500,
-            chatPrice: 1000,
-            audioPrice: 1500,
-            videoPrice: 1800,
-            expertise: ['Face Reading', 'Vedic', 'Palmistry'],
-            isActive: true,
-            about: 'Sahaskrit is a master in Vedic astrology and face reading with 15 years of experience. His accurate predictions and insightful readings have helped thousands of clients.',
-            education: 'Master\'s in Vedic Studies, Certified Face Reader',
-            certifications: ['Master Vedic Astrologer', 'Professional Face Reader'],
-            reviews: [
-                { name: 'Anjali Mehta', rating: 5, comment: 'Amazing face reading! Very accurate.', date: '1 week ago' },
-                { name: 'Rohit Verma', rating: 5, comment: 'Best Vedic consultation I\'ve ever had.', date: '2 weeks ago' }
-            ]
-        },
-        {
-            id: 5,
-            name: 'Jigneshwar',
-            image: '/images/team/t5.jpg',
-            profession: 'Vedic',
-            languages: ['Hindi', 'Bengali'],
-            experience: 6,
-            rating: 4.6,
-            testimonials: 28,
-            startingPrice: 700,
-            chatPrice: 400,
-            audioPrice: 700,
-            videoPrice: 900,
-            expertise: ['Vedic', 'Astrology', 'Remedies'],
-            isActive: false,
-            about: 'Jigneshwar is a dedicated Vedic astrologer specializing in providing remedies and solutions for life challenges through traditional Vedic methods.',
-            education: 'Bachelor\'s in Vedic Studies',
-            certifications: ['Certified Vedic Astrologer'],
-            reviews: [
-                { name: 'Mohan Das', rating: 4, comment: 'Good consultation.', date: '1 month ago' }
-            ]
-        },
-        {
-            id: 6,
-            name: 'Shonaaya',
-            image: '/images/team/t6.jpg',
-            profession: 'Numerology, Tarot, Face Reading',
-            languages: ['Hindi', 'Punjabi'],
-            experience: 9,
-            rating: 4.8,
-            testimonials: 41,
-            startingPrice: 1100,
-            chatPrice: 700,
-            audioPrice: 1100,
-            videoPrice: 1300,
-            expertise: ['Tarot', 'Numerology', 'Crystal Healing'],
-            isActive: true,
-            about: 'Shonaaya combines numerology, tarot reading, and crystal healing to provide holistic guidance. With 9 years of experience, she helps clients find clarity and direction.',
-            education: 'Certified Tarot Reader, Professional Numerologist',
-            certifications: ['Certified Tarot Reader', 'Crystal Healing Practitioner'],
-            reviews: [
-                { name: 'Kavita Arora', rating: 5, comment: 'Wonderful tarot reading!', date: '1 week ago' },
-                { name: 'Harpreet Singh', rating: 5, comment: 'Very insightful numerology analysis.', date: '2 weeks ago' }
-            ]
-        }
-    ];
+    const { shop_id, consultant_id } = useParams();
 
-    const [consultant, setConsultant] = useState(null);
-
+    const { consultantOverview, loading } = useSelector((state) => state.consultants);
     useEffect(() => {
-        const foundConsultant = consultants.find(c => c.id === parseInt(id));
-        if (foundConsultant) {
-            setConsultant(foundConsultant);
-        }
-    }, [id]);
+        dispatch(fetchConsultantById({ shop_id, consultant_id }));
+    }, [dispatch, shop_id, consultant_id]);
+
+
+    const consultantView = consultantOverview?.consultant;
+    console.log("consultantOverview___________", consultantView);
+    // Default static consultant data
+    const consultant = {
+        id: "691dbba35e388352e3203b0b",
+        name: 'Arlene McCoy',
+        image: 'https://images.pexels.com/photos/1704488/pexels-photo-1704488.jpeg?cs=srgb&dl=pexels-suliman-sallehi-1704488.jpg&fm=jpg',
+        profession: 'Psychologist - Adult, Adolescent',
+        languages: ['Hindi', 'English'],
+        experience: 12,
+        rating: 4.5,
+        testimonials: 23,
+        startingPrice: 1200,
+        chatPrice: 800,
+        audioPrice: 1200,
+        videoPrice: 1500,
+        expertise: ['Depression', 'Anxiety', 'Family', 'Couple'],
+        isActive: true,
+        about: 'Arlene McCoy is a licensed psychologist with over 12 years of experience in helping individuals, couples, and families navigate through life\'s challenges. She specializes in treating depression, anxiety disorders, and relationship issues. Her compassionate approach and evidence-based techniques have helped hundreds of clients achieve better mental health and well-being.',
+        education: 'Ph.D. in Clinical Psychology, Master\'s in Counseling Psychology',
+        certifications: ['Licensed Clinical Psychologist', 'Certified Family Therapist', 'Cognitive Behavioral Therapy Specialist'],
+        reviews: [
+            { name: 'Rajesh Kumar', rating: 5, comment: 'Excellent therapist! Helped me overcome my anxiety.', date: '2 weeks ago' },
+            { name: 'Priya Sharma', rating: 5, comment: 'Very understanding and professional. Highly recommend!', date: '1 month ago' },
+            { name: 'Amit Patel', rating: 4, comment: 'Good experience overall. Would visit again.', date: '2 months ago' }
+        ]
+    };
 
     const renderStars = (rating) => {
         const fullStars = Math.floor(rating);
@@ -182,18 +72,8 @@ function ViewProfile() {
         alert(`You selected ${optionType.toUpperCase()} call option.\nConsultant ID: ${consultantId}\nPrice: INR ${price.toLocaleString()}`);
     };
 
-    if (!consultant) {
-        return (
-            <div className="container py-5">
-                <div className="text-center">
-                    <h2>Consultant not found</h2>
-                    <button className="btn btn-primary mt-3" onClick={() => navigate('/consultant-cards')}>
-                        Back to Consultants
-                    </button>
-                </div>
-            </div>
-        );
-    }
+
+    
 
     return (
         <div className="view-profile-container">
@@ -214,7 +94,7 @@ function ViewProfile() {
                             {/* Profile Image */}
                             <div className="me-4 position-relative flex-shrink-0">
                                 <img
-                                    src={'https://images.pexels.com/photos/1704488/pexels-photo-1704488.jpeg?cs=srgb&dl=pexels-suliman-sallehi-1704488.jpg&fm=jpg'}
+                                    src={consultant.image}
                                     alt={consultant.name}
                                     className="rounded-circle profile-image profile-image-large"
                                     onError={(e) => {
@@ -230,10 +110,11 @@ function ViewProfile() {
                             <div className="flex-grow-1">
                                 <div className="flex align-items-center gap-2 mb-3">
                                     <h5 className="card-title mb-0 fw-bold consultant-name consultant-name-large">
-                                        {consultant.name}
+                                        {consultantView?.fullname}
                                     </h5>
                                     <span className="experience-badge experience-badge-large">
-                                        {consultant.experience}+ Years of Experience
+                                        {consultantView?.experience}
+                                        + Years of Experience
                                     </span>
                                 </div>
                                 <p className="mb-3 consultant-profession consultant-profession-large">
@@ -264,11 +145,12 @@ function ViewProfile() {
                             <div className="mb-0">
                                 <strong className="consultant-info d-block mb-2">Calling Options:</strong>
                                 <div className="calling-options">
+                                    
                                     <button
-                                        className="calling-option-btn chat-btn"
+                                        className="calling-option-btn chat-btn border-0"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            handleCallingOption('chat', consultant.id, consultant.chatPrice);
+                                            navigate(`/user-chat?consultantId=${consultant.id}`);
                                         }}
                                     >
                                         <div className="calling-option-content">
@@ -277,7 +159,7 @@ function ViewProfile() {
                                             </svg>
                                             <span className="calling-option-label">Chat</span>
                                         </div>
-                                        <span className="calling-option-price">INR {consultant.chatPrice.toLocaleString()}</span>
+                                        <span className="calling-option-price">INR vv {consultant.chatPrice.toLocaleString()}</span>
                                     </button>
                                     <button
                                         className="calling-option-btn audio-btn"
