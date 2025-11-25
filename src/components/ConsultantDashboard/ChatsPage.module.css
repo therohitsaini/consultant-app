@@ -48,6 +48,7 @@
     background: white;
     flex-shrink: 0;
     overflow: hidden;
+    /* border:2px solid red */
 }
 
 /* Hide on mobile when chat is open */

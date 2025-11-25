@@ -8,7 +8,7 @@ const ChatsPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showChatView, setShowChatView] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
-    
+
     // Check if mobile on mount and resize
     useEffect(() => {
         const checkMobile = () => {
@@ -17,12 +17,12 @@ const ChatsPage = () => {
                 setShowChatView(false);
             }
         };
-        
+
         checkMobile();
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
-    
+
     // Handle chat selection - on mobile, show chat view
     const handleChatSelect = (chatId) => {
         setSelectedChat(chatId);
@@ -30,7 +30,7 @@ const ChatsPage = () => {
             setShowChatView(true);
         }
     };
-    
+
     // Handle back to list on mobile
     const handleBackToList = () => {
         setShowChatView(false);
@@ -151,7 +151,7 @@ const ChatsPage = () => {
             <div className={styles.chatLayout}>
                 {/* Conversations Sidebar */}
                 <div className={`${styles.conversationsSidebar} ${showChatView ? styles.hideOnMobile : ''}`}>
-                    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', height: '100%',  }}>
                         {/* Search Bar */}
                         <div className={styles.searchBar}>
                             <div className={styles.searchInputWrapper}>
@@ -181,47 +181,52 @@ const ChatsPage = () => {
                                     </div>
                                 </div>
                             ) : (
-                                filteredConversations.map((conversation) => (
-                                    <div
-                                        key={conversation.id}
-                                        onClick={() => handleChatSelect(conversation.id)}
-                                        className={`${styles.conversationItem} ${selectedChat === conversation.id ? styles.conversationItemActive : ''}`}
-                                    >
-                                        <div className={styles.conversationContent}>
-                                            <div className={styles.avatarWrapper}>
-                                                <div className={styles.conversationAvatar}>
-                                                    {conversation.avatar}
-                                                </div>
-                                                {conversation.isOnline && (
-                                                    <div className={styles.onlineIndicator}></div>
-                                                )}
-                                            </div>
-                                            <div className={styles.conversationDetails}>
-                                                <div className={`${styles.conversationHeader} ${styles.flexBetween} ${styles.flexStart}`}>
-                                                    <div className={styles.conversationName}>
-                                                        {conversation.name}
+                                filteredConversations.map((conversation) => {
+                                    console.log("_____", conversation)
+                                    return (
+                                        <div
+                                            key={conversation.id}
+                                            onClick={() => handleChatSelect(conversation.id)}
+                                            className={`${styles.conversationItem} ${selectedChat === conversation.id ? styles.conversationItemActive : ''}`}
+                                        >
+                                            <div className={styles.conversationContent}>
+                                                <div className={styles.avatarWrapper}>
+                                                    <div className={styles.conversationAvatar}>
+                                                        {conversation.avatar}
                                                     </div>
-                                                    <div className={styles.conversationTimestamp}>
-                                                        {conversation.timestamp}
-                                                    </div>
-                                                </div>
-                                                <div className={`${styles.conversationMessage} ${styles.flexBetween} ${styles.flexCenter}`}>
-                                                    <div className={styles.messageText}>
-                                                        {conversation.lastMessage}
-                                                    </div>
-                                                    {conversation.unreadCount > 0 && (
-                                                        <span className={styles.unreadBadge}>
-                                                            {conversation.unreadCount}
-                                                        </span>
+                                                    {conversation.isOnline && (
+                                                        <div className={styles.onlineIndicator}></div>
                                                     )}
                                                 </div>
-                                                <div className={`${styles.conversationStatus} ${conversation.isOnline ? styles.statusOnline : styles.statusOffline}`}>
-                                                    {conversation.lastActive}
+                                                <div className={styles.conversationDetails}>
+                                                    <div className={`${styles.conversationHeader} ${styles.flexBetween} ${styles.flexStart}`}>
+                                                        <div className={styles.conversationName}>
+                                                            {conversation.name}
+                                                        </div>
+                                                        <div className={styles.conversationTimestamp}>
+                                                            {conversation.timestamp}
+                                                        </div>
+                                                    </div>
+                                                    <div className={`${styles.conversationMessage} ${styles.flexBetween} ${styles.flexCenter}`}>
+                                                        <div className={styles.messageText}>
+                                                            {conversation.lastMessage}
+                                                        </div>
+                                                        {conversation.unreadCount > 0 && (
+                                                            <span className={styles.unreadBadge}>
+                                                                {conversation.unreadCount}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div className={`${styles.conversationStatus} ${conversation.isOnline ? styles.statusOnline : styles.statusOffline}`}>
+                                                        {conversation.lastActive}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))
+                                    )
+                                }
+
+                                )
                             )}
                         </div>
                     </div>
@@ -235,7 +240,7 @@ const ChatsPage = () => {
                                 {/* Chat Header */}
                                 <div className={`${styles.chatHeader} ${styles.flexBetween} ${styles.flexCenter}`}>
                                     {/* Mobile Back Button */}
-                                    <button 
+                                    <button
                                         className={styles.mobileBackButton}
                                         onClick={handleBackToList}
                                         aria-label="Back to conversations"
@@ -263,10 +268,10 @@ const ChatsPage = () => {
                                         </div>
                                     </div>
                                     <div className={styles.chatHeaderActions} style={{ display: 'flex', gap: '8px' }}>
-                                        <button 
-                                            className={styles.headerButton} 
+                                        <button
+                                            className={styles.headerButton}
                                             title="Video Call"
-                                            onClick={() => navigate('/video-call', { state: { conversation: selectedConversation } })}
+                                            onClick={() => navigate('/video/calling/page', { state: { conversation: selectedConversation } })}
                                         >
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                                                 <path d="M23 7l-7 5 7 5V7z" />

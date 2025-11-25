@@ -15,6 +15,7 @@ import TabNavigation from "./components/ConsultantDashboard/TabNavigation";
 import UsersPage from "./components/ConsultantDashboard/UsersPage";
 import ChatsPage from "./components/ConsultantDashboard/ChatsPage";
 import VideoCallingPage from "./components/ConsultantDashboard/VideoCallingPage";
+import ChatBox from "./components/ClientDashbord/ChatBox";
 
 function App() {
   const app = useAppBridge();
@@ -51,6 +52,8 @@ function App() {
         <Route path="/consultant-dashboard" element={<TabNavigation />} />
         <Route path="/users-page/*" element={<TabNavigation />} />
         <Route path="/chats/*" element={<TabNavigation />} />
+        <Route path="/video/calling/page" element={<VideoCallingPage />} />
+        <Route path="/chat" element={<ChatBox />} />
         
 
 
