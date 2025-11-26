@@ -9,17 +9,7 @@ const UsersPage = () => {
     // Sample user data
     const users = [
         { id: 1, name: 'Sarah Johnson', email: 'sarah.johnson@example.com', role: 'Senior Consultant', status: 'Active', joinDate: '2023-01-15', consultations: 45, rating: 4.9, avatar: 'SJ' },
-        { id: 2, name: 'Michael Chen', email: 'michael.chen@example.com', role: 'Business Advisor', status: 'Active', joinDate: '2023-03-22', consultations: 38, rating: 4.7, avatar: 'MC' },
-        { id: 3, name: 'Emily Rodriguez', email: 'emily.rodriguez@example.com', role: 'Marketing Consultant', status: 'Active', joinDate: '2023-02-10', consultations: 52, rating: 4.8, avatar: 'ER' },
-        { id: 4, name: 'David Kim', email: 'david.kim@example.com', role: 'Tech Advisor', status: 'Inactive', joinDate: '2022-11-05', consultations: 28, rating: 4.6, avatar: 'DK' },
-        { id: 5, name: 'Lisa Anderson', email: 'lisa.anderson@example.com', role: 'HR Consultant', status: 'Active', joinDate: '2023-05-18', consultations: 33, rating: 4.9, avatar: 'LA' },
-        { id: 6, name: 'James Wilson', email: 'james.wilson@example.com', role: 'Financial Advisor', status: 'Pending', joinDate: '2024-01-08', consultations: 0, rating: 0, avatar: 'JW' },
-        { id: 7, name: 'Maria Garcia', email: 'maria.garcia@example.com', role: 'Strategy Consultant', status: 'Active', joinDate: '2023-04-12', consultations: 41, rating: 4.8, avatar: 'MG' },
-        { id: 8, name: 'Robert Taylor', email: 'robert.taylor@example.com', role: 'Operations Advisor', status: 'Inactive', joinDate: '2022-09-20', consultations: 19, rating: 4.4, avatar: 'RT' },
-        { id: 9, name: 'Jennifer Brown', email: 'jennifer.brown@example.com', role: 'Legal Consultant', status: 'Active', joinDate: '2023-06-25', consultations: 29, rating: 4.7, avatar: 'JB' },
-        { id: 10, name: 'William Davis', email: 'william.davis@example.com', role: 'Sales Consultant', status: 'Active', joinDate: '2023-07-14', consultations: 36, rating: 4.9, avatar: 'WD' },
-        { id: 11, name: 'Patricia Martinez', email: 'patricia.martinez@example.com', role: 'Healthcare Advisor', status: 'Pending', joinDate: '2024-01-10', consultations: 0, rating: 0, avatar: 'PM' },
-        { id: 12, name: 'Christopher Lee', email: 'christopher.lee@example.com', role: 'Education Consultant', status: 'Active', joinDate: '2023-08-30', consultations: 24, rating: 4.6, avatar: 'CL' }
+       
     ];
 
     const getStatusBadge = (status) => {

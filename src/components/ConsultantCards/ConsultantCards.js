@@ -98,30 +98,45 @@ function ConsultantCards() {
         alert(`You selected ${optionType.toUpperCase()} call option.\nConsultant ID: ${consultantId}\nPrice: INR ${price.toLocaleString()}`);
     };
 
-
     useEffect(() => {
-        if (!user_id) {
-            return console.log('User ID is required');
-        };
-        console.log('User ID_______', user_id);
-        socket.on('connection', () => {
-            console.log('Connected to socket', user_id);
+        if (!user_id) return console.log("User ID is required");
+
+        console.log("User ID_______", user_id);
+
+        socket.on("connect", () => {
+            console.log("Connected to socket", socket.id);
             socket.emit("register", user_id);
-            console.log('User ID registered', user_id);
-            // socket.on('register', (user_id) => {
-            //     console.log('Socket message', user_id);
-            // });
+            console.log("User ID registered", user_id);
         });
-        socket.on('disconnect', () => {
-            console.log('Disconnected from socket', user_id);
+
+
+        socket.on("disconnect", () => {
+            console.log("Disconnected from socket", user_id);
         });
-        socket.on('error', (error) => {
-            console.log('Socket error', error);
+
+        socket.on("error", (error) => {
+            console.log("Socket error", error);
         });
-        socket.on('message', (message) => {
-            console.log('Socket message', message);
+
+        socket.on("message", (message) => {
+            console.log("Socket message", message);
         });
+
     }, [user_id]);
+
+    // const sendMessageHandler = () => {
+    //     if (messageIo.trim() === "") return;
+    //     const messageData = {
+    //         senderId: user_id,
+    //         receiverId: consultantId,
+    //         text: messageIo,
+    //         timestamp: new Date().toISOString()
+    //     };
+    //     socket.emit("sendMessage", messageData);
+    //     setMessageIo("");
+    //     setRefresh((prev) => !prev);
+    // };
+
 
     return (
         <div className="container py-4">

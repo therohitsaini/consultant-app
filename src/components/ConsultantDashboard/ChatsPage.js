@@ -39,81 +39,22 @@ const ChatsPage = () => {
     // Sample conversations data
     const conversations = [
         {
-            id: 1,
-            name: 'Sarah Johnson',
-            avatar: 'SJ',
+            id: "692438d4b0783677e6de61cb",
+            name: 'Aniket saini',
+            avatar: 'AS',
             lastMessage: 'Thank you for the detailed analysis. This helps a lot!',
             timestamp: '2:30 PM',
             unreadCount: 2,
             isOnline: true,
             lastActive: 'Active now'
         },
-        {
-            id: 2,
-            name: 'Michael Chen',
-            avatar: 'MC',
-            lastMessage: 'Can we schedule a follow-up meeting next week?',
-            timestamp: '1:15 PM',
-            unreadCount: 0,
-            isOnline: true,
-            lastActive: 'Active 5m ago'
-        },
-        {
-            id: 3,
-            name: 'Emily Rodriguez',
-            avatar: 'ER',
-            lastMessage: 'I have reviewed the proposal. Looks great!',
-            timestamp: '12:45 PM',
-            unreadCount: 1,
-            isOnline: false,
-            lastActive: '2 hours ago'
-        },
-        {
-            id: 4,
-            name: 'David Kim',
-            avatar: 'DK',
-            lastMessage: 'The implementation plan is ready for review.',
-            timestamp: '11:20 AM',
-            unreadCount: 0,
-            isOnline: false,
-            lastActive: '3 hours ago'
-        },
-        {
-            id: 5,
-            name: 'Lisa Anderson',
-            avatar: 'LA',
-            lastMessage: 'Thanks for your help with the strategy session.',
-            timestamp: 'Yesterday',
-            unreadCount: 0,
-            isOnline: true,
-            lastActive: 'Active now'
-        },
-        {
-            id: 6,
-            name: 'James Wilson',
-            avatar: 'JW',
-            lastMessage: 'Looking forward to our consultation.',
-            timestamp: 'Yesterday',
-            unreadCount: 3,
-            isOnline: false,
-            lastActive: '1 day ago'
-        },
-        {
-            id: 7,
-            name: 'Maria Garcia',
-            avatar: 'MG',
-            lastMessage: 'The documents have been sent. Please review.',
-            timestamp: '2 days ago',
-            unreadCount: 0,
-            isOnline: false,
-            lastActive: '2 days ago'
-        }
+     
     ];
 
     // Sample messages for selected chat
     const messages = {
         1: [
-            { id: 1, sender: 'Sarah Johnson', text: 'Hello! I wanted to discuss the business strategy proposal.', timestamp: '10:15 AM', isOwn: false },
+            { id: "692438d4b0783677e6de61cb", sender: 'Sarah Johnson', text: 'Hello! I wanted to discuss the business strategy proposal.', timestamp: '10:15 AM', isOwn: false },
             { id: 2, sender: 'You', text: 'Hi Sarah! I\'d be happy to help. What specific aspects would you like to focus on?', timestamp: '10:16 AM', isOwn: true },
             { id: 3, sender: 'Sarah Johnson', text: 'I\'m particularly interested in the market analysis section and competitive positioning.', timestamp: '10:18 AM', isOwn: false },
             { id: 4, sender: 'You', text: 'Great! I\'ve prepared a comprehensive analysis. Let me share the key findings with you.', timestamp: '10:20 AM', isOwn: true },
@@ -181,6 +122,7 @@ const ChatsPage = () => {
                                     </div>
                                 </div>
                             ) : (
+                                
                                 filteredConversations.map((conversation) => {
                                     console.log("_____", conversation)
                                     return (
