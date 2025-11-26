@@ -9,6 +9,7 @@ import en from "@shopify/polaris/locales/en.json";
 import { Provider } from 'react-redux';
 import { store } from './components/Redux/store/store';
 import { AppBridgeProvider } from './components/createContext/AppBridgeContext';
+import SocketProvider from './components/Sokect-io/sokectProvider';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -16,7 +17,9 @@ root.render(
     <AppBridgeProvider>
       <PolarisAppProvider i18n={en}>
         <Provider store={store}>
-          <App />
+          <SocketProvider>
+            <App />
+          </SocketProvider>
         </Provider>
       </PolarisAppProvider>
     </AppBridgeProvider>
