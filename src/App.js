@@ -54,7 +54,7 @@ function App() {
         <Route path="/users-page/*" element={<TabNavigation />} />
         <Route path="/chats/*" element={<TabNavigation />} />
         <Route path="/video/calling/page" element={<VideoCallingPage />} />
-        <Route path="/user-chat" element={<UserChat />} />
+        <Route path="/user-chat/:consultantId" element={<UserChat />} />
         <Route path="/login" element={<LoginForm />} />
 
         

@@ -4,20 +4,19 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './ConsultantCards.css';
 import { fetchConsultants } from '../Redux/slices/ConsultantSlices';
 import { useDispatch, useSelector } from 'react-redux';
+import { Socket } from 'socket.io-client';
+import { socket } from '../Sokect-io/SokectConfig';
 
 function ConsultantCards() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { consultants, loading } = useSelector((state) => state.consultants);
     const params = new URLSearchParams(window.location.search);
-    const consultantId = params.get('customerId');
-    console.log("consultantId_______", consultantId);
+    const user_id = params.get('customerId');
+    console.log("user_id_______", user_id);
     useEffect(() => {
-        const client_id = localStorage.getItem('client_u_Identity', consultantId);
-    }, [consultantId]);
-    // const [searchParams] = useSearchParams();
-    // const consultantId = searchParams.get('consultantId');
-    // console.log("consultantId", consultantId);
+        const client_id = localStorage.getItem('client_u_Identity', user_id);
+    }, [user_id]);
 
     const shop_id = "690c374f605cb8b946503ccb"
 
@@ -25,9 +24,8 @@ function ConsultantCards() {
         dispatch(fetchConsultants(shop_id));
     }, [dispatch,]);
 
-    console.log("consultants", consultants);
 
-    // Get consultants array from API response (handle both direct array and findConsultant structure)
+
     const consultantsList = consultants?.findConsultant || consultants || [];
 
     // Map API data to component format
@@ -99,6 +97,31 @@ function ConsultantCards() {
         // For now, we'll just log it. You can customize this based on your requirements.
         alert(`You selected ${optionType.toUpperCase()} call option.\nConsultant ID: ${consultantId}\nPrice: INR ${price.toLocaleString()}`);
     };
+
+
+    useEffect(() => {
+        if (!user_id) {
+            return console.log('User ID is required');
+        };
+        console.log('User ID_______', user_id);
+        socket.on('connection', () => {
+            console.log('Connected to socket', user_id);
+            socket.emit("register", user_id);
+            console.log('User ID registered', user_id);
+            // socket.on('register', (user_id) => {
+            //     console.log('Socket message', user_id);
+            // });
+        });
+        socket.on('disconnect', () => {
+            console.log('Disconnected from socket', user_id);
+        });
+        socket.on('error', (error) => {
+            console.log('Socket error', error);
+        });
+        socket.on('message', (message) => {
+            console.log('Socket message', message);
+        });
+    }, [user_id]);
 
     return (
         <div className="container py-4">

@@ -6,31 +6,10 @@ import DashboardPage from './DashboardPage';
 import UsersPage from './UsersPage';
 import ChatsPage from './ChatsPage';
 import VideoCallingPage from './VideoCallingPage';
+import { ChatIcon, DashboardIcon, UsersIcon } from '../FallbackData/FallbackData';
 
 // Icon Components - Enhanced with better designs
-const DashboardIcon = () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="7" height="7" rx="1" />
-        <rect x="14" y="3" width="7" height="7" rx="1" />
-        <rect x="14" y="14" width="7" height="7" rx="1" />
-        <rect x="3" y="14" width="7" height="7" rx="1" />
-    </svg>
-);
 
-const UsersIcon = () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-        <circle cx="9" cy="7" r="4" />
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-);
-
-const ChatIcon = () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-    </svg>
-);
 
 
 
@@ -39,7 +18,9 @@ function TabNavigation({ children }) {
     const navigate = useNavigate();
     const location = useLocation();
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [consultantId, setConsultantId] = useState(null);
 
+    console.log("consultantId________________", consultantId);
     // Close sidebar when route changes on mobile
     useEffect(() => {
         if (window.innerWidth <= 768) {
@@ -57,6 +38,12 @@ function TabNavigation({ children }) {
 
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    useEffect(() => {
+        if (localStorage.getItem('consultant_u_Identity')) {
+            setConsultantId(localStorage.getItem('consultant_u_Identity'));
+        }
     }, []);
 
     const toggleSidebar = () => {
@@ -100,7 +87,7 @@ function TabNavigation({ children }) {
     return (
         <div className={`${styles.dashboardWrapper} ${isVideoCallPage ? styles.videoCallMode : ''}`}>
             {/* Mobile Toggle Button */}
-            <button 
+            <button
                 className={styles.mobileToggleButton}
                 onClick={toggleSidebar}
                 aria-label="Toggle navigation"
@@ -120,7 +107,7 @@ function TabNavigation({ children }) {
 
             {/* Mobile Overlay */}
             {sidebarOpen && (
-                <div 
+                <div
                     className={styles.mobileOverlay}
                     onClick={toggleSidebar}
                 ></div>
@@ -130,46 +117,46 @@ function TabNavigation({ children }) {
             <div className={styles.mainContainer}>
                 {/* Side Navigation Tabs - Hide on video call page */}
                 {!isVideoCallPage && (
-                <aside className={`${styles.sideNav} ${sidebarOpen ? styles.sideNavOpen : ''}`}>
-                    {/* Profile Section */}
-                    <div className={styles.profileSection}>
-                        <div className={styles.profileImage}>
-                            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                                <circle cx="12" cy="7" r="4" />
-                            </svg>
+                    <aside className={`${styles.sideNav} ${sidebarOpen ? styles.sideNavOpen : ''}`}>
+                        {/* Profile Section */}
+                        <div className={styles.profileSection}>
+                            <div className={styles.profileImage}>
+                                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                    <circle cx="12" cy="7" r="4" />
+                                </svg>
+                            </div>
+                            <div className={styles.profileDetails}>
+                                <div className={styles.profileName}>James Supardi</div>
+                                <div className={styles.profileEmail}>james@example.com</div>
+                            </div>
+                            <button className={styles.profileButton}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                    <circle cx="12" cy="7" r="4" />
+                                </svg>
+                                My Profile
+                            </button>
                         </div>
-                        <div className={styles.profileDetails}>
-                            <div className={styles.profileName}>James Supardi</div>
-                            <div className={styles.profileEmail}>james@example.com</div>
-                        </div>
-                        <button className={styles.profileButton}>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                                <circle cx="12" cy="7" r="4" />
-                            </svg>
-                            My Profile
-                        </button>
-                    </div>
 
-                    {/* Navigation Tabs */}
-                    <nav className={styles.navTabs}>
-                        <ul className={styles.navTabList}>
-                            {menuItems.map((item, index) => (
-                                <li key={index}>
-                                    <button
-                                        className={`${styles.navTab} ${item.active ? styles.navTabActive : ''}`}
-                                        onClick={() => handleNavigation(item.path)}
-                                        title={item.label}
-                                    >
-                                        <span className={styles.navTabIcon}>{item.icon}</span>
-                                        <span className={styles.navTabLabel}>{item.label}</span>
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
-                    </nav>
-                </aside>
+                        {/* Navigation Tabs */}
+                        <nav className={styles.navTabs}>
+                            <ul className={styles.navTabList}>
+                                {menuItems.map((item, index) => (
+                                    <li key={index}>
+                                        <button
+                                            className={`${styles.navTab} ${item.active ? styles.navTabActive : ''}`}
+                                            onClick={() => handleNavigation(item.path)}
+                                            title={item.label}
+                                        >
+                                            <span className={styles.navTabIcon}>{item.icon}</span>
+                                            <span className={styles.navTabLabel}>{item.label}</span>
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </nav>
+                    </aside>
                 )}
 
                 {/* Main Content Area */}

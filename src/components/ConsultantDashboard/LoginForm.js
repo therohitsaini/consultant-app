@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './LoginForm.module.css';
 import axios from 'axios';
@@ -60,11 +60,13 @@ const LoginForm = () => {
         );
         if (response.status === 200) {
             localStorage.setItem('consultant_u_Identity', response.data.userData._id);
-            // navigate('/consultant-dashboard');
+            navigate('/consultant-dashboard');
         } else {
             setErrors({ email: 'Invalid email or password' });
         }
     };
+
+
 
     return (
         <div className={styles.loginPageContainer}>

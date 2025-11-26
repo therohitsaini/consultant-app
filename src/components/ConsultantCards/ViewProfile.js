@@ -20,7 +20,7 @@ function ViewProfile() {
 
 
     const consultantView = consultantOverview?.consultant;
-    console.log("consultantOverview___________", consultantView);
+    console.log("consultantOverview___________Latest Consultant", consultantView);
     // Default static consultant data
     const consultant = {
         id: "691dbba35e388352e3203b0b",
@@ -150,7 +150,7 @@ function ViewProfile() {
                                         className="calling-option-btn chat-btn border-0"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            navigate(`/user-chat?consultantId=${consultant.id}`);
+                                            navigate(`/user-chat/${consultantView?._id}`);
                                         }}
                                     >
                                         <div className="calling-option-content">
@@ -165,7 +165,7 @@ function ViewProfile() {
                                         className="calling-option-btn audio-btn"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            handleCallingOption('audio', consultant.id, consultant.audioPrice);
+                                            // handleCallingOption('audio', consultant.id, consultant.audioPrice);
                                         }}
                                     >
                                         <div className="calling-option-content">
@@ -180,7 +180,7 @@ function ViewProfile() {
                                         className="calling-option-btn video-btn"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            handleCallingOption('video', consultant.id, consultant.videoPrice);
+                                            // handleCallingOption('video', consultant.id, consultant.videoPrice);
                                         }}
                                     >
                                         <div className="calling-option-content">
