@@ -352,10 +352,11 @@
 
 .messageBubble {
     max-width: 70%;
-    padding: 8px 12px;
-    border-radius: 8px;
+    padding: 5px 10px;
+    border-radius: 4px;
     word-wrap: break-word;
     position: relative;
+    /* border: 1px solid blue; */
 }
 
 .messageBubbleOwn {
@@ -373,6 +374,7 @@
     font-weight: 600;
     color: #667eea;
     margin-bottom: 4px;
+    
 }
 
 .messageText {
@@ -380,13 +382,16 @@
     color: #212529;
     line-height: 1.4;
     margin-bottom: 4px;
+    font-weight: 400;
 }
 
 .messageTimestamp {
-    font-size: 11px;
+    font-size: 10px;
     color: #6c757d;
     text-align: right;
-    margin-top: 4px;
+    margin-top: 0px;
+    /* border: 1px solid red; */
+    float: right;
 }
 
 .messageBubbleOther .messageTimestamp {

@@ -1,14 +1,26 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 // import styles from './UserChat.module.css';
 import styles from "./UserChat.module.css"
 import { socket } from '../Sokect-io/SokectConfig';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchConsultantById } from '../Redux/slices/ConsultantSlices';
 
 const UserChat = () => {
     const [text, setText] = useState()
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const { consultantId } = useParams()
-    console.log("consultantId", consultantId)
+    console.log("consultantId______________", consultantId)
+
+    const { consultantOverview } = useSelector((state) => state.consultants);
+    const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${consultantOverview?.consultant?.profileImage?.replace("\\", "/")}`;
+
+    console.log("consultantOverview______________", consultantOverview)
+
+    useEffect(() => {
+        dispatch(fetchConsultantById({ shop_id: "690c374f605cb8b946503ccb", consultant_id: consultantId }))
+    }, [dispatch, consultantId]);
 
     // Sample conversation data
     const selectedConversation = {
@@ -35,7 +47,7 @@ const UserChat = () => {
         if (text.trim() === "") return;
         const messageData = {
             senderId: "692438d4b0783677e6de61cb",
-            receiverId: "691f4b774af4ade88ed7676a",
+            receiverId: consultantId,
             shop_id: "690c374f605cb8b946503ccb",
             text: text,
             timestamp: new Date().toISOString()
@@ -74,8 +86,7 @@ const UserChat = () => {
                                     </button>
                                     <div className={styles.avatarWrapper}>
                                         <div className={styles.chatHeaderAvatar}>
-
-                                            {selectedConversation.avatar}
+                                            <img src={imageUrl} alt={consultantOverview?.consultant?.fullname} className={styles.chatHeaderAvatar} />
                                         </div>
                                         {selectedConversation.isOnline && (
                                             <div className={styles.onlineIndicator}></div>
@@ -83,10 +94,11 @@ const UserChat = () => {
                                     </div>
                                     <div>
                                         <div className={styles.chatHeaderName}>
-                                            {selectedConversation.name}
+                                            {consultantOverview?.consultant?.fullname
+                                            }
                                         </div>
-                                        <div className={styles.chatHeaderStatus} style={{ color: selectedConversation.isOnline ? '#10b981' : '#6c757d' }}>
-                                            {selectedConversation.lastActive}
+                                        <div className={styles.chatHeaderStatus} style={{ color:consultantOverview?.consultant?.isActive ? '#10b981' : '#6c757d' }}>
+                                            {consultantOverview?.consultant?.isActive ? 'Active now' : 'Offline'}
                                         </div>
                                     </div>
                                 </div>

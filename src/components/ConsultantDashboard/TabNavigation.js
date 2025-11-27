@@ -7,6 +7,8 @@ import UsersPage from './UsersPage';
 import ChatsPage from './ChatsPage';
 import VideoCallingPage from './VideoCallingPage';
 import { ChatIcon, DashboardIcon, UsersIcon } from '../FallbackData/FallbackData';
+import { useDispatch } from 'react-redux';
+import { connectSocket } from '../Redux/slices/sokectSlice';
 
 // Icon Components - Enhanced with better designs
 
@@ -19,6 +21,11 @@ function TabNavigation({ children }) {
     const location = useLocation();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [consultantId, setConsultantId] = useState(null);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(connectSocket("691dbba35e388352e3203b0b"));
+    }, []);
 
     console.log("consultantId________________", consultantId);
     // Close sidebar when route changes on mobile
@@ -40,11 +47,11 @@ function TabNavigation({ children }) {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    useEffect(() => {
-        if (localStorage.getItem('consultant_u_Identity')) {
-            setConsultantId(localStorage.getItem('consultant_u_Identity'));
-        }
-    }, []);
+    // useEffect(() => {
+    //     if (localStorage.getItem('consultant_u_Identity')) {
+    //         setConsultantId(localStorage.getItem('consultant_u_Identity'));
+    //     }
+    // }, []);
 
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);

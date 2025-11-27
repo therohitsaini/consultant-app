@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ChatsPage.module.css';
 import axios from 'axios';
+import { socket } from '../Sokect-io/SokectConfig';
 
 const ChatsPage = () => {
     const navigate = useNavigate();
@@ -10,7 +11,19 @@ const ChatsPage = () => {
     const [showChatView, setShowChatView] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [chatList, setChatList] = useState([]);
+    const [chatMessagesData, setChatMessagesData] = useState([]);
+    const [consultantId, setConsultantId] = useState(null);
+    const [chaterIds, setChaterIds] = useState(null);
+    const [text, setText] = useState('');
 
+    useEffect(() => {
+
+        if (localStorage.getItem('consultant_u_Identity')) {
+            setConsultantId(localStorage.getItem('consultant_u_Identity'));
+        }
+
+    }, []);
+    console.log("consultantId_____________________", consultantId)
     // Check if mobile on mount and resize
     useEffect(() => {
         const checkMobile = () => {
@@ -27,27 +40,46 @@ const ChatsPage = () => {
 
 
 
-    const getChatMessages = async () => {
-        const consultantId = "691f4b774af4ade88ed7676a"
-        const shopId = "690c374f605cb8b946503ccb"
-        const userId = "692438d4b0783677e6de61cb"
+    const getChatMessages = async (consultantId, shopId, userId) => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/chat/get/chat-history/${shopId}/${userId}/${consultantId}`);
-            console.log("response", response.data);
-            
+            if (response.data?.success) {
+                setChatMessagesData(response.data?.chatHistory);
+            }
         } catch (error) {
             console.log("error", error);
         }
     }
 
-    // Handle chat selection - on mobile, show chat view
-    const handleChatSelect = (chatId) => {
-        console.log("chatId", chatId)
-        setSelectedChat(chatId);
-        if (isMobile) {
-            setShowChatView(true);
+    // Load messages when selectedChat changes
+    useEffect(() => {
+        if (selectedChat && chatList.length > 0) {
+            const conversation = chatList.find(conv => conv.id === selectedChat);
+            if (conversation) {
+                getChatMessages("691dbba35e388352e3203b0b", conversation.shop.id, conversation.sender.id);
+            }
         }
-        getChatMessages();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedChat]);
+
+    console.log("chatMessagesData", chatMessagesData)
+
+    // Handle chat selection - on mobile, show chat view
+    const handleChatSelect = (chatData) => {
+        setChaterIds(chatData);
+        console.log("Selected chat data", chatData);
+        // Find conversation from chatList
+        const conversation = chatList.find(conv =>
+            conv.sender?.id === chatData.userId && conv.shop?.id === chatData.shopId
+        );
+
+        if (conversation) {
+            setSelectedChat(conversation.id);
+            if (isMobile) {
+                setShowChatView(true);
+            }
+            getChatMessages(conversation);
+        }
     };
 
     // Handle back to list on mobile
@@ -55,62 +87,50 @@ const ChatsPage = () => {
         setShowChatView(false);
     };
 
-    // Sample conversations data
-    const conversations = [
-        {
-            id: "692438d4b0783677e6de61cb",
-            name: 'Aniket saini',
-            avatar: 'AS',
-            lastMessage: 'Thank you for the detailed analysis. This helps a lot!',
-            timestamp: '2:30 PM',
-            unreadCount: 2,
-            isOnline: true,
-            lastActive: 'Active now'
-        },
+    // Find selected conversation from chatList
+    const selectedConversation = chatList.find(conv => conv.id === selectedChat);
 
-    ];
-
-    // Sample messages for selected chat
-    const messages = {
-        1: [
-            { id: "692438d4b0783677e6de61cb", sender: 'Sarah Johnson', text: 'Hello! I wanted to discuss the business strategy proposal.', timestamp: '10:15 AM', isOwn: false },
-            { id: 2, sender: 'You', text: 'Hi Sarah! I\'d be happy to help. What specific aspects would you like to focus on?', timestamp: '10:16 AM', isOwn: true },
-            { id: 3, sender: 'Sarah Johnson', text: 'I\'m particularly interested in the market analysis section and competitive positioning.', timestamp: '10:18 AM', isOwn: false },
-            { id: 4, sender: 'You', text: 'Great! I\'ve prepared a comprehensive analysis. Let me share the key findings with you.', timestamp: '10:20 AM', isOwn: true },
-            { id: 5, sender: 'You', text: 'The market analysis shows strong growth potential in your target segment. We\'ve identified three key competitors and their positioning strategies.', timestamp: '10:22 AM', isOwn: true },
-            { id: 6, sender: 'Sarah Johnson', text: 'That sounds excellent. Can you send me the detailed report?', timestamp: '10:25 AM', isOwn: false },
-            { id: 7, sender: 'You', text: 'Absolutely! I\'ll send it over within the next hour.', timestamp: '10:26 AM', isOwn: true },
-            { id: 8, sender: 'Sarah Johnson', text: 'Thank you for the detailed analysis. This helps a lot!', timestamp: '2:30 PM', isOwn: false }
-        ],
-        2: [
-            { id: 1, sender: 'Michael Chen', text: 'Hi, can we schedule a follow-up meeting?', timestamp: '1:10 PM', isOwn: false },
-            { id: 2, sender: 'You', text: 'Of course! What time works best for you?', timestamp: '1:12 PM', isOwn: true },
-            { id: 3, sender: 'Michael Chen', text: 'Can we schedule a follow-up meeting next week?', timestamp: '1:15 PM', isOwn: false }
-        ]
-    };
-
-    const selectedConversation = conversations.find(conv => conv.id === selectedChat);
-    const chatMessages = messages[selectedChat] || [];
-
-    const filteredConversations = conversations.filter(conv =>
-        conv.name.toLowerCase().includes(searchQuery.toLowerCase())
+    // Filter conversations based on search query
+    const filteredConversations = chatList.filter(conv =>
+        conv.sender?.fullname?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const getChatList = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/get/chat-list/${"690c374f605cb8b946503ccb"}/${"691f4b774af4ade88ed7676a"}`);
-            setChatList(response.data?.payload);
-            if (response.data?.payload?.length > 0) {
-                setSelectedChat(response.data?.payload[0]?.id);
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/get/chat-list/${"690c374f605cb8b946503ccb"}/${"691dbba35e388352e3203b0b"}`);
+            if (response.data?.payload) {
+                setChatList(response.data.payload);
+                // Auto-select first conversation and load messages
+                if (response.data.payload.length > 0) {
+                    const firstChat = response.data.payload[0];
+                    setSelectedChat(firstChat.id);
+                    // Load messages for first chat
+                    getChatMessages(firstChat);
+                }
             }
-
         } catch (error) {
             console.log("error", error);
         }
     }
+
     useEffect(() => {
         getChatList();
     }, []);
+
+    console.log("chaterIds____________", chaterIds)
+    const sendChat = () => {
+        if (text.trim() === "") return;
+        const messageData = {
+            senderId: "691dbba35e388352e3203b0b",
+            receiverId:chaterIds?.userId,
+            shop_id: chaterIds?.shopId,
+            text: text,
+            timestamp: new Date().toISOString()
+        };
+        socket.emit("sendMessage", messageData);
+        setText("");
+    }
+    console.log("text", text)
 
 
 
@@ -150,7 +170,16 @@ const ChatsPage = () => {
 
                         {/* Conversations List */}
                         <div className={styles.conversationsList}>
-                            {filteredConversations.length === 0 ? (
+                            {chatList.length === 0 ? (
+                                <div className={styles.emptyState}>
+                                    <div>
+                                        <svg className={styles.emptyIcon} width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                        </svg>
+                                        <p className={styles.emptyText}>Loading conversations...</p>
+                                    </div>
+                                </div>
+                            ) : filteredConversations.length === 0 ? (
                                 <div className={styles.emptyState}>
                                     <div>
                                         <svg className={styles.emptyIcon} width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -243,19 +272,28 @@ const ChatsPage = () => {
                                     </button>
                                     <div className={`${styles.chatHeaderInfo} ${styles.flex} ${styles.flexCenter}`}>
                                         <div className={styles.avatarWrapper}>
-                                            <div className={styles.chatHeaderAvatar}>
-                                                {selectedConversation.avatar}
-                                            </div>
-                                            {selectedConversation.isOnline && (
+                                            {selectedConversation?.sender?.profileImage ? (
+                                                <img
+                                                    src={`${process.env.REACT_APP_BACKEND_HOST}/${selectedConversation.sender.profileImage.replace("\\", "/")}`}
+                                                    alt={selectedConversation.sender.fullname}
+                                                    className={styles.chatHeaderAvatar}
+                                                    style={{ borderRadius: '50%', width: '40px', height: '40px', objectFit: 'cover' }}
+                                                />
+                                            ) : (
+                                                <div className={styles.chatHeaderAvatar}>
+                                                    {selectedConversation?.sender?.fullname?.charAt(0)?.toUpperCase() || 'U'}
+                                                </div>
+                                            )}
+                                            {selectedConversation?.isOnline && (
                                                 <div className={styles.onlineIndicator}></div>
                                             )}
                                         </div>
                                         <div>
                                             <div className={styles.chatHeaderName}>
-                                                {selectedConversation.name}
+                                                {selectedConversation?.sender?.fullname || 'User'}
                                             </div>
-                                            <div className={styles.chatHeaderStatus} style={{ color: selectedConversation.isOnline ? '#10b981' : '#6c757d' }}>
-                                                {selectedConversation.lastActive}
+                                            <div className={styles.chatHeaderStatus} style={{ color: selectedConversation?.isOnline ? '#10b981' : '#6c757d' }}>
+                                                {selectedConversation?.isOnline ? 'Active now' : selectedConversation?.lastActive || 'Offline'}
                                             </div>
                                         </div>
                                     </div>
@@ -282,26 +320,44 @@ const ChatsPage = () => {
 
                                 {/* Messages Area */}
                                 <div className={styles.messagesArea}>
-                                    {chatMessages.map((message) => (
-                                        <div
-                                            key={message.id}
-                                            className={`${styles.messageContainer} ${message.isOwn ? styles.messageContainerRight : styles.messageContainerLeft}`}
-                                        >
-                                            <div className={`${styles.messageBubble} ${message.isOwn ? styles.messageBubbleOwn : styles.messageBubbleOther}`}>
-                                                {!message.isOwn && (
-                                                    <div className={styles.messageSender}>
-                                                        {message.sender}
-                                                    </div>
-                                                )}
-                                                <div className={styles.messageText}>
-                                                    {message.text}
-                                                </div>
-                                                <div className={styles.messageTimestamp}>
-                                                    {message.timestamp}
-                                                </div>
-                                            </div>
+                                    {chatMessagesData.length === 0 ? (
+                                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                                            <p>No messages yet. Start the conversation!</p>
                                         </div>
-                                    ))}
+                                    ) : (
+                                        chatMessagesData.map((message) => {
+                                            const consultantId = "691f4b774af4ade88ed7676a";
+                                            const isOwn = message.senderId === consultantId;
+
+                                            // Format timestamp
+                                            const timestamp = new Date(message.timestamp).toLocaleTimeString([], {
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                                hour12: true
+                                            });
+
+                                            return (
+                                                <div
+                                                    key={message._id}
+                                                    className={`${styles.messageContainer} ${isOwn ? styles.messageContainerRight : styles.messageContainerLeft}`}
+                                                >
+                                                    <div className={`${styles.messageBubble} ${isOwn ? styles.messageBubbleOwn : styles.messageBubbleOther}`}>
+                                                        {/* {!isOwn && (
+                                                            <div className={styles.messageSender}>
+                                                                User
+                                                            </div>
+                                                        )} */}
+                                                        <div className={styles.messageText}>
+                                                            {message.text}
+                                                        </div>
+                                                        <div className={styles.messageTimestamp}>
+                                                            {timestamp}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })
+                                    )}
                                 </div>
 
                                 {/* Message Input */}
@@ -313,11 +369,12 @@ const ChatsPage = () => {
                                             </svg>
                                         </button>
                                         <input
+                                            onChange={(e) => setText(e.target.value)}
                                             type="text"
                                             className={styles.messageInput}
                                             placeholder="Type a message..."
                                         />
-                                        <button className={styles.sendButton} title="Send">
+                                        <button onClick={sendChat} className={styles.sendButton} title="Send">
                                             <svg className={styles.sendIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                                                 <line x1="22" y1="2" x2="11" y2="13" />
                                                 <polygon points="22 2 15 22 11 13 2 9 22 2" />
