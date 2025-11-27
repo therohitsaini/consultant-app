@@ -1,10 +1,14 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 // import styles from './UserChat.module.css';
 import styles from "./UserChat.module.css"
+import { socket } from '../Sokect-io/SokectConfig';
 
 const UserChat = () => {
+    const [text, setText] = useState()
     const navigate = useNavigate();
+    const { consultantId } = useParams()
+    console.log("consultantId", consultantId)
 
     // Sample conversation data
     const selectedConversation = {
@@ -26,9 +30,21 @@ const UserChat = () => {
         { id: 7, sender: 'You', text: 'Absolutely! I\'ll send it over within the next hour.', timestamp: '10:26 AM', isOwn: true },
         { id: 8, sender: 'Sarah Johnson', text: 'Thank you for the detailed analysis. This helps a lot!', timestamp: '2:30 PM', isOwn: false }
     ];
-    const consultantId = useParams()
-    console.log("consultantId________________Consultant", consultantId);
-    
+
+    const sendChat = () => {
+        if (text.trim() === "") return;
+        const messageData = {
+            senderId: "691dbba35e388352e3203b0b",
+            receiverId: "691f4b774af4ade88ed7676a",
+            shop_id: "690c374f605cb8b946503ccb",
+            text: text,
+            timestamp: new Date().toISOString()
+        };
+        socket.emit("sendMessage", messageData);
+        setText("");
+    }
+
+    console.log("TEXT", text)
 
     return (
         <Fragment>
@@ -128,11 +144,12 @@ const UserChat = () => {
                                         </svg>
                                     </button>
                                     <input
+                                        onChange={(e) => setText(e.target.value)}
                                         type="text"
                                         className={styles.messageInput}
                                         placeholder="Type a message..."
                                     />
-                                    <button className={styles.sendButton} title="Send">
+                                    <button onClick={sendChat} className={styles.sendButton} title="Send">
                                         <svg className={styles.sendIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                                             <line x1="22" y1="2" x2="11" y2="13" />
                                             <polygon points="22 2 15 22 11 13 2 9 22 2" />

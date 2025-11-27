@@ -6,6 +6,7 @@ import { fetchConsultants } from '../Redux/slices/ConsultantSlices';
 import { useDispatch, useSelector } from 'react-redux';
 import { Socket } from 'socket.io-client';
 import { socket } from '../Sokect-io/SokectConfig';
+import { connectSocket } from '../Redux/slices/sokectSlice';
 
 function ConsultantCards() {
     const navigate = useNavigate();
@@ -13,16 +14,21 @@ function ConsultantCards() {
     const { consultants, loading } = useSelector((state) => state.consultants);
     const params = new URLSearchParams(window.location.search);
     const user_id = params.get('customerId');
-    console.log("user_id_______", user_id);
-    useEffect(() => {
-        const client_id = localStorage.getItem('client_u_Identity', user_id);
-    }, [user_id]);
 
+    useEffect(() => {
+        const client_id = localStorage.setItem('client_u_Identity', user_id);
+        console.log(client_id)
+    }, [user_id]);
+    const userId = localStorage.getItem("client_u_Identity")
     const shop_id = "690c374f605cb8b946503ccb"
 
     useEffect(() => {
         dispatch(fetchConsultants(shop_id));
     }, [dispatch,]);
+
+    useEffect(() => {
+        dispatch(connectSocket("692438d4b0783677e6de61cb"))
+    }, [userId])
 
 
 
