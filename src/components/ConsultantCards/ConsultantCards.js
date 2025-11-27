@@ -14,23 +14,23 @@ function ConsultantCards() {
     const { consultants, loading } = useSelector((state) => state.consultants);
     const params = new URLSearchParams(window.location.search);
     const user_id = params.get('customerId');
+    const shop_id = params.get('shopid');
 
     useEffect(() => {
         const client_id = localStorage.setItem('client_u_Identity', user_id);
+        const shop = localStorage.setItem('shop_o_Identity', shop_id);
         console.log(client_id)
-    }, [user_id]);
-    const userId = localStorage.getItem("client_u_Identity")
-    const shop_id = "690c374f605cb8b946503ccb"
+    }, [user_id, shop_id]);
+
+    console.log("shop_id", localStorage.getItem('shop_o_Identity'), "user_id", localStorage.getItem('client_u_Identity'))
 
     useEffect(() => {
         dispatch(fetchConsultants(shop_id));
-    }, [dispatch,]);
+    }, [dispatch, shop_id]);
 
     useEffect(() => {
-        dispatch(connectSocket("692438d4b0783677e6de61cb"))
-    }, [userId])
-
-
+        dispatch(connectSocket(user_id))
+    }, [user_id])
 
     const consultantsList = consultants?.findConsultant || consultants || [];
 

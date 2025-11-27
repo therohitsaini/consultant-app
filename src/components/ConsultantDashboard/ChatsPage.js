@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ChatsPage.module.css';
+import axios from 'axios';
 
 const ChatsPage = () => {
     const navigate = useNavigate();
@@ -8,6 +9,7 @@ const ChatsPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showChatView, setShowChatView] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [chatList, setChatList] = useState([]);
 
     // Check if mobile on mount and resize
     useEffect(() => {
@@ -23,12 +25,29 @@ const ChatsPage = () => {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
+
+
+    const getChatMessages = async () => {
+        const consultantId = "691f4b774af4ade88ed7676a"
+        const shopId = "690c374f605cb8b946503ccb"
+        const userId = "692438d4b0783677e6de61cb"
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/chat/get/chat-history/${shopId}/${userId}/${consultantId}`);
+            console.log("response", response.data);
+            
+        } catch (error) {
+            console.log("error", error);
+        }
+    }
+
     // Handle chat selection - on mobile, show chat view
     const handleChatSelect = (chatId) => {
+        console.log("chatId", chatId)
         setSelectedChat(chatId);
         if (isMobile) {
             setShowChatView(true);
         }
+        getChatMessages();
     };
 
     // Handle back to list on mobile
@@ -48,7 +67,7 @@ const ChatsPage = () => {
             isOnline: true,
             lastActive: 'Active now'
         },
-     
+
     ];
 
     // Sample messages for selected chat
@@ -77,6 +96,25 @@ const ChatsPage = () => {
         conv.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    const getChatList = async () => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/get/chat-list/${"690c374f605cb8b946503ccb"}/${"691f4b774af4ade88ed7676a"}`);
+            setChatList(response.data?.payload);
+            if (response.data?.payload?.length > 0) {
+                setSelectedChat(response.data?.payload[0]?.id);
+            }
+
+        } catch (error) {
+            console.log("error", error);
+        }
+    }
+    useEffect(() => {
+        getChatList();
+    }, []);
+
+
+
+
     return (
         <div className={styles.pageContainer}>
             {/* Header Section */}
@@ -92,7 +130,7 @@ const ChatsPage = () => {
             <div className={styles.chatLayout}>
                 {/* Conversations Sidebar */}
                 <div className={`${styles.conversationsSidebar} ${showChatView ? styles.hideOnMobile : ''}`}>
-                    <div style={{ display: 'flex', flexDirection: 'column', height: '100%',  }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', }}>
                         {/* Search Bar */}
                         <div className={styles.searchBar}>
                             <div className={styles.searchInputWrapper}>
@@ -122,20 +160,30 @@ const ChatsPage = () => {
                                     </div>
                                 </div>
                             ) : (
-                                
-                                filteredConversations.map((conversation) => {
+
+                                chatList?.map((conversation) => {
                                     console.log("_____", conversation)
+                                    const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${conversation?.sender?.profileImage?.replace("\\", "/")}`;
+                                    const isImage = conversation?.sender?.profileImage ? true : false;
+                                    const updatedAt = new Date(conversation?.updatedAt).toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                        hour12: true
+                                    });
+
                                     return (
                                         <div
                                             key={conversation.id}
-                                            onClick={() => handleChatSelect(conversation.id)}
+                                            onClick={() => handleChatSelect({ shopId: conversation.shop.id, userId: conversation.sender.id })}
                                             className={`${styles.conversationItem} ${selectedChat === conversation.id ? styles.conversationItemActive : ''}`}
                                         >
                                             <div className={styles.conversationContent}>
                                                 <div className={styles.avatarWrapper}>
-                                                    <div className={styles.conversationAvatar}>
-                                                        {conversation.avatar}
-                                                    </div>
+                                                    <img
+                                                        src={isImage ? imageUrl : "../images/team/team1.avif"}
+                                                        alt="profile"
+                                                        className={styles.conversationAvatar}
+                                                    />
                                                     {conversation.isOnline && (
                                                         <div className={styles.onlineIndicator}></div>
                                                     )}
@@ -143,21 +191,23 @@ const ChatsPage = () => {
                                                 <div className={styles.conversationDetails}>
                                                     <div className={`${styles.conversationHeader} ${styles.flexBetween} ${styles.flexStart}`}>
                                                         <div className={styles.conversationName}>
-                                                            {conversation.name}
+                                                            {conversation.sender?.fullname}
                                                         </div>
                                                         <div className={styles.conversationTimestamp}>
-                                                            {conversation.timestamp}
+                                                            {updatedAt}
                                                         </div>
                                                     </div>
                                                     <div className={`${styles.conversationMessage} ${styles.flexBetween} ${styles.flexCenter}`}>
                                                         <div className={styles.messageText}>
-                                                            {conversation.lastMessage}
+                                                            {conversation?.
+                                                                lastMessage
+                                                            }
                                                         </div>
-                                                        {conversation.unreadCount > 0 && (
-                                                            <span className={styles.unreadBadge}>
-                                                                {conversation.unreadCount}
-                                                            </span>
-                                                        )}
+                                                        {/* {conversation.unreadCount > 0 && ( */}
+                                                        <span className={styles.unreadBadge}>
+                                                            {"5+"}
+                                                        </span>
+                                                        {/* )} */}
                                                     </div>
                                                     <div className={`${styles.conversationStatus} ${conversation.isOnline ? styles.statusOnline : styles.statusOffline}`}>
                                                         {conversation.lastActive}
