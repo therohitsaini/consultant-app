@@ -40,7 +40,12 @@ const ChatsPage = () => {
 
 
 
-    const getChatMessages = async (consultantId, shopId, userId) => {
+    const getChatMessages = async ({ userId, shopId }) => {
+        console.log('___________UserId___shopId', userId, shopId)
+        // console.log("check_________________",consultantId, shopId, userId )
+        // const shopId = "690c374f605cb8b946503ccb"
+        // const userId = "692438d4b0783677e6de61cb"
+        const consultantId = "691dbba35e388352e3203b0b"
         try {
             const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/chat/get/chat-history/${shopId}/${userId}/${consultantId}`);
             if (response.data?.success) {
@@ -55,14 +60,15 @@ const ChatsPage = () => {
     useEffect(() => {
         if (selectedChat && chatList.length > 0) {
             const conversation = chatList.find(conv => conv.id === selectedChat);
+            console.log(conversation)
             if (conversation) {
-                getChatMessages("691dbba35e388352e3203b0b", conversation.shop.id, conversation.sender.id);
+
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedChat]);
 
-    console.log("chatMessagesData", chatMessagesData)
+
 
     // Handle chat selection - on mobile, show chat view
     const handleChatSelect = (chatData) => {
@@ -78,7 +84,7 @@ const ChatsPage = () => {
             if (isMobile) {
                 setShowChatView(true);
             }
-            getChatMessages(conversation);
+            getChatMessages({ userId: chatData.userId, shopId: chatData.shopId });
         }
     };
 
@@ -105,7 +111,7 @@ const ChatsPage = () => {
                     const firstChat = response.data.payload[0];
                     setSelectedChat(firstChat.id);
                     // Load messages for first chat
-                    getChatMessages(firstChat);
+                    // getChatMessages(firstChat);
                 }
             }
         } catch (error) {
@@ -122,7 +128,7 @@ const ChatsPage = () => {
         if (text.trim() === "") return;
         const messageData = {
             senderId: "691dbba35e388352e3203b0b",
-            receiverId:chaterIds?.userId,
+            receiverId: chaterIds?.userId,
             shop_id: chaterIds?.shopId,
             text: text,
             timestamp: new Date().toISOString()
@@ -191,7 +197,6 @@ const ChatsPage = () => {
                             ) : (
 
                                 chatList?.map((conversation) => {
-                                    console.log("_____", conversation)
                                     const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${conversation?.sender?.profileImage?.replace("\\", "/")}`;
                                     const isImage = conversation?.sender?.profileImage ? true : false;
                                     const updatedAt = new Date(conversation?.updatedAt).toLocaleTimeString([], {

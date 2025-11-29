@@ -46,7 +46,7 @@ const UserChat = () => {
     const sendChat = () => {
         if (text.trim() === "") return;
         const messageData = {
-            senderId: "692438d4b0783677e6de61cb",
+            senderId: "691f4b774af4ade88ed7676a",
             receiverId: consultantId,
             shop_id: "690c374f605cb8b946503ccb",
             text: text,
