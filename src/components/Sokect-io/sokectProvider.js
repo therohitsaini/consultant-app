@@ -8,35 +8,51 @@ export default function SocketProvider({ children }) {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        socket.on("connection", () => {
+        // Check if socket is already connected
+        if (socket.connected) {
+            console.log("Socket already connected");
+            dispatch(setConnected(true));
+        }
+
+        // Listen for connect event (correct event name for socket.io)
+        const handleConnect = () => {
             console.log("Connected to socket");
             dispatch(setConnected(true));
-            socket.emit("register", "690c374f605cb8b946503ccb");
-        });
+            // Register with shop ID if needed
+            const shopId = localStorage.getItem('shop_o_Identity') || "690c374f605cb8b946503ccb";
+            socket.emit("register", shopId);
+        };
 
-        socket.on("disconnect", () => {
+        const handleDisconnect = () => {
             console.log("Disconnected from socket");
             dispatch(setConnected(false));
-        });
+        };
 
-        socket.on("activeUsers", (list) => {
+        const handleActiveUsers = (list) => {
             console.log("Active users", list);
             dispatch(setActiveUsers(list));
-        });
+        };
 
-        socket.on("receiveMessage", (msg) => {
+        const handleReceiveMessage = (msg) => {
             console.log("Received message", msg);
             dispatch(addMessage(msg));
-        });
-
-        return () => {
-            console.log("Cleaning up socket");
-            socket.off("connection");
-            socket.off("disconnect");
-            socket.off("activeUsers");
-            socket.off("receiveMessage");
         };
-    }, []);
+
+        // Set up event listeners
+        socket.on("connect", handleConnect);
+        socket.on("disconnect", handleDisconnect);
+        socket.on("activeUsers", handleActiveUsers);
+        socket.on("receiveMessage", handleReceiveMessage);
+
+        // Cleanup function
+        return () => {
+            console.log("Cleaning up socket listeners");
+            socket.off("connect", handleConnect);
+            socket.off("disconnect", handleDisconnect);
+            socket.off("activeUsers", handleActiveUsers);
+            socket.off("receiveMessage", handleReceiveMessage);
+        };
+    }, [dispatch]);
 
     return children;
 }

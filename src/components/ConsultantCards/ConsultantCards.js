@@ -15,14 +15,12 @@ function ConsultantCards() {
     const params = new URLSearchParams(window.location.search);
     const user_id = params.get('customerId');
     const shop_id = params.get('shopid');
-
+    console.log("shop_id", shop_id, "user_id____", user_id)
     useEffect(() => {
-        const client_id = localStorage.setItem('client_u_Identity', user_id);
+        const client_id = localStorage.setItem('client_u_Identity', "69257f27387c4f06e7de34d3");
         const shop = localStorage.setItem('shop_o_Identity', shop_id);
         console.log(client_id)
     }, [user_id, shop_id]);
-
-    console.log("shop_id", localStorage.getItem('shop_o_Identity'), "user_id", localStorage.getItem('client_u_Identity'))
 
     useEffect(() => {
         dispatch(fetchConsultants(shop_id));

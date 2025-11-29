@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ChatsPage.module.css';
 import axios from 'axios';
 import { socket } from '../Sokect-io/SokectConfig';
+import { fetchChatHistory } from '../Redux/slices/ConsultantSlices';
+import { useDispatch, useSelector } from 'react-redux';
 
 const ChatsPage = () => {
     const navigate = useNavigate();
@@ -12,19 +14,26 @@ const ChatsPage = () => {
     const [isMobile, setIsMobile] = useState(false);
     const [chatList, setChatList] = useState([]);
     const [chatMessagesData, setChatMessagesData] = useState([]);
-    const [consultantId, setConsultantId] = useState(null);
+    // const [consultantId, setConsultantId] = useState(null);
     const [chaterIds, setChaterIds] = useState(null);
     const [text, setText] = useState('');
+    const dispatch = useDispatch();
+    const { chatHistory } = useSelector((state) => state.consultants);
+    const messages = useSelector((state) => state.socket.messages);
 
-    useEffect(() => {
 
-        if (localStorage.getItem('consultant_u_Identity')) {
-            setConsultantId(localStorage.getItem('consultant_u_Identity'));
-        }
 
-    }, []);
-    console.log("consultantId_____________________", consultantId)
-    // Check if mobile on mount and resize
+    console.log("socketMessages", messages);
+
+    const lastProcessedMessageId = useRef(null);
+    const messagesEndRef = useRef(null);
+    const messagesAreaRef = useRef(null);
+
+    const consultantId = "691dbba35e388352e3203b0b";
+
+
+
+
     useEffect(() => {
         const checkMobile = () => {
             setIsMobile(window.innerWidth <= 768);
@@ -38,23 +47,88 @@ const ChatsPage = () => {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-
-
-    const getChatMessages = async ({ userId, shopId }) => {
-        console.log('___________UserId___shopId', userId, shopId)
-        // console.log("check_________________",consultantId, shopId, userId )
-        // const shopId = "690c374f605cb8b946503ccb"
-        // const userId = "692438d4b0783677e6de61cb"
-        const consultantId = "691dbba35e388352e3203b0b"
-        try {
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/chat/get/chat-history/${shopId}/${userId}/${consultantId}`);
-            if (response.data?.success) {
-                setChatMessagesData(response.data?.chatHistory);
-            }
-        } catch (error) {
-            console.log("error", error);
+    // Scroll to bottom function
+    const scrollToBottom = () => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        } else if (messagesAreaRef.current) {
+            messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
         }
-    }
+    };
+
+    // Update messages from chatHistory
+    useEffect(() => {
+        if (chatHistory?.chatHistory) {
+            setChatMessagesData(chatHistory.chatHistory);
+            // Reset last processed message when chat changes
+            lastProcessedMessageId.current = null;
+        }
+    }, [chatHistory]);
+
+    // Auto-scroll when messages update
+    useEffect(() => {
+        scrollToBottom();
+    }, [chatMessagesData]);
+
+    // Listen to socket messages and update chat in real-time
+    // useEffect(() => {
+    //     if (!chaterIds || !consultantId || !socketMessages.length) return;
+
+    //     // Get the latest socket message
+    //     const latestMessage = socketMessages[socketMessages.length - 1];
+
+    //     // Skip if we've already processed this message
+    //     if (latestMessage._id === lastProcessedMessageId.current) return;
+
+    //     // ✅ CONSOLE LOG: Backend se receiveMessage aaya
+    //     console.log("📨 ChatsPage - receiveMessage received from backend:", latestMessage);
+    //     console.log("📨 Message Details:", {
+    //         _id: latestMessage._id,
+    //         senderId: latestMessage.senderId,
+    //         receiverId: latestMessage.receiverId,
+    //         shop_id: latestMessage.shop_id,
+    //         text: latestMessage.text,
+    //         timestamp: latestMessage.timestamp
+    //     });
+
+    //     // Check if message belongs to current chat
+    //     const isCurrentChatMessage =
+    //         (latestMessage.shop_id === chaterIds.shopId) &&
+    //         ((latestMessage.senderId === chaterIds.userId && latestMessage.receiverId === consultantId) ||
+    //             (latestMessage.senderId === consultantId && latestMessage.receiverId === chaterIds.userId));
+
+    //     if (isCurrentChatMessage) {
+    //         console.log("✅ ChatsPage - Message belongs to current chat, adding to UI");
+
+    //         // Mark this message as processed
+    //         lastProcessedMessageId.current = latestMessage._id;
+
+    //         // Add new message to chat (check for duplicates and replace temp messages)
+    //         setChatMessagesData(prev => {
+    //             const messageExists = prev.some(msg => msg._id === latestMessage._id);
+    //             if (messageExists) {
+    //                 return prev;
+    //             }
+
+    //             // Check if there's a temporary message with same text and timestamp (optimistic update)
+    //             const tempMessageIndex = prev.findIndex(msg =>
+    //                 msg._id?.startsWith('temp-') &&
+    //                 msg.text === latestMessage.text &&
+    //                 msg.senderId === latestMessage.senderId
+    //             );
+
+    //             if (tempMessageIndex !== -1) {
+    //                 // Replace temp message with real message
+    //                 const newMessages = [...prev];
+    //                 newMessages[tempMessageIndex] = latestMessage;
+    //                 return newMessages;
+    //             }
+
+    //             // Add new message
+    //             return [...prev, latestMessage];
+    //         });
+    //     }
+    // }, [socketMessages, chaterIds, consultantId]);
 
     // Load messages when selectedChat changes
     useEffect(() => {
@@ -84,7 +158,7 @@ const ChatsPage = () => {
             if (isMobile) {
                 setShowChatView(true);
             }
-            getChatMessages({ userId: chatData.userId, shopId: chatData.shopId });
+            dispatch(fetchChatHistory({ shopId: chatData.shopId, userId: chatData.userId, consultantId: "691dbba35e388352e3203b0b" }));
         }
     };
 
@@ -123,21 +197,48 @@ const ChatsPage = () => {
         getChatList();
     }, []);
 
-    console.log("chaterIds____________", chaterIds)
     const sendChat = () => {
-        if (text.trim() === "") return;
-        const messageData = {
-            senderId: "691dbba35e388352e3203b0b",
-            receiverId: chaterIds?.userId,
-            shop_id: chaterIds?.shopId,
-            text: text,
-            timestamp: new Date().toISOString()
-        };
-        socket.emit("sendMessage", messageData);
-        setText("");
-    }
-    console.log("text", text)
+        if (text.trim() === "" || !chaterIds) return;
 
+        // Check if socket is connected
+        if (!socket.connected) {
+            console.warn("Socket not connected, attempting to reconnect...");
+            socket.connect();
+            // Wait a bit for connection, then send
+            setTimeout(() => {
+                if (socket.connected) {
+                    sendMessage();
+                } else {
+                    console.error("Failed to connect socket");
+                    // alert("Connection lost. Please refresh the page.");
+                }
+            }, 1000);
+            return;
+        }
+
+        sendMessage();
+
+        function sendMessage() {
+            const messageData = {
+                senderId: consultantId || "691dbba35e388352e3203b0b",
+                receiverId: chaterIds?.userId,
+                shop_id: chaterIds?.shopId,
+                text: text,
+                timestamp: new Date().toISOString()
+            };
+
+            // Optimistically add message to UI immediately
+            const optimisticMessage = {
+                _id: `temp-${Date.now()}`,
+                ...messageData
+            };
+            setChatMessagesData(prev => [...prev, optimisticMessage]);
+
+            // Send message via socket
+            socket.emit("sendMessage", messageData);
+            setText("");
+        }
+    }
 
 
 
@@ -324,44 +425,47 @@ const ChatsPage = () => {
                                 </div>
 
                                 {/* Messages Area */}
-                                <div className={styles.messagesArea}>
+                                <div className={styles.messagesArea} ref={messagesAreaRef}>
                                     {chatMessagesData.length === 0 ? (
                                         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                                             <p>No messages yet. Start the conversation!</p>
                                         </div>
                                     ) : (
-                                        chatMessagesData.map((message) => {
-                                            const consultantId = "691f4b774af4ade88ed7676a";
-                                            const isOwn = message.senderId === consultantId;
+                                        <>
+                                            {chatMessagesData.map((message) => {
+                                                const consultantId = "691dbba35e388352e3203b0b";
+                                                const isOwn = message.senderId === consultantId;
 
-                                            // Format timestamp
-                                            const timestamp = new Date(message.timestamp).toLocaleTimeString([], {
-                                                hour: "2-digit",
-                                                minute: "2-digit",
-                                                hour12: true
-                                            });
+                                                // Format timestamp
+                                                const timestamp = new Date(message.timestamp).toLocaleTimeString([], {
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                    hour12: true
+                                                });
 
-                                            return (
-                                                <div
-                                                    key={message._id}
-                                                    className={`${styles.messageContainer} ${isOwn ? styles.messageContainerRight : styles.messageContainerLeft}`}
-                                                >
-                                                    <div className={`${styles.messageBubble} ${isOwn ? styles.messageBubbleOwn : styles.messageBubbleOther}`}>
-                                                        {/* {!isOwn && (
-                                                            <div className={styles.messageSender}>
-                                                                User
+                                                return (
+                                                    <div
+                                                        key={message._id}
+                                                        className={`${styles.messageContainer} ${isOwn ? styles.messageContainerRight : styles.messageContainerLeft}`}
+                                                    >
+                                                        <div className={`${styles.messageBubble} ${isOwn ? styles.messageBubbleOwn : styles.messageBubbleOther}`}>
+                                                            {/* {!isOwn && (
+                                                                <div className={styles.messageSender}>
+                                                                    User
+                                                                </div>
+                                                            )} */}
+                                                            <div className={styles.messageText}>
+                                                                {message.text}
                                                             </div>
-                                                        )} */}
-                                                        <div className={styles.messageText}>
-                                                            {message.text}
-                                                        </div>
-                                                        <div className={styles.messageTimestamp}>
-                                                            {timestamp}
+                                                            <div className={styles.messageTimestamp}>
+                                                                {timestamp}
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            );
-                                        })
+                                                );
+                                            })}
+                                            <div ref={messagesEndRef} />
+                                        </>
                                     )}
                                 </div>
 
@@ -375,9 +479,15 @@ const ChatsPage = () => {
                                         </button>
                                         <input
                                             onChange={(e) => setText(e.target.value)}
+                                            value={text}
                                             type="text"
                                             className={styles.messageInput}
                                             placeholder="Type a message..."
+                                            onKeyPress={(e) => {
+                                                if (e.key === 'Enter' && text.trim()) {
+                                                    sendChat();
+                                                }
+                                            }}
                                         />
                                         <button onClick={sendChat} className={styles.sendButton} title="Send">
                                             <svg className={styles.sendIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
