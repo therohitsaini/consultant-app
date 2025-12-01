@@ -5,6 +5,7 @@ import styles from "./UserChat.module.css"
 import { socket } from '../Sokect-io/SokectConfig';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchChatHistory, fetchConsultantById } from '../Redux/slices/ConsultantSlices';
+import PopupNotification from '../AlertModel/MessageNotificationAlert';
 
 const UserChat = () => {
     const [text, setText] = useState()
@@ -31,6 +32,9 @@ const UserChat = () => {
     const lastProcessedMessageId = useRef(null);
     const messagesEndRef = useRef(null);
     const messagesAreaRef = useRef(null);
+    const [showNotification, setShowNotification] = useState(false);
+    const [notificationMessage, setNotificationMessage] = useState(null);
+    const lastNotificationMessageId = useRef(null);
     useEffect(() => {
         dispatch(fetchConsultantById({ shop_id: shopId, consultant_id: consultantId }))
     }, [dispatch, consultantId]);
@@ -146,6 +150,44 @@ const UserChat = () => {
         });
     }, [socketMessages, clientId, consultantId, shopId]);
 
+    // Show popup notification when new incoming message arrives
+    useEffect(() => {
+        if (!clientId || !consultantId || !shopId) return;
+        if (!socketMessages || socketMessages.length === 0) return;
+
+        const latestMessage = socketMessages[socketMessages.length - 1];
+        if (!latestMessage) return;
+
+        // Skip if we've already shown notification for this message
+        if (latestMessage._id && latestMessage._id === lastNotificationMessageId.current) {
+            return;
+        }
+
+        // Incoming for user: consultant → client
+        const isIncoming =
+            String(latestMessage.senderId) === String(consultantId) &&
+            String(latestMessage.receiverId) === String(clientId) &&
+            String(latestMessage.shop_id) === String(shopId);
+
+        if (!isIncoming) return;
+
+        // Build notification payload using consultant data
+        const payload = {
+            senderName: consultantOverview?.consultant?.fullname || 'Consultant',
+            text: latestMessage.text || '',
+            avatar: consultantOverview?.consultant?.profileImage
+                ? `${process.env.REACT_APP_BACKEND_HOST}/${consultantOverview.consultant.profileImage.replace("\\", "/")}`
+                : null,
+        };
+
+        setNotificationMessage(payload);
+        setShowNotification(true);
+
+        if (latestMessage._id) {
+            lastNotificationMessageId.current = latestMessage._id;
+        }
+    }, [socketMessages, clientId, consultantId, shopId, consultantOverview]);
+
     const sendChat = () => {
         if (text.trim() === "" || !clientId || !consultantId || !shopId) return;
 
@@ -258,6 +300,13 @@ const UserChat = () => {
 
     return (
         <Fragment>
+            {/* Global-style message notification for user side */}
+            {showNotification && notificationMessage && (
+                <PopupNotification
+                    message={notificationMessage}
+                    onClose={() => setShowNotification(false)}
+                />
+            )}
             {/* <button className="btn btn-link back-button mb-3" onClick={() => navigate('/consultant-cards')}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px', verticalAlign: 'middle' }}>
                     <path d="M19 12H5M12 19l-7-7 7-7" />

@@ -50,6 +50,8 @@ const LoginForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        console.log("process.env.REACT_APP_BACKEND_HOST", process.env.REACT_APP_BACKEND_HOST)
+
         if (!validateForm()) {
             return;
         }
@@ -59,8 +61,8 @@ const LoginForm = () => {
             userData
         );
         if (response.status === 200) {
-            localStorage.setItem('consultant_u_Identity', response.data.userData._id);
-            navigate('/consultant-dashboard');
+            localStorage.setItem('client_u_Identity', response.data.userData._id);
+            navigate('https://rohit-12345839.myshopify.com/apps/agora');
         } else {
             setErrors({ email: 'Invalid email or password' });
         }

@@ -6,6 +6,8 @@ import { socket } from '../Sokect-io/SokectConfig';
 import { fetchChatHistory } from '../Redux/slices/ConsultantSlices';
 import { useDispatch, useSelector } from 'react-redux';
 import { addMessage } from '../Redux/slices/sokectSlice';
+import PopupNotification from '../AlertModel/MessageNotificationAlert';
+import { BsThreeDotsVertical } from "react-icons/bs";
 
 const ChatsPage = () => {
     const navigate = useNavigate();
@@ -21,6 +23,11 @@ const ChatsPage = () => {
     const dispatch = useDispatch();
     const { chatHistory } = useSelector((state) => state.consultants);
     const messages = useSelector((state) => state.socket.messages);
+    const [showNotification, setShowNotification] = useState(false);
+    const [notificationMessage, setNotificationMessage] = useState(null);
+    const [showRequestModal, setShowRequestModal] = useState(false);
+    const [openMenuConversationId, setOpenMenuConversationId] = useState(null);
+    const lastNotificationMessageId = useRef(null);
 
     const lastProcessedMessageId = useRef(null);
     const messagesEndRef = useRef(null);
@@ -29,7 +36,7 @@ const ChatsPage = () => {
     const consultantId = "691dbba35e388352e3203b0b";
 
 
-    console.log("messages", messages)
+
 
     useEffect(() => {
         const checkMobile = () => {
@@ -68,66 +75,52 @@ const ChatsPage = () => {
     }, [chatMessagesData]);
 
     // Listen to socket messages and update chat in real-time
-    // useEffect(() => {
-    //     if (!chaterIds || !consultantId || !socketMessages.length) return;
+    useEffect(() => {
+        if (!chaterIds || !consultantId || !messages.length) return;
 
-    //     // Get the latest socket message
-    //     const latestMessage = socketMessages[socketMessages.length - 1];
+        // Get the latest socket message
+        const latestMessage = messages[messages.length - 1];
 
-    //     // Skip if we've already processed this message
-    //     if (latestMessage._id === lastProcessedMessageId.current) return;
+        // Skip if we've already processed this message
+        if (latestMessage._id === lastProcessedMessageId.current) return;
 
-    //     // ✅ CONSOLE LOG: Backend se receiveMessage aaya
-    //     console.log("📨 ChatsPage - receiveMessage received from backend:", latestMessage);
-    //     console.log("📨 Message Details:", {
-    //         _id: latestMessage._id,
-    //         senderId: latestMessage.senderId,
-    //         receiverId: latestMessage.receiverId,
-    //         shop_id: latestMessage.shop_id,
-    //         text: latestMessage.text,
-    //         timestamp: latestMessage.timestamp
-    //     });
+        // Check if message belongs to current chat
+        const isCurrentChatMessage =
+            (String(latestMessage.shop_id) === String(chaterIds.shopId)) &&
+            ((String(latestMessage.senderId) === String(chaterIds.userId) && String(latestMessage.receiverId) === String(consultantId)) ||
+                (String(latestMessage.senderId) === String(consultantId) && String(latestMessage.receiverId) === String(chaterIds.userId)));
 
-    //     // Check if message belongs to current chat
-    //     const isCurrentChatMessage =
-    //         (latestMessage.shop_id === chaterIds.shopId) &&
-    //         ((latestMessage.senderId === chaterIds.userId && latestMessage.receiverId === consultantId) ||
-    //             (latestMessage.senderId === consultantId && latestMessage.receiverId === chaterIds.userId));
+        if (isCurrentChatMessage) {
+            // Mark this message as processed
+            lastProcessedMessageId.current = latestMessage._id;
 
-    //     if (isCurrentChatMessage) {
-    //         console.log("✅ ChatsPage - Message belongs to current chat, adding to UI");
+            // Add new message to chat (check for duplicates and replace temp messages)
+            setChatMessagesData(prev => {
+                const messageExists = prev.some(msg => msg._id === latestMessage._id);
+                if (messageExists) {
+                    return prev;
+                }
 
-    //         // Mark this message as processed
-    //         lastProcessedMessageId.current = latestMessage._id;
+                // Check if there's a temporary message with same text and timestamp (optimistic update)
+                const tempMessageIndex = prev.findIndex(msg =>
+                    msg._id?.startsWith('temp-') &&
+                    msg.text === latestMessage.text &&
+                    String(msg.senderId) === String(latestMessage.senderId)
+                );
 
-    //         // Add new message to chat (check for duplicates and replace temp messages)
-    //         setChatMessagesData(prev => {
-    //             const messageExists = prev.some(msg => msg._id === latestMessage._id);
-    //             if (messageExists) {
-    //                 return prev;
-    //             }
+                if (tempMessageIndex !== -1) {
+                    // Replace temp message with real message
+                    const newMessages = [...prev];
+                    newMessages[tempMessageIndex] = latestMessage;
+                    return newMessages;
+                }
 
-    //             // Check if there's a temporary message with same text and timestamp (optimistic update)
-    //             const tempMessageIndex = prev.findIndex(msg =>
-    //                 msg._id?.startsWith('temp-') &&
-    //                 msg.text === latestMessage.text &&
-    //                 msg.senderId === latestMessage.senderId
-    //             );
+                // Add new message
+                return [...prev, latestMessage];
+            });
+        }
+    }, [messages, chaterIds, consultantId]);
 
-    //             if (tempMessageIndex !== -1) {
-    //                 // Replace temp message with real message
-    //                 const newMessages = [...prev];
-    //                 newMessages[tempMessageIndex] = latestMessage;
-    //                 return newMessages;
-    //             }
-
-    //             // Add new message
-    //             return [...prev, latestMessage];
-    //         });
-    //     }
-    // }, [socketMessages, chaterIds, consultantId]);
-
-    // Load messages when selectedChat changes
     useEffect(() => {
         if (selectedChat && chatList.length > 0) {
             const conversation = chatList.find(conv => conv.id === selectedChat);
@@ -173,6 +166,7 @@ const ChatsPage = () => {
     );
 
     const getChatList = async () => {
+        console.log("process.env.REACT_APP_BACKEND_HOST", process.env.REACT_APP_BACKEND_HOST)
         try {
             const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/get/chat-list/${"690c374f605cb8b946503ccb"}/${"691dbba35e388352e3203b0b"}`);
             if (response.data?.payload) {
@@ -192,7 +186,7 @@ const ChatsPage = () => {
 
     useEffect(() => {
         getChatList();
-    }, []);
+    }, [messages]);
 
     const sendChat = () => {
         if (text.trim() === "" || !chaterIds) return;
@@ -241,286 +235,463 @@ const ChatsPage = () => {
     }
 
 
+    // Show notification when new message arrives
+    useEffect(() => {
+        if (messages && messages.length > 0) {
+            // Get the latest message
+            const latestMessage = messages[messages.length - 1];
+
+            // Skip if we've already shown notification for this message
+            if (latestMessage._id === lastNotificationMessageId.current) return;
+
+            // Check if this is an incoming message (not sent by consultant)
+            const isIncomingMessage = String(latestMessage.senderId) !== String(consultantId);
+
+            // Check if message belongs to current chat (if chat is selected)
+            let isCurrentChatMessage = true;
+            if (chaterIds) {
+                isCurrentChatMessage =
+                    String(latestMessage.shop_id) === String(chaterIds.shopId) &&
+                    ((String(latestMessage.senderId) === String(chaterIds.userId) && String(latestMessage.receiverId) === String(consultantId)) ||
+                        (String(latestMessage.senderId) === String(consultantId) && String(latestMessage.receiverId) === String(chaterIds.userId)));
+            }
+
+            // Show notification only for incoming messages
+            if (isIncomingMessage) {
+                // Get sender name from chatList
+                const senderConversation = chatList.find(conv =>
+                    conv.sender?.id === latestMessage.senderId && conv.shop?.id === latestMessage.shop_id
+                );
+
+                const senderName = senderConversation?.sender?.fullname || 'User';
+                const senderAvatar = senderConversation?.sender?.profileImage
+                    ? `${process.env.REACT_APP_BACKEND_HOST}/${senderConversation.sender.profileImage.replace("\\", "/")}`
+                    : null;
+
+                // Set notification data
+                setNotificationMessage({
+                    senderName: senderName,
+                    text: latestMessage.text,
+                    avatar: senderAvatar
+                });
+
+                // Show notification
+                setShowNotification(true);
+
+                // Mark as processed
+                lastNotificationMessageId.current = latestMessage._id;
+
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    setShowNotification(false);
+                }, 5000);
+            }
+        }
+    }, [messages, consultantId, chaterIds, chatList]);
+
+
+    console.log("chatList", chatList)
+    // filter the request modal data
+    const isRequestModalOpen = chatList.filter((conversation) => conversation.isRequest === false);
+    const isRequestModalClose = chatList.filter((conversation) => conversation.isRequest === true);
+
+    console.log("isRequestModalOpen", isRequestModalOpen)
+    console.log("isRequestModalClose", isRequestModalClose)
+
 
     return (
-        <div className={styles.pageContainer}>
-            {/* Header Section */}
-            <div className={styles.headerSection}>
-                <h1 className={styles.pageTitle}>
-                    Messages
-                </h1>
-                <p className={styles.pageDescription}>
-                    Communicate with clients and manage your conversations.
-                </p>
-            </div>
+        <Fragment>
+            {/* Message Notification Alert */}
+            {/* {showNotification && notificationMessage && (
+                <PopupNotification
+                    message={notificationMessage}
+                    onClose={() => setShowNotification(false)}
+                />
+            )} */}
 
-            <div className={styles.chatLayout}>
-                {/* Conversations Sidebar */}
-                <div className={`${styles.conversationsSidebar} ${showChatView ? styles.hideOnMobile : ''}`}>
-                    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', }}>
-                        {/* Search Bar */}
-                        <div className={styles.searchBar}>
-                            <div className={styles.searchInputWrapper}>
-                                <svg className={styles.searchIcon} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                    <circle cx="11" cy="11" r="8" />
-                                    <path d="m21 21-4.35-4.35" />
-                                </svg>
-                                <input
-                                    type="text"
-                                    className={styles.searchInput}
-                                    placeholder="Search conversations..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                />
+            <div className={styles.pageContainer}>
+                {/* Header Section */}
+                <div className={styles.headerSection}>
+                    <h1 className={styles.pageTitle}>
+                        Messages
+                    </h1>
+                    <p className={styles.pageDescription}>
+                        Communicate with clients and manage your conversations.
+                    </p>
+                </div>
+                <div className={styles.chatLayout}>
+                    {/* Conversations Sidebar */}
+                    <div className={`${styles.conversationsSidebar} ${showChatView ? styles.hideOnMobile : ''}`}>
+                        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', }}>
+                            {/* Search Bar */}
+                            <div className={styles.searchBar}>
+                                <div className={styles.searchInputWrapper}>
+                                    <svg className={styles.searchIcon} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                        <circle cx="11" cy="11" r="8" />
+                                        <path d="m21 21-4.35-4.35" />
+                                    </svg>
+                                    <input
+                                        type="text"
+                                        className={styles.searchInput}
+                                        placeholder="Search conversations..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                    />
+                                </div>
                             </div>
-                        </div>
 
-                        <div style={{
-                            width: "100%",
-                            display: "flex",
-                            justifyContent: "end"
-                        }}>
-                            <p style={{}}>Request</p>
-                        </div>
-                        {/* Conversations List */}
-                        <div className={styles.conversationsList}>
-                            {chatList.length === 0 ? (
-                                <div className={styles.emptyState}>
-                                    <div>
-                                        <svg className={styles.emptyIcon} width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                                        </svg>
-                                        <p className={styles.emptyText}>Loading conversations...</p>
-                                    </div>
-                                </div>
-                            ) : filteredConversations.length === 0 ? (
-                                <div className={styles.emptyState}>
-                                    <div>
-                                        <svg className={styles.emptyIcon} width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                                        </svg>
-                                        <p className={styles.emptyText}>No conversations found</p>
-                                    </div>
-                                </div>
-                            ) : (
+                            <div style={{
+                                width: "100%",
+                                display: "flex",
+                                justifyContent: "end"
+                            }}>
+                                <p onClick={() => setShowRequestModal(!showRequestModal)} style={{ fontSize: "14px", fontWeight: "600", padding: "10px", cursor: "pointer" }}>Request</p>
+                            </div>
+                            {
+                                showRequestModal ? (
 
-                                chatList?.map((conversation) => {
-                                    const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${conversation?.sender?.profileImage?.replace("\\", "/")}`;
-                                    const isImage = conversation?.sender?.profileImage ? true : false;
-                                    const updatedAt = new Date(conversation?.updatedAt).toLocaleTimeString([], {
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                        hour12: true
-                                    });
+                                    isRequestModalOpen?.map((conversation) => {
+                                        const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${conversation?.sender?.profileImage?.replace("\\", "/")}`;
+                                        const isImage = conversation?.sender?.profileImage ? true : false;
+                                        const updatedAt = new Date(conversation?.updatedAt).toLocaleTimeString([], {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                            hour12: true
+                                        });
 
-                                    return (
-                                        <Fragment>
-                                            <div
-                                                key={conversation.id}
-                                                onClick={() => handleChatSelect({ shopId: conversation.shop.id, userId: conversation.sender.id })}
-                                                className={`${styles.conversationItem} ${selectedChat === conversation.id ? styles.conversationItemActive : ''}`}
-                                            >
-                                                <div className={styles.conversationContent}>
-                                                    <div className={styles.avatarWrapper}>
-                                                        <img
-                                                            src={isImage ? imageUrl : "../images/team/team1.avif"}
-                                                            alt="profile"
-                                                            className={styles.conversationAvatar}
-                                                        />
-                                                        {conversation.isOnline && (
-                                                            <div className={styles.onlineIndicator}></div>
-                                                        )}
-                                                    </div>
-                                                    <div className={styles.conversationDetails}>
-                                                        <div className={`${styles.conversationHeader} ${styles.flexBetween} ${styles.flexStart}`}>
-                                                            <div className={styles.conversationName}>
-                                                                {conversation.sender?.fullname}
-                                                            </div>
-                                                            <div className={styles.conversationTimestamp}>
-                                                                {updatedAt}
-                                                            </div>
+                                        return (
+                                            <Fragment>
+                                                <div
+                                                    key={conversation.id}
+                                                    // onClick={() => handleChatSelect({ shopId: conversation.shop.id, userId: conversation.sender.id })}
+                                                    className={`${styles.conversationItem} ${selectedChat === conversation.id ? styles.conversationItemActive : ''}`}
+                                                >
+                                                    <div className={styles.conversationContent}>
+                                                        <div className={styles.avatarWrapper}>
+                                                            <img
+                                                                src={isImage ? imageUrl : "../images/team/team1.avif"}
+                                                                alt="profile"
+                                                                className={styles.conversationAvatar}
+                                                            />
+                                                            {conversation.isOnline && (
+                                                                <div className={styles.onlineIndicator}></div>
+                                                            )}
                                                         </div>
-                                                        <div className={`${styles.conversationMessage} ${styles.flexBetween} ${styles.flexCenter}`}>
-                                                            <div className={styles.messageText}>
-                                                                {conversation?.
-                                                                    lastMessage
-                                                                }
+                                                        <div className={styles.conversationDetails}>
+                                                            <div className={`${styles.conversationHeader} ${styles.flexBetween} ${styles.flexStart}`}>
+                                                                <div className={styles.conversationName}>
+                                                                    {conversation.sender?.fullname}
+                                                                </div>
+                                                                <div className={styles.conversationTimestamp}>
+                                                                    {updatedAt}
+                                                                </div>
                                                             </div>
-                                                            {/* {conversation.unreadCount > 0 && ( */}
-                                                            <span className={styles.unreadBadge}>
-                                                                {"5+"}
-                                                            </span>
-                                                            {/* )} */}
-                                                        </div>
-                                                        <div className={`${styles.conversationStatus} ${conversation.isOnline ? styles.statusOnline : styles.statusOffline}`}>
-                                                            {conversation.lastActive}
+                                                            <div className={`${styles.conversationMessage} ${styles.flexBetween} ${styles.flexCenter}`}>
+                                                                <div className={styles.messageText}>
+                                                                    {conversation?.lastMessage}
+                                                                </div>
+
+                                                                <div className={styles.moreMenuWrapper}>
+                                                                    <button
+                                                                        type="button"
+                                                                        className={styles.unreadBadgeIcon}
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            setOpenMenuConversationId(
+                                                                                openMenuConversationId === conversation.id ? null : conversation.id
+                                                                            );
+                                                                        }}
+                                                                    >
+                                                                        <BsThreeDotsVertical />
+                                                                    </button>
+
+                                                                    {openMenuConversationId === conversation.id && (
+                                                                        <div
+                                                                            className={styles.moreMenu}
+                                                                            onClick={(e) => e.stopPropagation()}
+                                                                        >
+                                                                            <button
+                                                                                type="button"
+                                                                                className={styles.moreMenuItem}
+                                                                                onClick={() => {
+                                                                                    // TODO: add your add logic here
+                                                                                    console.log("Add clicked for", conversation.id);
+                                                                                    setOpenMenuConversationId(null);
+                                                                                }}
+                                                                            >
+                                                                                Add
+                                                                            </button>
+                                                                            <button
+                                                                                type="button"
+                                                                                className={styles.moreMenuItem}
+                                                                                onClick={() => {
+                                                                                    // TODO: add your remove logic here
+                                                                                    console.log("Remove clicked for", conversation.id);
+                                                                                    setOpenMenuConversationId(null);
+                                                                                }}
+                                                                            >
+                                                                                Remove
+                                                                            </button>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                            {/* <div className={`${styles.conversationStatus} ${conversation.isOnline ? styles.statusOnline : styles.statusOffline}`}>
+                                                                {conversation.lastActive}
+                                                            </div> */}
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </Fragment>
-                                    )
-                                }
+                                            </Fragment>
+                                        )
+                                    })
 
                                 )
-                            )}
+                                    : (
+                                        <div className={styles.conversationsList}>
+                                            {isRequestModalClose.length === 0 ? (
+                                                <div className={styles.emptyState}>
+                                                    <div>
+                                                        <svg className={styles.emptyIcon} width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                                        </svg>
+                                                        <p className={styles.emptyText}>Loading conversations...</p>
+                                                    </div>
+                                                </div>
+                                            ) : filteredConversations.length === 0 ? (
+                                                <div className={styles.emptyState}>
+                                                    <div>
+                                                        <svg className={styles.emptyIcon} width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                                        </svg>
+                                                        <p className={styles.emptyText}>No conversations found</p>
+                                                    </div>
+                                                </div>
+                                            ) : (
+
+                                                isRequestModalClose?.map((conversation) => {
+                                                    const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${conversation?.sender?.profileImage?.replace("\\", "/")}`;
+                                                    const isImage = conversation?.sender?.profileImage ? true : false;
+                                                    const updatedAt = new Date(conversation?.updatedAt).toLocaleTimeString([], {
+                                                        hour: "2-digit",
+                                                        minute: "2-digit",
+                                                        hour12: true
+                                                    });
+
+                                                    return (
+                                                        <Fragment>
+                                                            <div
+                                                                key={conversation.id}
+                                                                onClick={() => handleChatSelect({ shopId: conversation.shop.id, userId: conversation.sender.id })}
+                                                                className={`${styles.conversationItem} ${selectedChat === conversation.id ? styles.conversationItemActive : ''}`}
+                                                            >
+                                                                <div className={styles.conversationContent}>
+                                                                    <div className={styles.avatarWrapper}>
+                                                                        <img
+                                                                            src={isImage ? imageUrl : "../images/team/team1.avif"}
+                                                                            alt="profile"
+                                                                            className={styles.conversationAvatar}
+                                                                        />
+                                                                        {conversation.isOnline && (
+                                                                            <div className={styles.onlineIndicator}></div>
+                                                                        )}
+                                                                    </div>
+                                                                    <div className={styles.conversationDetails}>
+                                                                        <div className={`${styles.conversationHeader} ${styles.flexBetween} ${styles.flexStart}`}>
+                                                                            <div className={styles.conversationName}>
+                                                                                {conversation.sender?.fullname}
+                                                                            </div>
+                                                                            <div className={styles.conversationTimestamp}>
+                                                                                {updatedAt}
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className={`${styles.conversationMessage} ${styles.flexBetween} ${styles.flexCenter}`}>
+                                                                            <div className={styles.messageText}>
+                                                                                {conversation?.
+                                                                                    lastMessage
+                                                                                }
+                                                                            </div>
+                                                                            {/* {conversation.unreadCount > 0 && ( */}
+                                                                            <span className={styles.unreadBadge}>
+                                                                                {"5+"}
+                                                                            </span>
+                                                                            {/* )} */}
+                                                                        </div>
+                                                                        <div className={`${styles.conversationStatus} ${conversation.isOnline ? styles.statusOnline : styles.statusOffline}`}>
+                                                                            {conversation.lastActive}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </Fragment>
+                                                    )
+                                                }
+
+                                                )
+                                            )}
+                                        </div>
+                                    )
+
+                            }
+                            {/* Conversations List */}
+
                         </div>
                     </div>
-                </div>
 
-                {/* Chat Window */}
-                <div className={`${styles.chatWindow} ${!showChatView ? styles.hideOnMobile : ''}`}>
-                    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                        {selectedConversation ? (
-                            <>
-                                {/* Chat Header */}
-                                <div className={`${styles.chatHeader} ${styles.flexBetween} ${styles.flexCenter}`}>
-                                    {/* Mobile Back Button */}
-                                    <button
-                                        className={styles.mobileBackButton}
-                                        onClick={handleBackToList}
-                                        aria-label="Back to conversations"
-                                    >
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                            <path d="M19 12H5M12 19l-7-7 7-7" />
-                                        </svg>
-                                    </button>
-                                    <div className={`${styles.chatHeaderInfo} ${styles.flex} ${styles.flexCenter}`}>
-                                        <div className={styles.avatarWrapper}>
-                                            {selectedConversation?.sender?.profileImage ? (
-                                                <img
-                                                    src={`${process.env.REACT_APP_BACKEND_HOST}/${selectedConversation.sender.profileImage.replace("\\", "/")}`}
-                                                    alt={selectedConversation.sender.fullname}
-                                                    className={styles.chatHeaderAvatar}
-                                                    style={{ borderRadius: '50%', width: '40px', height: '40px', objectFit: 'cover' }}
-                                                />
-                                            ) : (
-                                                <div className={styles.chatHeaderAvatar}>
-                                                    {selectedConversation?.sender?.fullname?.charAt(0)?.toUpperCase() || 'U'}
-                                                </div>
-                                            )}
-                                            {selectedConversation?.isOnline && (
-                                                <div className={styles.onlineIndicator}></div>
-                                            )}
-                                        </div>
-                                        <div>
-                                            <div className={styles.chatHeaderName}>
-                                                {selectedConversation?.sender?.fullname || 'User'}
-                                            </div>
-                                            <div className={styles.chatHeaderStatus} style={{ color: selectedConversation?.isOnline ? '#10b981' : '#6c757d' }}>
-                                                {selectedConversation?.isOnline ? 'Active now' : selectedConversation?.lastActive || 'Offline'}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className={styles.chatHeaderActions} style={{ display: 'flex', gap: '8px' }}>
+                    {/* Chat Window */}
+                    <div className={`${styles.chatWindow} ${!showChatView ? styles.hideOnMobile : ''}`}>
+                        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                            {selectedConversation ? (
+                                <>
+                                    {/* Chat Header */}
+                                    <div className={`${styles.chatHeader} ${styles.flexBetween} ${styles.flexCenter}`}>
+                                        {/* Mobile Back Button */}
                                         <button
-                                            className={styles.headerButton}
-                                            title="Video Call"
-                                            onClick={() => navigate('/video/calling/page', { state: { conversation: selectedConversation } })}
+                                            className={styles.mobileBackButton}
+                                            onClick={handleBackToList}
+                                            aria-label="Back to conversations"
                                         >
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                                <path d="M23 7l-7 5 7 5V7z" />
-                                                <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                                <path d="M19 12H5M12 19l-7-7 7-7" />
                                             </svg>
                                         </button>
-                                        <button className={styles.headerButton} title="More Options">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                                <circle cx="12" cy="12" r="1" />
-                                                <circle cx="19" cy="12" r="1" />
-                                                <circle cx="5" cy="12" r="1" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Messages Area */}
-                                <div className={styles.messagesArea} ref={messagesAreaRef}>
-                                    {chatMessagesData.length === 0 ? (
-                                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                                            <p>No messages yet. Start the conversation!</p>
+                                        <div className={`${styles.chatHeaderInfo} ${styles.flex} ${styles.flexCenter}`}>
+                                            <div className={styles.avatarWrapper}>
+                                                {selectedConversation?.sender?.profileImage ? (
+                                                    <img
+                                                        src={`${process.env.REACT_APP_BACKEND_HOST}/${selectedConversation.sender.profileImage.replace("\\", "/")}`}
+                                                        alt={selectedConversation.sender.fullname}
+                                                        className={styles.chatHeaderAvatar}
+                                                        style={{ borderRadius: '50%', width: '40px', height: '40px', objectFit: 'cover' }}
+                                                    />
+                                                ) : (
+                                                    <div className={styles.chatHeaderAvatar}>
+                                                        {selectedConversation?.sender?.fullname?.charAt(0)?.toUpperCase() || 'U'}
+                                                    </div>
+                                                )}
+                                                {selectedConversation?.isOnline && (
+                                                    <div className={styles.onlineIndicator}></div>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <div className={styles.chatHeaderName}>
+                                                    {selectedConversation?.sender?.fullname || 'User'}
+                                                </div>
+                                                <div className={styles.chatHeaderStatus} style={{ color: selectedConversation?.isOnline ? '#10b981' : '#6c757d' }}>
+                                                    {selectedConversation?.isOnline ? 'Active now' : selectedConversation?.lastActive || 'Offline'}
+                                                </div>
+                                            </div>
                                         </div>
-                                    ) : (
-                                        <>
-                                            {chatMessagesData.map((message) => {
-                                                const consultantId = "691dbba35e388352e3203b0b";
-                                                const isOwn = message.senderId === consultantId;
+                                        <div className={styles.chatHeaderActions} style={{ display: 'flex', gap: '8px' }}>
+                                            <button
+                                                className={styles.headerButton}
+                                                title="Video Call"
+                                                onClick={() => navigate('/video/calling/page', { state: { conversation: selectedConversation } })}
+                                            >
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                                    <path d="M23 7l-7 5 7 5V7z" />
+                                                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                                                </svg>
+                                            </button>
+                                            <button className={styles.headerButton} title="More Options">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                                    <circle cx="12" cy="12" r="1" />
+                                                    <circle cx="19" cy="12" r="1" />
+                                                    <circle cx="5" cy="12" r="1" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
 
-                                                // Format timestamp
-                                                const timestamp = new Date(message.timestamp).toLocaleTimeString([], {
-                                                    hour: "2-digit",
-                                                    minute: "2-digit",
-                                                    hour12: true
-                                                });
+                                    {/* Messages Area */}
+                                    <div className={styles.messagesArea} ref={messagesAreaRef}>
+                                        {chatMessagesData.length === 0 ? (
+                                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                                                <p>No messages yet. Start the conversation!</p>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                {chatMessagesData.map((message) => {
+                                                    const consultantId = "691dbba35e388352e3203b0b";
+                                                    const isOwn = message.senderId === consultantId;
 
-                                                return (
-                                                    <div
-                                                        key={message._id}
-                                                        className={`${styles.messageContainer} ${isOwn ? styles.messageContainerRight : styles.messageContainerLeft}`}
-                                                    >
-                                                        <div className={`${styles.messageBubble} ${isOwn ? styles.messageBubbleOwn : styles.messageBubbleOther}`}>
-                                                            {/* {!isOwn && (
+                                                    // Format timestamp
+                                                    const timestamp = new Date(message.timestamp).toLocaleTimeString([], {
+                                                        hour: "2-digit",
+                                                        minute: "2-digit",
+                                                        hour12: true
+                                                    });
+
+                                                    return (
+                                                        <div
+                                                            key={message._id}
+                                                            className={`${styles.messageContainer} ${isOwn ? styles.messageContainerRight : styles.messageContainerLeft}`}
+                                                        >
+                                                            <div className={`${styles.messageBubble} ${isOwn ? styles.messageBubbleOwn : styles.messageBubbleOther}`}>
+                                                                {/* {!isOwn && (
                                                                 <div className={styles.messageSender}>
                                                                     User
                                                                 </div>
                                                             )} */}
-                                                            <div className={styles.messageText}>
-                                                                {message.text}
-                                                            </div>
-                                                            <div className={styles.messageTimestamp}>
-                                                                {timestamp}
+                                                                <div className={styles.messageText}>
+                                                                    {message.text}
+                                                                </div>
+                                                                <div className={styles.messageTimestamp}>
+                                                                    {timestamp}
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                );
-                                            })}
-                                            <div ref={messagesEndRef} />
-                                        </>
-                                    )}
-                                </div>
+                                                    );
+                                                })}
+                                                <div ref={messagesEndRef} />
+                                            </>
+                                        )}
+                                    </div>
 
-                                {/* Message Input */}
-                                <div className={styles.messageInputArea}>
-                                    <div className={styles.inputGroup}>
-                                        <button className={styles.attachButton} title="Attach File">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                                <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
-                                            </svg>
-                                        </button>
-                                        <input
-                                            onChange={(e) => setText(e.target.value)}
-                                            value={text}
-                                            type="text"
-                                            className={styles.messageInput}
-                                            placeholder="Type a message..."
-                                            onKeyPress={(e) => {
-                                                if (e.key === 'Enter' && text.trim()) {
-                                                    sendChat();
-                                                }
-                                            }}
-                                        />
-                                        <button onClick={sendChat} className={styles.sendButton} title="Send">
-                                            <svg className={styles.sendIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                                <line x1="22" y1="2" x2="11" y2="13" />
-                                                <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                                            </svg>
-                                        </button>
+                                    {/* Message Input */}
+                                    <div className={styles.messageInputArea}>
+                                        <div className={styles.inputGroup}>
+                                            <button className={styles.attachButton} title="Attach File">
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                                                </svg>
+                                            </button>
+                                            <input
+                                                onChange={(e) => setText(e.target.value)}
+                                                value={text}
+                                                type="text"
+                                                className={styles.messageInput}
+                                                placeholder="Type a message..."
+                                                onKeyPress={(e) => {
+                                                    if (e.key === 'Enter' && text.trim()) {
+                                                        sendChat();
+                                                    }
+                                                }}
+                                            />
+                                            <button onClick={sendChat} className={styles.sendButton} title="Send">
+                                                <svg className={styles.sendIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                                    <line x1="22" y1="2" x2="11" y2="13" />
+                                                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className={styles.emptyChatState}>
+                                    <div className={styles.emptyChatContent}>
+                                        <svg className={styles.emptyChatIcon} width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                        </svg>
+                                        <p className={styles.emptyChatText}>Select a conversation to start chatting</p>
                                     </div>
                                 </div>
-                            </>
-                        ) : (
-                            <div className={styles.emptyChatState}>
-                                <div className={styles.emptyChatContent}>
-                                    <svg className={styles.emptyChatIcon} width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                                    </svg>
-                                    <p className={styles.emptyChatText}>Select a conversation to start chatting</p>
-                                </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </Fragment>
     );
 };
 

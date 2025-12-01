@@ -17,6 +17,7 @@ import ChatsPage from "./components/ConsultantDashboard/ChatsPage";
 import VideoCallingPage from "./components/ConsultantDashboard/VideoCallingPage";
 import UserChat from "./components/ClientDashbord/UserChat";
 import LoginForm from "./components/ConsultantDashboard/LoginForm";
+import GlobalMessageNotification from "./components/AlertModel/GlobalMessageNotification";
 
 function App() {
   const app = useAppBridge();
@@ -40,6 +41,8 @@ function App() {
 
   return (
     <BrowserRouter>
+      {/* Global message notification - visible on all pages */}
+      <GlobalMessageNotification />
       <Routes>
         <Route path="/" element={<LayoutFrame><Dashboard /></LayoutFrame>} />
         <Route path="/dashboard" element={<LayoutFrame><Dashboard /></LayoutFrame>} />
