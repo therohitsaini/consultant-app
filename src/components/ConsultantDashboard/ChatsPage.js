@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ChatsPage.module.css';
 import axios from 'axios';
 import { socket } from '../Sokect-io/SokectConfig';
 import { fetchChatHistory } from '../Redux/slices/ConsultantSlices';
 import { useDispatch, useSelector } from 'react-redux';
+import { addMessage } from '../Redux/slices/sokectSlice';
 
 const ChatsPage = () => {
     const navigate = useNavigate();
@@ -21,10 +22,6 @@ const ChatsPage = () => {
     const { chatHistory } = useSelector((state) => state.consultants);
     const messages = useSelector((state) => state.socket.messages);
 
-
-
-    console.log("socketMessages", messages);
-
     const lastProcessedMessageId = useRef(null);
     const messagesEndRef = useRef(null);
     const messagesAreaRef = useRef(null);
@@ -32,7 +29,7 @@ const ChatsPage = () => {
     const consultantId = "691dbba35e388352e3203b0b";
 
 
-
+    console.log("messages", messages)
 
     useEffect(() => {
         const checkMobile = () => {
@@ -218,6 +215,8 @@ const ChatsPage = () => {
 
         sendMessage();
 
+        // const {message} = 
+
         function sendMessage() {
             const messageData = {
                 senderId: consultantId || "691dbba35e388352e3203b0b",
@@ -237,6 +236,7 @@ const ChatsPage = () => {
             // Send message via socket
             socket.emit("sendMessage", messageData);
             setText("");
+            dispatch(addMessage(messageData))
         }
     }
 
@@ -275,6 +275,13 @@ const ChatsPage = () => {
                             </div>
                         </div>
 
+                        <div style={{
+                            width: "100%",
+                            display: "flex",
+                            justifyContent: "end"
+                        }}>
+                            <p style={{}}>Request</p>
+                        </div>
                         {/* Conversations List */}
                         <div className={styles.conversationsList}>
                             {chatList.length === 0 ? (
@@ -307,49 +314,51 @@ const ChatsPage = () => {
                                     });
 
                                     return (
-                                        <div
-                                            key={conversation.id}
-                                            onClick={() => handleChatSelect({ shopId: conversation.shop.id, userId: conversation.sender.id })}
-                                            className={`${styles.conversationItem} ${selectedChat === conversation.id ? styles.conversationItemActive : ''}`}
-                                        >
-                                            <div className={styles.conversationContent}>
-                                                <div className={styles.avatarWrapper}>
-                                                    <img
-                                                        src={isImage ? imageUrl : "../images/team/team1.avif"}
-                                                        alt="profile"
-                                                        className={styles.conversationAvatar}
-                                                    />
-                                                    {conversation.isOnline && (
-                                                        <div className={styles.onlineIndicator}></div>
-                                                    )}
-                                                </div>
-                                                <div className={styles.conversationDetails}>
-                                                    <div className={`${styles.conversationHeader} ${styles.flexBetween} ${styles.flexStart}`}>
-                                                        <div className={styles.conversationName}>
-                                                            {conversation.sender?.fullname}
-                                                        </div>
-                                                        <div className={styles.conversationTimestamp}>
-                                                            {updatedAt}
-                                                        </div>
+                                        <Fragment>
+                                            <div
+                                                key={conversation.id}
+                                                onClick={() => handleChatSelect({ shopId: conversation.shop.id, userId: conversation.sender.id })}
+                                                className={`${styles.conversationItem} ${selectedChat === conversation.id ? styles.conversationItemActive : ''}`}
+                                            >
+                                                <div className={styles.conversationContent}>
+                                                    <div className={styles.avatarWrapper}>
+                                                        <img
+                                                            src={isImage ? imageUrl : "../images/team/team1.avif"}
+                                                            alt="profile"
+                                                            className={styles.conversationAvatar}
+                                                        />
+                                                        {conversation.isOnline && (
+                                                            <div className={styles.onlineIndicator}></div>
+                                                        )}
                                                     </div>
-                                                    <div className={`${styles.conversationMessage} ${styles.flexBetween} ${styles.flexCenter}`}>
-                                                        <div className={styles.messageText}>
-                                                            {conversation?.
-                                                                lastMessage
-                                                            }
+                                                    <div className={styles.conversationDetails}>
+                                                        <div className={`${styles.conversationHeader} ${styles.flexBetween} ${styles.flexStart}`}>
+                                                            <div className={styles.conversationName}>
+                                                                {conversation.sender?.fullname}
+                                                            </div>
+                                                            <div className={styles.conversationTimestamp}>
+                                                                {updatedAt}
+                                                            </div>
                                                         </div>
-                                                        {/* {conversation.unreadCount > 0 && ( */}
-                                                        <span className={styles.unreadBadge}>
-                                                            {"5+"}
-                                                        </span>
-                                                        {/* )} */}
-                                                    </div>
-                                                    <div className={`${styles.conversationStatus} ${conversation.isOnline ? styles.statusOnline : styles.statusOffline}`}>
-                                                        {conversation.lastActive}
+                                                        <div className={`${styles.conversationMessage} ${styles.flexBetween} ${styles.flexCenter}`}>
+                                                            <div className={styles.messageText}>
+                                                                {conversation?.
+                                                                    lastMessage
+                                                                }
+                                                            </div>
+                                                            {/* {conversation.unreadCount > 0 && ( */}
+                                                            <span className={styles.unreadBadge}>
+                                                                {"5+"}
+                                                            </span>
+                                                            {/* )} */}
+                                                        </div>
+                                                        <div className={`${styles.conversationStatus} ${conversation.isOnline ? styles.statusOnline : styles.statusOffline}`}>
+                                                            {conversation.lastActive}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </Fragment>
                                     )
                                 }
 
