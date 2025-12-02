@@ -47,24 +47,60 @@ const LoginForm = () => {
         return Object.keys(newErrors).length === 0;
     };
 
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+
+    //     console.log("process.env.REACT_APP_BACKEND_HOST", process.env.REACT_APP_BACKEND_HOST)
+
+    //     if (!validateForm()) {
+    //         return;
+    //     }
+    //     const response = await axios.post(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/login-consultant`, formData);
+    //     console.log("response_login_consultant", response.
+    //         data.
+    //         userData
+    //     );
+    //     if (response.status === 200) {
+    //         localStorage.setItem('client_u_Identity', response.data.userData._id);
+    //         navigate('/consultant-dashboard');
+    //     } else {
+    //         setErrors({ email: 'Invalid email or password' });
+    //     }
+    // };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log("process.env.REACT_APP_BACKEND_HOST", process.env.REACT_APP_BACKEND_HOST)
+        if (!validateForm()) return;
 
-        if (!validateForm()) {
-            return;
-        }
-        const response = await axios.post(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/login-consultant`, formData);
-        console.log("response_login_consultant", response.
-            data.
-            userData
-        );
-        if (response.status === 200) {
-            localStorage.setItem('client_u_Identity', response.data.userData._id);
-            navigate('/consultant-dashboard');
-        } else {
-            setErrors({ email: 'Invalid email or password' });
+        try {
+            const response = await axios.post(
+                `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/login-consultant`,
+                formData
+            );
+
+            console.log("login response", response?.data);
+
+            // Ensure userData exists and has an _id
+            if (response.status === 200 && response.data?.userData?._id) {
+                const params = new URLSearchParams(window.location.search);
+                const shop = params.get("shop");
+                const host = params.get("host");
+
+                localStorage.setItem("client_u_Identity", response.data.userData._id);
+
+                // Break out of the Shopify admin iframe to avoid CSP frame-ancestors issue
+                if (window.top) {
+                    const targetShop = shop || "rohit-12345839.myshopify.com";
+                    const hostQuery = host ? `?host=${encodeURIComponent(host)}` : "";
+                    window.top.location.href = `https://${targetShop}/apps/agora/dashboard${hostQuery}`;
+                }
+            } else {
+                setErrors({ email: "Invalid email or password" });
+            }
+        } catch (err) {
+            console.error("login error", err);
+            setErrors({ email: "Something went wrong. Please try again." });
         }
     };
 

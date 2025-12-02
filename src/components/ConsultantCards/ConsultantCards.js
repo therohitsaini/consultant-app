@@ -16,6 +16,33 @@ function ConsultantCards() {
     const user_id = params.get('customerId');
     const shop_id = params.get('shopid');
     console.log("shop_id", shop_id, "user_id____", user_id)
+
+    // ----- Iframe height sync (for Shopify theme embedding) -----
+    const sendHeight = () => {
+        const height = document.documentElement.scrollHeight;
+        if (window.parent) {
+            window.parent.postMessage(
+                { type: "AGORA_IFRAME_HEIGHT", height },
+                "*"
+            );
+        }
+    };
+
+    // Add listeners for load / resize and initial timeout
+    useEffect(() => {
+        window.addEventListener("load", sendHeight);
+        window.addEventListener("resize", sendHeight);
+
+        // One-time call shortly after mount (in case content is already rendered)
+        const timeoutId = setTimeout(sendHeight, 500);
+
+        return () => {
+            window.removeEventListener("load", sendHeight);
+            window.removeEventListener("resize", sendHeight);
+            clearTimeout(timeoutId);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     useEffect(() => {
         const client_id = localStorage.setItem('client_u_Identity', "69257f27387c4f06e7de34d3");
         const shop = localStorage.setItem('shop_o_Identity', shop_id);
@@ -74,6 +101,15 @@ function ConsultantCards() {
             videoPrice: parseInt(consultant.fees) || 1000,
         };
     });
+
+    // After data/API load, trigger height send once so iframe resizes to final content
+    useEffect(() => {
+        if (!loading) {
+            // small delay so DOM has rendered mappedConsultants
+            const id = setTimeout(sendHeight, 300);
+            return () => clearTimeout(id);
+        }
+    }, [loading, mappedConsultants.length]);
 
     // Function to render stars with half-star support
     const renderStars = (rating) => {
