@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import styles from "./UserChat.module.css"
 import { socket } from '../Sokect-io/SokectConfig';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchChatHistory, fetchConsultantById } from '../Redux/slices/ConsultantSlices';
+import { fetchChatHistory, fetchConsultantById, updateUserRequestById } from '../Redux/slices/ConsultantSlices';
 import PopupNotification from '../AlertModel/MessageNotificationAlert';
 
 const UserChat = () => {
@@ -73,8 +73,7 @@ const UserChat = () => {
             return;
         }
 
-        console.log("UserChat - Socket messages received:", socketMessages.length, "Current IDs:", { clientId, consultantId, shopId });
-        
+
         // Process all new messages, not just the latest one
         socketMessages.forEach((message) => {
             // Skip if message doesn't have required fields
@@ -296,6 +295,13 @@ const UserChat = () => {
             socket.off("receiveMessage", handleDirectMessage);
         };
     }, [clientId, consultantId, shopId]);
+
+
+    // useEffect(() => {
+    
+       
+    // }, [dispatch, shopId, clientId, consultantId]);
+    // console.log("userInRequest_________>_____>", userInRequest);
 
 
     return (

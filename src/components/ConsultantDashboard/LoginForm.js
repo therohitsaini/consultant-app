@@ -62,7 +62,7 @@ const LoginForm = () => {
         );
         if (response.status === 200) {
             localStorage.setItem('client_u_Identity', response.data.userData._id);
-            navigate('https://rohit-12345839.myshopify.com/apps/agora');
+            navigate('/consultant-dashboard');
         } else {
             setErrors({ email: 'Invalid email or password' });
         }

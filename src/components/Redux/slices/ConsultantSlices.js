@@ -47,6 +47,11 @@ export const deleteConsultantById = createAsyncThunk("consultants/delete", async
     return response.data;
 });
 
+export const updateUserRequestById = createAsyncThunk("consultants/updateUserRequestById", async ({ shopId, userId,consultantId }) => {
+    const response = await axios.put(`${process.env.REACT_APP_BACKEND_HOST}/api/chat/update-user-request/${shopId}/${userId}/${consultantId}`);
+    return response.data;
+});
+
 
 const consultantSlice = createSlice({
     name: "consultants",
@@ -57,6 +62,7 @@ const consultantSlice = createSlice({
         loading: false,
         error: null,
         deletedConsultant: null,
+        userInRequest: null,
     },
 
     extraReducers: (builder) => {
@@ -102,6 +108,17 @@ const consultantSlice = createSlice({
                 state.chatHistory = action.payload;
             })
             .addCase(fetchChatHistory.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
+            .addCase(updateUserRequestById.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(updateUserRequestById.fulfilled, (state, action) => {
+                state.loading = false;
+                state.userInRequest = action.payload;
+            })
+            .addCase(updateUserRequestById.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
             });

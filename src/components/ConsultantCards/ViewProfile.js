@@ -18,8 +18,14 @@ function ViewProfile() {
         dispatch(fetchConsultantById({ shop_id, consultant_id }));
     }, [dispatch, shop_id, consultant_id]);
 
+    // Ensure page opens at the top when this component is mounted
+    useEffect(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }, []);
+
 
     const consultantView = consultantOverview?.consultant;
+    const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${consultantView?.profileImage?.replace("\\", "/")}`;
     console.log("consultantOverview___________Latest Consultant", consultantView);
     // Default static consultant data
     const consultant = {
@@ -94,8 +100,8 @@ function ViewProfile() {
                             {/* Profile Image */}
                             <div className="me-4 position-relative flex-shrink-0">
                                 <img
-                                    src={consultant.image}
-                                    alt={consultant.name}
+                                    src={imageUrl}
+                                    alt={consultantView?.fullname}
                                     className="rounded-circle profile-image profile-image-large"
                                     onError={(e) => {
                                         e.target.src = '/images/teamdefault.png';

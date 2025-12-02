@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './ChatsPage.module.css';
 import axios from 'axios';
 import { socket } from '../Sokect-io/SokectConfig';
-import { fetchChatHistory } from '../Redux/slices/ConsultantSlices';
+import { fetchChatHistory, updateUserRequestById } from '../Redux/slices/ConsultantSlices';
 import { useDispatch, useSelector } from 'react-redux';
 import { addMessage } from '../Redux/slices/sokectSlice';
 import PopupNotification from '../AlertModel/MessageNotificationAlert';
@@ -34,6 +34,9 @@ const ChatsPage = () => {
     const messagesAreaRef = useRef(null);
 
     const consultantId = "691dbba35e388352e3203b0b";
+
+    const { userInRequest } = useSelector((state) => state.consultants);
+    console.log("userInRequest", userInRequest)
 
 
 
@@ -186,7 +189,7 @@ const ChatsPage = () => {
 
     useEffect(() => {
         getChatList();
-    }, [messages]);
+    }, [messages, userInRequest]);
 
     const sendChat = () => {
         if (text.trim() === "" || !chaterIds) return;
@@ -290,7 +293,12 @@ const ChatsPage = () => {
     }, [messages, consultantId, chaterIds, chatList]);
 
 
-    console.log("chatList", chatList)
+    const updateUser = (conversation) => {
+
+        dispatch(updateUserRequestById({ shopId: conversation.shop.id, userId: conversation.sender.id, consultantId: consultantId }));
+    }
+
+
     // filter the request modal data
     const isRequestModalOpen = chatList.filter((conversation) => conversation.isRequest === false);
     const isRequestModalClose = chatList.filter((conversation) => conversation.isRequest === true);
@@ -415,8 +423,8 @@ const ChatsPage = () => {
                                                                                 className={styles.moreMenuItem}
                                                                                 onClick={() => {
                                                                                     // TODO: add your add logic here
-                                                                                    console.log("Add clicked for", conversation.id);
-                                                                                    setOpenMenuConversationId(null);
+                                                                                    // setOpenMenuConversationId(null);
+                                                                                    updateUser(conversation);
                                                                                 }}
                                                                             >
                                                                                 Add
