@@ -54,7 +54,7 @@ function App() {
         <Route path="/faq" element={<LayoutFrame><Faq /></LayoutFrame>} />
         <Route path="/consultant-cards" element={<ConsultantCards />} />
         <Route path="/view-profile/:shop_id/:consultant_id" element={<ViewProfile />} />
-        <Route path="/consultant-dashboard" element={<TabNavigation />} />
+        <Route path="/consultant-theme-page" element={<TabNavigation />} />
         <Route path="/users-page/*" element={<TabNavigation />} />
         <Route path="/chats/*" element={<TabNavigation />} />
         <Route path="/video/calling/page" element={<VideoCallingPage />} />

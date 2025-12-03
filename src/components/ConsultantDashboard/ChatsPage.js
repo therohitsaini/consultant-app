@@ -55,9 +55,9 @@ const ChatsPage = () => {
     }, []);
 
     // Scroll to bottom function
-    const scrollToBottom = () => {
+    const scrollToBottom = (behavior = 'auto') => {
         if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+            messagesEndRef.current.scrollIntoView({ behavior });
         } else if (messagesAreaRef.current) {
             messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
         }
@@ -72,9 +72,9 @@ const ChatsPage = () => {
         }
     }, [chatHistory]);
 
-    // Auto-scroll when messages update
+    // Auto-scroll when messages update (always keep at last message)
     useEffect(() => {
-        scrollToBottom();
+        scrollToBottom('auto'); // instant jump, page ko upar‑niche animate nahi karega
     }, [chatMessagesData]);
 
     // Listen to socket messages and update chat in real-time
@@ -330,7 +330,7 @@ const ChatsPage = () => {
                 <div className={styles.chatLayout}>
                     {/* Conversations Sidebar */}
                     <div className={`${styles.conversationsSidebar} ${showChatView ? styles.hideOnMobile : ''}`}>
-                        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', border: "1px solid red" }}>
                             {/* Search Bar */}
                             <div className={styles.searchBar}>
                                 <div className={styles.searchInputWrapper}>

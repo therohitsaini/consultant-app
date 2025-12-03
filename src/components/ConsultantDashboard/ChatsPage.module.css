@@ -3,8 +3,8 @@
     padding: 0;
     width: 100%;
     max-width: 100%;
-    overflow-x: hidden;
-    height: 100%;
+    overflow: hidden; /* window pe extra scrollbar na aaye */
+    height: 100vh;    /* pure viewport ke andar lock */
 }
 
 .headerSection {
@@ -630,6 +630,7 @@
         height: 100vh;
         overflow: hidden;
         position: relative;
+        border: 1px solid red;
     }
 
     .headerSection {
