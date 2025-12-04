@@ -161,7 +161,14 @@ const ChatsPage = () => {
     };
 
     // Find selected conversation from chatList
-    const selectedConversation = chatList.find(conv => conv.id === selectedChat);
+    // Priority: use currently selected user/shop (chaterIds) so header always matches opened chat
+    const selectedConversation = chaterIds
+        ? chatList.find(
+            (conv) =>
+                String(conv.sender?.id) === String(chaterIds.userId) &&
+                String(conv.shop?.id) === String(chaterIds.shopId)
+        )
+        : chatList.find((conv) => conv.id === selectedChat);
 
     // Filter conversations based on search query
     const filteredConversations = chatList.filter(conv =>
@@ -217,8 +224,8 @@ const ChatsPage = () => {
         function sendMessage() {
             const messageData = {
                 senderId: consultantId || "691dbba35e388352e3203b0b",
-                receiverId: chaterIds?.userId,
-                shop_id: chaterIds?.shopId,
+                receiverId: "69257f27387c4f06e7de34d3" || chaterIds?.userId,
+                shop_id: "690c374f605cb8b946503ccb" || chaterIds?.shopId,
                 text: text,
                 timestamp: new Date().toISOString()
             };
@@ -330,7 +337,7 @@ const ChatsPage = () => {
                 <div className={styles.chatLayout}>
                     {/* Conversations Sidebar */}
                     <div className={`${styles.conversationsSidebar} ${showChatView ? styles.hideOnMobile : ''}`}>
-                        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', border: "1px solid red" }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', }}>
                             {/* Search Bar */}
                             <div className={styles.searchBar}>
                                 <div className={styles.searchInputWrapper}>

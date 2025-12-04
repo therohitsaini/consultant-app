@@ -1,17 +1,19 @@
 /* Login Page Container */
 .loginPageContainer {
-    min-height: 70vh;
+    min-height: 80vh;
     display: flex;
     align-items: center;
     justify-content: center;
     background: white;
     padding: 20px;
+    border: 1px solid red;
 }
 
 /* Login Container */
 .loginContainer {
     width: 100%;
     max-width: 500px;
+    border: 1px solid blue;
 }
 
 /* Login Title */

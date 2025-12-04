@@ -1,12 +1,13 @@
 /* Dashboard Wrapper */
 .dashboardWrapper {
-    min-height: 100vh;
+    height:80vh;
     background-color: #f5f6fa;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
         'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
         sans-serif;
-    padding: 24px;
+    padding: 0;
     position: relative;
+    /* border: 1px solid blue; */
 }
 
 /* Video Call Mode - Full Screen */
@@ -28,6 +29,7 @@
     margin-left: 0;
     background: transparent;
     border-radius: 0;
+    /* border: 1px solid red; */
 }
 
 .dashboardWrapper.videoCallMode .content {
@@ -94,27 +96,32 @@
 
 /* Main Container */
 .mainContainer {
-    max-width: 1400px;
+    max-width: 100%;
     margin: 0 auto;
     display: flex;
     gap: 24px;
     background: white;
-    border-radius: 16px;
+    border-radius: 0;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     overflow: hidden;
-    min-height: calc(100vh - 48px);
+    min-height: calc(80vh - 48px);
 }
 
 /* Side Navigation Tabs - Light Theme */
 .sideNav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
     width: 260px;
+    height: 70%;
     background: #f8f9fa;
     color: #212529;
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
     border-radius: 16px 0 0 16px;
-    border-right: 1px solid #e9ecef;
+    /* border-right: 1px solid #0e4b89; */
 }
 
 /* Profile Section */
@@ -279,6 +286,7 @@
 
 /* Content Area */
 .contentArea {
+    margin-left: 260px;
     flex: 1;
     display: flex;
     flex-direction: column;

@@ -40,12 +40,15 @@ const UserChat = () => {
     }, [dispatch, consultantId]);
 
     // Scroll to bottom function
-    const scrollToBottom = () => {
-        if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-        } else if (messagesAreaRef.current) {
-            messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
-        }
+    const scrollToBottom = (behavior = 'auto') => {
+        // Use setTimeout to ensure DOM has updated
+        setTimeout(() => {
+            if (messagesEndRef.current) {
+                messagesEndRef.current.scrollIntoView({ behavior });
+            } else if (messagesAreaRef.current) {
+                messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
+            }
+        }, 100);
     };
 
     // Update messages from chatHistory
@@ -54,12 +57,22 @@ const UserChat = () => {
             setChatMessagesData(chatHistory.chatHistory);
             // Reset last processed message when chat changes
             lastProcessedMessageId.current = null;
+            // Scroll to bottom when chat history loads
+            setTimeout(() => {
+                scrollToBottom('auto');
+            }, 400);
         }
     }, [chatHistory]);
 
-    // Auto-scroll when messages update
+    // Auto-scroll when messages update (always keep at last message)
     useEffect(() => {
-        scrollToBottom();
+        if (chatMessagesData.length > 0 && messagesAreaRef.current) {
+            // Wait for DOM to fully render, then scroll to bottom
+            const timer = setTimeout(() => {
+                scrollToBottom('auto'); // instant jump, page ko upar‑niche animate nahi karega
+            }, 300);
+            return () => clearTimeout(timer);
+        }
     }, [chatMessagesData]);
 
     // Listen to socket messages and update chat in real-time
@@ -94,15 +107,6 @@ const UserChat = () => {
             const messageReceiverId = String(message.receiverId || '');
             const currentClientId = String(clientId || '');
             const currentConsultantId = String(consultantId || '');
-
-            console.log("UserChat - Checking message:", {
-                messageShopId,
-                currentShopId,
-                messageSenderId,
-                messageReceiverId,
-                currentClientId,
-                currentConsultantId
-            });
 
             // Check if message belongs to current chat
             const isCurrentChatMessage =
@@ -144,7 +148,7 @@ const UserChat = () => {
                     return [...prev, message];
                 });
             } else {
-                console.log("UserChat - ❌ Message doesn't belong to current chat");
+                console.log("UserChat -  Message doesn't belong to current chat");
             }
         });
     }, [socketMessages, clientId, consultantId, shopId]);
@@ -234,8 +238,22 @@ const UserChat = () => {
     useEffect(() => {
         if (shopId && clientId && consultantId) {
             dispatch(fetchChatHistory({ shopId: shopId, userId: clientId, consultantId: consultantId }));
+            // Reset scroll position when fetching new chat
+            setChatMessagesData([]);
+            lastProcessedMessageId.current = null;
         }
     }, [dispatch, shopId, clientId, consultantId]);
+
+    // Initial scroll to bottom when page loads and messages are available
+    useEffect(() => {
+        if (chatMessagesData.length > 0 && messagesAreaRef.current) {
+            // Wait for DOM to fully render messages
+            const timer = setTimeout(() => {
+                scrollToBottom('auto');
+            }, 200);
+            return () => clearTimeout(timer);
+        }
+    }, [chatMessagesData.length]);
 
     // Direct socket listener as backup (in addition to Redux)
     useEffect(() => {

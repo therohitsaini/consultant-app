@@ -96,7 +96,7 @@
         flex: 0 0 33.333333%;
         max-width: 33.333333%;
     }
-    
+
     .col-md-6 {
         flex: 0 0 50%;
         max-width: 50%;
@@ -136,7 +136,7 @@
         flex: 0 0 33.333333%;
         max-width: 33.333333%;
     }
-    
+
     .col-lg-8 {
         flex: 0 0 66.666667%;
         max-width: 66.666667%;
@@ -1066,7 +1066,7 @@
     .consultant-card {
         height: 100%;
     }
-    
+
     .card-body {
         padding: 1.5rem;
     }
@@ -1084,7 +1084,7 @@
     .consultant-card {
         height: 100%;
     }
-    
+
     .card-body {
         padding: 1.25rem;
     }
@@ -1095,17 +1095,17 @@
     .consultant-name {
         font-size: 16px;
     }
-    
+
     .profile-image {
         width: 70px;
         height: 70px;
     }
-    
+
     .experience-badge {
         font-size: 10px;
         padding: 3px 8px;
     }
-    
+
     .view-profile-btn {
         padding: 8px 16px;
         font-size: 13px;
@@ -1127,41 +1127,41 @@
     .section-title {
         font-size: 20px;
     }
-    
+
     /* Consultant Card Responsive */
     .consultant-card {
         margin-bottom: 1rem;
         width: 100%;
     }
-    
+
     .card-body {
         padding: 1rem;
     }
-    
+
     .calling-options {
         flex-direction: column;
         gap: 8px;
     }
-    
+
     .calling-option-btn {
         width: 100%;
         flex-direction: row;
         justify-content: space-between;
         padding: 12px;
     }
-    
+
     .calling-option-content {
         flex-direction: row;
     }
-    
+
     .calling-option-price {
         font-size: 12px;
     }
-    
+
     .calling-option-label {
         font-size: 13px;
     }
-    
+
     /* Row gap adjustment for mobile */
     .row[style*="gap"] {
         gap: 1rem;
@@ -1173,48 +1173,48 @@
     .consultant-card {
         margin-bottom: 0.75rem;
     }
-    
+
     .consultant-card .flex {
         flex-direction: column;
         align-items: center;
         text-align: center;
     }
-    
+
     .consultant-card .me-3 {
         margin-right: 0;
         margin-bottom: 12px;
     }
-    
+
     .consultant-card .flex-grow-1 {
         width: 100%;
     }
-    
+
     .consultant-card .align-items-center {
         justify-content: center;
     }
-    
+
     .experience-badge {
         margin-left: 0;
         margin-top: 8px;
     }
-    
+
     .card-body {
         padding: 0.875rem;
     }
-    
+
     .consultant-name {
         font-size: 15px;
     }
-    
+
     .consultant-profession {
         font-size: 13px;
     }
-    
+
     .profile-image {
         width: 60px;
         height: 60px;
     }
-    
+
     /* Row gap adjustment for small mobile */
     .row[style*="gap"] {
         gap: 0.75rem;
@@ -1227,37 +1227,37 @@
     .view-profile-container .row {
         flex-direction: column;
     }
-    
+
     .view-profile-container .col-lg-8,
     .view-profile-container .col-lg-4 {
         flex: 0 0 100%;
         max-width: 100%;
     }
-    
+
     .profile-header-card .flex {
         flex-direction: column;
         align-items: center;
         text-align: center;
     }
-    
+
     .profile-header-card .me-4 {
         margin-right: 0;
         margin-bottom: 16px;
     }
-    
+
     .profile-header-card .flex-grow-1 {
         width: 100%;
     }
-    
+
     .profile-header-card .align-items-center {
         justify-content: center;
     }
-    
+
     .experience-badge-large {
         margin-left: 0;
         margin-top: 8px;
     }
-    
+
     .calling-options-profile-sidebar {
         justify-content: center;
         flex-wrap: wrap;
@@ -1268,80 +1268,80 @@
     .view-profile-container {
         padding: 0;
     }
-    
+
     .profile-header-card .card-body {
         padding: 1.5rem;
     }
-    
+
     .profile-image-large {
         width: 100px !important;
         height: 100px !important;
     }
-    
+
     .consultant-name-large {
         font-size: 20px !important;
     }
-    
+
     .consultant-profession-large {
         font-size: 14px !important;
     }
-    
+
     .profile-header-card .calling-options {
         flex-direction: column;
         gap: 8px;
     }
-    
+
     .profile-header-card .calling-option-btn {
         width: 100%;
         flex-direction: row;
         justify-content: space-between;
         padding: 12px;
     }
-    
+
     .card-body {
         padding: 1rem;
     }
-    
+
     .section-title {
         font-size: 18px;
     }
-    
+
     .subsection-title {
         font-size: 16px;
     }
-    
+
     .about-text,
     .info-text {
         font-size: 14px;
     }
-    
+
     .certifications-list li {
         font-size: 14px;
     }
-    
+
     .review-item {
         padding: 12px 0;
     }
-    
+
     .reviewer-name {
         font-size: 14px;
     }
-    
+
     .review-comment {
         font-size: 13px;
     }
-    
+
     .calling-options-profile-sidebar {
         width: 100%;
         justify-content: space-around;
     }
-    
+
     .calling-options-profile-sidebar .calling-option-btn {
         width: 48px;
         height: 48px;
         padding: 12px;
     }
-    
+
     .calling-options-profile-sidebar .calling-option-btn svg {
         width: 20px;
         height: 20px;
@@ -1353,34 +1353,34 @@
     .profile-header-card .card-body {
         padding: 1rem;
     }
-    
+
     .profile-image-large {
         width: 80px !important;
         height: 80px !important;
     }
-    
+
     .consultant-name-large {
         font-size: 18px !important;
     }
-    
+
     .experience-badge-large {
         font-size: 10px !important;
         padding: 4px 8px !important;
     }
-    
+
     .section-title {
         font-size: 16px;
         margin-bottom: 12px;
     }
-    
+
     .card {
         margin-bottom: 1rem;
     }
-    
+
     .expertise-tags {
         gap: 6px;
     }
-    
+
     .expertise-tag {
         font-size: 11px;
         padding: 4px 10px;
@@ -1646,15 +1646,15 @@
     .hero-section {
         padding: 50px 20px;
     }
-    
+
     .hero-title {
         font-size: 40px;
     }
-    
+
     .hero-stats {
         gap: 20px;
     }
-    
+
     .hero-stat-item {
         min-width: 150px;
     }
@@ -1676,7 +1676,7 @@
     .hero-description {
         font-size: 16px;
     }
-    
+
     .hero-badge {
         font-size: 13px;
         padding: 6px 14px;
@@ -1759,7 +1759,7 @@
         margin-bottom: 24px;
         border-radius: 8px;
     }
-    
+
     .hero-content {
         max-width: 100%;
     }
@@ -1773,12 +1773,12 @@
         font-size: 14px;
         line-height: 1.5;
     }
-    
+
     .hero-badge {
         font-size: 12px;
         padding: 5px 12px;
     }
-    
+
     .hero-badge-icon {
         font-size: 14px;
     }
@@ -1787,12 +1787,12 @@
         margin-top: 20px;
         margin-bottom: 20px;
     }
-    
+
     .hero-search-input {
         font-size: 14px;
         padding: 12px 14px;
     }
-    
+
     .hero-search-btn {
         padding: 12px;
         font-size: 13px;
@@ -1826,7 +1826,7 @@
         font-size: 20px;
         margin-bottom: 6px;
     }
-    
+
     .hero-stat-label {
         font-size: 11px;
     }
@@ -1834,7 +1834,7 @@
     .hero-quick-filters {
         margin-top: 20px;
     }
-    
+
     .hero-filter-label {
         font-size: 12px;
         margin-bottom: 4px;
@@ -1851,3 +1851,86 @@
     }
 }
 
+/* ============================================
+   LOADER STYLES
+   ============================================ */
+
+.page-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100%;
+    background-color: #f8f9fa;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    box-sizing: border-box; 
+    padding-top: 40px;
+    /* tweak this value if you want it a bit lower */
+}
+
+.loader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+}
+
+.loader-spinner {
+    width: 60px;
+    height: 60px;
+    border: 5px solid #e9ecef;
+    border-top: 5px solid #FF6B35;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loader-text {
+    font-size: 18px;
+    font-weight: 600;
+    color: #495057;
+    margin: 0;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive Loader */
+@media (max-width: 767.98px) {
+    .loader-spinner {
+        width: 50px;
+        height: 50px;
+        border-width: 4px;
+    }
+
+    .loader-text {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .loader-spinner {
+        width: 40px;
+        height: 40px;
+        border-width: 3px;
+    }
+
+    .loader-text {
+        font-size: 14px;
+    }
+
+    .loader-container {
+        gap: 16px;
+    }
+}

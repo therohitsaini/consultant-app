@@ -6,7 +6,6 @@ export default function PopupNotification({ message, onClose }) {
         return () => clearTimeout(timer);
     }, [onClose]);
     
-    console.log("PopupNotification - message received:", message);
     
     // Handle both single object and array
     const messageData = Array.isArray(message) ? message[0] : message;

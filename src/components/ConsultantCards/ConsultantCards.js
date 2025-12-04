@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './ConsultantCards.css';
@@ -17,31 +17,17 @@ function ConsultantCards() {
     const shop_id = params.get('shopid');
     console.log("shop_id", shop_id, "user_id____", user_id)
 
-    // ----- Iframe height sync (for Shopify theme embedding) -----
-    const sendHeight = () => {
-        const height = document.documentElement.scrollHeight;
-        if (window.parent) {
-            window.parent.postMessage(
-                { type: "AGORA_IFRAME_HEIGHT", height },
-                "*"
-            );
-        }
-    };
+    // Initial loading state - shows loader before component fully initializes
+    const [initialLoading, setInitialLoading] = useState(true);
 
-    // Add listeners for load / resize and initial timeout
+    // Set initial loading to false after component mounts
     useEffect(() => {
-        window.addEventListener("load", sendHeight);
-        window.addEventListener("resize", sendHeight);
+        // Small delay to ensure component is fully mounted
+        const timer = setTimeout(() => {
+            setInitialLoading(false);
+        }, 100);
 
-        // One-time call shortly after mount (in case content is already rendered)
-        const timeoutId = setTimeout(sendHeight, 500);
-
-        return () => {
-            window.removeEventListener("load", sendHeight);
-            window.removeEventListener("resize", sendHeight);
-            clearTimeout(timeoutId);
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        return () => clearTimeout(timer);
     }, []);
     useEffect(() => {
         const client_id = localStorage.setItem('client_u_Identity', "69257f27387c4f06e7de34d3");
@@ -103,8 +89,20 @@ function ConsultantCards() {
     });
 
     // After data/API load, trigger height send once so iframe resizes to final content
+    // Note: sendHeight is now handled globally in App.js
     useEffect(() => {
         if (!loading) {
+            // Trigger height update after content loads (handled by App.js global listener)
+            // This is just to ensure height updates when data changes
+            const sendHeight = () => {
+                const height = document.documentElement.scrollHeight;
+                if (window.parent) {
+                    window.parent.postMessage(
+                        { type: "AGORA_IFRAME_HEIGHT", height },
+                        "*"
+                    );
+                }
+            };
             // small delay so DOM has rendered mappedConsultants
             const id = setTimeout(sendHeight, 300);
             return () => clearTimeout(id);
@@ -177,6 +175,18 @@ function ConsultantCards() {
     //     setRefresh((prev) => !prev);
     // };
 
+
+    // Show loader while initial loading or data is loading
+    if (initialLoading || loading) {
+        return (
+            <div className="page-loader">
+                <div className="loader-container">
+                    <div className="loader-spinner"></div>
+                    <p className="loader-text">Loading consultants...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="container py-4">
@@ -279,11 +289,7 @@ function ConsultantCards() {
             </div>
 
             <div className="row" style={{ gap: '1.5rem' }}>
-                {loading ? (
-                    <div className="col-12 text-center py-5">
-                        <p>Loading consultants...</p>
-                    </div>
-                ) : mappedConsultants.length === 0 ? (
+                {mappedConsultants.length === 0 ? (
                     <div className="col-12 text-center py-5">
                         <p>No consultants found.</p>
                     </div>

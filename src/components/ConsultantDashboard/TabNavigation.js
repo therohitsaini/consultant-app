@@ -23,6 +23,35 @@ function TabNavigation({ children }) {
     const [consultantId, setConsultantId] = useState(null);
     const dispatch = useDispatch();
 
+
+    const sendHeight = () => {
+        const height = document.documentElement.scrollHeight;
+        if (window.parent) {
+            window.parent.postMessage(
+                { type: "AGORA_IFRAME_HEIGHT", height },
+                "*"
+            );
+        }
+    };
+
+    // Add listeners for load / resize and initial timeout
+    useEffect(() => {
+        window.addEventListener("load", sendHeight);
+        window.addEventListener("resize", sendHeight);
+
+        // One-time call shortly after mount (in case content is already rendered)
+        const timeoutId = setTimeout(sendHeight, 500);
+
+        return () => {
+            window.removeEventListener("load", sendHeight);
+            window.removeEventListener("resize", sendHeight);
+            clearTimeout(timeoutId);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+
+
     useEffect(() => {
         dispatch(connectSocket("691dbba35e388352e3203b0b"));
     }, []);

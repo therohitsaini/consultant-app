@@ -93,7 +93,7 @@ const LoginForm = () => {
                 if (window.top) {
                     const targetShop = shop || "rohit-12345839.myshopify.com";
                     const hostQuery = host ? `?host=${encodeURIComponent(host)}` : "";
-                    window.top.location.href = `https://${targetShop}/apps/agora/dashboard${hostQuery}`;
+                    window.top.location.href = `https://${targetShop}/apps/agora/consultant-dashboard${hostQuery}`;
                 }
             } else {
                 setErrors({ email: "Invalid email or password" });
@@ -103,8 +103,6 @@ const LoginForm = () => {
             setErrors({ email: "Something went wrong. Please try again." });
         }
     };
-
-
 
     return (
         <div className={styles.loginPageContainer}>

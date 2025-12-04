@@ -4,7 +4,11 @@
     width: 100%;
     max-width: 100%;
     overflow: hidden; /* window pe extra scrollbar na aaye */
-    height: 100vh;    /* pure viewport ke andar lock */
+    height: 100%;    /* pure viewport ke andar lock */
+    max-height:80vh; /* prevent height from growing beyond viewport */
+    position: relative;
+    box-sizing: border-box;
+    /* border: 1px solid rgb(63, 14, 198); */
 }
 
 .headerSection {
@@ -28,13 +32,14 @@
 /* Chat Layout */
 .chatLayout {
     display: flex;
-    height: calc(100vh - 200px);
-    min-height: 600px;
+    height: calc(80vh - 200px);
+    max-height: calc(80vh - 200px); /* prevent height from growing */
     gap: 0;
     width: 100%;
     max-width: 100%;
     overflow: hidden;
     position: relative;
+    box-sizing: border-box;
 }
 
 /* Conversations Sidebar */
@@ -588,7 +593,6 @@
 @media (max-width: 1200px) {
     .chatLayout {
         height: calc(100vh - 220px);
-        min-height: 580px;
     }
 
     .conversationsSidebar {
@@ -613,7 +617,6 @@
 
     .chatLayout {
         height: calc(100vh - 200px);
-        min-height: 550px;
     }
 
     .conversationsSidebar {
@@ -630,7 +633,6 @@
         height: 100vh;
         overflow: hidden;
         position: relative;
-        border: 1px solid red;
     }
 
     .headerSection {
@@ -643,8 +645,6 @@
 
     .chatLayout {
         flex-direction: row;
-        height: 100vh;
-        min-height: 100vh;
         position: relative;
     }
 
