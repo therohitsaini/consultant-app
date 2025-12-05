@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import styles from './VideoCallingPage.module.css';
 
 const VideoCallingPage = () => {
@@ -8,7 +8,18 @@ const VideoCallingPage = () => {
     const [isMuted, setIsMuted] = useState(false);
     const [isVideoOff, setIsVideoOff] = useState(false);
     const [isAudioCall, setIsAudioCall] = useState(false);
-    
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const consultantId = params.get("consultantId");
+        const shopId = params.get("shopId");
+
+        console.log("consultantId:", consultantId);
+        console.log("shopId:", shopId);
+    }, []);
+
+
+    const parms = useParams();
+    console.log("parms___________ViewProfile", parms)
     const conversation = location.state?.conversation || {
         id: 1,
         name: 'Sarah Johnson',
@@ -36,7 +47,7 @@ const VideoCallingPage = () => {
         <div className={styles.videoCallContainer}>
             {/* Header */}
             <div className={styles.callHeader}>
-                <button 
+                <button
                     className={styles.backButton}
                     onClick={handleEndCall}
                     aria-label="End call"
@@ -82,8 +93,8 @@ const VideoCallingPage = () => {
 
             {/* Call Controls */}
             <div className={styles.callControls}>
-                <button 
-                    className={`${styles.controlButton} ${isMuted ? styles.controlButtonActive : ''}`} 
+                <button
+                    className={`${styles.controlButton} ${isMuted ? styles.controlButtonActive : ''}`}
                     title={isMuted ? "Unmute" : "Mute"}
                     onClick={handleMuteToggle}
                 >
@@ -100,8 +111,8 @@ const VideoCallingPage = () => {
                         </svg>
                     )}
                 </button>
-                <button 
-                    className={`${styles.controlButton} ${isVideoOff ? styles.controlButtonActive : ''}`} 
+                <button
+                    className={`${styles.controlButton} ${isVideoOff ? styles.controlButtonActive : ''}`}
                     title={isVideoOff ? "Turn On Camera" : "Turn Off Camera"}
                     onClick={handleVideoToggle}
                 >
@@ -118,8 +129,8 @@ const VideoCallingPage = () => {
                         </svg>
                     )}
                 </button>
-                <button 
-                    className={`${styles.controlButton} ${isAudioCall ? styles.controlButtonActive : ''}`} 
+                <button
+                    className={`${styles.controlButton} ${isAudioCall ? styles.controlButtonActive : ''}`}
                     title={isAudioCall ? "Switch to Video Call" : "Switch to Audio Call"}
                     onClick={handleAudioCallToggle}
                 >

@@ -79,20 +79,22 @@ const LoginForm = () => {
                 formData
             );
 
-            console.log("login response", response?.data);
+            const { userData } = response?.data;
+            console.log("userData", userData);
 
             // Ensure userData exists and has an _id
             if (response.status === 200 && response.data?.userData?._id) {
                 const params = new URLSearchParams(window.location.search);
                 const shop = params.get("shop");
                 const host = params.get("host");
-
-                localStorage.setItem("client_u_Identity", response.data.userData._id);
-
+                console.log("shop", shop, "host", host)
+                localStorage.setItem("client_u_Identity", userData?._id);
+                localStorage.setItem("shop_o_Identity", userData?.shop_id);
                 // Break out of the Shopify admin iframe to avoid CSP frame-ancestors issue
                 if (window.top) {
                     const targetShop = shop || "rohit-12345839.myshopify.com";
                     const hostQuery = host ? `?host=${encodeURIComponent(host)}` : "";
+                    console.log("targetShop", targetShop, "hostQuery", hostQuery)
                     window.top.location.href = `https://${targetShop}/apps/agora/consultant-dashboard${hostQuery}`;
                 }
             } else {

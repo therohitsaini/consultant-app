@@ -38,6 +38,9 @@ export const fetchConsultantById = createAsyncThunk("consultants/fetchById", asy
  * get chat history with shop id and consultant id
  */
 export const fetchChatHistory = createAsyncThunk("consultants/fetchChatHistory", async ({ shopId, userId,consultantId }) => {
+    console.log("shopId____________________REDUX", shopId)
+    console.log("userId____________________REDUX", userId)
+    console.log("consultantId________________REDUX", consultantId)
     const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/chat/get/chat-history/${shopId}/${userId}/${consultantId}`);
     return response.data;
 });

@@ -17,7 +17,8 @@ const ChatsPage = () => {
     const [isMobile, setIsMobile] = useState(false);
     const [chatList, setChatList] = useState([]);
     const [chatMessagesData, setChatMessagesData] = useState([]);
-    // const [consultantId, setConsultantId] = useState(null);
+    const [consultantId, setConsultantId] = useState(null);
+    const [shopId, setShopId] = useState(null);
     const [chaterIds, setChaterIds] = useState(null);
     const [text, setText] = useState('');
     const dispatch = useDispatch();
@@ -33,13 +34,20 @@ const ChatsPage = () => {
     const messagesEndRef = useRef(null);
     const messagesAreaRef = useRef(null);
 
-    const consultantId = "691dbba35e388352e3203b0b";
+    // const consultantId = "691dbba35e388352e3203b0b";
+
+    useEffect(() => {
+        const clientId = localStorage.getItem('client_u_Identity');
+        const shopId = localStorage.getItem('shop_o_Identity');
+        setConsultantId(clientId);
+        setShopId(shopId);
+    }, []);
 
     const { userInRequest } = useSelector((state) => state.consultants);
     console.log("userInRequest", userInRequest)
 
 
-
+    console.log("shopId______________________chatList__________________", chatList)
 
     useEffect(() => {
         const checkMobile = () => {
@@ -54,11 +62,10 @@ const ChatsPage = () => {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    // Scroll to bottom function
+    // Scroll to bottom function - only scroll messages area, not the whole page
     const scrollToBottom = (behavior = 'auto') => {
-        if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior });
-        } else if (messagesAreaRef.current) {
+        if (messagesAreaRef.current) {
+            // Directly set scrollTop to scroll only the messages area, not the whole page
             messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
         }
     };
@@ -69,12 +76,22 @@ const ChatsPage = () => {
             setChatMessagesData(chatHistory.chatHistory);
             // Reset last processed message when chat changes
             lastProcessedMessageId.current = null;
+            // Scroll to bottom when chat loads - only messages area
+            setTimeout(() => {
+                scrollToBottom('auto');
+            }, 300);
         }
     }, [chatHistory]);
 
-    // Auto-scroll when messages update (always keep at last message)
+    // Auto-scroll when messages update - scroll for all messages (send or receive)
+    // But only scroll the messages area, not the whole page
     useEffect(() => {
-        scrollToBottom('auto'); // instant jump, page ko upar‑niche animate nahi karega
+        if (chatMessagesData.length > 0 && messagesAreaRef.current) {
+            // Scroll messages area to bottom when new message is added
+            setTimeout(() => {
+                scrollToBottom('auto');
+            }, 100);
+        }
     }, [chatMessagesData]);
 
     // Listen to socket messages and update chat in real-time
@@ -151,7 +168,9 @@ const ChatsPage = () => {
             if (isMobile) {
                 setShowChatView(true);
             }
-            dispatch(fetchChatHistory({ shopId: chatData.shopId, userId: chatData.userId, consultantId: "691dbba35e388352e3203b0b" }));
+            // Prevent page scroll when selecting chat
+            window.scrollTo(0, 0);
+            dispatch(fetchChatHistory({ shopId: chatData.shopId, userId: chatData.userId, consultantId: consultantId }));
         }
     };
 
@@ -176,9 +195,11 @@ const ChatsPage = () => {
     );
 
     const getChatList = async () => {
-        console.log("process.env.REACT_APP_BACKEND_HOST", process.env.REACT_APP_BACKEND_HOST)
+        if (!shopId || !consultantId) return;
+
         try {
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/get/chat-list/${"690c374f605cb8b946503ccb"}/${"691dbba35e388352e3203b0b"}`);
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/get/chat-list/${shopId}/${consultantId}`);
+            console.log("response___ChatsPage", response)
             if (response.data?.payload) {
                 setChatList(response.data.payload);
                 // Auto-select first conversation and load messages
@@ -196,7 +217,7 @@ const ChatsPage = () => {
 
     useEffect(() => {
         getChatList();
-    }, [messages, userInRequest]);
+    }, [messages, userInRequest, shopId, consultantId]);
 
     const sendChat = () => {
         if (text.trim() === "" || !chaterIds) return;
@@ -223,13 +244,13 @@ const ChatsPage = () => {
 
         function sendMessage() {
             const messageData = {
-                senderId: consultantId || "691dbba35e388352e3203b0b",
-                receiverId: "69257f27387c4f06e7de34d3" || chaterIds?.userId,
-                shop_id: "690c374f605cb8b946503ccb" || chaterIds?.shopId,
+                senderId: consultantId || consultantId,
+                receiverId:  chaterIds?.userId,
+                shop_id: shopId || chaterIds?.shopId,
                 text: text,
                 timestamp: new Date().toISOString()
             };
-
+            console.log("messageData____________________SEND CHAT", messageData)
             // Optimistically add message to UI immediately
             const optimisticMessage = {
                 _id: `temp-${Date.now()}`,
@@ -310,8 +331,7 @@ const ChatsPage = () => {
     const isRequestModalOpen = chatList.filter((conversation) => conversation.isRequest === false);
     const isRequestModalClose = chatList.filter((conversation) => conversation.isRequest === true);
 
-    console.log("isRequestModalOpen", isRequestModalOpen)
-    console.log("isRequestModalClose", isRequestModalClose)
+
 
 
     return (
@@ -627,8 +647,8 @@ const ChatsPage = () => {
                                         ) : (
                                             <>
                                                 {chatMessagesData.map((message) => {
-                                                    const consultantId = "691dbba35e388352e3203b0b";
-                                                    const isOwn = message.senderId === consultantId;
+                                                    // const consultantId = consultantId;
+                                                    const isOwn = message.senderId === "691eafcff95528ab305eba59";
 
                                                     // Format timestamp
                                                     const timestamp = new Date(message.timestamp).toLocaleTimeString([], {

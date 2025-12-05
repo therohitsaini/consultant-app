@@ -180,7 +180,8 @@
 
 .messageContainer {
     display: flex;
-    height: 80vh !important;
+    /* height: 80vh !important; */
+    /* border: 1px solid blue; */
     /* width: 90%; */
     /* border: 1px solid red; */
 }
@@ -195,9 +196,10 @@
 
 .messageBubble {
     max-width: 70%;
-    padding: 10px 14px;
-    border-radius: 12px;
+    padding:10px;
+    border-radius: 8px;
     word-wrap: break-word;
+    /* border: 1px solid red; */
 }
 
 .messageBubbleOwn {

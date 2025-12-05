@@ -56,6 +56,21 @@ function TabNavigation({ children }) {
         dispatch(connectSocket("691dbba35e388352e3203b0b"));
     }, []);
 
+    // Check for page query parameter and navigate accordingly
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const page = params.get("page");
+        if (page === "chats") {
+            // Check if we're not already on chats page
+            if (location.pathname !== "/chats" && !location.pathname.startsWith("/chats")) {
+                // Small delay to ensure component is fully mounted
+                setTimeout(() => {
+                    navigate("/chats", { replace: true });
+                }, 100);
+            }
+        }
+    }, [location.search, location.pathname, navigate]);
+
     console.log("consultantId________________", consultantId);
     // Close sidebar when route changes on mobile
     useEffect(() => {
@@ -108,8 +123,38 @@ function TabNavigation({ children }) {
     ];
 
     const handleNavigation = (path) => {
+        console.log("path________________", path);
         if (path) {
-            navigate(path);
+            // If clicking on chat page
+            if (path === '/chats' || path.startsWith('/chats')) {
+                // Check if we're already in TabNavigation context
+                const isInTabNavigation = 
+                    location.pathname === '/consultant-dashboard' || 
+                    location.pathname.startsWith('/users-page') || 
+                    location.pathname.startsWith('/chats');
+                
+                if (isInTabNavigation) {
+                    // Already in TabNavigation, just navigate internally
+                    navigate(path);
+                } else {
+                    // Not in TabNavigation, do external redirect to break out of iframe
+                    const params = new URLSearchParams(window.location.search);
+                    const shop = params.get("shop");
+                    const host = params.get("host");
+                    const targetShop = shop || "rohit-12345839.myshopify.com";
+                    const hostQuery = host ? `&host=${encodeURIComponent(host)}` : "";
+                    
+                    // Break out of the Shopify admin iframe to avoid CSP frame-ancestors issue
+                    if (window.top) {
+                        window.top.location.href = `https://${targetShop}/apps/agora/chats${hostQuery}`;
+                    } else {
+                        // Fallback to normal navigation if not in iframe
+                        navigate(path);
+                    }
+                }
+            } else {
+                navigate(path);
+            }
             // Close sidebar on mobile after navigation
             if (window.innerWidth <= 768) {
                 setSidebarOpen(false);

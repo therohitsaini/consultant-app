@@ -19,8 +19,8 @@ export default function SocketProvider({ children }) {
             console.log("Connected to socket");
             dispatch(setConnected(true));
             // Register with shop ID if needed
-            const shopId = localStorage.getItem('shop_o_Identity') || "690c374f605cb8b946503ccb";
-            socket.emit("register", shopId);
+            const clientId = localStorage.getItem('client_u_Identity') || "690c374f605cb8b946503ccb";
+            socket.emit("register", clientId);
         };
 
         const handleDisconnect = () => {

@@ -20,32 +20,41 @@ const UserChat = () => {
         const storedShopId = localStorage.getItem('shop_o_Identity');
         setClientId(storedClientId);
         setShopId(storedShopId);
-        console.log("UserChat - ClientId:", storedClientId, "ShopId:", storedShopId, "ConsultantId:", consultantId);
     }, [consultantId]);
 
     const { consultantOverview } = useSelector((state) => state.consultants);
     const { chatHistory } = useSelector((state) => state.consultants);
     const { messages: socketMessages } = useSelector((state) => state.socket);
     const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${consultantOverview?.consultant?.profileImage?.replace("\\", "/")}`;
-    
+
     const [chatMessagesData, setChatMessagesData] = useState([]);
     const lastProcessedMessageId = useRef(null);
-    const messagesEndRef = useRef(null);
     const messagesAreaRef = useRef(null);
     const [showNotification, setShowNotification] = useState(false);
     const [notificationMessage, setNotificationMessage] = useState(null);
     const lastNotificationMessageId = useRef(null);
+    const isUserScrollingRef = useRef(false);
+    const shouldAutoScrollRef = useRef(true);
     useEffect(() => {
         dispatch(fetchConsultantById({ shop_id: shopId, consultant_id: consultantId }))
-    }, [dispatch, consultantId]);
+    }, [dispatch, shopId, consultantId]);
 
-    // Scroll to bottom function
-    const scrollToBottom = (behavior = 'auto') => {
-        // Use setTimeout to ensure DOM has updated
+    // Check if user is near bottom of messages area
+    const isNearBottom = () => {
+        if (!messagesAreaRef.current) return true;
+        const { scrollTop, scrollHeight, clientHeight } = messagesAreaRef.current;
+        // Consider "near bottom" if within 100px of bottom
+        return scrollHeight - scrollTop - clientHeight < 100;
+    };
+
+    // Scroll to bottom function - only scroll the messages container, not the whole page
+    // Only scrolls if user is already near bottom or if it's initial load
+    const scrollToBottom = (force = false) => {
+        if (!force && !shouldAutoScrollRef.current) return;
+        
         setTimeout(() => {
-            if (messagesEndRef.current) {
-                messagesEndRef.current.scrollIntoView({ behavior });
-            } else if (messagesAreaRef.current) {
+            if (messagesAreaRef.current) {
+                // Only scroll the messages container, not the whole page
                 messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
             }
         }, 100);
@@ -57,23 +66,14 @@ const UserChat = () => {
             setChatMessagesData(chatHistory.chatHistory);
             // Reset last processed message when chat changes
             lastProcessedMessageId.current = null;
-            // Scroll to bottom when chat history loads
+            // Reset auto-scroll flag when new chat loads
+            shouldAutoScrollRef.current = true;
+            // Scroll to bottom when chat history loads (force scroll on initial load)
             setTimeout(() => {
-                scrollToBottom('auto');
+                scrollToBottom(true);
             }, 400);
         }
     }, [chatHistory]);
-
-    // Auto-scroll when messages update (always keep at last message)
-    useEffect(() => {
-        if (chatMessagesData.length > 0 && messagesAreaRef.current) {
-            // Wait for DOM to fully render, then scroll to bottom
-            const timer = setTimeout(() => {
-                scrollToBottom('auto'); // instant jump, page ko upar‑niche animate nahi karega
-            }, 300);
-            return () => clearTimeout(timer);
-        }
-    }, [chatMessagesData]);
 
     // Listen to socket messages and update chat in real-time
     useEffect(() => {
@@ -81,7 +81,6 @@ const UserChat = () => {
             console.log("UserChat - Missing IDs:", { clientId, consultantId, shopId });
             return;
         }
-        
         if (!socketMessages || socketMessages.length === 0) {
             return;
         }
@@ -116,7 +115,7 @@ const UserChat = () => {
 
             if (isCurrentChatMessage) {
                 console.log("UserChat - ✅ Processing new message for current chat:", message);
-                
+
                 // Mark this message as processed
                 lastProcessedMessageId.current = message._id;
 
@@ -213,6 +212,9 @@ const UserChat = () => {
         sendMessage();
 
         function sendMessage() {
+            console.log("clientId____________________", clientId)
+            console.log("consultantId________________", consultantId)
+            console.log("shopId______________________", shopId)
             const messageData = {
                 senderId: clientId,
                 receiverId: consultantId,
@@ -232,6 +234,12 @@ const UserChat = () => {
             socket.emit("sendMessage", messageData);
             console.log("Message sent via socket:", messageData);
             setText("");
+            
+            // User sent a message, so enable auto-scroll and scroll to bottom
+            shouldAutoScrollRef.current = true;
+            setTimeout(() => {
+                scrollToBottom(true);
+            }, 100);
         }
     }
 
@@ -244,16 +252,39 @@ const UserChat = () => {
         }
     }, [dispatch, shopId, clientId, consultantId]);
 
-    // Initial scroll to bottom when page loads and messages are available
+    // Auto-scroll when messages update (only when new messages are added and user is at bottom)
     useEffect(() => {
         if (chatMessagesData.length > 0 && messagesAreaRef.current) {
-            // Wait for DOM to fully render messages
-            const timer = setTimeout(() => {
-                scrollToBottom('auto');
-            }, 200);
-            return () => clearTimeout(timer);
+            // Only auto-scroll if user is near bottom
+            if (isNearBottom() || shouldAutoScrollRef.current) {
+                const timer = setTimeout(() => {
+                    scrollToBottom();
+                }, 200);
+                return () => clearTimeout(timer);
+            }
         }
     }, [chatMessagesData.length]);
+
+    // Track user scroll behavior - disable auto-scroll if user scrolls up
+    useEffect(() => {
+        const messagesArea = messagesAreaRef.current;
+        if (!messagesArea) return;
+
+        const handleScroll = () => {
+            // Check if user scrolled up (away from bottom)
+            if (!isNearBottom()) {
+                shouldAutoScrollRef.current = false;
+            } else {
+                // User scrolled back to bottom, re-enable auto-scroll
+                shouldAutoScrollRef.current = true;
+            }
+        };
+
+        messagesArea.addEventListener('scroll', handleScroll);
+        return () => {
+            messagesArea.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
 
     // Direct socket listener as backup (in addition to Redux)
     useEffect(() => {
@@ -261,7 +292,7 @@ const UserChat = () => {
 
         const handleDirectMessage = (message) => {
             console.log("UserChat - Direct socket message received:", message);
-            
+
             // Normalize IDs for comparison
             const messageShopId = String(message.shop_id || message.shopId || '');
             const currentShopId = String(shopId || '');
@@ -278,7 +309,7 @@ const UserChat = () => {
 
             if (isCurrentChatMessage && message._id) {
                 console.log("UserChat - ✅ Direct: Processing message for current chat");
-                
+
                 // Skip if already processed
                 if (message._id === lastProcessedMessageId.current) return;
                 lastProcessedMessageId.current = message._id;
@@ -307,7 +338,6 @@ const UserChat = () => {
 
         // Listen for receiveMessage event directly
         socket.on("receiveMessage", handleDirectMessage);
-        console.log("consultantOverview_________>_____>", handleDirectMessage);
 
         return () => {
             socket.off("receiveMessage", handleDirectMessage);
@@ -316,8 +346,8 @@ const UserChat = () => {
 
 
     // useEffect(() => {
-    
-       
+
+
     // }, [dispatch, shopId, clientId, consultantId]);
     // console.log("userInRequest_________>_____>", userInRequest);
 
@@ -434,7 +464,6 @@ const UserChat = () => {
                                                 </div>
                                             );
                                         })}
-                                        <div ref={messagesEndRef} />
                                     </>
                                 )}
                             </div>

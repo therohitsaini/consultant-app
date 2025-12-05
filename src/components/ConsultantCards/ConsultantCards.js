@@ -17,12 +17,9 @@ function ConsultantCards() {
     const shop_id = params.get('shopid');
     console.log("shop_id", shop_id, "user_id____", user_id)
 
-    // Initial loading state - shows loader before component fully initializes
     const [initialLoading, setInitialLoading] = useState(true);
 
-    // Set initial loading to false after component mounts
     useEffect(() => {
-        // Small delay to ensure component is fully mounted
         const timer = setTimeout(() => {
             setInitialLoading(false);
         }, 100);
@@ -30,7 +27,7 @@ function ConsultantCards() {
         return () => clearTimeout(timer);
     }, []);
     useEffect(() => {
-        const client_id = localStorage.setItem('client_u_Identity', "69257f27387c4f06e7de34d3");
+        const client_id = localStorage.setItem('client_u_Identity', user_id);
         const shop = localStorage.setItem('shop_o_Identity', shop_id);
         console.log(client_id)
     }, [user_id, shop_id]);
@@ -131,16 +128,10 @@ function ConsultantCards() {
     // Function to handle calling option selection
     const handleCallingOption = (optionType, consultantId, price) => {
         console.log(`Selected ${optionType} option for consultant ${consultantId} at price INR ${price}`);
-        // Here you can add logic to navigate to booking page or open a modal
-        // For now, we'll just log it. You can customize this based on your requirements.
-        alert(`You selected ${optionType.toUpperCase()} call option.\nConsultant ID: ${consultantId}\nPrice: INR ${price.toLocaleString()}`);
     };
 
     useEffect(() => {
         if (!user_id) return console.log("User ID is required");
-
-        console.log("User ID_______", user_id);
-
         socket.on("connect", () => {
             console.log("Connected to socket", socket.id);
             socket.emit("register", user_id);
@@ -186,6 +177,13 @@ function ConsultantCards() {
                 </div>
             </div>
         );
+    }
+
+    const viewProfile = (shop_id, consultant_id) => {
+        const targetShop = "rohit-12345839.myshopify.com";
+        const hostQuery = "";
+        console.log("targetShop", targetShop, "hostQuery", hostQuery)
+        window.top.location.href = `https://${targetShop}/apps/agora/view-profile?consultantId=${consultant_id}&shopId=${shop_id}${hostQuery}`;
     }
 
     return (
@@ -302,7 +300,8 @@ function ConsultantCards() {
                             <div key={consultant.id} className="col-lg-4 col-md-6 col-sm-12">
                                 <div
                                     className="card shadow-sm border-0 consultant-card"
-                                    onClick={() => navigate(`/view-profile/${shop_id}/${consultant_id}`)}
+                                    // onClick={() => navigate(`/view-profile/${shop_id}/${consultant_id}`)}
+                                    onClick={() => viewProfile(shop_id, consultant_id)}
                                     style={{ cursor: 'pointer' }}
                                 >
                                     <div className="card-body p-4">

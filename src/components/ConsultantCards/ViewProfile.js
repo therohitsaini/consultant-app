@@ -8,11 +8,10 @@ import { fetchConsultantById } from '../Redux/slices/ConsultantSlices';
 function ViewProfile() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    // const shop_id = "690c374f605cb8b946503ccb";
-    // const consultant_id = "691dbba35e388352e3203b0b";
-
-    const { shop_id, consultant_id } = useParams();
-
+    // const { shop_id, consultant_id } = useParams();
+    const params = new URLSearchParams(window.location.search);
+    const consultant_id = params.get("consultantId");
+    const shop_id = params.get("shopId");
     const { consultantOverview, loading } = useSelector((state) => state.consultants);
     useEffect(() => {
         dispatch(fetchConsultantById({ shop_id, consultant_id }));
@@ -22,6 +21,7 @@ function ViewProfile() {
     useEffect(() => {
         window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     }, []);
+
 
 
     const consultantView = consultantOverview?.consultant;
@@ -78,8 +78,12 @@ function ViewProfile() {
         alert(`You selected ${optionType.toUpperCase()} call option.\nConsultant ID: ${consultantId}\nPrice: INR ${price.toLocaleString()}`);
     };
 
-
-    
+    const viewProfile = () => {
+        const targetShop = "rohit-12345839.myshopify.com";
+        const hostQuery = "";
+        console.log("targetShop", targetShop, "hostQuery", hostQuery)
+        window.top.location.href = `https://${targetShop}/apps/agora/chats?consultantId=${consultantView?._id}${hostQuery}`;
+    }
 
     return (
         <div className="view-profile-container">
@@ -95,6 +99,8 @@ function ViewProfile() {
                 {/* Profile Header */}
                 <div className="card shadow-sm border-0 mb-4 profile-header-card">
                     <div className="card-body p-4">
+
+
                         {/* Profile Section */}
                         <div className="flex align-items-start mb-3">
                             {/* Profile Image */}
@@ -151,12 +157,13 @@ function ViewProfile() {
                             <div className="mb-0">
                                 <strong className="consultant-info d-block mb-2">Calling Options:</strong>
                                 <div className="calling-options">
-                                    
+
                                     <button
                                         className="calling-option-btn chat-btn border-0"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            navigate(`/user-chat/${consultantView?._id}`);
+                                            viewProfile();
+                                            // navigate(`/user-chat/${consultantView?._id}`);
                                         }}
                                     >
                                         <div className="calling-option-content">

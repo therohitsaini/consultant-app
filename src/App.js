@@ -12,96 +12,33 @@ import AddConsultant2 from "./pages/AddConsultant2";
 import ConsultantCards from "./components/ConsultantCards/ConsultantCards";
 import ViewProfile from "./components/ConsultantCards/ViewProfile";
 import TabNavigation from "./components/ConsultantDashboard/TabNavigation";
-import UsersPage from "./components/ConsultantDashboard/UsersPage";
-import ChatsPage from "./components/ConsultantDashboard/ChatsPage";
 import VideoCallingPage from "./components/ConsultantDashboard/VideoCallingPage";
 import UserChat from "./components/ClientDashbord/UserChat";
 import LoginForm from "./components/ConsultantDashboard/LoginForm";
 import GlobalMessageNotification from "./components/AlertModel/GlobalMessageNotification";
 import './components/ConsultantCards/ConsultantCards.css';
 
-// Component to handle iframe height sync
+// Component to handle iframe height sync on route changes
 function IframeHeightSync() {
   const location = useLocation();
 
   useEffect(() => {
-    try {
-      const sendHeight = () => {
-        try {
-          // Check if we're on ChatsPage
-          const isChatsPage = location.pathname.includes('/chats') || location.pathname.includes('/users-page');
-          
-          let height;
-          if (isChatsPage) {
-            // Use viewport height for chat pages to prevent auto-growth
-            height = window.innerHeight || document.documentElement.clientHeight;
-          } else {
-            // For other pages, use scrollHeight
-            height = document.documentElement.scrollHeight;
-          }
-          
-          if (window.parent) {
-            window.parent.postMessage(
-              { type: "AGORA_IFRAME_HEIGHT", height },
-              "*"
-            );
-          }
-        } catch (err) {
-          console.error("Error sending height:", err);
+    const sendHeight = () => {
+      try {
+        const height = document.documentElement.scrollHeight;
+        if (window.parent) {
+          window.parent.postMessage(
+            { type: "AGORA_IFRAME_HEIGHT", height },
+            "*"
+          );
         }
-      };
-
-      // Add listeners for load / resize
-      window.addEventListener("load", sendHeight);
-      window.addEventListener("resize", sendHeight);
-
-      // One-time call shortly after mount (in case content is already rendered)
-      const timeoutId = setTimeout(sendHeight, 500);
-
-      return () => {
-        window.removeEventListener("load", sendHeight);
-        window.removeEventListener("resize", sendHeight);
-        clearTimeout(timeoutId);
-      };
-    } catch (error) {
-      console.error("Error in IframeHeightSync setup:", error);
-    }
-  }, [location.pathname]);
-
-  // Update height when route changes (for SPA navigation)
-  useEffect(() => {
-    try {
-      const sendHeight = () => {
-        try {
-          // For ChatsPage, use fixed viewport height instead of scrollHeight
-          // to prevent height from growing with content
-          const isChatsPage = location.pathname.includes('/chats') || location.pathname.includes('/users-page');
-          
-          let height;
-          if (isChatsPage) {
-            // Use viewport height for chat pages to prevent auto-growth
-            height = window.innerHeight || document.documentElement.clientHeight;
-          } else {
-            // For other pages, use scrollHeight
-            height = document.documentElement.scrollHeight;
-          }
-          
-          if (window.parent) {
-            window.parent.postMessage(
-              { type: "AGORA_IFRAME_HEIGHT", height },
-              "*"
-            );
-          }
-        } catch (err) {
-          console.error("Error sending height on route change:", err);
-        }
-      };
-      // Delay to allow DOM to update after route change
-      const timeoutId = setTimeout(sendHeight, 300);
-      return () => clearTimeout(timeoutId);
-    } catch (error) {
-      console.error("Error in route change height sync:", error);
-    }
+      } catch (err) {
+        console.error("Error sending height on route change:", err);
+      }
+    };
+    // Delay to allow DOM to update after route change
+    const timeoutId = setTimeout(sendHeight, 300);
+    return () => clearTimeout(timeoutId);
   }, [location.pathname]);
 
   return null;
@@ -172,6 +109,33 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Simple iframe height sync using postMessage
+  useEffect(() => {
+    const sendHeight = () => {
+      try {
+        const height = document.documentElement.scrollHeight;
+        if (window.parent) {
+          window.parent.postMessage(
+            { type: "AGORA_IFRAME_HEIGHT", height },
+            "*"
+          );
+        }
+      } catch (err) {
+        console.error("Error sending height:", err);
+      }
+    };
+
+    // Send height on load and resize
+    window.addEventListener("load", sendHeight);
+    window.addEventListener("resize", sendHeight);
+    setTimeout(sendHeight, 500);
+
+    return () => {
+      window.removeEventListener("load", sendHeight);
+      window.removeEventListener("resize", sendHeight);
+    };
+  }, []);
+
   useEffect(() => {
     if (!app) return;
 
@@ -204,7 +168,7 @@ function App() {
   return (
     
     <BrowserRouter>
-      {/* Iframe height sync - runs globally for all pages */}
+      {/* Iframe height sync on route changes */}
       <IframeHeightSync />
       {/* Global message notification - visible on all pages */}
       <GlobalMessageNotification />
@@ -217,12 +181,12 @@ function App() {
         <Route path="/pricing" element={<LayoutFrame><Pricing /></LayoutFrame>} />
         <Route path="/faq" element={<LayoutFrame><Faq /></LayoutFrame>} />
         <Route path="/consultant-cards" element={<ConsultantCards />} />
-        <Route path="/view-profile/:shop_id/:consultant_id" element={<ViewProfile />} />
+        <Route path="/view-profile" element={<ViewProfile />} />
         <Route path="/consultant-dashboard" element={<TabNavigation />} />
         <Route path="/users-page/*" element={<TabNavigation />} />
         <Route path="/chats/*" element={<TabNavigation />} />
         <Route path="/video/calling/page" element={<VideoCallingPage />} />
-        <Route path="/user-chat/:consultantId" element={<UserChat />} />
+        <Route path="/chats" element={<UserChat />} />
         <Route path="/login" element={<LoginForm />} />
       </Routes>
     </BrowserRouter>
