@@ -17,6 +17,7 @@ import UserChat from "./components/ClientDashbord/UserChat";
 import LoginForm from "./components/ConsultantDashboard/LoginForm";
 import GlobalMessageNotification from "./components/AlertModel/GlobalMessageNotification";
 import './components/ConsultantCards/ConsultantCards.css';
+import { useSelector } from "react-redux";
 
 // Component to handle iframe height sync on route changes
 function IframeHeightSync() {
@@ -26,6 +27,7 @@ function IframeHeightSync() {
     const sendHeight = () => {
       try {
         const height = document.documentElement.scrollHeight;
+        console.log("height____________________", height)
         if (window.parent) {
           window.parent.postMessage(
             { type: "AGORA_IFRAME_HEIGHT", height },
@@ -48,7 +50,9 @@ function App() {
   const app = useAppBridge();
   const [initialLoading, setInitialLoading] = useState(true);
 
-  // Hide React error overlay in development
+
+
+ 
   useEffect(() => {
     // Suppress React error overlay
     if (process.env.NODE_ENV === 'development') {
@@ -165,8 +169,10 @@ function App() {
     );
   }
 
+
+
   return (
-    
+
     <BrowserRouter>
       {/* Iframe height sync on route changes */}
       <IframeHeightSync />
@@ -184,7 +190,7 @@ function App() {
         <Route path="/view-profile" element={<ViewProfile />} />
         <Route path="/consultant-dashboard" element={<TabNavigation />} />
         <Route path="/users-page/*" element={<TabNavigation />} />
-        <Route path="/chats/*" element={<TabNavigation />} />
+        <Route path="/consulant-chats/*" element={<TabNavigation />} />
         <Route path="/video/calling/page" element={<VideoCallingPage />} />
         <Route path="/chats" element={<UserChat />} />
         <Route path="/login" element={<LoginForm />} />

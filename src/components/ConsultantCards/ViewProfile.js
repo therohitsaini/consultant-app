@@ -82,7 +82,7 @@ function ViewProfile() {
         const targetShop = "rohit-12345839.myshopify.com";
         const hostQuery = "";
         console.log("targetShop", targetShop, "hostQuery", hostQuery)
-        window.top.location.href = `https://${targetShop}/apps/agora/chats?consultantId=${consultantView?._id}${hostQuery}`;
+        window.top.location.href = `https://${targetShop}/apps/agora/chats-c?consultantId=${consultantView?._id}${hostQuery}`;
     }
 
     return (

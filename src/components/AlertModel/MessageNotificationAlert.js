@@ -1,21 +1,21 @@
 import React, { useEffect } from "react";
 
-export default function PopupNotification({ message, onClose }) {
+export default function PopupNotification({ message, onClose,showNotification }) {
     useEffect(() => {
-        const timer = setTimeout(() => onClose(), 5000);
+        const timer = setTimeout(() => onClose(), 5000000000);
         return () => clearTimeout(timer);
     }, [onClose]);
     
-    
+    console.log("showNotification____________________", showNotification)
     // Handle both single object and array
     const messageData = Array.isArray(message) ? message[0] : message;
-
+    console.log("messageData____________________", messageData?.text)
     return (
         <>
             {/* Internal CSS */}
             <style>{`
                 .bs-popup {
-                    position: fixed;
+                    // position: fixed;
                     bottom: 20px;       /* bottom */
                     right: 20px;        /* right */
                     width: 330px;
@@ -26,8 +26,9 @@ export default function PopupNotification({ message, onClose }) {
                     padding: 1rem;
                     z-index: 99999;
                     color: #fff;
-                    box-shadow: 0px 8px 25px rgba(0,0,0,0.3);
+                    box-shadow: 0px 8px 25px rgba(129, 81, 81, 0.3);
                     animation: slideUp .4s ease forwards;
+                    // border: 1px solid red;
                 }
 
                 /* Slide from bottom-right */
@@ -60,7 +61,8 @@ export default function PopupNotification({ message, onClose }) {
                 }
             `}</style>
 
-            <div className="bs-popup d-flex align-items-center gap-3 shadow-lg">
+          {/* {showNotification && (     */}
+            <div className="bs-popup d-flex align-items-center gap-3 shadow-lg "  >
                 <button className="bs-close-btn" onClick={onClose}>×</button>
 
                 <img
@@ -73,6 +75,7 @@ export default function PopupNotification({ message, onClose }) {
                     <p>{messageData?.text || "New message received"}</p>
                 </div>
             </div>
+        {/* )} */}
         </>
     );
 }

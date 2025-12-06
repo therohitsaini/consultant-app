@@ -60,12 +60,12 @@ function TabNavigation({ children }) {
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const page = params.get("page");
-        if (page === "chats") {
-            // Check if we're not already on chats page
-            if (location.pathname !== "/chats" && !location.pathname.startsWith("/chats")) {
+        if (page === "consulant-chats") {
+            // Check if we're not already on consulant-chats page
+            if (location.pathname !== "/consulant-chats" && !location.pathname.startsWith("/consulant-chats")) {
                 // Small delay to ensure component is fully mounted
                 setTimeout(() => {
-                    navigate("/chats", { replace: true });
+                    navigate("/consulant-chats", { replace: true });
                 }, 100);
             }
         }
@@ -101,6 +101,7 @@ function TabNavigation({ children }) {
         setSidebarOpen(!sidebarOpen);
     };
 
+    console.log("location.pathname________________", location.pathname)
     const menuItems = [
         {
             label: 'Dashboard',
@@ -117,49 +118,53 @@ function TabNavigation({ children }) {
         {
             label: 'Chats',
             icon: <ChatIcon />,
-            path: '/chats',
-            active: location.pathname === '/chats'
+            path: '/consultant-chats-section',
+            active: location.pathname === '/consultant-chats-section'
         },
     ];
 
     const handleNavigation = (path) => {
         console.log("path________________", path);
-        if (path) {
-            // If clicking on chat page
-            if (path === '/chats' || path.startsWith('/chats')) {
-                // Check if we're already in TabNavigation context
-                const isInTabNavigation = 
-                    location.pathname === '/consultant-dashboard' || 
-                    location.pathname.startsWith('/users-page') || 
-                    location.pathname.startsWith('/chats');
-                
-                if (isInTabNavigation) {
-                    // Already in TabNavigation, just navigate internally
-                    navigate(path);
-                } else {
-                    // Not in TabNavigation, do external redirect to break out of iframe
-                    const params = new URLSearchParams(window.location.search);
-                    const shop = params.get("shop");
-                    const host = params.get("host");
-                    const targetShop = shop || "rohit-12345839.myshopify.com";
-                    const hostQuery = host ? `&host=${encodeURIComponent(host)}` : "";
-                    
-                    // Break out of the Shopify admin iframe to avoid CSP frame-ancestors issue
-                    if (window.top) {
-                        window.top.location.href = `https://${targetShop}/apps/agora/chats${hostQuery}`;
-                    } else {
-                        // Fallback to normal navigation if not in iframe
-                        navigate(path);
-                    }
-                }
-            } else {
-                navigate(path);
-            }
-            // Close sidebar on mobile after navigation
-            if (window.innerWidth <= 768) {
-                setSidebarOpen(false);
-            }
-        }
+        const targetShop = "rohit-12345839.myshopify.com";
+        const hostQuery = "";
+        console.log("targetShop", targetShop, "hostQuery", hostQuery)
+        window.top.location.href = `https://${targetShop}/apps/agora${path}${hostQuery}`;
+
+        // if (path) {
+        //     // If clicking on chat page
+        //     if (path === '/consultant-chats-section' || path.startsWith('/consultant-chats-section')) {
+        //         // Check if we're already in TabNavigation context
+        //         const isInTabNavigation =
+        //             location.pathname === '/consultant-dashboard' ||
+        //             location.pathname.startsWith('/users-page') ||
+        //             location.pathname.startsWith('/consultant-chats-section');
+
+              
+        //         if (isInTabNavigation) {
+        //             // Not in TabNavigation, do external redirect to break out of iframe
+        //             const params = new URLSearchParams(window.location.search);
+        //             const shop = params.get("shop");
+        //             const host = params.get("host");
+        //             const targetShop = shop || "rohit-12345839.myshopify.com";
+        //             const hostQuery = host ? `&host=${encodeURIComponent(host)}` : "";
+
+        //             // Break out of the Shopify admin iframe to avoid CSP frame-ancestors issue
+        //             if (window.top) {
+        //                 const isInTabNavigation =
+        //                     window.top.location.href = `https://${targetShop}/apps/agora/${isInTabNavigation}${hostQuery}`;
+        //             } else {
+        //                 // Fallback to normal navigation if not in iframe
+        //                 navigate(path);
+        //             }
+        //         }
+        //     } else {
+        //         navigate(path);
+        //     }
+        //     // Close sidebar on mobile after navigation
+        //     if (window.innerWidth <= 768) {
+        //         setSidebarOpen(false);
+        //     }
+        // }
     };
 
     // Check if we're on video call page - hide sidebar
@@ -247,7 +252,7 @@ function TabNavigation({ children }) {
                             const path = location.pathname;
                             if (path === '/users-page' || path.startsWith('/users-page')) {
                                 return <UsersPage />;
-                            } else if (path === '/chats' || path.startsWith('/chats')) {
+                            } else if (path === '/consulant-chats' || path.startsWith('/consulant-chats')) {
                                 return <ChatsPage />;
                             } else if (path === '/video-call' || path.startsWith('/video-call')) {
                                 return <VideoCallingPage />;

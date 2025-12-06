@@ -11,64 +11,63 @@ const UserChat = () => {
     const [text, setText] = useState()
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { consultantId } = useParams()
+    // const { consultantId } = useParams()
     const [clientId, setClientId] = useState(null);
     const [shopId, setShopId] = useState(null);
 
+    // useEffect(() => {
+        const parms = new URLSearchParams(window.location.search);
+        const consultantId = parms.get('consultantId');
+        // const shopIdParms = parms.get('shopId');
+        // console.log("consultantIdParms", consultantIdParms)
+
+    // }, [clientId]);
+
     useEffect(() => {
         const storedClientId = localStorage.getItem('client_u_Identity');
+        console.log("storedClientId____________________", storedClientId)
         const storedShopId = localStorage.getItem('shop_o_Identity');
+        console.log("storedShopId____________________", storedShopId)
         setClientId(storedClientId);
         setShopId(storedShopId);
-    }, [consultantId]);
+    }, []);
 
     const { consultantOverview } = useSelector((state) => state.consultants);
     const { chatHistory } = useSelector((state) => state.consultants);
     const { messages: socketMessages } = useSelector((state) => state.socket);
     const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${consultantOverview?.consultant?.profileImage?.replace("\\", "/")}`;
-
     const [chatMessagesData, setChatMessagesData] = useState([]);
     const lastProcessedMessageId = useRef(null);
     const messagesAreaRef = useRef(null);
     const [showNotification, setShowNotification] = useState(false);
     const [notificationMessage, setNotificationMessage] = useState(null);
     const lastNotificationMessageId = useRef(null);
-    const isUserScrollingRef = useRef(false);
     const shouldAutoScrollRef = useRef(true);
     useEffect(() => {
         dispatch(fetchConsultantById({ shop_id: shopId, consultant_id: consultantId }))
     }, [dispatch, shopId, consultantId]);
 
-    // Check if user is near bottom of messages area
     const isNearBottom = () => {
         if (!messagesAreaRef.current) return true;
         const { scrollTop, scrollHeight, clientHeight } = messagesAreaRef.current;
-        // Consider "near bottom" if within 100px of bottom
         return scrollHeight - scrollTop - clientHeight < 100;
     };
 
-    // Scroll to bottom function - only scroll the messages container, not the whole page
-    // Only scrolls if user is already near bottom or if it's initial load
     const scrollToBottom = (force = false) => {
         if (!force && !shouldAutoScrollRef.current) return;
-        
+
         setTimeout(() => {
             if (messagesAreaRef.current) {
-                // Only scroll the messages container, not the whole page
                 messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
             }
         }, 100);
     };
 
-    // Update messages from chatHistory
     useEffect(() => {
         if (chatHistory?.chatHistory) {
             setChatMessagesData(chatHistory.chatHistory);
-            // Reset last processed message when chat changes
             lastProcessedMessageId.current = null;
-            // Reset auto-scroll flag when new chat loads
             shouldAutoScrollRef.current = true;
-            // Scroll to bottom when chat history loads (force scroll on initial load)
             setTimeout(() => {
                 scrollToBottom(true);
             }, 400);
@@ -212,9 +211,7 @@ const UserChat = () => {
         sendMessage();
 
         function sendMessage() {
-            console.log("clientId____________________", clientId)
-            console.log("consultantId________________", consultantId)
-            console.log("shopId______________________", shopId)
+   
             const messageData = {
                 senderId: clientId,
                 receiverId: consultantId,
@@ -234,7 +231,7 @@ const UserChat = () => {
             socket.emit("sendMessage", messageData);
             console.log("Message sent via socket:", messageData);
             setText("");
-            
+
             // User sent a message, so enable auto-scroll and scroll to bottom
             shouldAutoScrollRef.current = true;
             setTimeout(() => {
@@ -355,12 +352,12 @@ const UserChat = () => {
     return (
         <Fragment>
             {/* Global-style message notification for user side */}
-            {showNotification && notificationMessage && (
+            {/* {showNotification && notificationMessage && (
                 <PopupNotification
                     message={notificationMessage}
                     onClose={() => setShowNotification(false)}
                 />
-            )}
+            )} */}
             {/* <button className="btn btn-link back-button mb-3" onClick={() => navigate('/consultant-cards')}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px', verticalAlign: 'middle' }}>
                     <path d="M19 12H5M12 19l-7-7 7-7" />

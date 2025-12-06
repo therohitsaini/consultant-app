@@ -15,10 +15,9 @@ function ConsultantCards() {
     const params = new URLSearchParams(window.location.search);
     const user_id = params.get('customerId');
     const shop_id = params.get('shopid');
-    console.log("shop_id", shop_id, "user_id____", user_id)
-
     const [initialLoading, setInitialLoading] = useState(true);
-
+   
+   
     useEffect(() => {
         const timer = setTimeout(() => {
             setInitialLoading(false);
@@ -185,6 +184,7 @@ function ConsultantCards() {
         console.log("targetShop", targetShop, "hostQuery", hostQuery)
         window.top.location.href = `https://${targetShop}/apps/agora/view-profile?consultantId=${consultant_id}&shopId=${shop_id}${hostQuery}`;
     }
+
 
     return (
         <div className="container py-4">

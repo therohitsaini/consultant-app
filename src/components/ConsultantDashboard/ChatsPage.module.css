@@ -5,10 +5,10 @@
     max-width: 100%;
     overflow: hidden; /* window pe extra scrollbar na aaye */
     height: 100%;    /* pure viewport ke andar lock */
-    max-height:80vh; /* prevent height from growing beyond viewport */
+    max-height:100vh; /* prevent height from growing beyond viewport */
     position: relative;
     box-sizing: border-box;
-    /* border: 1px solid rgb(63, 14, 198); */
+    /* border: 1px solid rgb(198, 57, 71); */
 }
 
 .headerSection {
@@ -32,8 +32,8 @@
 /* Chat Layout */
 .chatLayout {
     display: flex;
-    height: calc(80vh - 200px);
-    max-height: calc(80vh - 200px); /* prevent height from growing */
+    height: calc(100vh - 200px);
+    max-height: calc(100vh - 200px); /* prevent height from growing */
     gap: 0;
     width: 100%;
     max-width: 100%;
