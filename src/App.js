@@ -18,6 +18,8 @@ import LoginForm from "./components/ConsultantDashboard/LoginForm";
 import GlobalMessageNotification from "./components/AlertModel/GlobalMessageNotification";
 import './components/ConsultantCards/ConsultantCards.css';
 import { useSelector } from "react-redux";
+import useFcmToken from "./firebase/hooks/useFcmToken";
+import FcmToken from "./firebase/FcmToken";
 
 // Component to handle iframe height sync on route changes
 function IframeHeightSync() {
@@ -50,9 +52,18 @@ function App() {
   const app = useAppBridge();
   const [initialLoading, setInitialLoading] = useState(true);
 
+  const [userId, setUserId] = useState(null);
+  const vapidKey = "BB8E-fAs8w3xZZ3cL_R3jjnTHaNDu4LGcra1NJhX60UG0lxvzBHVzzblrvv7cm6FMaGo_o_r2hbiB1eibrtg1h0";
+
+  useEffect(() => {
+    setUserId(localStorage.getItem("client_u_Identity"));
+  }, []);
 
 
- 
+  const token = useFcmToken(userId, vapidKey);
+  console.log("token", token)
+
+
   useEffect(() => {
     // Suppress React error overlay
     if (process.env.NODE_ENV === 'development') {
@@ -194,6 +205,7 @@ function App() {
         <Route path="/video/calling/page" element={<VideoCallingPage />} />
         <Route path="/chats" element={<UserChat />} />
         <Route path="/login" element={<LoginForm />} />
+        <Route path="/fcm-token" element={<FcmToken />} />
       </Routes>
     </BrowserRouter>
   );

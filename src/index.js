@@ -12,6 +12,12 @@ import { AppBridgeProvider } from './components/createContext/AppBridgeContext';
 import SocketProvider from './components/Sokect-io/sokectProvider';
 import ErrorBoundary from './components/ErrorBoundary';
 
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/firebase-messaging-sw.js")
+    .then((reg) => console.log("Service worker registered:", reg.scope))
+    .catch((err) => console.error("SW registration failed:", err));
+}
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
@@ -43,13 +49,13 @@ if (process.env.NODE_ENV === 'development') {
       overlay.style.display = 'none';
       overlay.remove();
     }
-    
+
     // Hide webpack dev server iframe
     const iframe = document.querySelector('iframe[id*="webpack-dev-server"]');
     if (iframe) {
       iframe.style.display = 'none';
     }
-    
+
     // Hide any error divs with "Uncaught runtime errors"
     const errorDivs = document.querySelectorAll('div');
     errorDivs.forEach(div => {
@@ -66,7 +72,7 @@ if (process.env.NODE_ENV === 'development') {
   } else {
     hideErrorOverlay();
   }
-  
+
   // Use MutationObserver to continuously hide error overlay
   const observer = new MutationObserver(() => {
     hideErrorOverlay();
@@ -76,7 +82,7 @@ if (process.env.NODE_ENV === 'development') {
     childList: true,
     subtree: true
   });
-  
+
   // Also check periodically
   setInterval(hideErrorOverlay, 500);
 }

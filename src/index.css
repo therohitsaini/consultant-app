@@ -29,3 +29,13 @@ iframe[id*="webpack-dev-server"] {
 body > div[style*="position: fixed"][style*="z-index: 9999"] {
   display: none !important;
 }
+
+/* Hide WebSocket connection error messages */
+body > div[style*="position: fixed"]:has-text("WebSocket") {
+  display: none !important;
+}
+
+/* Suppress React Refresh WebSocket errors */
+script[src*="react-refresh"] {
+  display: none;
+}
