@@ -1,22 +1,21 @@
 import { useEffect, useState } from "react";
 import { getToken, onMessage } from "firebase/messaging";
 import { messaging } from "./firebase";
-import { checkAndRequestNotificationPermission } from "./utils/notificationPermission";
 
 const vapidKey = "BB8E-fAs8w3xZZ3cL_R3jjnTHaNDu4LGcra1NJhX60UG0lxvzBHVzzblrvv7cm6FMaGo_o_r2hbiB1eibrtg1h0";
 
 export default function FcmToken() {
-    const [status, setStatus] = useState("Checking notification permission...");
+    const [status, setStatus] = useState("Generating FCM token...");
     const [token, setToken] = useState(null);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        // Function to generate FCM token (called after permission is granted)
+        // Function to generate FCM token
         async function generateFcmToken() {
             try {
-                // Step 2: Get FCM token
+                // Step 1: Get FCM token
                 setStatus("Generating FCM token...");
-                console.log("🔑 Step 2: Generating FCM token with VAPID key...");
+                console.log("🔑 Generating FCM token with VAPID key...");
                 
                 const currentToken = await getToken(messaging, { vapidKey });
                 
@@ -35,7 +34,7 @@ export default function FcmToken() {
                     return;
                 }
 
-                // Step 3: Token generated successfully
+                // Step 2: Token generated successfully
                 setToken(currentToken);
                 setStatus("Token generated successfully!");
                 console.log("✅ ========================================");
@@ -51,9 +50,9 @@ export default function FcmToken() {
                               new URLSearchParams(window.location.search).get("userId");
                 
                 if (userId) {
-                    // Step 4: Save token to backend
+                    // Step 3: Save token to backend
                     setStatus("Saving token to backend...");
-                    console.log("💾 Step 3: Saving token to backend for userId:", userId);
+                    console.log("💾 Saving token to backend for userId:", userId);
                     
                     const backendHost = process.env.REACT_APP_BACKEND_HOST || "http://localhost:5001";
                     try {
@@ -79,7 +78,7 @@ export default function FcmToken() {
                     console.warn("⚠️ No userId found. Token generated but not saved.");
                 }
 
-                // Step 5: Send token to parent window
+                // Step 4: Send token to parent window
                 if (window.opener) {
                     window.opener.postMessage({
                         type: "FCM_TOKEN_SUCCESS",
@@ -89,7 +88,7 @@ export default function FcmToken() {
                     console.log("📤 Token sent to parent window");
                 }
 
-                // Step 6: Setup foreground message listener
+                // Step 5: Setup foreground message listener
                 const unsubOnMessage = onMessage(messaging, (payload) => {
                     console.log("📨 Foreground message received:", payload);
                     
@@ -138,44 +137,8 @@ export default function FcmToken() {
             }
         }
 
-        // Step 1: Check and request notification permission
-        async function initFcmToken() {
-            setStatus("Checking notification permission...");
-            console.log("🔔 Step 1: Checking notification permission...");
-            console.log("📋 Current permission status:", Notification.permission);
-            
-            const permissionGranted = await checkAndRequestNotificationPermission(() => {
-                // Callback: Permission granted, now generate FCM token
-                console.log("✅ Permission granted! Generating FCM token...");
-                generateFcmToken();
-            });
-
-            if (!permissionGranted) {
-                let errorMsg = "";
-                if (Notification.permission === "denied") {
-                    errorMsg = "Notification permission denied. Please allow notifications in browser settings (click the lock icon in address bar).";
-                } else {
-                    errorMsg = "Notification permission not granted. Please allow notifications to continue.";
-                }
-                
-                setError(errorMsg);
-                setStatus("Permission denied");
-                console.error("❌", errorMsg);
-                console.log("💡 Current permission:", Notification.permission);
-                console.log("💡 To enable: Click lock icon (🔒) in address bar → Notifications → Allow");
-                
-                // Send error to parent window
-                if (window.opener) {
-                    window.opener.postMessage({
-                        type: "FCM_TOKEN_ERROR",
-                        error: errorMsg,
-                        permission: Notification.permission
-                    }, window.location.origin);
-                }
-            }
-        }
-
-        initFcmToken();
+        // Generate FCM token directly
+        generateFcmToken();
     }, []);
 
     return (
@@ -254,50 +217,8 @@ export default function FcmToken() {
                                 ❌ {error}
                             </p>
                         </div>
-                        
-                        <div style={{
-                            backgroundColor: "#fff3cd",
-                            border: "1px solid #ffc107",
-                            borderRadius: "5px",
-                            padding: "15px",
-                            marginBottom: "20px",
-                            textAlign: "left"
-                        }}>
-                            <p style={{ margin: "0 0 10px 0", fontWeight: "bold", color: "#856404" }}>
-                                📋 How to Enable Notifications:
-                            </p>
-                            <ol style={{ margin: "0", paddingLeft: "20px", color: "#856404", fontSize: "14px" }}>
-                                <li>Click the <strong>lock icon (🔒)</strong> or <strong>info icon (i)</strong> in your browser's address bar</li>
-                                <li>Find <strong>"Notifications"</strong> in the permissions list</li>
-                                <li>Change it to <strong>"Allow"</strong></li>
-                                <li>Refresh this page or click the button below</li>
-                            </ol>
-                        </div>
-                        
-                        <button
-                            onClick={() => {
-                                // Retry permission request
-                                window.location.reload();
-                            }}
-                            style={{
-                                backgroundColor: "#007bff",
-                                color: "white",
-                                border: "none",
-                                borderRadius: "5px",
-                                padding: "10px 20px",
-                                fontSize: "16px",
-                                cursor: "pointer",
-                                fontWeight: "bold",
-                                marginTop: "10px"
-                            }}
-                            onMouseOver={(e) => e.target.style.backgroundColor = "#0056b3"}
-                            onMouseOut={(e) => e.target.style.backgroundColor = "#007bff"}
-                        >
-                            🔄 Retry After Enabling Notifications
-                        </button>
-                        
-                        <p style={{ color: "#666", fontSize: "14px", marginTop: "15px" }}>
-                            After enabling notifications, click the button above to retry.
+                        <p style={{ color: "#666", fontSize: "14px" }}>
+                            Please check the console for more details.
                         </p>
                     </>
                 ) : (

@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { getToken, onMessage } from "firebase/messaging";
 import { messaging } from "../firebase";
-import { requestNotificationPermission } from "../utils/notificationPermission";
 
 /**
  * useFcmToken(userId, vapidKey)
@@ -20,11 +19,7 @@ export default function useFcmToken(userId, vapidKey) {
         async function register() {
             try {
                 // 1) Ask permission using utility function
-                const permissionGranted = await requestNotificationPermission();
-                if (!permissionGranted) {
-                    console.log("Notification permission not granted");
-                    return;
-                }
+             
 
                 // 2) Get token
                 const currentToken = await getToken(messaging, { vapidKey });

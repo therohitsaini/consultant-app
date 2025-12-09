@@ -25,9 +25,7 @@ const UserChat = () => {
 
     useEffect(() => {
         const storedClientId = localStorage.getItem('client_u_Identity');
-        console.log("storedClientId____________________", storedClientId)
         const storedShopId = localStorage.getItem('shop_o_Identity');
-        console.log("storedShopId____________________", storedShopId)
         setClientId(storedClientId);
         setShopId(storedShopId);
     }, []);

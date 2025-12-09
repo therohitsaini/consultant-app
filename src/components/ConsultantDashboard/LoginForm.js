@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './LoginForm.module.css';
 import axios from 'axios';
-import { getFcmToken } from '../../firebase/firebase';
 
 const LoginForm = () => {
     const navigate = useNavigate();
@@ -91,53 +90,16 @@ const LoginForm = () => {
                 console.log("shop", shop, "host", host)
                 const userId = userData?._id;
                 const shopId = userData?.shop_id;
-                
+
                 // Store user data in localStorage
                 localStorage.setItem("client_u_Identity", userId);
                 localStorage.setItem("shop_o_Identity", shopId);
-                
-                // Open new tab/window for FCM token generation
-                const fcmWindow = window.open(
-                    `/fcm-token?userId=${userId}`,
-                    "_blank",
-                    "width=600,height=500,scrollbars=yes,resizable=yes"
-                );
-                
-                // Listen for token from popup window
-                const handleMessage = (event) => {
-                    // Verify origin for security
-                    if (event.origin !== window.location.origin) {
-                        return;
-                    }
-                    
-                    if (event.data.type === "FCM_TOKEN_SUCCESS") {
-                        console.log("✅ ========================================");
-                        console.log("✅ FCM TOKEN RECEIVED FROM POPUP!");
-                        console.log("✅ ========================================");
-                        console.log("📱 FCM TOKEN:", event.data.token);
-                        console.log("👤 User ID:", event.data.userId);
-                        console.log("✅ ========================================");
-                    } else if (event.data.type === "FCM_TOKEN_ERROR") {
-                        console.error("❌ FCM Token Error:", event.data.error);
-                    }
-                };
-                
-                window.addEventListener("message", handleMessage);
-                
-                // Cleanup listener after 30 seconds
-                setTimeout(() => {
-                    window.removeEventListener("message", handleMessage);
-                }, 30000);
-
-                // const token = await getFcmToken();
-                // console.log("FCM TOKEN:", token);
 
                 // Break out of the Shopify admin iframe to avoid CSP frame-ancestors issue
                 if (window.top) {
-
-                    // const targetShop = shop || "rohit-12345839.myshopify.com";
-                    // const hostQuery = host ? `?host=${encodeURIComponent(host)}` : "";
-                    // console.log("targetShop", targetShop, "hostQuery", hostQuery)
+                    const targetShop = shop
+                    const hostQuery = host ? `?host=${encodeURIComponent(host)}` : "";
+                    console.log("targetShop", targetShop, "hostQuery", hostQuery)
                     // window.top.location.href = `https://${targetShop}/apps/agora/consultant-dashboard${hostQuery}`;
                 }
             } else {

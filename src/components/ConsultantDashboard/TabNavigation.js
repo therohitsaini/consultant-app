@@ -21,7 +21,12 @@ function TabNavigation({ children }) {
     const location = useLocation();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [consultantId, setConsultantId] = useState(null);
+    const [userId, setUserId] = useState(null);
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        setUserId(localStorage.getItem('client_u_Identity'));
+    }, []);
 
 
     const sendHeight = () => {
@@ -53,8 +58,8 @@ function TabNavigation({ children }) {
 
 
     useEffect(() => {
-        dispatch(connectSocket("691dbba35e388352e3203b0b"));
-    }, []);
+        dispatch(connectSocket(userId));
+    }, [userId]);
 
     // Check for page query parameter and navigate accordingly
     useEffect(() => {
@@ -124,8 +129,9 @@ function TabNavigation({ children }) {
     ];
 
     const handleNavigation = (path) => {
-        console.log("path________________", path);
-        const targetShop = "rohit-12345839.myshopify.com";
+        const params = new URLSearchParams(window.location.search);
+        const shop = params.get("shop");
+        const targetShop = shop;
         const hostQuery = "";
         console.log("targetShop", targetShop, "hostQuery", hostQuery)
         window.top.location.href = `https://${targetShop}/apps/agora${path}${hostQuery}`;
@@ -139,7 +145,7 @@ function TabNavigation({ children }) {
         //             location.pathname.startsWith('/users-page') ||
         //             location.pathname.startsWith('/consultant-chats-section');
 
-              
+
         //         if (isInTabNavigation) {
         //             // Not in TabNavigation, do external redirect to break out of iframe
         //             const params = new URLSearchParams(window.location.search);
