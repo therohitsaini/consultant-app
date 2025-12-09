@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './LoginForm.module.css';
 import axios from 'axios';
+import { getToken } from 'firebase/messaging';
+import { messaging } from '../../firebase/firebase';
 
 const LoginForm = () => {
     const navigate = useNavigate();
@@ -12,6 +14,7 @@ const LoginForm = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
+    const [tokenStatus, setTokenStatus] = useState('');
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -95,12 +98,64 @@ const LoginForm = () => {
                 localStorage.setItem("client_u_Identity", userId);
                 localStorage.setItem("shop_o_Identity", shopId);
 
-                // Break out of the Shopify admin iframe to avoid CSP frame-ancestors issue
-                if (window.top) {
-                    const targetShop = shop
+                // Generate FCM token on same page
+                setIsLoading(true);
+                setTokenStatus("Generating FCM token...");
+                
+                try {
+                    // Request notification permission
+                    if (Notification.permission === "default") {
+                        setTokenStatus("Requesting notification permission...");
+                        await Notification.requestPermission();
+                    }
+
+                    if (Notification.permission === "granted") {
+                        setTokenStatus("Generating FCM token...");
+                        const vapidKey = "BB8E-fAs8w3xZZ3cL_R3jjnTHaNDu4LGcra1NJhX60UG0lxvzBHVzzblrvv7cm6FMaGo_o_r2hbiB1eibrtg1h0";
+                        const fcmToken = await getToken(messaging, { vapidKey });
+                        
+                        if (fcmToken) {
+                            console.log("✅ FCM TOKEN:", fcmToken);
+                            setTokenStatus("Saving token to backend...");
+                            
+                            // Save token to backend
+                            const backendHost = process.env.REACT_APP_BACKEND_HOST 
+                            try {
+                                const tokenResponse = await axios.post(`${backendHost}/api/save-fcm-token`, {
+                                    shopId: shopId,
+                                    userId: userId,
+                                    token: fcmToken
+                                });
+                                
+                                if (tokenResponse.status === 200) {
+                                    console.log("✅ Token saved to backend:", tokenResponse.data);
+                                    setTokenStatus("Token saved successfully!");
+                                }
+                            } catch (tokenError) {
+                                console.error("❌ Error saving token:", tokenError);
+                                setTokenStatus("Token generated but save failed");
+                            }
+                        } else {
+                            console.warn("⚠️ No FCM token generated");
+                            setTokenStatus("Token generation failed");
+                        }
+                    } else {
+                        console.warn("⚠️ Notification permission not granted");
+                        setTokenStatus("Permission denied");
+                    }
+                } catch (tokenErr) {
+                    console.error("❌ FCM Token Error:", tokenErr);
+                    setTokenStatus("Token generation failed");
+                } finally {
+                    setIsLoading(false);
+                    setTokenStatus("");
+                    
+                    // Navigate to dashboard after token generation
+                    const targetShop = shop;
                     const hostQuery = host ? `?host=${encodeURIComponent(host)}` : "";
-                    console.log("targetShop", targetShop, "hostQuery", hostQuery)
-                    // window.top.location.href = `https://${targetShop}/apps/agora/consultant-dashboard${hostQuery}`;
+                    if (targetShop) {
+                        window.top.location.href = `https://${targetShop}/apps/agora/consultant-dashboard${hostQuery}`;
+                    }
                 }
             } else {
                 setErrors({ email: "Invalid email or password" });
@@ -180,6 +235,21 @@ const LoginForm = () => {
                         </a>
                     </div>
 
+                    {/* Token Status */}
+                    {tokenStatus && (
+                        <div style={{
+                            padding: "10px",
+                            marginBottom: "15px",
+                            backgroundColor: "#e7f3ff",
+                            borderRadius: "5px",
+                            textAlign: "center",
+                            fontSize: "14px",
+                            color: "#0066cc"
+                        }}>
+                            {tokenStatus}
+                        </div>
+                    )}
+
                     {/* Submit Button */}
                     <button
                         type="submit"
@@ -198,7 +268,7 @@ const LoginForm = () => {
                                     <line x1="4.93" y1="19.07" x2="7.76" y2="16.24" />
                                     <line x1="16.24" y1="7.76" x2="19.07" y2="4.93" />
                                 </svg>
-                                Signing in...
+                                {tokenStatus || "Signing in..."}
                             </>
                         ) : (
                             'Log in'

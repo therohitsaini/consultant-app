@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { getToken, onMessage } from "firebase/messaging";
-import { messaging } from "./firebase";
+import { getToken, isSupported, onMessage } from "firebase/messaging";
+import firebaseApp, { messaging } from "./firebase";
 
 const vapidKey = "BB8E-fAs8w3xZZ3cL_R3jjnTHaNDu4LGcra1NJhX60UG0lxvzBHVzzblrvv7cm6FMaGo_o_r2hbiB1eibrtg1h0";
 
@@ -10,27 +10,45 @@ export default function FcmToken() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        // Function to generate FCM token
         async function generateFcmToken() {
             try {
-                // Step 1: Get FCM token
+                // Request notification permission first
+                if (Notification.permission === "default") {
+                    setStatus("Requesting notification permission...");
+                    await Notification.requestPermission();
+                }
+                
+                if (Notification.permission === "denied") {
+                    const errorMsg = "Notification permission is blocked. Please enable it in browser settings (click lock icon in address bar → Notifications → Allow).";
+                    setError(errorMsg);
+                    setStatus("Permission blocked");
+                    console.error("❌", errorMsg);
+                    return;
+                }
+                
+                if (Notification.permission !== "granted") {
+                    const errorMsg = "Notification permission not granted. Please allow notifications.";
+                    setError(errorMsg);
+                    setStatus("Permission denied");
+                    console.error("❌", errorMsg);
+                    return;
+                }
+
+                // Get FCM token
                 setStatus("Generating FCM token...");
                 console.log("🔑 Generating FCM token with VAPID key...");
                 
                 const currentToken = await getToken(messaging, { vapidKey });
+
+                const issSupported = await isSupported();
+
+                console.log("issSupported", issSupported);
                 
                 if (!currentToken) {
                     const errorMsg = "No FCM token available. Please check Firebase configuration.";
                     setError(errorMsg);
                     setStatus("Token generation failed");
                     console.error("❌", errorMsg);
-                    
-                    if (window.opener) {
-                        window.opener.postMessage({
-                            type: "FCM_TOKEN_ERROR",
-                            error: errorMsg
-                        }, window.location.origin);
-                    }
                     return;
                 }
 
@@ -78,38 +96,17 @@ export default function FcmToken() {
                     console.warn("⚠️ No userId found. Token generated but not saved.");
                 }
 
-                // Step 4: Send token to parent window
-                if (window.opener) {
-                    window.opener.postMessage({
-                        type: "FCM_TOKEN_SUCCESS",
-                        token: currentToken,
-                        userId: userId
-                    }, window.location.origin);
-                    console.log("📤 Token sent to parent window");
-                }
-
-                // Step 5: Setup foreground message listener
+                // Step 4: Setup foreground message listener
                 const unsubOnMessage = onMessage(messaging, (payload) => {
                     console.log("📨 Foreground message received:", payload);
-                    
-                    if (window.opener && payload.notification) {
-                        window.opener.postMessage({
-                            type: "FCM_NOTIFICATION",
-                            title: payload.notification.title || "New Notification",
-                            body: payload.notification.body || "",
-                            icon: payload.notification.icon,
-                            data: payload.data || {}
-                        }, window.location.origin);
-                    }
                 });
 
-                // Auto close after 3 seconds
-                setTimeout(() => {
-                    console.log("🔒 Closing window in 3 seconds...");
-                    if (window.opener) {
+                // Auto close after 3 seconds if opened from iframe
+                if (window.opener) {
+                    setTimeout(() => {
                         window.close();
-                    }
-                }, 3000);
+                    }, 3000);
+                }
 
                 return () => {
                     if (typeof unsubOnMessage === "function") {
@@ -122,18 +119,6 @@ export default function FcmToken() {
                 setError(errorMsg);
                 setStatus("Error occurred");
                 console.error("❌ FCM TOKEN ERROR:", err);
-                console.error("❌ Error details:", {
-                    message: err.message,
-                    code: err.code,
-                    stack: err.stack
-                });
-
-                if (window.opener) {
-                    window.opener.postMessage({
-                        type: "FCM_TOKEN_ERROR",
-                        error: errorMsg
-                    }, window.location.origin);
-                }
             }
         }
 
@@ -217,9 +202,41 @@ export default function FcmToken() {
                                 ❌ {error}
                             </p>
                         </div>
-                        <p style={{ color: "#666", fontSize: "14px" }}>
-                            Please check the console for more details.
-                        </p>
+                        <div style={{
+                            backgroundColor: "#fff3cd",
+                            border: "1px solid #ffc107",
+                            borderRadius: "5px",
+                            padding: "15px",
+                            marginBottom: "20px",
+                            textAlign: "left"
+                        }}>
+                            <p style={{ margin: "0 0 10px 0", fontWeight: "bold", color: "#856404" }}>
+                                📋 How to Enable Notifications:
+                            </p>
+                            <ol style={{ margin: "0", paddingLeft: "20px", color: "#856404", fontSize: "14px" }}>
+                                <li>Click the <strong>lock icon (🔒)</strong> in your browser's address bar</li>
+                                <li>Find <strong>"Notifications"</strong> in the permissions list</li>
+                                <li>Change it to <strong>"Allow"</strong></li>
+                                <li>Click the button below to retry</li>
+                            </ol>
+                        </div>
+                        <button
+                            onClick={() => window.location.reload()}
+                            style={{
+                                backgroundColor: "#007bff",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "5px",
+                                padding: "10px 20px",
+                                fontSize: "16px",
+                                cursor: "pointer",
+                                fontWeight: "bold"
+                            }}
+                            onMouseOver={(e) => e.target.style.backgroundColor = "#0056b3"}
+                            onMouseOut={(e) => e.target.style.backgroundColor = "#007bff"}
+                        >
+                            🔄 Retry After Enabling Notifications
+                        </button>
                     </>
                 ) : (
                     <>
