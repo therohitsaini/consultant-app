@@ -1,8 +1,156 @@
 import { useEffect, useState } from "react";
 import { getToken, isSupported, onMessage } from "firebase/messaging";
 import firebaseApp, { messaging } from "./firebase";
+import axios from "axios";
 
 const vapidKey = "BB8E-fAs8w3xZZ3cL_R3jjnTHaNDu4LGcra1NJhX60UG0lxvzBHVzzblrvv7cm6FMaGo_o_r2hbiB1eibrtg1h0";
+
+/**
+ * Request FCM token in new window and handle the response
+ * @param {string} userId - User ID
+ * @param {string} shopId - Shop ID (optional)
+ * @param {object} callbacks - Callback functions
+ * @param {function} callbacks.onSuccess - Called when token is saved successfully
+ * @param {function} callbacks.onError - Called when token generation fails
+ * @param {function} callbacks.onStatusChange - Called when status changes
+ * @returns {function} Cleanup function to remove event listeners
+ */
+export const requestFcmTokenInNewWindow = (userId, shopId, callbacks = {}) => {
+    const { onSuccess, onError, onStatusChange } = callbacks;
+    
+    // Update status
+    if (onStatusChange) {
+        onStatusChange("Opening notification permission window...");
+    }
+
+    // Open new window for permission request and token generation
+    const tokenWindowUrl = `${window.location.origin}/fcm-token?userId=${encodeURIComponent(userId)}&shopId=${encodeURIComponent(shopId || '')}`;
+    const tokenWindow = window.open(tokenWindowUrl, 'fcmTokenWindow', 'width=600,height=500,scrollbars=yes');
+    
+    if (!tokenWindow) {
+        // Popup blocked - try direct approach
+        if (onStatusChange) {
+            onStatusChange("Popup blocked. Trying direct permission request...");
+        }
+        
+        // Try direct token generation
+        (async () => {
+            try {
+                const isInIframe = window.self !== window.top;
+                if (!isInIframe && Notification.permission === "default") {
+                    await Notification.requestPermission();
+                }
+                
+                const fcmToken = await getToken(messaging, { vapidKey });
+                
+                if (fcmToken) {
+                    const backendHost = process.env.REACT_APP_BACKEND_HOST;
+                    await axios.post(`${backendHost}/api/save-fcm-token`, {
+                        shopId: shopId,
+                        userId: userId,
+                        token: fcmToken
+                    });
+                    
+                    if (onStatusChange) {
+                        onStatusChange("Token saved successfully!");
+                    }
+                    if (onSuccess) {
+                        onSuccess({ token: fcmToken, userId, shopId });
+                    }
+                } else {
+                    if (onStatusChange) {
+                        onStatusChange("Token generation failed");
+                    }
+                    if (onError) {
+                        onError("Token generation failed");
+                    }
+                }
+            } catch (err) {
+                console.error("❌ Direct token generation failed:", err);
+                if (onStatusChange) {
+                    onStatusChange("Token generation failed, proceeding...");
+                }
+                if (onError) {
+                    onError(err.message);
+                }
+            }
+        })();
+        return () => {}; // No cleanup needed
+    }
+
+    // Listen for message from token window
+    let timeoutId;
+    const handleMessage = (event) => {
+        // Verify origin for security
+        if (event.origin !== window.location.origin) {
+            return;
+        }
+
+        // Clear timeout since we got a response
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+
+        if (event.data.type === "FCM_TOKEN_SAVED") {
+            console.log("✅ Token saved successfully:", event.data);
+            
+            if (onStatusChange) {
+                onStatusChange("Token saved successfully! Redirecting...");
+            }
+            
+            // Close token window if still open
+            if (tokenWindow && !tokenWindow.closed) {
+                tokenWindow.close();
+            }
+            
+            if (onSuccess) {
+                onSuccess(event.data);
+            }
+        } else if (event.data.type === "FCM_TOKEN_ERROR") {
+            console.error("❌ Token generation error:", event.data.error);
+            
+            if (onStatusChange) {
+                onStatusChange(`Token generation failed: ${event.data.error}. Proceeding...`);
+            }
+            
+            // Close token window if still open
+            if (tokenWindow && !tokenWindow.closed) {
+                tokenWindow.close();
+            }
+            
+            if (onError) {
+                onError(event.data.error);
+            }
+        }
+    };
+
+    window.addEventListener("message", handleMessage);
+
+    // Timeout after 30 seconds if no response
+    timeoutId = setTimeout(() => {
+        window.removeEventListener("message", handleMessage);
+        if (tokenWindow && !tokenWindow.closed) {
+            tokenWindow.close();
+        }
+        if (onStatusChange) {
+            onStatusChange("Timeout. Proceeding...");
+        }
+        if (onError) {
+            onError("Timeout waiting for token generation");
+        }
+    }, 30000);
+
+    // Return cleanup function
+    return () => {
+        window.removeEventListener("message", handleMessage);
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+        if (tokenWindow && !tokenWindow.closed) {
+            tokenWindow.close();
+        }
+    };
+};
 
 export default function FcmToken() {
     const [status, setStatus] = useState("Generating FCM token...");
@@ -63,34 +211,74 @@ export default function FcmToken() {
                 console.log("📋 Token Length:", currentToken.length);
                 console.log("✅ ========================================");
 
-                // Get userId from localStorage or URL params
-                const userId = localStorage.getItem("client_u_Identity") || 
-                              new URLSearchParams(window.location.search).get("userId");
+                // Get userId and shopId from URL params (when opened from LoginForm)
+                const urlParams = new URLSearchParams(window.location.search);
+                const userId = urlParams.get("userId") || localStorage.getItem("client_u_Identity");
+                const shopId = urlParams.get("shopId");
                 
                 if (userId) {
                     // Step 3: Save token to backend
                     setStatus("Saving token to backend...");
-                    console.log("💾 Saving token to backend for userId:", userId);
+                    console.log("💾 Saving token to backend for userId:", userId, "shopId:", shopId);
                     
                     const backendHost = process.env.REACT_APP_BACKEND_HOST || "http://localhost:5001";
                     try {
                         const response = await fetch(`${backendHost}/api/save-fcm-token`, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ userId, token: currentToken }),
+                            body: JSON.stringify({ 
+                                userId, 
+                                shopId: shopId || null,
+                                token: currentToken 
+                            }),
                         });
 
                         if (response.ok) {
                             const data = await response.json();
                             console.log("✅ Token saved to backend successfully:", data);
                             setStatus("Token saved successfully!");
+                            
+                            // Send success message to parent window (if opened from LoginForm)
+                            if (window.opener) {
+                                window.opener.postMessage({
+                                    type: "FCM_TOKEN_SAVED",
+                                    success: true,
+                                    token: currentToken,
+                                    userId: userId,
+                                    shopId: shopId
+                                }, window.location.origin);
+                                console.log("✅ Sent success message to parent window");
+                                
+                                // Close window after 2 seconds
+                                setTimeout(() => {
+                                    window.close();
+                                }, 2000);
+                            }
                         } else {
                             console.warn("⚠️ Failed to save token to backend:", response.statusText);
                             setStatus("Token generated but save failed");
+                            
+                            // Send error message to parent window
+                            if (window.opener) {
+                                window.opener.postMessage({
+                                    type: "FCM_TOKEN_ERROR",
+                                    success: false,
+                                    error: "Failed to save token to backend"
+                                }, window.location.origin);
+                            }
                         }
                     } catch (apiError) {
                         console.error("❌ Error saving token to backend:", apiError);
                         setStatus("Token generated but save failed");
+                        
+                        // Send error message to parent window
+                        if (window.opener) {
+                            window.opener.postMessage({
+                                type: "FCM_TOKEN_ERROR",
+                                success: false,
+                                error: apiError.message
+                            }, window.location.origin);
+                        }
                     }
                 } else {
                     console.warn("⚠️ No userId found. Token generated but not saved.");
@@ -101,8 +289,8 @@ export default function FcmToken() {
                     console.log("📨 Foreground message received:", payload);
                 });
 
-                // Auto close after 3 seconds if opened from iframe
-                if (window.opener) {
+                // Auto close after 3 seconds if opened from window (not from iframe)
+                if (window.opener && !urlParams.get("userId")) {
                     setTimeout(() => {
                         window.close();
                     }, 3000);
@@ -119,6 +307,15 @@ export default function FcmToken() {
                 setError(errorMsg);
                 setStatus("Error occurred");
                 console.error("❌ FCM TOKEN ERROR:", err);
+                
+                // Send error message to parent window
+                if (window.opener) {
+                    window.opener.postMessage({
+                        type: "FCM_TOKEN_ERROR",
+                        success: false,
+                        error: err.message
+                    }, window.location.origin);
+                }
             }
         }
 

@@ -251,7 +251,6 @@ const ChatsPage = () => {
                 text: text,
                 timestamp: new Date().toISOString()
             };
-            console.log("messageData____________________SEND CHAT", messageData)
             // Optimistically add message to UI immediately
             const optimisticMessage = {
                 _id: `temp-${Date.now()}`,

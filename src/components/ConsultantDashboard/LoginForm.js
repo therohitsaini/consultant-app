@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './LoginForm.module.css';
 import axios from 'axios';
-import { getToken } from 'firebase/messaging';
-import { messaging } from '../../firebase/firebase';
+import { requestFcmTokenInNewWindow } from '../../firebase/FcmToken';
 
 const LoginForm = () => {
     const navigate = useNavigate();
@@ -16,6 +15,7 @@ const LoginForm = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [tokenStatus, setTokenStatus] = useState('');
 
+    console.log("tokenStatus", tokenStatus)
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -71,6 +71,17 @@ const LoginForm = () => {
     //     }
     // };
 
+    // Helper function to navigate to dashboard
+    const proceedToDashboard = (shop, host) => {
+        const targetShop = shop;
+        const hostQuery = host ? `?host=${encodeURIComponent(host)}` : "";
+        if (targetShop) {
+            window.top.location.href = `https://${targetShop}/apps/agora/consultant-dashboard${hostQuery}`;
+        } else {
+            navigate('/consultant-dashboard');
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -90,73 +101,38 @@ const LoginForm = () => {
                 const params = new URLSearchParams(window.location.search);
                 const shop = params.get("shop");
                 const host = params.get("host");
-                console.log("shop", shop, "host", host)
                 const userId = userData?._id;
                 const shopId = userData?.shop_id;
-
-                // Store user data in localStorage
                 localStorage.setItem("client_u_Identity", userId);
                 localStorage.setItem("shop_o_Identity", shopId);
 
-                // Generate FCM token on same page
+                // Generate FCM token in new tab/window
                 setIsLoading(true);
-                setTokenStatus("Generating FCM token...");
                 
-                try {
-                    // Request notification permission
-                    if (Notification.permission === "default") {
-                        setTokenStatus("Requesting notification permission...");
-                        await Notification.requestPermission();
-                    }
-
-                    if (Notification.permission === "granted") {
-                        setTokenStatus("Generating FCM token...");
-                        const vapidKey = "BB8E-fAs8w3xZZ3cL_R3jjnTHaNDu4LGcra1NJhX60UG0lxvzBHVzzblrvv7cm6FMaGo_o_r2hbiB1eibrtg1h0";
-                        const fcmToken = await getToken(messaging, { vapidKey });
-                        
-                        if (fcmToken) {
-                            console.log("✅ FCM TOKEN:", fcmToken);
-                            setTokenStatus("Saving token to backend...");
-                            
-                            // Save token to backend
-                            const backendHost = process.env.REACT_APP_BACKEND_HOST 
-                            try {
-                                const tokenResponse = await axios.post(`${backendHost}/api/save-fcm-token`, {
-                                    shopId: shopId,
-                                    userId: userId,
-                                    token: fcmToken
-                                });
-                                
-                                if (tokenResponse.status === 200) {
-                                    console.log("✅ Token saved to backend:", tokenResponse.data);
-                                    setTokenStatus("Token saved successfully!");
-                                }
-                            } catch (tokenError) {
-                                console.error("❌ Error saving token:", tokenError);
-                                setTokenStatus("Token generated but save failed");
-                            }
-                        } else {
-                            console.warn("⚠️ No FCM token generated");
-                            setTokenStatus("Token generation failed");
+                // Call FcmToken utility function
+                const cleanup = requestFcmTokenInNewWindow(
+                    userId,
+                    shopId,
+                    {
+                        onStatusChange: (status) => {
+                            setTokenStatus(status);
+                        },
+                        onSuccess: (data) => {
+                            console.log("✅ Token saved successfully:", data);
+                            setIsLoading(false);
+                            proceedToDashboard(shop, host);
+                        },
+                        onError: (error) => {
+                            console.error("❌ Token generation error:", error);
+                            setIsLoading(false);
+                            // Still proceed to dashboard even if token failed
+                            proceedToDashboard(shop, host);
                         }
-                    } else {
-                        console.warn("⚠️ Notification permission not granted");
-                        setTokenStatus("Permission denied");
                     }
-                } catch (tokenErr) {
-                    console.error("❌ FCM Token Error:", tokenErr);
-                    setTokenStatus("Token generation failed");
-                } finally {
-                    setIsLoading(false);
-                    setTokenStatus("");
-                    
-                    // Navigate to dashboard after token generation
-                    const targetShop = shop;
-                    const hostQuery = host ? `?host=${encodeURIComponent(host)}` : "";
-                    if (targetShop) {
-                        window.top.location.href = `https://${targetShop}/apps/agora/consultant-dashboard${hostQuery}`;
-                    }
-                }
+                );
+                
+                // Store cleanup function for component unmount (optional)
+                // cleanup will be called automatically when callbacks are executed
             } else {
                 setErrors({ email: "Invalid email or password" });
             }
