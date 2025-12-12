@@ -16,10 +16,10 @@ const UserChat = () => {
     const [shopId, setShopId] = useState(null);
 
     // useEffect(() => {
-        const parms = new URLSearchParams(window.location.search);
-        const consultantId = parms.get('consultantId');
-        // const shopIdParms = parms.get('shopId');
-        // console.log("consultantIdParms", consultantIdParms)
+    const parms = new URLSearchParams(window.location.search);
+    const consultantId = parms.get('consultantId');
+    // const shopIdParms = parms.get('shopId');
+    // console.log("consultantIdParms", consultantIdParms)
 
     // }, [clientId]);
 
@@ -41,6 +41,8 @@ const UserChat = () => {
     const [notificationMessage, setNotificationMessage] = useState(null);
     const lastNotificationMessageId = useRef(null);
     const shouldAutoScrollRef = useRef(true);
+    const { insufficientBalanceError } = useSelector((state) => state.socket);
+    console.log("insufficientBalanceError", insufficientBalanceError);
     useEffect(() => {
         dispatch(fetchConsultantById({ shop_id: shopId, consultant_id: consultantId }))
     }, [dispatch, shopId, consultantId]);
@@ -188,6 +190,11 @@ const UserChat = () => {
     }, [socketMessages, clientId, consultantId, shopId, consultantOverview]);
 
     const sendChat = () => {
+        if (insufficientBalanceError) {
+            console.log("Insufficient balance error", insufficientBalanceError);
+            alert("Insufficient balance. Please recharge your account.");
+            return;
+        }
         if (text.trim() === "" || !clientId || !consultantId || !shopId) return;
 
         // Check if socket is connected
@@ -209,7 +216,7 @@ const UserChat = () => {
         sendMessage();
 
         function sendMessage() {
-   
+
             const messageData = {
                 senderId: clientId,
                 receiverId: consultantId,
@@ -217,6 +224,11 @@ const UserChat = () => {
                 text: text,
                 timestamp: new Date().toISOString()
             };
+            if (insufficientBalanceError) {
+                console.log("Insufficient balance error", insufficientBalanceError);
+                alert("Insufficient balance. Please recharge your account.");
+                return;
+            }
 
             // Optimistically add message to UI immediately
             const optimisticMessage = {

@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { socket } from "./SokectConfig";
 import { useDispatch } from "react-redux";
-import { setConnected, setActiveUsers, addMessage } from "../Redux/slices/sokectSlice";
+import { setConnected, setActiveUsers, addMessage, setInsufficientBalanceError } from "../Redux/slices/sokectSlice";
 
 export default function SocketProvider({ children }) {
     const dispatch = useDispatch();
@@ -37,13 +37,18 @@ export default function SocketProvider({ children }) {
             console.log("Received message____Sokect", msg)
             dispatch(addMessage(msg));
         };
+        const handleBalanceError = (error) => {
+            console.log("Balance Error From Server:", error);
+            dispatch(setInsufficientBalanceError(error));   // Redux me daalna
+        };
+
 
         // Set up event listeners
         socket.on("connect", handleConnect);
         socket.on("disconnect", handleDisconnect);
         socket.on("activeUsers", handleActiveUsers);
         socket.on("receiveMessage", handleReceiveMessage);
-
+        socket.on("balanceError", handleBalanceError);
         // Cleanup function
         return () => {
             console.log("Cleaning up socket listeners");
@@ -51,6 +56,7 @@ export default function SocketProvider({ children }) {
             socket.off("disconnect", handleDisconnect);
             socket.off("activeUsers", handleActiveUsers);
             socket.off("receiveMessage", handleReceiveMessage);
+            socket.off("balanceError", handleBalanceError);
         };
     }, [dispatch]);
 

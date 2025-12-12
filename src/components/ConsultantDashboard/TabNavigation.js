@@ -7,8 +7,9 @@ import UsersPage from './UsersPage';
 import ChatsPage from './ChatsPage';
 import VideoCallingPage from './VideoCallingPage';
 import { ChatIcon, DashboardIcon, UsersIcon } from '../FallbackData/FallbackData';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { connectSocket } from '../Redux/slices/sokectSlice';
+import { fetchConsultantById } from '../Redux/slices/ConsultantSlices';
 
 // Icon Components - Enhanced with better designs
 
@@ -23,7 +24,8 @@ function TabNavigation({ children }) {
     const [consultantId, setConsultantId] = useState(null);
     const [userId, setUserId] = useState(null);
     const dispatch = useDispatch();
-
+    const { consultantOverview } = useSelector((state) => state.consultants);
+    console.log("consultantOverview________________", consultantOverview)
     useEffect(() => {
         setUserId(localStorage.getItem('client_u_Identity'));
     }, []);
@@ -38,13 +40,14 @@ function TabNavigation({ children }) {
             );
         }
     };
+    useEffect(() => {
+        dispatch(fetchConsultantById({ shop_id: "690c374f605cb8b946503ccb", consultant_id: "691eafcff95528ab305eba59" }));
+    }, []);
 
     // Add listeners for load / resize and initial timeout
     useEffect(() => {
         window.addEventListener("load", sendHeight);
         window.addEventListener("resize", sendHeight);
-
-        // One-time call shortly after mount (in case content is already rendered)
         const timeoutId = setTimeout(sendHeight, 500);
 
         return () => {
@@ -52,7 +55,6 @@ function TabNavigation({ children }) {
             window.removeEventListener("resize", sendHeight);
             clearTimeout(timeoutId);
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
 
@@ -61,14 +63,11 @@ function TabNavigation({ children }) {
         dispatch(connectSocket(userId));
     }, [userId]);
 
-    // Check for page query parameter and navigate accordingly
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const page = params.get("page");
         if (page === "consulant-chats") {
-            // Check if we're not already on consulant-chats page
             if (location.pathname !== "/consulant-chats" && !location.pathname.startsWith("/consulant-chats")) {
-                // Small delay to ensure component is fully mounted
                 setTimeout(() => {
                     navigate("/consulant-chats", { replace: true });
                 }, 100);
@@ -136,42 +135,9 @@ function TabNavigation({ children }) {
         console.log("targetShop", targetShop, "hostQuery", hostQuery)
         window.top.location.href = `https://${targetShop}/apps/agora${path}${hostQuery}`;
 
-        // if (path) {
-        //     // If clicking on chat page
-        //     if (path === '/consultant-chats-section' || path.startsWith('/consultant-chats-section')) {
-        //         // Check if we're already in TabNavigation context
-        //         const isInTabNavigation =
-        //             location.pathname === '/consultant-dashboard' ||
-        //             location.pathname.startsWith('/users-page') ||
-        //             location.pathname.startsWith('/consultant-chats-section');
-
-
-        //         if (isInTabNavigation) {
-        //             // Not in TabNavigation, do external redirect to break out of iframe
-        //             const params = new URLSearchParams(window.location.search);
-        //             const shop = params.get("shop");
-        //             const host = params.get("host");
-        //             const targetShop = shop || "rohit-12345839.myshopify.com";
-        //             const hostQuery = host ? `&host=${encodeURIComponent(host)}` : "";
-
-        //             // Break out of the Shopify admin iframe to avoid CSP frame-ancestors issue
-        //             if (window.top) {
-        //                 const isInTabNavigation =
-        //                     window.top.location.href = `https://${targetShop}/apps/agora/${isInTabNavigation}${hostQuery}`;
-        //             } else {
-        //                 // Fallback to normal navigation if not in iframe
-        //                 navigate(path);
-        //             }
-        //         }
-        //     } else {
-        //         navigate(path);
-        //     }
-        //     // Close sidebar on mobile after navigation
-        //     if (window.innerWidth <= 768) {
-        //         setSidebarOpen(false);
-        //     }
-        // }
+       
     };
+    const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${consultantOverview?.consultant?.profileImage?.replace("\\", "/")}`;
 
     // Check if we're on video call page - hide sidebar
     const isVideoCallPage = location.pathname === '/video-call' || location.pathname.startsWith('/video-call');
@@ -211,16 +177,13 @@ function TabNavigation({ children }) {
                 {!isVideoCallPage && (
                     <aside className={`${styles.sideNav} ${sidebarOpen ? styles.sideNavOpen : ''}`}>
                         {/* Profile Section */}
-                        <div className={styles.profileSection}>
+                        <div className={styles.profileSection }>
                             <div className={styles.profileImage}>
-                                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                                    <circle cx="12" cy="7" r="4" />
-                                </svg>
+                                <img src={imageUrl} alt={consultantOverview?.consultant?.fullname} />
                             </div>
                             <div className={styles.profileDetails}>
-                                <div className={styles.profileName}>James Supardi</div>
-                                <div className={styles.profileEmail}>james@example.com</div>
+                                <div className={styles.profileName}>{consultantOverview?.consultant?.fullname}</div>
+                                <div className={styles.profileEmail}>{consultantOverview?.consultant?.email}</div>
                             </div>
                             <button className={styles.profileButton}>
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

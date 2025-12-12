@@ -137,16 +137,23 @@
 }
 
 .profileImage {
-    width: 70px;
-    height: 70px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     color: #ffffff;
+    overflow: hidden;
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-    border: 3px solid #ffffff;
+    border: 3px solid #4a90e2;
+}
+
+.profileImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .profileImage svg {
@@ -160,7 +167,7 @@
 }
 
 .profileName {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     color: #212529;
     margin-bottom: 4px;
