@@ -90,3 +90,4 @@ After applying the fix:
 3. Try opening the app in an incognito/private window
 4. Check if you have any browser extensions blocking WebSocket connections
 
+

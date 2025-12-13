@@ -7,7 +7,7 @@ const socketSlice = createSlice({
         isConnected: false,
         activeUsers: [],
         messages: [],
-        insufficientBalanceError: null,
+        insufficientBalance: null,
     },
     reducers: {
         connectSocket: (state, action) => {
@@ -26,19 +26,17 @@ const socketSlice = createSlice({
             state.activeUsers = action.payload;
         },
         addMessage: (state, action) => {
-            console.log("action.payload", action.payload);
             state.messages.push(action.payload);
-            console.log("state.messages", state.messages);
         },
         setInsufficientBalanceError: (state, action) => {
+            state.insufficientBalance = action.payload;
+            console.log("state__insufficientBalance", state.insufficientBalance);
             console.log("action.payload", action.payload);
-            console.log("state.insufficientBalanceError", state.insufficientBalanceError);
-            state.insufficientBalanceError = action.payload;
-            console.log("state.insufficientBalanceError", state.insufficientBalanceError);
+    
         },
         clearMessages: (state) => {
             state.messages = [];
-            state.insufficientBalanceError = null;
+            // state.insufficientBalance = null; 
         }
     }
 });

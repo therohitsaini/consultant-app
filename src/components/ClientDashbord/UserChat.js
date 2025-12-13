@@ -5,23 +5,18 @@ import styles from "./UserChat.module.css"
 import { socket } from '../Sokect-io/SokectConfig';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchChatHistory, fetchConsultantById, updateUserRequestById } from '../Redux/slices/ConsultantSlices';
-import PopupNotification from '../AlertModel/MessageNotificationAlert';
+import InsufficientBalanceModal from '../AlertModel/InsuffientBalance';
+
 
 const UserChat = () => {
     const [text, setText] = useState()
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    // const { consultantId } = useParams()
     const [clientId, setClientId] = useState(null);
     const [shopId, setShopId] = useState(null);
-
-    // useEffect(() => {
+    const [show, setShow] = useState(false);
     const parms = new URLSearchParams(window.location.search);
     const consultantId = parms.get('consultantId');
-    // const shopIdParms = parms.get('shopId');
-    // console.log("consultantIdParms", consultantIdParms)
-
-    // }, [clientId]);
 
     useEffect(() => {
         const storedClientId = localStorage.getItem('client_u_Identity');
@@ -41,8 +36,16 @@ const UserChat = () => {
     const [notificationMessage, setNotificationMessage] = useState(null);
     const lastNotificationMessageId = useRef(null);
     const shouldAutoScrollRef = useRef(true);
-    const { insufficientBalanceError } = useSelector((state) => state.socket);
-    console.log("insufficientBalanceError", insufficientBalanceError);
+    const { insufficientBalance } = useSelector((state) => state.socket);
+
+    console.log("insufficientBalance______-", insufficientBalance);
+
+    useEffect(() => {
+        if (insufficientBalance) {
+            setShow(true);
+        }
+    }, [insufficientBalance]);
+
     useEffect(() => {
         dispatch(fetchConsultantById({ shop_id: shopId, consultant_id: consultantId }))
     }, [dispatch, shopId, consultantId]);
@@ -72,9 +75,8 @@ const UserChat = () => {
                 scrollToBottom(true);
             }, 400);
         }
-    }, [chatHistory]);
+    }, [chatHistory, show]);
 
-    // Listen to socket messages and update chat in real-time
     useEffect(() => {
         if (!clientId || !consultantId || !shopId) {
             console.log("UserChat - Missing IDs:", { clientId, consultantId, shopId });
@@ -85,20 +87,16 @@ const UserChat = () => {
         }
 
 
-        // Process all new messages, not just the latest one
         socketMessages.forEach((message) => {
-            // Skip if message doesn't have required fields
             if (!message || !message._id) {
                 console.log("UserChat - Skipping invalid message:", message);
                 return;
             }
 
-            // Skip if we've already processed this message
             if (message._id === lastProcessedMessageId.current) {
                 return;
             }
 
-            // Normalize IDs for comparison (handle string/number mismatch)
             const messageShopId = String(message.shop_id || message.shopId || '');
             const currentShopId = String(shopId || '');
             const messageSenderId = String(message.senderId || '');
@@ -106,7 +104,6 @@ const UserChat = () => {
             const currentClientId = String(clientId || '');
             const currentConsultantId = String(consultantId || '');
 
-            // Check if message belongs to current chat
             const isCurrentChatMessage =
                 messageShopId === currentShopId &&
                 ((messageSenderId === currentClientId && messageReceiverId === currentConsultantId) ||
@@ -115,10 +112,8 @@ const UserChat = () => {
             if (isCurrentChatMessage) {
                 console.log("UserChat - ✅ Processing new message for current chat:", message);
 
-                // Mark this message as processed
                 lastProcessedMessageId.current = message._id;
 
-                // Add new message to chat (check for duplicates and replace temp messages)
                 setChatMessagesData(prev => {
                     const messageExists = prev.some(msg => msg._id === message._id);
                     if (messageExists) {
@@ -126,7 +121,6 @@ const UserChat = () => {
                         return prev;
                     }
 
-                    // Check if there's a temporary message with same text and sender (optimistic update)
                     const tempMessageIndex = prev.findIndex(msg =>
                         msg._id?.startsWith('temp-') &&
                         msg.text === message.text &&
@@ -135,14 +129,12 @@ const UserChat = () => {
 
                     if (tempMessageIndex !== -1) {
                         console.log("UserChat - Replacing temp message with real message");
-                        // Replace temp message with real message
                         const newMessages = [...prev];
                         newMessages[tempMessageIndex] = message;
                         return newMessages;
                     }
 
                     console.log("UserChat - Adding new message to chat");
-                    // Add new message
                     return [...prev, message];
                 });
             } else {
@@ -151,7 +143,6 @@ const UserChat = () => {
         });
     }, [socketMessages, clientId, consultantId, shopId]);
 
-    // Show popup notification when new incoming message arrives
     useEffect(() => {
         if (!clientId || !consultantId || !shopId) return;
         if (!socketMessages || socketMessages.length === 0) return;
@@ -159,12 +150,10 @@ const UserChat = () => {
         const latestMessage = socketMessages[socketMessages.length - 1];
         if (!latestMessage) return;
 
-        // Skip if we've already shown notification for this message
         if (latestMessage._id && latestMessage._id === lastNotificationMessageId.current) {
             return;
         }
 
-        // Incoming for user: consultant → client
         const isIncoming =
             String(latestMessage.senderId) === String(consultantId) &&
             String(latestMessage.receiverId) === String(clientId) &&
@@ -172,7 +161,6 @@ const UserChat = () => {
 
         if (!isIncoming) return;
 
-        // Build notification payload using consultant data
         const payload = {
             senderName: consultantOverview?.consultant?.fullname || 'Consultant',
             text: latestMessage.text || '',
@@ -190,14 +178,9 @@ const UserChat = () => {
     }, [socketMessages, clientId, consultantId, shopId, consultantOverview]);
 
     const sendChat = () => {
-        if (insufficientBalanceError) {
-            console.log("Insufficient balance error", insufficientBalanceError);
-            alert("Insufficient balance. Please recharge your account.");
-            return;
-        }
+
         if (text.trim() === "" || !clientId || !consultantId || !shopId) return;
 
-        // Check if socket is connected
         if (!socket.connected) {
             console.warn("Socket not connected, attempting to reconnect...");
             socket.connect();
@@ -216,7 +199,11 @@ const UserChat = () => {
         sendMessage();
 
         function sendMessage() {
-
+            // if (insufficientBalanceError) {
+            //     // setShow(true);
+            //     alert("Insufficient balance. Please recharge your account.");
+            //     return;
+            // }
             const messageData = {
                 senderId: clientId,
                 receiverId: consultantId,
@@ -224,11 +211,6 @@ const UserChat = () => {
                 text: text,
                 timestamp: new Date().toISOString()
             };
-            if (insufficientBalanceError) {
-                console.log("Insufficient balance error", insufficientBalanceError);
-                alert("Insufficient balance. Please recharge your account.");
-                return;
-            }
 
             // Optimistically add message to UI immediately
             const optimisticMessage = {
@@ -237,12 +219,10 @@ const UserChat = () => {
             };
             setChatMessagesData(prev => [...prev, optimisticMessage]);
 
-            // Send message via socket
             socket.emit("sendMessage", messageData);
             console.log("Message sent via socket:", messageData);
             setText("");
 
-            // User sent a message, so enable auto-scroll and scroll to bottom
             shouldAutoScrollRef.current = true;
             setTimeout(() => {
                 scrollToBottom(true);
@@ -253,16 +233,13 @@ const UserChat = () => {
     useEffect(() => {
         if (shopId && clientId && consultantId) {
             dispatch(fetchChatHistory({ shopId: shopId, userId: clientId, consultantId: consultantId }));
-            // Reset scroll position when fetching new chat
             setChatMessagesData([]);
             lastProcessedMessageId.current = null;
         }
     }, [dispatch, shopId, clientId, consultantId]);
 
-    // Auto-scroll when messages update (only when new messages are added and user is at bottom)
     useEffect(() => {
         if (chatMessagesData.length > 0 && messagesAreaRef.current) {
-            // Only auto-scroll if user is near bottom
             if (isNearBottom() || shouldAutoScrollRef.current) {
                 const timer = setTimeout(() => {
                     scrollToBottom();
@@ -272,17 +249,14 @@ const UserChat = () => {
         }
     }, [chatMessagesData.length]);
 
-    // Track user scroll behavior - disable auto-scroll if user scrolls up
     useEffect(() => {
         const messagesArea = messagesAreaRef.current;
         if (!messagesArea) return;
 
         const handleScroll = () => {
-            // Check if user scrolled up (away from bottom)
             if (!isNearBottom()) {
                 shouldAutoScrollRef.current = false;
             } else {
-                // User scrolled back to bottom, re-enable auto-scroll
                 shouldAutoScrollRef.current = true;
             }
         };
@@ -293,14 +267,12 @@ const UserChat = () => {
         };
     }, []);
 
-    // Direct socket listener as backup (in addition to Redux)
     useEffect(() => {
         if (!clientId || !consultantId || !shopId) return;
 
         const handleDirectMessage = (message) => {
             console.log("UserChat - Direct socket message received:", message);
 
-            // Normalize IDs for comparison
             const messageShopId = String(message.shop_id || message.shopId || '');
             const currentShopId = String(shopId || '');
             const messageSenderId = String(message.senderId || '');
@@ -308,7 +280,6 @@ const UserChat = () => {
             const currentClientId = String(clientId || '');
             const currentConsultantId = String(consultantId || '');
 
-            // Check if message belongs to current chat
             const isCurrentChatMessage =
                 messageShopId === currentShopId &&
                 ((messageSenderId === currentClientId && messageReceiverId === currentConsultantId) ||
@@ -317,7 +288,6 @@ const UserChat = () => {
             if (isCurrentChatMessage && message._id) {
                 console.log("UserChat - ✅ Direct: Processing message for current chat");
 
-                // Skip if already processed
                 if (message._id === lastProcessedMessageId.current) return;
                 lastProcessedMessageId.current = message._id;
 
@@ -361,19 +331,7 @@ const UserChat = () => {
 
     return (
         <Fragment>
-            {/* Global-style message notification for user side */}
-            {/* {showNotification && notificationMessage && (
-                <PopupNotification
-                    message={notificationMessage}
-                    onClose={() => setShowNotification(false)}
-                />
-            )} */}
-            {/* <button className="btn btn-link back-button mb-3" onClick={() => navigate('/consultant-cards')}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px', verticalAlign: 'middle' }}>
-                    <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-                Back to Consultants
-            </button> */}
+            <InsufficientBalanceModal show={show} setShow={setShow} insufficientBalance={insufficientBalance} />
             <div className={styles.chatPageContainer}>
 
                 <div className={styles.container}>

@@ -33,11 +33,9 @@ const ChatsPage = () => {
     const messagesEndRef = useRef(null);
     const messagesAreaRef = useRef(null);
 
-    // const consultantId = "691dbba35e388352e3203b0b";
 
     useEffect(() => {
         const clientId = localStorage.getItem('client_u_Identity');
-        console.log("clientId________________CHATS PAGE", clientId)
         const shopId = localStorage.getItem('shop_o_Identity');
         setConsultantId(clientId);
         setShopId(shopId);
@@ -47,7 +45,6 @@ const ChatsPage = () => {
 
 
 
-    console.log("shopId______________________chatList__________________", consultantId)
 
     useEffect(() => {
         const checkMobile = () => {
