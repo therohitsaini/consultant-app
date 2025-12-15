@@ -28,14 +28,23 @@ const socketSlice = createSlice({
         addMessage: (state, action) => {
             state.messages.push(action.payload);
         },
-        
+        markMessagesSeen: (state, action) => {
+            const { senderId } = action.payload;
+            state.messages = state.messages.map(msg =>
+                msg.senderId === senderId
+                    ? { ...msg, seen: true }
+                    : msg
+            );
+        },
+
+
         setInsufficientBalanceError: (state, action) => {
             state.insufficientBalance = action.payload;
             console.log("state__insufficientBalance", state.insufficientBalance);
             console.log("action.payload", action.payload);
-    
+
         },
-        
+
         clearMessages: (state) => {
             state.messages = [];
             // state.insufficientBalance = null; 
@@ -43,7 +52,10 @@ const socketSlice = createSlice({
     }
 });
 
-export const { connectSocket, disconnectSocket, setConnected, setActiveUsers, addMessage, setInsufficientBalanceError, clearMessages } =
+export const { connectSocket,
+    disconnectSocket,
+    setConnected,
+    setActiveUsers, addMessage, setInsufficientBalanceError, clearMessages, markMessagesSeen } =
     socketSlice.actions;
 
 export default socketSlice.reducer;

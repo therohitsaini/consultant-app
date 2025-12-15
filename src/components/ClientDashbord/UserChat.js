@@ -322,6 +322,16 @@ const UserChat = () => {
         };
     }, [clientId, consultantId, shopId]);
 
+    /**
+     * Mark messages as seen
+     */
+    useEffect(() => {
+        if (!clientId || !consultantId) return;
+        socket.emit("markSeen", {
+            senderId: clientId,
+            receiverId: consultantId
+        });
+    }, [clientId, consultantId])
 
     const backToViewProfile = () => {
         const targetShop = shop;
