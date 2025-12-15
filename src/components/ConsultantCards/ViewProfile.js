@@ -12,6 +12,7 @@ function ViewProfile() {
     const params = new URLSearchParams(window.location.search);
     const consultant_id = params.get("consultantId");
     const shop_id = params.get("shopId");
+    const shop = params.get("shop");
     const { consultantOverview, loading } = useSelector((state) => state.consultants);
     useEffect(() => {
         dispatch(fetchConsultantById({ shop_id, consultant_id }));
@@ -78,18 +79,25 @@ function ViewProfile() {
         alert(`You selected ${optionType.toUpperCase()} call option.\nConsultant ID: ${consultantId}\nPrice: INR ${price.toLocaleString()}`);
     };
 
-    const viewProfile = () => {
-        const targetShop = "rohit-12345839.myshopify.com";
+    const viewProfile = (consultantView) => {
+        console.log("consultantView______", consultantView);
+        const targetShop = shop;
         const hostQuery = "";
         console.log("targetShop", targetShop, "hostQuery", hostQuery)
-        window.top.location.href = `https://${targetShop}/apps/agora/chats-c?consultantId=${consultantView?._id}${hostQuery}`;
+        window.top.location.href = `https://${targetShop}/apps/consultant-theme/chats-c?consultantId=${consultantView}${hostQuery}`;
+    }
+    const backToHome = () => {
+        const targetShop = shop;
+        const hostQuery = "";
+        console.log("targetShop", targetShop, "hostQuery", hostQuery)
+        window.top.location.href = `https://${targetShop}/apps/consultant-theme/consultant-cards${hostQuery}`;
     }
 
     return (
         <div className="view-profile-container">
             <div className="container py-4">
                 {/* Back Button */}
-                <button className="btn btn-link back-button mb-3" onClick={() => navigate('/consultant-cards')}>
+                <button className="btn btn-link back-button mb-3" onClick={() => backToHome()}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px', verticalAlign: 'middle' }}>
                         <path d="M19 12H5M12 19l-7-7 7-7" />
                     </svg>
@@ -162,7 +170,7 @@ function ViewProfile() {
                                         className="calling-option-btn chat-btn border-0"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            viewProfile();
+                                            viewProfile( consultantView?._id);
                                             // navigate(`/user-chat/${consultantView?._id}`);
                                         }}
                                     >

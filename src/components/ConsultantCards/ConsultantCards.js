@@ -182,7 +182,7 @@ function ConsultantCards() {
         const targetShop = "rohit-12345839.myshopify.com";
         const hostQuery = "";
         console.log("targetShop", targetShop, "hostQuery", hostQuery)
-        window.top.location.href = `https://${targetShop}/apps/agora/view-profile?consultantId=${consultant_id}&shopId=${shop_id}${hostQuery}`;
+        window.top.location.href = `https://${targetShop}/apps/consultant-theme/view-profile?consultantId=${consultant_id}&shopId=${shop_id}${hostQuery}`;
     }
 
 

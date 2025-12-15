@@ -28,12 +28,14 @@ const socketSlice = createSlice({
         addMessage: (state, action) => {
             state.messages.push(action.payload);
         },
+        
         setInsufficientBalanceError: (state, action) => {
             state.insufficientBalance = action.payload;
             console.log("state__insufficientBalance", state.insufficientBalance);
             console.log("action.payload", action.payload);
     
         },
+        
         clearMessages: (state) => {
             state.messages = [];
             // state.insufficientBalance = null; 

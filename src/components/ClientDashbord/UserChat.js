@@ -17,6 +17,8 @@ const UserChat = () => {
     const [show, setShow] = useState(false);
     const parms = new URLSearchParams(window.location.search);
     const consultantId = parms.get('consultantId');
+    const shop = parms.get('shop');
+    console.log("shop______consultantId", consultantId);
 
     useEffect(() => {
         const storedClientId = localStorage.getItem('client_u_Identity');
@@ -38,7 +40,6 @@ const UserChat = () => {
     const shouldAutoScrollRef = useRef(true);
     const { insufficientBalance } = useSelector((state) => state.socket);
 
-    console.log("insufficientBalance______-", insufficientBalance);
 
     useEffect(() => {
         if (insufficientBalance) {
@@ -48,7 +49,7 @@ const UserChat = () => {
 
     useEffect(() => {
         dispatch(fetchConsultantById({ shop_id: shopId, consultant_id: consultantId }))
-    }, [dispatch, shopId, consultantId]);
+    }, [shopId, consultantId]);
 
     const isNearBottom = () => {
         if (!messagesAreaRef.current) return true;
@@ -322,13 +323,12 @@ const UserChat = () => {
     }, [clientId, consultantId, shopId]);
 
 
-    // useEffect(() => {
-
-
-    // }, [dispatch, shopId, clientId, consultantId]);
-    // console.log("userInRequest_________>_____>", userInRequest);
-
-
+    const backToViewProfile = () => {
+        const targetShop = shop;
+        const hostQuery = "";
+        console.log("targetShop", targetShop, "hostQuery", hostQuery)
+        window.top.location.href = `https://${targetShop}/apps/consultant-theme/view-profile?consultantId=${consultantId}&shopId=${shopId}${hostQuery}`;
+    }
     return (
         <Fragment>
             <InsufficientBalanceModal show={show} setShow={setShow} insufficientBalance={insufficientBalance} />
@@ -342,8 +342,8 @@ const UserChat = () => {
                             <div className={styles.chatHeader}>
                                 <div className={styles.chatHeaderInfo}>
                                     <button
+                                        onCLick={() => backToViewProfile()}
                                         className={styles.backButton}
-                                        onClick={() => navigate(-1)}
                                         title="Go Back"
                                     >
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
