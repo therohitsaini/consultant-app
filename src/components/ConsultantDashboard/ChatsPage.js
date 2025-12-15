@@ -6,7 +6,6 @@ import { socket } from '../Sokect-io/SokectConfig';
 import { fetchChatHistory, updateUserRequestById } from '../Redux/slices/ConsultantSlices';
 import { useDispatch, useSelector } from 'react-redux';
 import { addMessage } from '../Redux/slices/sokectSlice';
-import PopupNotification from '../AlertModel/MessageNotificationAlert';
 import { BsThreeDotsVertical } from "react-icons/bs";
 
 const ChatsPage = () => {
@@ -32,6 +31,9 @@ const ChatsPage = () => {
     const lastProcessedMessageId = useRef(null);
     const messagesEndRef = useRef(null);
     const messagesAreaRef = useRef(null);
+    const { userInRequest } = useSelector((state) => state.consultants);
+
+
 
 
     useEffect(() => {
@@ -40,10 +42,6 @@ const ChatsPage = () => {
         setConsultantId(clientId);
         setShopId(shopId);
     }, []);
-
-    const { userInRequest } = useSelector((state) => state.consultants);
-
-
 
 
     useEffect(() => {
@@ -59,66 +57,51 @@ const ChatsPage = () => {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    // Scroll to bottom function - only scroll messages area, not the whole page
     const scrollToBottom = (behavior = 'auto') => {
         if (messagesAreaRef.current) {
-            // Directly set scrollTop to scroll only the messages area, not the whole page
             messagesAreaRef.current.scrollTop = messagesAreaRef.current.scrollHeight;
         }
     };
 
-    // Update messages from chatHistory
     useEffect(() => {
         if (chatHistory?.chatHistory) {
             setChatMessagesData(chatHistory.chatHistory);
-            // Reset last processed message when chat changes
             lastProcessedMessageId.current = null;
-            // Scroll to bottom when chat loads - only messages area
             setTimeout(() => {
                 scrollToBottom('auto');
             }, 300);
         }
     }, [chatHistory]);
 
-    // Auto-scroll when messages update - scroll for all messages (send or receive)
-    // But only scroll the messages area, not the whole page
     useEffect(() => {
         if (chatMessagesData.length > 0 && messagesAreaRef.current) {
-            // Scroll messages area to bottom when new message is added
             setTimeout(() => {
                 scrollToBottom('auto');
             }, 100);
         }
     }, [chatMessagesData]);
 
-    // Listen to socket messages and update chat in real-time
     useEffect(() => {
         if (!chaterIds || !consultantId || !messages.length) return;
 
-        // Get the latest socket message
         const latestMessage = messages[messages.length - 1];
 
-        // Skip if we've already processed this message
         if (latestMessage._id === lastProcessedMessageId.current) return;
 
-        // Check if message belongs to current chat
         const isCurrentChatMessage =
             (String(latestMessage.shop_id) === String(chaterIds.shopId)) &&
             ((String(latestMessage.senderId) === String(chaterIds.userId) && String(latestMessage.receiverId) === String(consultantId)) ||
                 (String(latestMessage.senderId) === String(consultantId) && String(latestMessage.receiverId) === String(chaterIds.userId)));
 
         if (isCurrentChatMessage) {
-            // Mark this message as processed
             lastProcessedMessageId.current = latestMessage._id;
 
-            // Add new message to chat (check for duplicates and replace temp messages)
             setChatMessagesData(prev => {
                 const messageExists = prev.some(msg => msg._id === latestMessage._id);
                 if (messageExists) {
                     return prev;
                 }
 
-                // Check if there's a temporary message with same text and timestamp (optimistic update)
                 const tempMessageIndex = prev.findIndex(msg =>
                     msg._id?.startsWith('temp-') &&
                     msg.text === latestMessage.text &&
@@ -126,13 +109,11 @@ const ChatsPage = () => {
                 );
 
                 if (tempMessageIndex !== -1) {
-                    // Replace temp message with real message
                     const newMessages = [...prev];
                     newMessages[tempMessageIndex] = latestMessage;
                     return newMessages;
                 }
 
-                // Add new message
                 return [...prev, latestMessage];
             });
         }
@@ -146,16 +127,13 @@ const ChatsPage = () => {
 
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedChat]);
 
 
 
-    // Handle chat selection - on mobile, show chat view
     const handleChatSelect = (chatData) => {
         setChaterIds(chatData);
         console.log("Selected chat data", chatData);
-        // Find conversation from chatList
         const conversation = chatList.find(conv =>
             conv.sender?.id === chatData.userId && conv.shop?.id === chatData.shopId
         );
@@ -165,19 +143,15 @@ const ChatsPage = () => {
             if (isMobile) {
                 setShowChatView(true);
             }
-            // Prevent page scroll when selecting chat
             window.scrollTo(0, 0);
             dispatch(fetchChatHistory({ shopId: chatData.shopId, userId: chatData.userId, consultantId: consultantId }));
         }
     };
 
-    // Handle back to list on mobile
     const handleBackToList = () => {
         setShowChatView(false);
     };
 
-    // Find selected conversation from chatList
-    // Priority: use currently selected user/shop (chaterIds) so header always matches opened chat
     const selectedConversation = chaterIds
         ? chatList.find(
             (conv) =>
@@ -186,7 +160,6 @@ const ChatsPage = () => {
         )
         : chatList.find((conv) => conv.id === selectedChat);
 
-    // Filter conversations based on search query
     const filteredConversations = chatList.filter(conv =>
         conv.sender?.fullname?.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -200,12 +173,9 @@ const ChatsPage = () => {
             console.log("response___ChatsPage", response)
             if (response.data?.payload) {
                 setChatList(response.data.payload);
-                // Auto-select first conversation and load messages
                 if (response.data.payload.length > 0) {
                     const firstChat = response.data.payload[0];
                     setSelectedChat(firstChat.id);
-                    // Load messages for first chat
-                    // getChatMessages(firstChat);
                 }
             }
         } catch (error) {
@@ -220,25 +190,20 @@ const ChatsPage = () => {
     const sendChat = () => {
         if (text.trim() === "" || !chaterIds) return;
 
-        // Check if socket is connected
         if (!socket.connected) {
             console.warn("Socket not connected, attempting to reconnect...");
             socket.connect();
-            // Wait a bit for connection, then send
             setTimeout(() => {
                 if (socket.connected) {
                     sendMessage();
                 } else {
                     console.error("Failed to connect socket");
-                    // alert("Connection lost. Please refresh the page.");
                 }
             }, 1000);
             return;
         }
 
         sendMessage();
-
-        // const {message} = 
 
         function sendMessage() {
             const messageData = {
@@ -248,14 +213,12 @@ const ChatsPage = () => {
                 text: text,
                 timestamp: new Date().toISOString()
             };
-            // Optimistically add message to UI immediately
             const optimisticMessage = {
                 _id: `temp-${Date.now()}`,
                 ...messageData
             };
             setChatMessagesData(prev => [...prev, optimisticMessage]);
 
-            // Send message via socket
             socket.emit("sendMessage", messageData);
             setText("");
             dispatch(addMessage(messageData))
@@ -263,19 +226,14 @@ const ChatsPage = () => {
     }
 
 
-    // Show notification when new message arrives
     useEffect(() => {
         if (messages && messages.length > 0) {
-            // Get the latest message
             const latestMessage = messages[messages.length - 1];
 
-            // Skip if we've already shown notification for this message
             if (latestMessage._id === lastNotificationMessageId.current) return;
 
-            // Check if this is an incoming message (not sent by consultant)
             const isIncomingMessage = String(latestMessage.senderId) !== String(consultantId);
 
-            // Check if message belongs to current chat (if chat is selected)
             let isCurrentChatMessage = true;
             if (chaterIds) {
                 isCurrentChatMessage =
@@ -284,9 +242,7 @@ const ChatsPage = () => {
                         (String(latestMessage.senderId) === String(consultantId) && String(latestMessage.receiverId) === String(chaterIds.userId)));
             }
 
-            // Show notification only for incoming messages
             if (isIncomingMessage) {
-                // Get sender name from chatList
                 const senderConversation = chatList.find(conv =>
                     conv.sender?.id === latestMessage.senderId && conv.shop?.id === latestMessage.shop_id
                 );
@@ -296,20 +252,16 @@ const ChatsPage = () => {
                     ? `${process.env.REACT_APP_BACKEND_HOST}/${senderConversation.sender.profileImage.replace("\\", "/")}`
                     : null;
 
-                // Set notification data
                 setNotificationMessage({
                     senderName: senderName,
                     text: latestMessage.text,
                     avatar: senderAvatar
                 });
 
-                // Show notification
                 setShowNotification(true);
 
-                // Mark as processed
                 lastNotificationMessageId.current = latestMessage._id;
 
-                // Auto-hide after 5 seconds
                 setTimeout(() => {
                     setShowNotification(false);
                 }, 5000);
@@ -324,26 +276,27 @@ const ChatsPage = () => {
     }
 
 
-    // filter the request modal data
     const isRequestModalOpen = chatList.filter((conversation) => conversation.isRequest === false);
     const isRequestModalClose = chatList.filter((conversation) => conversation.isRequest === true);
 
+    console.log("consultantId", consultantId);
+    console.log("chaterIds?.userId", chaterIds?.userId);
+    useEffect(() => {
+        if (!consultantId || !chaterIds?.userId) return
 
+        console.log("Marking messages as seen", consultantId, chaterIds?.userId);
+        socket.emit("markSeen", {
+            senderId: chaterIds?.userId,
+            receiverId: consultantId
+        });
+        console.log("Messages marked as seen");
+    }, [consultantId, chaterIds?.userId, chatMessagesData])
 
 
 
     return (
         <Fragment>
-            {/* Message Notification Alert */}
-            {/* {showNotification && notificationMessage && (
-                <PopupNotification
-                    message={notificationMessage}
-                    onClose={() => setShowNotification(false)}
-                />
-            )} */}
-
             <div className={styles.pageContainer}>
-                {/* Header Section */}
                 <div className={styles.headerSection}>
                     <h1 className={styles.pageTitle}>
                         Messages

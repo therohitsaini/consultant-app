@@ -18,7 +18,7 @@ const UserChat = () => {
     const parms = new URLSearchParams(window.location.search);
     const consultantId = parms.get('consultantId');
     const shop = parms.get('shop');
-    console.log("shop______consultantId", consultantId);
+
 
     useEffect(() => {
         const storedClientId = localStorage.getItem('client_u_Identity');
@@ -325,26 +325,30 @@ const UserChat = () => {
     /**
      * Mark messages as seen
      */
+
     useEffect(() => {
-        if (!clientId || !consultantId) return;
+        if (!clientId || !consultantId) return 
+     
+        console.log("Marking messages as seen", clientId, consultantId);
         socket.emit("markSeen", {
-            senderId: clientId,
-            receiverId: consultantId
+            senderId:  consultantId,
+            receiverId: clientId
         });
+        // console.log("Messages marked as seen");
     }, [clientId, consultantId])
 
     const backToViewProfile = () => {
         const targetShop = shop;
         const hostQuery = "";
-        console.log("targetShop", targetShop, "hostQuery", hostQuery)
         window.top.location.href = `https://${targetShop}/apps/consultant-theme/view-profile?consultantId=${consultantId}&shopId=${shopId}${hostQuery}`;
     }
     return (
         <Fragment>
             <InsufficientBalanceModal show={show} setShow={setShow} insufficientBalance={insufficientBalance} />
             <div className={styles.chatPageContainer}>
-
-                <div className={styles.container}>
+                <div
+                    className={styles.container}
+                >
                     {/* Chat Window */}
                     <div className={styles.chatWindow}>
                         <div className={styles.chatWindowContent}>

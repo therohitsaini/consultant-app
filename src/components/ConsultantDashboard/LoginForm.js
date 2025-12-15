@@ -76,7 +76,7 @@ const LoginForm = () => {
         const targetShop = shop;
         const hostQuery = host ? `?host=${encodeURIComponent(host)}` : "";
         if (targetShop) {
-            window.top.location.href = `https://${targetShop}/apps/agora/consultant-dashboard${hostQuery}`;
+            window.top.location.href = `https://${targetShop}/apps/consultant-theme/consultant-dashboard${hostQuery}`;
         } else {
             navigate('/consultant-dashboard');
         }

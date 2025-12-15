@@ -37,9 +37,11 @@ export default function SocketProvider({ children }) {
             console.log("Received message____Sokect", msg)
             dispatch(addMessage(msg));
         };
-        const handleSeenUpdate = ({ senderId }) => {
-            dispatch(markMessagesSeen({ senderId }));
+        const handleSeenUpdate = ({ seenBy }) => {
+            console.log("Seen update by:", seenBy);
+            dispatch(markMessagesSeen({ seenBy }));
         };
+        
 
         const handleBalanceError = (error) => {
             console.log("Balance Error From Server:", error);

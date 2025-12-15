@@ -133,7 +133,7 @@ function TabNavigation({ children }) {
         const targetShop = shop;
         const hostQuery = "";
         console.log("targetShop", targetShop, "hostQuery", hostQuery)
-        window.top.location.href = `https://${targetShop}/apps/agora${path}${hostQuery}`;
+        window.top.location.href = `https://${targetShop}/apps/consultant-theme${path}${hostQuery}`;
 
        
     };
