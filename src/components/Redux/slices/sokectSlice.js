@@ -8,6 +8,7 @@ const socketSlice = createSlice({
         activeUsers: [],
         messages: [],
         insufficientBalance: null,
+        isChatAccepted: null,
     },
     reducers: {
         connectSocket: (state, action) => {
@@ -44,6 +45,11 @@ const socketSlice = createSlice({
             console.log("action.payload", action.payload);
 
         },
+        setChatAccepted: (state, action) => {
+            console.log("setChatAccepted", action.payload);
+            state.isChatAccepted = action.payload;
+            console.log("state.isChatAccepted", state.isChatAccepted);
+        },
 
         clearMessages: (state) => {
             state.messages = [];
@@ -55,7 +61,7 @@ const socketSlice = createSlice({
 export const { connectSocket,
     disconnectSocket,
     setConnected,
-    setActiveUsers, addMessage, setInsufficientBalanceError, clearMessages, markMessagesSeen } =
+    setActiveUsers, addMessage, setInsufficientBalanceError, clearMessages, markMessagesSeen, setChatAccepted } =
     socketSlice.actions;
 
 export default socketSlice.reducer;

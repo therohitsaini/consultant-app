@@ -33,8 +33,8 @@ const ChatsPage = () => {
     const messagesEndRef = useRef(null);
     const messagesAreaRef = useRef(null);
     const { userInRequest } = useSelector((state) => state.consultants);
-
-    console.log("chatAccepted____ChatsPage", chatAccepted);
+    const isChatAccepted = useSelector((state) => state.socket.isChatAccepted);
+    console.log("isChatAccepted____ChatsPage", isChatAccepted);
 
 
     useEffect(() => {
@@ -96,13 +96,11 @@ const ChatsPage = () => {
 
         if (isCurrentChatMessage) {
             lastProcessedMessageId.current = latestMessage._id;
-
             setChatMessagesData(prev => {
                 const messageExists = prev.some(msg => msg._id === latestMessage._id);
                 if (messageExists) {
                     return prev;
                 }
-
                 const tempMessageIndex = prev.findIndex(msg =>
                     msg._id?.startsWith('temp-') &&
                     msg.text === latestMessage.text &&
@@ -135,7 +133,6 @@ const ChatsPage = () => {
     const handleChatSelect = (chatData) => {
         setChaterIds(chatData);
         setChatAccepted(chatData);
-        console.log("Selected chat data", chatData.isChatAccepted);
         const conversation = chatList.find(conv =>
             conv.sender?.id === chatData.userId && conv.shop?.id === chatData.shopId
         );
@@ -172,7 +169,6 @@ const ChatsPage = () => {
 
         try {
             const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/get/chat-list/${shopId}/${consultantId}`);
-            console.log("response___ChatsPage", response)
             if (response.data?.payload) {
                 setChatList(response.data.payload);
                 if (response.data.payload.length > 0) {
@@ -187,7 +183,7 @@ const ChatsPage = () => {
 
     useEffect(() => {
         getChatList();
-    }, [messages, userInRequest, shopId, consultantId]);
+    }, [messages, userInRequest, shopId, consultantId, chatAccepted]);
 
     const sendChat = () => {
         if (text.trim() === "" || !chaterIds) return;
@@ -282,20 +278,29 @@ const ChatsPage = () => {
     const isRequestModalClose = chatList.filter((conversation) => conversation.isRequest === true);
 
 
-    useEffect(() => {
-        if (!consultantId || !chaterIds?.userId) return
-        socket.emit("markSeen", {
-            senderId: chaterIds?.userId,
-            receiverId: consultantId
-        });
-    }, [consultantId, chaterIds?.userId, chatMessagesData])
+    // useEffect(() => {
+    //     if (!consultantId || !chaterIds?.userId) return
+    //     socket.emit("markSeen", {
+    //         senderId: chaterIds?.userId,
+    //         receiverId: consultantId
+    //     });
+    // }, [consultantId, chaterIds?.userId, chatMessagesData])
 
     const acceptUserChat = (userId) => {
         socket.emit("acceptUserChat", {
             userId: userId
         });
-       
+        setChatAccepted(prev => !prev);
     }
+
+    useEffect(() => {
+        if (socket) {
+            socket.on("userChatAccepted", (response) => {
+                console.log("acceptUserChat", response);
+
+            });
+        }
+    }, [socket]);
 
     return (
         <Fragment>
@@ -598,7 +603,7 @@ const ChatsPage = () => {
 
                                         {/* Messages Area */}
                                         <div className={styles.messagesArea} ref={messagesAreaRef}>
-                                            {chatAccepted?.isChatAccepted === "pending" ? (
+                                            {chatAccepted?.isChatAccepted === "request" ? (
                                                 <div className={styles.mainChatReqBox}>
                                                     <div className={styles.chatRequestBox}>
                                                         <div className={styles.chatIcon}>💬</div>
