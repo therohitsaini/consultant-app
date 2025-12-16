@@ -3,9 +3,12 @@
     padding: 0;
     width: 100%;
     max-width: 100%;
-    overflow: hidden; /* window pe extra scrollbar na aaye */
-    height: 100%;    /* pure viewport ke andar lock */
-    max-height:100vh; /* prevent height from growing beyond viewport */
+    overflow: hidden;
+    /* window pe extra scrollbar na aaye */
+    height: 100%;
+    /* pure viewport ke andar lock */
+    max-height: 100vh;
+    /* prevent height from growing beyond viewport */
     position: relative;
     box-sizing: border-box;
     /* border: 1px solid rgb(198, 57, 71); */
@@ -33,7 +36,8 @@
 .chatLayout {
     display: flex;
     height: calc(100vh - 200px);
-    max-height: calc(100vh - 200px); /* prevent height from growing */
+    max-height: calc(100vh - 200px);
+    /* prevent height from growing */
     gap: 0;
     width: 100%;
     max-width: 100%;
@@ -60,6 +64,78 @@
 .hideOnMobile {
     display: none !important;
 }
+.mainChatReqBox{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    /* border: 1px solid red; */
+}
+
+.chatRequestBox {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    /* padding: 16px 20px; */
+    border-radius: 12px;
+    background: linear-gradient(135deg, #747476, #59881b);
+    color: #fff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    max-width: 450px;
+    /* margin: 20px auto; */
+    /* border: 1px solid red; */
+    /* width: 100%; */
+    height: 100px;
+    padding: 10px;
+}
+
+.chatIcon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #ffd700;
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+}
+
+.chatRequestContent {
+    flex: 1;
+}
+
+.chatRequestContent h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.chatRequestContent p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+.acceptBtn {
+    background: #00c853;
+    border: none;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.acceptBtn:hover {
+    background: #00b248;
+    transform: scale(1.05);
+}
+
 
 @media (min-width: 769px) {
     .hideOnMobile {
@@ -233,6 +309,7 @@
     text-align: center;
     margin-left: 8px;
 }
+
 .unreadBadgeIcon {
     font-size: 18px;
     color: #6b7280;
@@ -432,7 +509,7 @@
     font-weight: 600;
     color: #667eea;
     margin-bottom: 4px;
-    
+
 }
 
 .messageText {

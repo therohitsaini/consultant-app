@@ -40,7 +40,6 @@ const UserChat = () => {
     const shouldAutoScrollRef = useRef(true);
     const { insufficientBalance } = useSelector((state) => state.socket);
 
-
     useEffect(() => {
         if (insufficientBalance) {
             setShow(true);
@@ -211,6 +210,7 @@ const UserChat = () => {
                 shop_id: shopId,
                 text: text,
                 timestamp: new Date().toISOString()
+                
             };
 
             // Optimistically add message to UI immediately
@@ -327,16 +327,16 @@ const UserChat = () => {
      */
 
     useEffect(() => {
-        if (!clientId || !consultantId) return 
-     
+        if (!clientId || !consultantId) return
+        if (chatMessagesData.length === 0) return
         console.log("Marking messages as seen", clientId, consultantId);
         socket.emit("markSeen", {
-            senderId:  consultantId,
+            senderId: consultantId,
             receiverId: clientId
         });
         // console.log("Messages marked as seen");
-    }, [clientId, consultantId])
-
+    }, [clientId, consultantId, ])
+    console.log("chatMessagesData____UserChat", chatMessagesData);
     const backToViewProfile = () => {
         const targetShop = shop;
         const hostQuery = "";
