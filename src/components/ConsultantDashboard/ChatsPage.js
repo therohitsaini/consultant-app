@@ -27,13 +27,15 @@ const ChatsPage = () => {
     const [notificationMessage, setNotificationMessage] = useState(null);
     const [showRequestModal, setShowRequestModal] = useState(false);
     const [openMenuConversationId, setOpenMenuConversationId] = useState(null);
+    const [chatAccepted, setChatAccepted] = useState(null);
     const lastNotificationMessageId = useRef(null);
     const lastProcessedMessageId = useRef(null);
     const messagesEndRef = useRef(null);
     const messagesAreaRef = useRef(null);
     const { userInRequest } = useSelector((state) => state.consultants);
 
-    console.log("chatList____ChatsPage", chatList);
+    console.log("chatAccepted____ChatsPage", chatAccepted);
+
 
     useEffect(() => {
         const clientId = localStorage.getItem('client_u_Identity');
@@ -132,7 +134,8 @@ const ChatsPage = () => {
 
     const handleChatSelect = (chatData) => {
         setChaterIds(chatData);
-        console.log("Selected chat data", chatData);
+        setChatAccepted(chatData);
+        console.log("Selected chat data", chatData.isChatAccepted);
         const conversation = chatList.find(conv =>
             conv.sender?.id === chatData.userId && conv.shop?.id === chatData.shopId
         );
@@ -146,15 +149,6 @@ const ChatsPage = () => {
             dispatch(fetchChatHistory({ shopId: chatData.shopId, userId: chatData.userId, consultantId: consultantId }));
         }
     };
-    /**
-     * get chat history with shop id and consultant id
-     * Auto call when new message came or user select a chat
-      */
-    // useEffect(() => {
-    //     if (chaterIds) {
-    //         dispatch(fetchChatHistory({ shopId: chaterIds.shopId, userId: chaterIds.userId, consultantId: consultantId }));
-    //     }
-    // }, [chaterIds, messages]);
 
     const handleBackToList = () => {
         setShowChatView(false);
@@ -173,10 +167,12 @@ const ChatsPage = () => {
     );
 
     const getChatList = async () => {
+
         if (!shopId || !consultantId) return;
+
         try {
             const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/get/chat-list/${shopId}/${consultantId}`);
-            console.log("response___ChatsPage", response.data.payload)
+            console.log("response___ChatsPage", response)
             if (response.data?.payload) {
                 setChatList(response.data.payload);
                 if (response.data.payload.length > 0) {
@@ -223,7 +219,7 @@ const ChatsPage = () => {
                 _id: `temp-${Date.now()}`,
                 ...messageData
             };
-            setChatMessagesData(prev => [...prev, optimisticMessage]);
+            // setChatMessagesData(prev => [...prev, optimisticMessage]);
 
             socket.emit("sendMessage", messageData);
             setText("");
@@ -285,18 +281,21 @@ const ChatsPage = () => {
     const isRequestModalOpen = chatList.filter((conversation) => conversation.isRequest === false);
     const isRequestModalClose = chatList.filter((conversation) => conversation.isRequest === true);
 
-    console.log("isRequestModalClose", isRequestModalClose);
-    // useEffect(() => {
-    //     if (!consultantId || !chaterIds?.userId) return
-    //     socket.emit("markSeen", {
-    //         senderId: chaterIds?.userId,
-    //         receiverId: consultantId
-    //     });
-    // }, [consultantId, chaterIds?.userId, chatMessagesData])
-    const requestChat = "req";
-const acceptUserChat = () => {
-    console.log("acceptUserChat");
-}
+
+    useEffect(() => {
+        if (!consultantId || !chaterIds?.userId) return
+        socket.emit("markSeen", {
+            senderId: chaterIds?.userId,
+            receiverId: consultantId
+        });
+    }, [consultantId, chaterIds?.userId, chatMessagesData])
+
+    const acceptUserChat = (userId) => {
+        socket.emit("acceptUserChat", {
+            userId: userId
+        });
+       
+    }
 
     return (
         <Fragment>
@@ -468,12 +467,13 @@ const acceptUserChat = () => {
                                                             minute: "2-digit",
                                                             hour12: true
                                                         });
+                                                        const isChatAccepted = conversation?.isChatAccepted;
 
                                                         return (
                                                             <Fragment>
                                                                 <div
                                                                     key={conversation.id}
-                                                                    onClick={() => handleChatSelect({ shopId: conversation.shop.id, userId: conversation.sender.id })}
+                                                                    onClick={() => handleChatSelect({ shopId: conversation.shop.id, userId: conversation.sender.id, isChatAccepted: isChatAccepted })}
                                                                     className={`${styles.conversationItem} ${selectedChat === conversation.id ? styles.conversationItemActive : ''}`}
                                                                 >
                                                                     <div className={styles.conversationContent}>
@@ -596,22 +596,35 @@ const acceptUserChat = () => {
                                             </div>
                                         </div>
 
-
-                                        {/* <==============================================> start chat area code <==============================================> */}
                                         {/* Messages Area */}
-                                        {/* <div className={styles.messagesArea} ref={messagesAreaRef} style={{ border: '1px solid red' }}>
-                                            {chatMessagesData.length === 0 ? (
-                                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                                                    <p>No messages yet. Start the conversation!Rohit </p>
+                                        <div className={styles.messagesArea} ref={messagesAreaRef}>
+                                            {chatAccepted?.isChatAccepted === "pending" ? (
+                                                <div className={styles.mainChatReqBox}>
+                                                    <div className={styles.chatRequestBox}>
+                                                        <div className={styles.chatIcon}>💬</div>
+
+                                                        <div className={styles.chatRequestContent}>
+                                                            <h4>New Chat Request</h4>
+                                                            <p>A user wants to start a chat with you</p>
+                                                        </div>
+
+                                                        <button onClick={() => acceptUserChat(chatAccepted?.userId)} className={styles.acceptBtn}>
+                                                            Accept Chat
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            )
-                                             : (
+                                            ) : chatMessagesData.length === 0 ? (
+                                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                                                    <p>No messages yet. Start the conversation!</p>
+                                                </div>
+                                            ) : (
                                                 <>
-                                              
                                                     {
                                                         chatMessagesData.map((message) => {
+                                                            // const consultantId = consultantId;
                                                             const isOwn = message.senderId === consultantId;
 
+                                                            // Format timestamp
                                                             const timestamp = new Date(message.timestamp).toLocaleTimeString([], {
                                                                 hour: "2-digit",
                                                                 minute: "2-digit",
@@ -624,7 +637,11 @@ const acceptUserChat = () => {
                                                                     className={`${styles.messageContainer} ${isOwn ? styles.messageContainerRight : styles.messageContainerLeft}`}
                                                                 >
                                                                     <div className={`${styles.messageBubble} ${isOwn ? styles.messageBubbleOwn : styles.messageBubbleOther}`}>
-                                                                      
+                                                                        {/* {!isOwn && (
+                                                                <div className={styles.messageSender}>
+                                                                    User
+                                                                </div>
+                                                            )} */}
                                                                         <div className={styles.messageText}>
                                                                             {message.text}
                                                                         </div>
@@ -635,84 +652,10 @@ const acceptUserChat = () => {
                                                                 </div>
                                                             );
                                                         })}
-
-                                                    <div ref={messagesEndRef} />
-                                                </>
-                                            )}
-                                        </div> */}
-
-                                        <div className={styles.messagesArea} ref={messagesAreaRef}>
-
-                                            {/* 1️⃣ No messages */}
-                                            {chatMessagesData.length === 0 && requestChat !== "req" && (
-                                                <div
-                                                    style={{
-                                                        display: 'flex',
-                                                        justifyContent: 'center',
-                                                        alignItems: 'center',
-                                                        height: '100%',
-                                                    }}
-                                                >
-                                                    <p>No messages yet. Start the conversation! Rohit</p>
-                                                </div>
-                                            )}
-
-                                            {/* 2️⃣ Chat request pending */}
-                                            {requestChat === "req" && (
-                                                <div className={styles.mainChatReqBox}>
-                                                    <div className={styles.chatRequestBox}>
-                                                        <div className={styles.chatIcon}>💬</div>
-
-                                                        <div className={styles.chatRequestContent}>
-                                                            <h4>New Chat Request</h4>
-                                                            <p>A user wants to start a chat with you</p>
-                                                        </div>
-
-                                                        <button className={styles.acceptBtn}>
-                                                            Accept Chat
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {/* 3️⃣ Messages */}
-                                            {chatMessagesData.length > 0 && requestChat !== "req" && (
-                                                <>
-                                                    {chatMessagesData.map((message) => {
-                                                        const isOwn = message.senderId === consultantId;
-
-                                                        const timestamp = new Date(message.timestamp).toLocaleTimeString([], {
-                                                            hour: "2-digit",
-                                                            minute: "2-digit",
-                                                            hour12: true
-                                                        });
-
-                                                        return (
-                                                            <div
-                                                                key={message._id}
-                                                                className={`${styles.messageContainer} ${isOwn ? styles.messageContainerRight : styles.messageContainerLeft
-                                                                    }`}
-                                                            >
-                                                                <div
-                                                                    className={`${styles.messageBubble} ${isOwn ? styles.messageBubbleOwn : styles.messageBubbleOther
-                                                                        }`}
-                                                                >
-                                                                    <div className={styles.messageText}>
-                                                                        {message.text}
-                                                                    </div>
-                                                                    <div className={styles.messageTimestamp}>
-                                                                        {timestamp}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        );
-                                                    })}
-
                                                     <div ref={messagesEndRef} />
                                                 </>
                                             )}
                                         </div>
-
 
                                         {/* Message Input */}
                                         <div className={styles.messageInputArea}>
