@@ -210,7 +210,7 @@ const UserChat = () => {
                 shop_id: shopId,
                 text: text,
                 timestamp: new Date().toISOString()
-                
+
             };
 
             // Optimistically add message to UI immediately
@@ -335,13 +335,76 @@ const UserChat = () => {
             receiverId: clientId
         });
         // console.log("Messages marked as seen");
-    }, [clientId, consultantId, ])
+    }, [clientId, consultantId,])
     console.log("chatMessagesData____UserChat", chatMessagesData);
     const backToViewProfile = () => {
         const targetShop = shop;
         const hostQuery = "";
         window.top.location.href = `https://${targetShop}/apps/consultant-theme/view-profile?consultantId=${consultantId}&shopId=${shopId}${hostQuery}`;
     }
+
+    const { chatTimer } = useSelector(state => state.socket);
+    const { autoChatEnded } = useSelector(state => state.socket);
+    const [seconds, setSeconds] = useState(0);
+    console.log("chatTimer____ChatsPage", chatTimer);
+
+
+
+
+    // useEffect(() => {
+    //     if (!chatTimer.isRunning || !chatTimer.startTime) return;
+    //     const interval = setInterval(() => {
+    //         const diff = Math.floor(
+    //             (Date.now() - new Date(chatTimer.startTime)) / 1000
+    //         );
+    //         setSeconds(diff);
+    //     }, 1000);
+
+    //     return () => clearInterval(interval);
+    // }, [chatTimer.isRunning, chatTimer.startTime]);
+    useEffect(() => {
+        if (!chatTimer.isRunning || !chatTimer.startTime) return;
+
+        const interval = setInterval(() => {
+            const diff = Math.floor(
+                (Date.now() - new Date(chatTimer.startTime)) / 1000
+            );
+            setSeconds(diff); // total seconds
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [chatTimer.isRunning, chatTimer.startTime]);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+
+
+
+    const stopChatTimer = () => {
+        socket.emit("endChat", {
+            transactionId: chatTimer.transactionId,
+            startTime: chatTimer.startTime,
+            isRunning: chatTimer.isRunning,
+            shopId: chatTimer.shopId,
+            userId: clientId,
+            consultantId: consultantId
+        });
+        setSeconds(0);
+    }
+
+    useEffect(() => {
+        if (autoChatEnded) {
+            socket.emit("endChat", {
+                transactionId: chatTimer.transactionId,
+                startTime: chatTimer.startTime,
+                isRunning: chatTimer.isRunning,
+                shopId: chatTimer.shopId,
+                userId: clientId,
+                consultantId: consultantId
+            });
+            setSeconds(0);
+        }
+    }, [autoChatEnded]);
+
     return (
         <Fragment>
             <InsufficientBalanceModal show={show} setShow={setShow} insufficientBalance={insufficientBalance} />
@@ -383,6 +446,28 @@ const UserChat = () => {
                                     </div>
                                 </div>
                                 <div className={styles.chatHeaderActions}>
+                                    {chatTimer.isRunning && (
+                                        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", mr: "10px" }}>
+                                            <p> Timer: {minutes}:{remainingSeconds}</p>
+                                            <div>
+                                                <button
+                                                    onClick={stopChatTimer}
+                                                    style={{
+                                                        padding: "5px 12px",
+                                                        backgroundColor: "#ff4d4f",
+                                                        color: "#fff",
+                                                        border: "none",
+                                                        borderRadius: "4px",
+                                                        cursor: "pointer",
+                                                        fontSize: "13px"
+                                                    }}
+                                                >
+                                                    Stop Chat
+                                                </button>
+                                            </div>
+
+                                        </div>
+                                    )}
                                     <button
                                         className={styles.headerButton}
                                         title="Video Call"
@@ -401,6 +486,7 @@ const UserChat = () => {
                                         </svg>
                                     </button>
                                 </div>
+
                             </div>
 
                             {/* Messages Area */}

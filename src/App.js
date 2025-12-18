@@ -20,6 +20,7 @@ import './components/ConsultantCards/ConsultantCards.css';
 import { useSelector } from "react-redux";
 import useFcmToken from "./firebase/hooks/useFcmToken";
 import FcmToken from "./firebase/FcmToken";
+import ProfileSection from "./components/ClientDashbord/ProfileSection";
 
 // Component to handle iframe height sync on route changes
 function IframeHeightSync() {
@@ -206,6 +207,7 @@ function App() {
         <Route path="/chats" element={<UserChat />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/fcm-token" element={<FcmToken />} />
+        <Route path="/profile" element={<ProfileSection />} />
       </Routes>
     </BrowserRouter>
   );

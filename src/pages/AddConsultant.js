@@ -216,6 +216,7 @@ function AddConsultant() {
             });
 
             const responseData = await response.json();
+            console.log("responseData", responseData);
             if (response.ok) {
                 setSubmitSuccess(true);
                 setTextFieldValue('');

@@ -79,8 +79,8 @@
     gap: 14px;
     /* padding: 16px 20px; */
     border-radius: 12px;
-    background: linear-gradient(135deg, #747476, #59881b);
-    color: #fff;
+    background: white;
+    color: #070707;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
     max-width: 450px;
     /* margin: 20px auto; */
@@ -133,7 +133,7 @@
 
 .acceptBtn:hover {
     background: #00b248;
-    transform: scale(1.05);
+    /* transform: scale(1.05); */
 }
 
 

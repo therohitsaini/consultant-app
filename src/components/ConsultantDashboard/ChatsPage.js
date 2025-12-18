@@ -286,10 +286,15 @@ const ChatsPage = () => {
     //     });
     // }, [consultantId, chaterIds?.userId, chatMessagesData])
 
-    const acceptUserChat = (userId) => {
-        socket.emit("acceptUserChat", {
-            userId: userId
-        });
+    const acceptUserChat = (data) => {
+        if (!data || !consultantId) return;
+        const acceptDataIds = {
+            userId: data.userId,
+            shopId: data.shopId,
+            consultantId: consultantId
+        }
+
+        socket.emit("acceptUserChat", acceptDataIds);
         setChatAccepted(prev => !prev);
     }
 
@@ -301,6 +306,26 @@ const ChatsPage = () => {
             });
         }
     }, [socket]);
+    const { chatTimer } = useSelector(state => state.socket);
+    const [seconds, setSeconds] = useState(0);
+    console.log("chatTimer____ChatsPage", chatTimer);
+    useEffect(() => {
+        if (!chatTimer.isRunning || !chatTimer.startTime) return;
+
+        const interval = setInterval(() => {
+            const diff = Math.floor(
+                (Date.now() - new Date(chatTimer.startTime)) / 1000
+            );
+            setSeconds(diff);
+        }, 1000);
+        if (chatTimer?.isRunning === false) {
+            setChatAccepted(prev => !prev);
+        }
+
+        return () => clearInterval(interval);
+    }, [chatTimer.isRunning, chatTimer.startTime]);
+
+
 
     return (
         <Fragment>
@@ -580,6 +605,11 @@ const ChatsPage = () => {
                                                     </div>
                                                 </div>
                                             </div>
+                                            {chatTimer.isRunning && (
+                                                <div className={styles.chatTimer}>
+                                                    <p> Timer: {seconds}</p>
+                                                </div>
+                                            )}
                                             <div className={styles.chatHeaderActions} style={{ display: 'flex', gap: '8px' }}>
                                                 <button
                                                     className={styles.headerButton}
@@ -613,7 +643,7 @@ const ChatsPage = () => {
                                                             <p>A user wants to start a chat with you</p>
                                                         </div>
 
-                                                        <button onClick={() => acceptUserChat(chatAccepted?.userId)} className={styles.acceptBtn}>
+                                                        <button onClick={() => acceptUserChat(chatAccepted)} className={styles.acceptBtn}>
                                                             Accept Chat
                                                         </button>
                                                     </div>

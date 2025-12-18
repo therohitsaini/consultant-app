@@ -93,8 +93,9 @@ const LoginForm = () => {
                 formData
             );
 
-            const { userData } = response?.data;
+            const { userData, token } = response?.data;
             console.log("userData", userData);
+            console.log("token", response?.data);
 
             // Ensure userData exists and has an _id
             if (response.status === 200 && response.data?.userData?._id) {
@@ -105,6 +106,7 @@ const LoginForm = () => {
                 const shopId = userData?.shop_id;
                 localStorage.setItem("client_u_Identity", userId);
                 localStorage.setItem("shop_o_Identity", shopId);
+                localStorage.setItem("varify_tokem", token);
 
                 // Generate FCM token in new tab/window
                 setIsLoading(true);

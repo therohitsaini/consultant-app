@@ -9,6 +9,12 @@ const socketSlice = createSlice({
         messages: [],
         insufficientBalance: null,
         isChatAccepted: null,
+        chatTimer: {
+            transactionId: null,
+            startTime: null,
+            isRunning: false,
+        },
+        autoChatEnded: null,
     },
     reducers: {
         connectSocket: (state, action) => {
@@ -50,6 +56,30 @@ const socketSlice = createSlice({
             state.isChatAccepted = action.payload;
             console.log("state.isChatAccepted", state.isChatAccepted);
         },
+        setChatTimerStarted: (state, action) => {
+            console.log("setChatTimerStarted", action.payload);
+            state.chatTimer.transactionId = action.payload.transactionId;
+            state.chatTimer.startTime = action.payload.startTime;
+            state.chatTimer.isRunning = true;
+            state.chatTimer.userId = action.payload.userId;
+            state.chatTimer.shopId = action.payload.shopId;
+            state.chatTimer.consultantId = action.payload.consultantId;
+        },
+        setChatTimerStopped: (state) => {
+            state.chatTimer.transactionId = null;
+            state.chatTimer.startTime = null;
+            state.chatTimer.isRunning = false;
+            state.chatTimer.userId = null;
+            state.chatTimer.shopId = null;
+            state.chatTimer.consultantId = null;
+        },
+        setAutoChatEnded: (state, action) => {
+            console.log("setAutoChatEnded", state.autoChatEnded);
+            state.autoChatEnded = action.payload;
+            console.log("state.autoChatEnded", state.autoChatEnded);
+        },
+
+
 
         clearMessages: (state) => {
             state.messages = [];
@@ -61,7 +91,16 @@ const socketSlice = createSlice({
 export const { connectSocket,
     disconnectSocket,
     setConnected,
-    setActiveUsers, addMessage, setInsufficientBalanceError, clearMessages, markMessagesSeen, setChatAccepted } =
+    setActiveUsers,
+    addMessage,
+    setInsufficientBalanceError,
+    clearMessages,
+    markMessagesSeen,
+    setChatAccepted,
+    setChatTimerStarted,
+    setChatTimerStopped,
+    setAutoChatEnded
+} =
     socketSlice.actions;
 
 export default socketSlice.reducer;

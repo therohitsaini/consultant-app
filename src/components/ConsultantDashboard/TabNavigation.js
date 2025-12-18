@@ -75,15 +75,12 @@ function TabNavigation({ children }) {
         }
     }, [location.search, location.pathname, navigate]);
 
-    console.log("consultantId________________", consultantId);
-    // Close sidebar when route changes on mobile
     useEffect(() => {
         if (window.innerWidth <= 768) {
             setSidebarOpen(false);
         }
     }, [location.pathname]);
 
-    // Handle window resize
     useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth > 768) {
@@ -105,7 +102,6 @@ function TabNavigation({ children }) {
         setSidebarOpen(!sidebarOpen);
     };
 
-    console.log("location.pathname________________", location.pathname)
     const menuItems = [
         {
             label: 'Dashboard',
