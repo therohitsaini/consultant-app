@@ -1,0 +1,86 @@
+.profileSection {
+    /* padding: 64px; */
+    padding : 64px 100px;
+    display: flex;
+    gap: 24px;
+    height: 100vh;
+    box-sizing: border-box;
+    background-color: #fafafa;
+}
+
+.profileRight {
+    flex: 1;
+    padding: 20px 24px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+    display: flex;
+    flex-direction: column;
+}
+
+.profileSectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.profileTitle {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+    color: #111827;
+}
+
+.profileNav {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 8px;
+}
+
+.profileNavButton {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    background-color: transparent;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.profileNavButton:hover {
+    background-color: #eff6ff;
+    color: #313232;
+}
+
+.profileNavButtonActive {
+    background-color: #e1cf08;
+    color: #0a0909;
+}
+
+.profileContent {
+    flex: 1;
+    padding-top: 8px;
+}
+
+@media (max-width: 768px) {
+    .profileSection {
+        flex-direction: column;
+    }
+
+    .profileLeft {
+        width: 100%;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 16px;
+    }
+
+    .profileBasicInfo {
+        text-align: left;
+    }
+}
