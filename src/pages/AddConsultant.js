@@ -49,9 +49,11 @@ function AddConsultant() {
     const [textFieldValue, setTextFieldValue] = useState('');
     const [showDropdown, setShowDropdown] = useState(false);
     console.log("formData,", formData)
-    // Get consultant ID from URL query parameter
     const [searchParams] = useSearchParams();
     const consultantId = searchParams.get('id');
+    const params = new URLSearchParams(window.location.search);
+    const adminId = params.get('adminId');
+    console.log("adminId", adminId);
 
     useEffect(() => {
         if (consultantId) {

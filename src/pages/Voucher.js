@@ -1,9 +1,7 @@
 import React, { useEffect } from "react";
 import styles from "./Voucher.module.css";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchUsers } from "../components/Redux/slices/UserSlices";
 import axios from "axios";
-import { redirect } from "react-router-dom";
+import { redirect, useOutletContext } from "react-router-dom";
 
 const rechargeOptions = [
     { id: 1, amount: "100", extra: " 100 Extra" },
@@ -23,29 +21,20 @@ const rechargeOptions = [
 
 
 function Voucher() {
-    // const { user } = useSelector(state => state.user);
-    // const dispatch = useDispatch();
-    // useEffect(() => {
-    //     dispatch(fetchUsers());
-    // }, []);
-    // console.log("user", user)
+    const { shop, userId, walletBalance } = useOutletContext();
     const handleRecharge = async (amount) => {
-        console.log("amount", amount)
         const response = await axios.post(`${process.env.REACT_APP_BACKEND_HOST}/api/draft-order/create-draft-order`, {
             amount: amount,
-            shop: "rohit-12345839.myshopify.com",
+            shop: shop,
             title: "Recharge Amount",
-            userId: "69328ff18736b56002ef83df",
+            userId: userId,
         });
         const data = response.data;
-        console.log("data", data)
         if (response.status === 200) {
-            console.log("response", data.invoiceUrl)
             redirect(data.invoiceUrl)
             window.open(data.invoiceUrl, "_blank")
-            // toast.success("Recharge successful")
         } else {
-            toast.error("Recharge failed")
+            console.log("error", response.data)
         }
     }
 
@@ -54,8 +43,8 @@ function Voucher() {
             <h1 className={styles.title}>Add Money to Wallet</h1>
 
             <div className={styles.balanceSection}>
-                <span className={styles.balanceLabel}>Available balance:</span>
-                <span className={styles.balanceValue}>₹ 0</span>
+                {/* <span className={styles.balanceLabel}>Available balance:</span> */}
+                <span className={styles.balanceValue}>Coins : {walletBalance}</span>
             </div>
 
             <div className={styles.sectionHeader}>

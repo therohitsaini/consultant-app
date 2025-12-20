@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchUsers } from '../components/Redux/slices/UserSlices';
 import { fetchConsultants } from '../components/Redux/slices/ConsultantSlices';
 import { apps } from '../components/FallbackData/FallbackData';
+import axios from 'axios';
 
 // Component to display animated count with motion
 function AnimatedCount({ value }) {
@@ -62,20 +63,16 @@ function AnimatedCount({ value }) {
 
 function Dashboard() {
     const [isBannerVisible, setIsBannerVisible] = useState(true);
-
-    // Use official App Bridge hook from @shopify/app-bridge-react
+    const [adminDetails, setAdminDetails] = useState(null);
     const app = useAppBridge();
-
-    // Get host from URL (for debugging)
     const params = new URLSearchParams(window.location.search);
     const host = params.get("host");
     const adminId = params.get("adminId");
     console.log("adminId", adminId);
 
     useEffect(() => {
-        localStorage.setItem('doamin_V_id', "690c374f605cb8b946503ccb");
+        localStorage.setItem('doamin_V_id', adminId);
     }, []);
-
 
 
     // Duplicate list for infinite loop
@@ -87,10 +84,6 @@ function Dashboard() {
     // Get target values
     const userCount = users?.data?.length || 0;
     const consultantCount = consultants?.findConsultant?.length || 0;
-    console.log("Dashboard - Host from URL:", host);
-    console.log("Dashboard - App Bridge instance:", app);
-
-
 
     useEffect(() => {
         dispatch(fetchConsultants());
@@ -99,8 +92,20 @@ function Dashboard() {
     useEffect(() => {
         dispatch(fetchUsers());
     }, [dispatch]);
-    console.log("consultants", consultants);
-    console.log(loading);
+
+    useEffect(() => {
+        const getAdminDetails = async () => {
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/admin/${adminId}`);
+            console.log("response", response);
+            if (response.status === 200) {
+                console.log("response", response.data);
+                setAdminDetails(response?.data?.data);
+            }
+        }
+        if (adminId) {
+            getAdminDetails();
+        }
+    }, [adminId]);
 
     return (
         <>
@@ -159,7 +164,7 @@ function Dashboard() {
                                             }}>
                                                 👥
                                             </div>
-                                            <div style={{ flex: 1,  }}>
+                                            <div style={{ flex: 1, }}>
                                                 <Text variant="headingLg" as="h2" fontWeight="bold">
                                                     <AnimatedCount value={userCount} />
                                                 </Text>
@@ -189,7 +194,7 @@ function Dashboard() {
                                             }}>
                                                 📈
                                             </div>
-                                            <div style={{ flex: 1,  }}>
+                                            <div style={{ flex: 1, }}>
                                                 <Text variant="headingLg" as="h2" fontWeight="bold">
                                                     0%
                                                 </Text>
@@ -247,9 +252,11 @@ function Dashboard() {
                                             }}>
                                                 💰
                                             </div>
-                                            <div style={{ flex: 1,  }}>
+                                            <div style={{ flex: 1, }}>
                                                 <Text variant="headingLg" as="h2" fontWeight="bold">
-                                                    ₹0.00
+                                                    ₹{parseFloat(
+                                                        adminDetails?.adminWalletBalance?.$numberDecimal || 0
+                                                    ).toFixed(2)}
                                                 </Text>
                                                 <Text variant="bodyMd" as="p" tone="subdued">
                                                     Total Revenue

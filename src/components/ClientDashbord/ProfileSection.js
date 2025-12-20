@@ -1,19 +1,64 @@
-import React from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { NavLink, Outlet, redirect } from 'react-router-dom';
 import styles from './ProfileSection.module.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUserDetailsByIds } from '../Redux/slices/UserSlices';
+import { FormLayout, TextField } from '@shopify/polaris';
 
 const ProfileSection = () => {
+  const [userId, setUserId] = useState(null);
+  const params = new URLSearchParams(window.location.search);
+  const shop = params.get("shop");
+  const loggedInCustomerId = params.get('logged_in_customer_I');
+  // console.log("loggedInCustomerId", loggedInCustomerId);
+  console.log("shop", shop);
+
+  const dispatch = useDispatch();
+  const { userDetails } = useSelector((state) => state.users);
+  useEffect(() => {
+    const storedShop = localStorage.getItem('client_u_Identity');
+    setUserId(storedShop);
+  }, [shop])
+
+  useEffect(() => {
+    dispatch(fetchUserDetailsByIds(userId));
+  }, [userId])
+
+  const walletBalance = userDetails?.data?.walletBalance;
+
+  console.log("userDetails__ROhit", walletBalance)
   return (
     <div className={styles.profileSection}>
       {/* Left side: user image / basic info */}
-     
+      <div className={styles.profileSectionHeader}>
+        <h1 className={styles.profileTitle}>Profile Settings</h1>
+        <div className={styles.profileImageContainer}>
+          <div className={styles.profileImage}>
+            <img className='h-100 w-100 object-fit-cover' src={"https://imgs.search.brave.com/LgLnG0YyKC78VZULy9IVIpVyQVnacpc2pmuro63xxSo/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/cHJlbWl1bS1waG90/by91c2VyLXByb2Zp/bGUtcG5nLXByb2Zl/c3Npb25hbC1idXNp/bmVzc3dvbWFuLXN0/aWNrZXItdHJhbnNw/YXJlbnQtYmFja2dy/b3VuZF81Mzg3Ni0x/MDQ5MDE3LmpwZz9z/ZW10PWFpc19oeWJy/aWQmdz03NDAmcT04/MA"} alt="profile" />
+          </div>
 
-      {/* Right side: profile navigation + nested content */}
-      <div className={styles.profileRight}>
-        <div className={styles.profileSectionHeader}>
-          <h1 className={styles.profileTitle}>Profile Settings</h1>
         </div>
+        <div className={styles.profileName}>
+          <FormLayout>
+            <TextField
+              label="Full Name"
+              type="text"
+              value={userDetails?.data?.fullname}
+              // onChange={handleFieldChange('email')}
+              autoComplete="off"
+            />
+            <TextField
+              label="Email"
+              type="text"
+              value={userDetails?.data?.email}
+              // onChange={handleFieldChange('email')}
+              autoComplete="off"
+            />
 
+          </FormLayout>
+        </div>
+      </div>
+      <div className={styles.profileRight}>
         <div className={styles.profileNav}>
           <NavLink
             to="voucher"
@@ -39,7 +84,7 @@ const ProfileSection = () => {
 
         <div className={styles.profileContent}>
           {/* Nested routes for Voucher / History will render here */}
-          <Outlet />
+          <Outlet context={{ shop, userId, walletBalance }} />
         </div>
       </div>
     </div>
