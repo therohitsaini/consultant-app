@@ -18,6 +18,8 @@ import GlobalMessageNotification from "./components/AlertModel/GlobalMessageNoti
 import ProfileSection from "./components/ClientDashbord/ProfileSection";
 import Voucher from "./pages/Voucher";
 import History from "./pages/History";
+import AdminSettings from "./pages/AdminSettings";
+import VaocherSettings from "./pages/VaocherSettings";
 
 /* 🔥 Shopify iframe height sync */
 function IframeHeightSync() {
@@ -56,6 +58,8 @@ export default function App() {
           <Route path="consultant-list" element={<ConsultantList />} />
           <Route path="add-consultant" element={<AddConsultant />} />
           <Route path="pricing" element={<Pricing />} />
+          <Route path="admin-settings" element={<AdminSettings />} />
+          <Route path="admin-settings/voucher" element={<VaocherSettings />} />
           <Route path="faq" element={<Faq />} />
         </Route>
 

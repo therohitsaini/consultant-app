@@ -14,6 +14,7 @@ import {
     CashDollarIcon,
     QuestionCircleIcon,
     ListBulletedIcon,
+    SettingsIcon,
 } from "@shopify/polaris-icons";
 
 import { useState, useCallback } from "react";
@@ -68,11 +69,18 @@ export default function LayoutFrame() {
                         onClick: () => navigate("/pricing"),
                     },
                     {
+                        label: "Admin Settings",
+                        icon: SettingsIcon,
+                        selected: location.pathname === "/admin-settings",
+                        onClick: () => navigate("/admin-settings"),
+                    },
+                    {
                         label: "FAQ",
                         icon: QuestionCircleIcon,
                         selected: location.pathname === "/faq",
                         onClick: () => navigate("/faq"),
                     },
+
                 ]}
             />
         </Navigation>
