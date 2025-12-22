@@ -71,9 +71,20 @@ export default function LayoutFrame() {
                     {
                         label: "Admin Settings",
                         icon: SettingsIcon,
-                        selected: location.pathname === "/admin-settings",
-                        onClick: () => navigate("/admin-settings"),
+                        url: "/admin-settings",
+                        selected: location.pathname.startsWith("/admin-settings"),
+                        subNavigationItems: [
+                            {
+                                label: "Voucher Settings",
+                                url: "/admin-settings/voucher",
+                            },
+                            {
+                                label: "Permissions",
+                                url: "/admin-settings/permissions",
+                            },
+                        ],
                     },
+                      
                     {
                         label: "FAQ",
                         icon: QuestionCircleIcon,
