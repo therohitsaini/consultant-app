@@ -21,7 +21,7 @@ const rechargeOptions = [
 
 
 function Voucher() {
-    const { shop, userId, walletBalance } = useOutletContext();
+    const { shop, userId, walletBalance, voucherData } = useOutletContext();
     const handleRecharge = async (amount) => {
         const response = await axios.post(`${process.env.REACT_APP_BACKEND_HOST}/api/draft-order/create-draft-order`, {
             amount: amount,
@@ -37,6 +37,7 @@ function Voucher() {
             console.log("error", response.data)
         }
     }
+    console.log("voucherData", voucherData)
 
     return (
         <div className={styles.voucherPage}>
@@ -52,19 +53,19 @@ function Voucher() {
             </div>
 
             <div className={styles.cardGrid}>
-                {rechargeOptions.map((option) => (
+                {voucherData?.voucherCode?.map((option) => (
                     <button
                         key={option.id}
                         type="button"
-                        onClick={() => handleRecharge(option.amount)}
+                        onClick={() => handleRecharge(option.totalCoin)}
                         className={`${styles.rechargeCard} ${option.badge ? styles.rechargeCardHighlighted : ""
                             }`}
                     >
-                        {option.badge && (
-                            <span className={styles.badge}>{option.badge}</span>
+                        {option.extraCoin && (
+                            <span className={styles.badge}>{option.extraCoin}</span>
                         )}
-                        <div className={styles.amount}>₹{option.amount}</div>
-                        <div className={styles.extra}>{option.extra}</div>
+                        <div className={styles.amount}>₹{option.totalCoin}</div>
+                        <div className={styles.extra}>Extra : {option.extraCoin}</div>
                     </button>
                 ))}
             </div>

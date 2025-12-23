@@ -20,6 +20,7 @@ import Voucher from "./pages/Voucher";
 import History from "./pages/History";
 import AdminSettings from "./pages/AdminSettings";
 import VaocherSettings from "./pages/VaocherSettings";
+import CustomerProtected from "./components/ProtectRoute/CustomerProtected";
 
 /* 🔥 Shopify iframe height sync */
 function IframeHeightSync() {
@@ -74,11 +75,14 @@ export default function App() {
         <Route path="/login" element={<LoginForm />} />
 
         {/* 👤 PROFILE SECTION */}
-        <Route path="/profile" element={<ProfileSection />}>
-          <Route index element={<Voucher />} />
-          <Route path="voucher" element={<Voucher />} />
-          <Route path="history" element={<History />} />
+        <Route element={<CustomerProtected />}>
+          <Route path="/profile" element={<ProfileSection />}>
+            <Route index element={<Voucher />} />
+            <Route path="voucher" element={<Voucher />} />
+            <Route path="history" element={<History />} />
+          </Route>
         </Route>
+
       </Routes>
     </BrowserRouter>
   );
