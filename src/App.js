@@ -48,7 +48,7 @@ function IframeHeightSync() {
 export default function App() {
   return (
     <Fragment>
-      <AdminMenu />
+      {/* <AdminMenu /> */}
       <BrowserRouter>
         <IframeHeightSync />
         <GlobalMessageNotification />
@@ -75,7 +75,6 @@ export default function App() {
           <Route path="/chats" element={<UserChat />} />
           <Route path="/login" element={<LoginForm />} />
 
-          {/* 👤 PROFILE SECTION */}
           <Route path="/profile" element={<ProfileSection />}>
             <Route index element={<Voucher />} />
             <Route path="voucher" element={<Voucher />} />

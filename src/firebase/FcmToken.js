@@ -17,7 +17,7 @@ const vapidKey = "BB8E-fAs8w3xZZ3cL_R3jjnTHaNDu4LGcra1NJhX60UG0lxvzBHVzzblrvv7cm
  */
 export const requestFcmTokenInNewWindow = (userId, shopId, callbacks = {}) => {
     const { onSuccess, onError, onStatusChange } = callbacks;
-    
+
     // Update status
     if (onStatusChange) {
         onStatusChange("Opening notification permission window...");
@@ -26,13 +26,13 @@ export const requestFcmTokenInNewWindow = (userId, shopId, callbacks = {}) => {
     // Open new window for permission request and token generation
     const tokenWindowUrl = `${window.location.origin}/fcm-token?userId=${encodeURIComponent(userId)}&shopId=${encodeURIComponent(shopId || '')}`;
     const tokenWindow = window.open(tokenWindowUrl, 'fcmTokenWindow', 'width=600,height=500,scrollbars=yes');
-    
+
     if (!tokenWindow) {
         // Popup blocked - try direct approach
         if (onStatusChange) {
             onStatusChange("Popup blocked. Trying direct permission request...");
         }
-        
+
         // Try direct token generation
         (async () => {
             try {
@@ -40,9 +40,9 @@ export const requestFcmTokenInNewWindow = (userId, shopId, callbacks = {}) => {
                 if (!isInIframe && Notification.permission === "default") {
                     await Notification.requestPermission();
                 }
-                
+
                 const fcmToken = await getToken(messaging, { vapidKey });
-                
+
                 if (fcmToken) {
                     const backendHost = process.env.REACT_APP_BACKEND_HOST;
                     await axios.post(`${backendHost}/api/save-fcm-token`, {
@@ -50,18 +50,21 @@ export const requestFcmTokenInNewWindow = (userId, shopId, callbacks = {}) => {
                         userId: userId,
                         token: fcmToken
                     });
-                    
+
                     if (onStatusChange) {
                         onStatusChange("Token saved successfully!");
+                        console.log("Token saved successfully!");
                     }
                     if (onSuccess) {
                         onSuccess({ token: fcmToken, userId, shopId });
                     }
                 } else {
                     if (onStatusChange) {
+                        console.log("Token generation failed");
                         onStatusChange("Token generation failed");
                     }
                     if (onError) {
+                        console.log("Token generation failed");
                         onError("Token generation failed");
                     }
                 }
@@ -75,7 +78,7 @@ export const requestFcmTokenInNewWindow = (userId, shopId, callbacks = {}) => {
                 }
             }
         })();
-        return () => {}; // No cleanup needed
+        return () => { }; // No cleanup needed
     }
 
     // Listen for message from token window
@@ -93,31 +96,31 @@ export const requestFcmTokenInNewWindow = (userId, shopId, callbacks = {}) => {
 
         if (event.data.type === "FCM_TOKEN_SAVED") {
             console.log("✅ Token saved successfully:", event.data);
-            
+
             if (onStatusChange) {
                 onStatusChange("Token saved successfully! Redirecting...");
             }
-            
+
             // Close token window if still open
             if (tokenWindow && !tokenWindow.closed) {
                 tokenWindow.close();
             }
-            
+
             if (onSuccess) {
                 onSuccess(event.data);
             }
         } else if (event.data.type === "FCM_TOKEN_ERROR") {
             console.error("❌ Token generation error:", event.data.error);
-            
+
             if (onStatusChange) {
                 onStatusChange(`Token generation failed: ${event.data.error}. Proceeding...`);
             }
-            
+
             // Close token window if still open
             if (tokenWindow && !tokenWindow.closed) {
                 tokenWindow.close();
             }
-            
+
             if (onError) {
                 onError(event.data.error);
             }
@@ -165,7 +168,7 @@ export default function FcmToken() {
                     setStatus("Requesting notification permission...");
                     await Notification.requestPermission();
                 }
-                
+
                 if (Notification.permission === "denied") {
                     const errorMsg = "Notification permission is blocked. Please enable it in browser settings (click lock icon in address bar → Notifications → Allow).";
                     setError(errorMsg);
@@ -173,7 +176,7 @@ export default function FcmToken() {
                     console.error("❌", errorMsg);
                     return;
                 }
-                
+
                 if (Notification.permission !== "granted") {
                     const errorMsg = "Notification permission not granted. Please allow notifications.";
                     setError(errorMsg);
@@ -185,13 +188,13 @@ export default function FcmToken() {
                 // Get FCM token
                 setStatus("Generating FCM token...");
                 console.log("🔑 Generating FCM token with VAPID key...");
-                
-                const currentToken = await getToken(messaging, { vapidKey });
 
+                const currentToken = await getToken(messaging, { vapidKey });
+                console.log("currentToken", currentToken);
                 const issSupported = await isSupported();
 
                 console.log("issSupported", issSupported);
-                
+
                 if (!currentToken) {
                     const errorMsg = "No FCM token available. Please check Firebase configuration.";
                     setError(errorMsg);
@@ -215,21 +218,21 @@ export default function FcmToken() {
                 const urlParams = new URLSearchParams(window.location.search);
                 const userId = urlParams.get("userId") || localStorage.getItem("client_u_Identity");
                 const shopId = urlParams.get("shopId");
-                
+
                 if (userId) {
                     // Step 3: Save token to backend
                     setStatus("Saving token to backend...");
                     console.log("💾 Saving token to backend for userId:", userId, "shopId:", shopId);
-                    
+
                     const backendHost = process.env.REACT_APP_BACKEND_HOST || "http://localhost:5001";
                     try {
                         const response = await fetch(`${backendHost}/api/save-fcm-token`, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ 
-                                userId, 
+                            body: JSON.stringify({
+                                userId,
                                 shopId: shopId || null,
-                                token: currentToken 
+                                token: currentToken
                             }),
                         });
 
@@ -237,7 +240,7 @@ export default function FcmToken() {
                             const data = await response.json();
                             console.log("✅ Token saved to backend successfully:", data);
                             setStatus("Token saved successfully!");
-                            
+
                             // Send success message to parent window (if opened from LoginForm)
                             if (window.opener) {
                                 window.opener.postMessage({
@@ -248,7 +251,7 @@ export default function FcmToken() {
                                     shopId: shopId
                                 }, window.location.origin);
                                 console.log("✅ Sent success message to parent window");
-                                
+
                                 // Close window after 2 seconds
                                 setTimeout(() => {
                                     window.close();
@@ -257,7 +260,7 @@ export default function FcmToken() {
                         } else {
                             console.warn("⚠️ Failed to save token to backend:", response.statusText);
                             setStatus("Token generated but save failed");
-                            
+
                             // Send error message to parent window
                             if (window.opener) {
                                 window.opener.postMessage({
@@ -270,7 +273,7 @@ export default function FcmToken() {
                     } catch (apiError) {
                         console.error("❌ Error saving token to backend:", apiError);
                         setStatus("Token generated but save failed");
-                        
+
                         // Send error message to parent window
                         if (window.opener) {
                             window.opener.postMessage({
@@ -307,7 +310,7 @@ export default function FcmToken() {
                 setError(errorMsg);
                 setStatus("Error occurred");
                 console.error("❌ FCM TOKEN ERROR:", err);
-                
+
                 // Send error message to parent window
                 if (window.opener) {
                     window.opener.postMessage({
@@ -346,7 +349,7 @@ export default function FcmToken() {
                 <h2 style={{ color: "#333", marginBottom: "20px" }}>
                     🔔 FCM Token Generation
                 </h2>
-                
+
                 {token ? (
                     <>
                         <div style={{
