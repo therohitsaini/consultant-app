@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './ConsultantCards.css';
+import '../../components/ConsultantCards/ConsultantCards.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchConsultantById } from '../Redux/slices/ConsultantSlices';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './DashboardPage.module.css';
+import styles from '../../components/ConsultantDashboard/DashboardPage.module.css';
 
 const DashboardPage = () => {
     // Sample data - in real app, this would come from API/state

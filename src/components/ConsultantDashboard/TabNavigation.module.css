@@ -146,7 +146,7 @@
     color: #ffffff;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-    border: 3px solid #4a90e2;
+    border: 3px solid #fdfdfd;
 }
 
 .profileImage img {
@@ -183,9 +183,9 @@
     padding: 10px 16px;
     margin-top: 12px;
     border-radius: 8px;
-    border: 1px solid #4a90e2;
+    border: 1px solid #090905;
     background: transparent;
-    color: #4a90e2;
+    color: #11110f;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -197,7 +197,7 @@
 }
 
 .profileButton:hover {
-    background: #4a90e2;
+    background: #060708;
     color: white;
 }
 

@@ -50,28 +50,7 @@ const LoginForm = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    // const handleSubmit = async (e) => {
-    //     e.preventDefault();
-
-    //     console.log("process.env.REACT_APP_BACKEND_HOST", process.env.REACT_APP_BACKEND_HOST)
-
-    //     if (!validateForm()) {
-    //         return;
-    //     }
-    //     const response = await axios.post(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/login-consultant`, formData);
-    //     console.log("response_login_consultant", response.
-    //         data.
-    //         userData
-    //     );
-    //     if (response.status === 200) {
-    //         localStorage.setItem('client_u_Identity', response.data.userData._id);
-    //         navigate('/consultant-dashboard');
-    //     } else {
-    //         setErrors({ email: 'Invalid email or password' });
-    //     }
-    // };
-
-    // Helper function to navigate to dashboard
+  
     const proceedToDashboard = (shop, host) => {
         const targetShop = shop;
         const hostQuery = host ? `?host=${encodeURIComponent(host)}` : "";
@@ -94,7 +73,7 @@ const LoginForm = () => {
             );
 
             const { userData, token } = response?.data;
-            console.log("userData", userData);
+            console.log("userData", response);
             console.log("token", response?.data);
 
             // Ensure userData exists and has an _id

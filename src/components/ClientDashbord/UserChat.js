@@ -1,7 +1,6 @@
 import React, { Fragment, useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-// import styles from './UserChat.module.css';
-import styles from "./UserChat.module.css"
+import styles from './UserChat.module.css';
 import { socket } from '../Sokect-io/SokectConfig';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchChatHistory, fetchConsultantById, updateUserRequestById } from '../Redux/slices/ConsultantSlices';

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import styles from './UsersPage.module.css';
+import styles from '../../components/ConsultantDashboard/UsersPage.module.css';
 
 const UsersPage = () => {
     const [searchQuery, setSearchQuery] = useState('');

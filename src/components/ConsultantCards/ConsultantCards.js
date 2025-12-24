@@ -1,23 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './ConsultantCards.css';
+import '../../components/ConsultantCards/ConsultantCards.css';
 import { fetchConsultants } from '../Redux/slices/ConsultantSlices';
 import { useDispatch, useSelector } from 'react-redux';
 import { Socket } from 'socket.io-client';
 import { socket } from '../Sokect-io/SokectConfig';
 import { connectSocket } from '../Redux/slices/sokectSlice';
+import { startVideoCall, startVoiceCall } from '../Redux/slices/callSlice';
 
 function ConsultantCards() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const [userId, setUserId] = useState(null);
+    const [shopId, setShopId] = useState(null);
     const { consultants, loading } = useSelector((state) => state.consultants);
     const params = new URLSearchParams(window.location.search);
     const user_id = params.get('customerId');
     const shop_id = params.get('shopid');
     const [initialLoading, setInitialLoading] = useState(true);
-   
-   
+
+
     useEffect(() => {
         const timer = setTimeout(() => {
             setInitialLoading(false);
@@ -28,8 +31,13 @@ function ConsultantCards() {
     useEffect(() => {
         const client_id = localStorage.setItem('client_u_Identity', user_id);
         const shop = localStorage.setItem('shop_o_Identity', shop_id);
-        console.log(client_id)
     }, [user_id, shop_id]);
+    useEffect(() => {
+        setUserId(localStorage.getItem('client_u_Identity'));
+        setShopId(localStorage.getItem('shop_o_Identity'));
+    }, []);
+    console.log("user_id", userId)
+    console.log("shop_id", shop_id)
 
     useEffect(() => {
         dispatch(fetchConsultants(shop_id));
@@ -41,30 +49,23 @@ function ConsultantCards() {
 
     const consultantsList = consultants?.findConsultant || consultants || [];
 
-    // Map API data to component format
     const mappedConsultants = consultantsList.map((consultant) => {
-        // Parse language array (it's stored as stringified array)
         let languages = [];
         try {
             if (typeof consultant.language === 'string') {
-                // If it's a string, try to parse it
                 languages = JSON.parse(consultant.language);
             } else if (Array.isArray(consultant.language)) {
-                // If it's an array, check if first element is a stringified array
                 if (consultant.language.length > 0 && typeof consultant.language[0] === 'string') {
-                    // Try to parse the first element as JSON
                     languages = JSON.parse(consultant.language[0]);
                 } else {
-                    // If it's already a proper array, use it directly
                     languages = consultant.language;
                 }
             }
-            // Ensure languages is an array
             if (!Array.isArray(languages)) {
                 languages = ['English'];
             }
         } catch (e) {
-            languages = ['English']; // default fallback
+            languages = ['English'];
         }
 
         return {
@@ -75,8 +76,8 @@ function ConsultantCards() {
             specialization: consultant.specialization || '',
             experience: parseInt(consultant.experience) || 0,
             languages: languages,
-            rating: 4.5, // Default rating (API doesn't provide)
-            testimonials: 0, // Default testimonials (API doesn't provide)
+            rating: 4.5,
+            testimonials: 0,
             isActive: consultant.isActive || false,
             chatPrice: parseInt(consultant.fees) || 500,
             audioPrice: parseInt(consultant.fees) || 800,
@@ -84,12 +85,8 @@ function ConsultantCards() {
         };
     });
 
-    // After data/API load, trigger height send once so iframe resizes to final content
-    // Note: sendHeight is now handled globally in App.js
     useEffect(() => {
         if (!loading) {
-            // Trigger height update after content loads (handled by App.js global listener)
-            // This is just to ensure height updates when data changes
             const sendHeight = () => {
                 const height = document.documentElement.scrollHeight;
                 if (window.parent) {
@@ -99,13 +96,11 @@ function ConsultantCards() {
                     );
                 }
             };
-            // small delay so DOM has rendered mappedConsultants
             const id = setTimeout(sendHeight, 300);
             return () => clearTimeout(id);
         }
     }, [loading, mappedConsultants.length]);
 
-    // Function to render stars with half-star support
     const renderStars = (rating) => {
         const fullStars = Math.floor(rating);
         const hasHalfStar = rating % 1 !== 0;
@@ -124,7 +119,6 @@ function ConsultantCards() {
         );
     };
 
-    // Function to handle calling option selection
     const handleCallingOption = (optionType, consultantId, price) => {
         console.log(`Selected ${optionType} option for consultant ${consultantId} at price INR ${price}`);
     };
@@ -152,21 +146,58 @@ function ConsultantCards() {
 
     }, [user_id]);
 
-    // const sendMessageHandler = () => {
-    //     if (messageIo.trim() === "") return;
-    //     const messageData = {
-    //         senderId: user_id,
-    //         receiverId: consultantId,
-    //         text: messageIo,
-    //         timestamp: new Date().toISOString()
-    //     };
-    //     socket.emit("sendMessage", messageData);
-    //     setMessageIo("");
-    //     setRefresh((prev) => !prev);
-    // };
+    /**
+     * Start Voice Call and Video Call
+     */
 
+    const startCall = async ({receiverId, type}) => {
+        const channelName = `channel-${userId.slice(-6)}-${receiverId.slice(-6)}`;
+        const uid = Math.floor(Math.random() * 1000000);
+        console.log("channelName", channelName)
+        const url = `${process.env.REACT_APP_BACKEND_HOST}/api/call/generate-token`;
+        const res = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ channelName, uid }),
+        });
+        const data = await res.json();
+        console.log("data", data)
 
-    // Show loader while initial loading or data is loading
+        socket.emit("call-user", {
+            callerId: userId,
+            receiverId: receiverId,
+            channelName,
+            callType: type,
+        });
+
+        // if (type === "voice") {
+        //     await dispatch(
+        //         startVoiceCall({
+        //             token: data.token,
+        //             channel: "123",
+        //             uid: 1,
+        //             appId: "AGORA_APP_ID",
+        //         })
+        //     );
+        // }
+
+        // if (type === "video") {
+        //     await dispatch(
+        //         startVideoCall({
+        //             token: data.token,
+        //             channel: "123",
+        //             uid: 1,
+        //             appId: "AGORA_APP_ID",
+        //         })
+        //     );
+        // }
+
+        // navigate("/call");
+    };
+    
+
     if (initialLoading || loading) {
         return (
             <div className="page-loader">
@@ -183,6 +214,15 @@ function ConsultantCards() {
         const hostQuery = "";
         console.log("targetShop", targetShop, "hostQuery", hostQuery)
         window.top.location.href = `https://${targetShop}/apps/consultant-theme/view-profile?consultantId=${consultant_id}&shopId=${shop_id}${hostQuery}`;
+    }
+
+    const viewChatsPage = (consultantView) => {
+        console.log("consultantView", consultantView);
+        const targetShop = "rohit-12345839.myshopify.com";
+        const hostQuery = "";
+        window.top.location.href = `https://${targetShop}/apps/consultant-theme/chats-c?consultantId=${consultantView}${hostQuery}`;
+        // const hostQuery = "";
+        // window.top.location.href = `https://${targetShop}/apps/consultant-theme/view-profile?consultantId=${consultantView}${hostQuery}`;
     }
 
 
@@ -293,7 +333,7 @@ function ConsultantCards() {
                     </div>
                 ) : (
                     mappedConsultants.map((consultant) => {
-                        const shop_id = "690c374f605cb8b946503ccb";
+                        const shop_id = shopId;
                         const consultant_id = consultant.id;
 
                         return (
@@ -365,7 +405,7 @@ function ConsultantCards() {
 
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            navigate(`/user-chat?consultantId=${consultant.id}`);
+                                                            viewChatsPage(consultant.id);
                                                         }}
 
                                                     >
@@ -381,7 +421,7 @@ function ConsultantCards() {
                                                         className="calling-option-btn audio-btn"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            handleCallingOption('audio', consultant.id, consultant.audioPrice);
+                                                            startCall({ receiverId: consultant.id, type: 'voice' })
                                                         }}
                                                     >
                                                         <div className="calling-option-content">
@@ -394,10 +434,7 @@ function ConsultantCards() {
                                                     </button>
                                                     <button
                                                         className="calling-option-btn video-btn"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleCallingOption('video', consultant.id, consultant.videoPrice);
-                                                        }}
+                                                       
                                                     >
                                                         <div className="calling-option-content">
                                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

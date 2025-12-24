@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, Outlet, redirect } from 'react-router-dom';
-import styles from './ProfileSection.module.css';
+import styles from '../../components/ClientDashbord/ProfileSection.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserDetailsByIds } from '../Redux/slices/UserSlices';
 import { FormLayout, TextField } from '@shopify/polaris';
@@ -14,7 +14,7 @@ const ProfileSection = () => {
   const loggedInCustomerId = params.get('logged_in_customer_Id');
   console.log("loggedInCustomerId", loggedInCustomerId);
   console.log("shop", shop);
-
+console.log("userId", userId)
   const dispatch = useDispatch();
   const { userDetails } = useSelector((state) => state.users);
   const walletBalance = userDetails?.data?.walletBalance;
@@ -38,11 +38,7 @@ const ProfileSection = () => {
 
   console.log("vo", voucherData)
 
-  if (loggedInCustomerId) {
-    <div>Loading...</div>
-    return 
-
-  }
+ 
   return (
     <div className={styles.profileSection}>
       {/* Left side: user image / basic info */}

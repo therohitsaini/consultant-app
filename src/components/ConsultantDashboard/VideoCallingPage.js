@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import styles from './VideoCallingPage.module.css';
+import AgoraRTC from 'agora-rtc-sdk-ng';
 
-const VideoCallingPage = () => {
+function VideoCallingPage() {
     const navigate = useNavigate();
     const location = useLocation();
     const [isMuted, setIsMuted] = useState(false);
@@ -16,10 +17,12 @@ const VideoCallingPage = () => {
         console.log("consultantId:", consultantId);
         console.log("shopId:", shopId);
     }, []);
+    const client = AgoraRTC.createClient({
+        mode: "rtc",
+        codec: "vp8",
+    });
 
 
-    const parms = useParams();
-    console.log("parms___________ViewProfile", parms)
     const conversation = location.state?.conversation || {
         id: 1,
         name: 'Sarah Johnson',

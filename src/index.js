@@ -18,11 +18,12 @@ if ("serviceWorker" in navigator) {
     .catch((err) => console.error("SW registration failed:", err));
 }
 
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <ErrorBoundary>
-      <AppBridgeProvider>
+      <AppBridgeProvider >
         <PolarisAppProvider i18n={en}>
           <Provider store={store}>
             <SocketProvider>

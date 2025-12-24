@@ -8,7 +8,7 @@ export const fetchUsers = createAsyncThunk("users/fetch", async () => {
 });
 
 export const fetchUserDetailsByIds = createAsyncThunk("users/fetch-details", async (userId) => {
-    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/users/shopify/users/69328ff18736b56002ef83df`);
+    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/users/shopify/users/${userId}`);
     return response.data;
 });
 const userSlice = createSlice({

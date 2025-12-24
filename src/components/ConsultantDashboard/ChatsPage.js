@@ -364,7 +364,7 @@ const ChatsPage = () => {
                                 display: "flex",
                                 justifyContent: "end"
                             }}>
-                                <p onClick={() => setShowRequestModal(!showRequestModal)} style={{ fontSize: "14px", fontWeight: "600", padding: "10px", cursor: "pointer" }}> Request ({isRequestModalOpen.length})</p>
+                                <p onClick={() => setShowRequestModal(!showRequestModal)} style={{ fontSize: "14px", fontWeight: "600", padding: "10px", cursor: "pointer",  }}> <span style={{ color: "#63ba77" }}>Request</span> ({isRequestModalOpen.length})</p>
                             </div>
                             {
                                 showRequestModal ? (

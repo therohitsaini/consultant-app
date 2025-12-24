@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import styles from './TabNavigation.module.css';
+import styles from '../../components/ConsultantDashboard/TabNavigation.module.css';
 import DashboardPage from './DashboardPage';
 import UsersPage from './UsersPage';
 import ChatsPage from './ChatsPage';
@@ -23,11 +23,13 @@ function TabNavigation({ children }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [consultantId, setConsultantId] = useState(null);
     const [userId, setUserId] = useState(null);
+    const [shopId, setShopId] = useState(null);
     const dispatch = useDispatch();
     const { consultantOverview } = useSelector((state) => state.consultants);
     console.log("consultantOverview________________", consultantOverview)
     useEffect(() => {
         setUserId(localStorage.getItem('client_u_Identity'));
+        setShopId(localStorage.getItem('shop_o_Identity'));
     }, []);
 
 
@@ -41,8 +43,8 @@ function TabNavigation({ children }) {
         }
     };
     useEffect(() => {
-        dispatch(fetchConsultantById({ shop_id: "690c374f605cb8b946503ccb", consultant_id: "691eafcff95528ab305eba59" }));
-    }, []);
+        dispatch(fetchConsultantById({ shop_id: shopId, consultant_id: userId }));
+    }, [shopId, userId]);
 
     // Add listeners for load / resize and initial timeout
     useEffect(() => {
@@ -131,11 +133,11 @@ function TabNavigation({ children }) {
         console.log("targetShop", targetShop, "hostQuery", hostQuery)
         window.top.location.href = `https://${targetShop}/apps/consultant-theme${path}${hostQuery}`;
 
-       
+
     };
     const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${consultantOverview?.consultant?.profileImage?.replace("\\", "/")}`;
+    
 
-    // Check if we're on video call page - hide sidebar
     const isVideoCallPage = location.pathname === '/video-call' || location.pathname.startsWith('/video-call');
 
     return (
@@ -173,9 +175,9 @@ function TabNavigation({ children }) {
                 {!isVideoCallPage && (
                     <aside className={`${styles.sideNav} ${sidebarOpen ? styles.sideNavOpen : ''}`}>
                         {/* Profile Section */}
-                        <div className={styles.profileSection }>
+                        <div className={styles.profileSection}>
                             <div className={styles.profileImage}>
-                                <img src={imageUrl} alt={consultantOverview?.consultant?.fullname} />
+                                <img src={ 'https://imgs.search.brave.com/9rELSNB2JEASiZPQlCef36aaHliToZj5fynVvObLBKg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4t/aWNvbnMtcG5nLmZs/YXRpY29uLmNvbS8x/MjgvNTk4Ny81OTg3/ODExLnBuZw'} alt={consultantOverview?.consultant?.fullname} />
                             </div>
                             <div className={styles.profileDetails}>
                                 <div className={styles.profileName}>{consultantOverview?.consultant?.fullname}</div>
