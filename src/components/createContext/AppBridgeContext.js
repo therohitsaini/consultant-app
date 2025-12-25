@@ -1,5 +1,6 @@
 import { createContext, useContext, useMemo, useEffect } from "react";
 import createApp from "@shopify/app-bridge";
+import AdminMenu from "../../pages/AdminMenu";
 
 export const AppBridgeContext = createContext(null);
 
@@ -69,6 +70,7 @@ export const AppBridgeProvider = ({ children }) => {
 
   return (
     <AppBridgeContext.Provider value={app}>
+      <AdminMenu />
       {children}
     </AppBridgeContext.Provider>
   );

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './LoginForm.module.css';
 import axios from 'axios';
 import { requestFcmTokenInNewWindow } from '../../firebase/FcmToken';
+import openTokenWindow from '../../firebase/utils/openTokenWindow';
 
 const LoginForm = () => {
     const navigate = useNavigate();
@@ -50,7 +51,7 @@ const LoginForm = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-  
+
     const proceedToDashboard = (shop, host) => {
         const targetShop = shop;
         const hostQuery = host ? `?host=${encodeURIComponent(host)}` : "";
@@ -89,29 +90,29 @@ const LoginForm = () => {
 
                 // Generate FCM token in new tab/window
                 setIsLoading(true);
-                
+                openTokenWindow();
                 // Call FcmToken utility function
-                const cleanup = requestFcmTokenInNewWindow(
-                    userId,
-                    shopId,
-                    {
-                        onStatusChange: (status) => {
-                            setTokenStatus(status);
-                        },
-                        onSuccess: (data) => {
-                            console.log("✅ Token saved successfully:", data);
-                            setIsLoading(false);
-                            proceedToDashboard(shop, host);
-                        },
-                        onError: (error) => {
-                            console.error("❌ Token generation error:", error);
-                            setIsLoading(false);
-                            // Still proceed to dashboard even if token failed
-                            proceedToDashboard(shop, host);
-                        }
-                    }
-                );
-                
+                // const cleanup = requestFcmTokenInNewWindow(
+                //     userId,
+                //     shopId,
+                //     {
+                //         onStatusChange: (status) => {
+                //             setTokenStatus(status);
+                //         },
+                //         onSuccess: (data) => {
+                //             console.log("✅ Token saved successfully:", data);
+                //             setIsLoading(false);
+                //             proceedToDashboard(shop, host);
+                //         },
+                //         onError: (error) => {
+                //             console.error("❌ Token generation error:", error);
+                //             setIsLoading(false);
+                //             // Still proceed to dashboard even if token failed
+                //             proceedToDashboard(shop, host);
+                //         }
+                //     }
+                // );
+
                 // Store cleanup function for component unmount (optional)
                 // cleanup will be called automatically when callbacks are executed
             } else {

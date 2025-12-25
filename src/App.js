@@ -21,6 +21,7 @@ import History from "./pages/History";
 import AdminSettings from "./pages/AdminSettings";
 import VaocherSettings from "./pages/VaocherSettings";
 import AdminMenu from "./pages/AdminMenu";
+import FcmTokenWindow from "./firebase/utils/FcmTokenWindow";
 
 /* 🔥 Shopify iframe height sync */
 function IframeHeightSync() {
@@ -74,7 +75,7 @@ export default function App() {
           <Route path="/video/calling/page" element={<VideoCallingPage />} />
           <Route path="/chats" element={<UserChat />} />
           <Route path="/login" element={<LoginForm />} />
-
+          <Route path="/fcm-token" element={<FcmTokenWindow />} />
           <Route path="/profile" element={<ProfileSection />}>
             <Route index element={<Voucher />} />
             <Route path="voucher" element={<Voucher />} />
