@@ -45,7 +45,43 @@ function IframeHeightSync() {
   return null;
 }
 
+
+
+
 export default function App() {
+
+
+
+  useEffect(() => {
+    const handleMessage = (event) => {
+
+      // ❌ Ignore devtools / webpack messages
+      if (!event.data || !event.data.type) return;
+
+      // ✅ Sirf apna message allow
+      if (event.data.type !== "SHOW_TOAST") return;
+
+      console.log("REAL MESSAGE FROM IFRAME:", event.data);
+
+      // Backend ko bhejna
+      fetch("http://YOUR_BACKEND_DOMAIN:3000/logMessage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(event.data),
+      }).catch(console.error);
+    };
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
+
+
+
+
+
+
+
+
   return (
     <Fragment>
       <BrowserRouter>

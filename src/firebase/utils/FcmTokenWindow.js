@@ -22,7 +22,6 @@ export default function FcmTokenWindow() {
 
                 console.log("✅ FCM TOKEN:", fcmToken);
 
-                // 3️⃣ URL params
                 const params = new URLSearchParams(window.location.search);
                 const userId = params.get("userId");
                 const shopId = params.get("shopId");
@@ -40,7 +39,7 @@ export default function FcmTokenWindow() {
                 // ✅ Parent window ko inform karo
                 if (window.opener) {
                     window.opener.postMessage(
-                        { tokenGenerated: true ,fcmToken: fcmToken},
+                        { tokenGenerated: true ,},
                         window.location.origin
                         
                     );

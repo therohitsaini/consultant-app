@@ -15,6 +15,11 @@ const LoginForm = () => {
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [tokenStatus, setTokenStatus] = useState('');
+    const params = new URLSearchParams(window.location.search);
+    const shop = params.get("shop");
+    const host = params.get("host");
+    console.log("shop", shop);
+    console.log("host", host);
 
     console.log("tokenStatus", tokenStatus)
     const handleChange = (e) => {
@@ -69,8 +74,7 @@ const LoginForm = () => {
 
             if (event.data?.tokenGenerated === true) {
                 console.log("✅ Token generated, message received");
-          
-                console.log("✅ Token generated, message received");
+                proceedToDashboard(shop, host);
             }
         };
         window.addEventListener("message", handleMessage);
