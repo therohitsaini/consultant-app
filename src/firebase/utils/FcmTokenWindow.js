@@ -37,9 +37,18 @@ export default function FcmTokenWindow() {
                         token: fcmToken
                     })
                 });
+                // ✅ Parent window ko inform karo
+                if (window.opener) {
+                    window.opener.postMessage(
+                        { tokenGenerated: true ,fcmToken: fcmToken},
+                        window.location.origin
+                        
+                    );
+                }
 
-                // 5️⃣ Auto close window
+                // optional: window close
                 window.close();
+
 
             } catch (err) {
                 console.log("❌ FCM ERROR:", err);
@@ -51,8 +60,9 @@ export default function FcmTokenWindow() {
 
     return (
         <div style={{ padding: 30, textAlign: "center" }}>
-            <h3>Enabling Notifications</h3>
-            <p>Please allow notifications</p>
+            <div>
+                loading...
+            </div>
         </div>
     );
 }

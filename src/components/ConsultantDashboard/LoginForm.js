@@ -62,6 +62,22 @@ const LoginForm = () => {
         }
     };
 
+    useEffect(() => {
+        const handleMessage = (event) => {
+            // 🔐 Security check (important)
+            if (event.origin !== window.location.origin) return;
+
+            if (event.data?.tokenGenerated === true) {
+                console.log("✅ Token generated, message received");
+          
+                console.log("✅ Token generated, message received");
+            }
+        };
+        window.addEventListener("message", handleMessage);
+        return () => {
+            window.removeEventListener("message", handleMessage);
+        };
+    }, []);
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -89,7 +105,7 @@ const LoginForm = () => {
                 localStorage.setItem("varify_tokem", token);
 
                 // Generate FCM token in new tab/window
-                setIsLoading(true);
+
                 openTokenWindow();
                 // Call FcmToken utility function
                 // const cleanup = requestFcmTokenInNewWindow(

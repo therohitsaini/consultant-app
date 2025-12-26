@@ -7,7 +7,6 @@ import ConsultantList from "./pages/ConsultantList";
 import AddConsultant from "./pages/AddConsultant";
 import Pricing from "./pages/Pricing";
 import Faq from "./pages/Faq";
-
 import ConsultantCards from "./components/ConsultantCards/ConsultantCards";
 import ViewProfile from "./components/ConsultantCards/ViewProfile";
 import TabNavigation from "./components/ConsultantDashboard/TabNavigation";
@@ -49,12 +48,10 @@ function IframeHeightSync() {
 export default function App() {
   return (
     <Fragment>
-      {/* <AdminMenu /> */}
       <BrowserRouter>
         <IframeHeightSync />
         <GlobalMessageNotification />
         <Routes>
-          {/* ✅ LAYOUT ROUTE (SIDEBAR + TOPBAR) */}
           <Route element={<LayoutFrame />}>
             <Route index element={<Dashboard />} />
             <Route path="dashboard" element={<Dashboard />} />
@@ -65,8 +62,6 @@ export default function App() {
             <Route path="admin-settings/voucher" element={<VaocherSettings />} />
             <Route path="faq" element={<Faq />} />
           </Route>
-
-          {/* ❌ FULL SCREEN ROUTES (NO LAYOUT) */}
           <Route path="/consultant-cards" element={<ConsultantCards />} />
           <Route path="/view-profile" element={<ViewProfile />} />
           <Route path="/consultant-dashboard/*" element={<TabNavigation />} />
