@@ -2,9 +2,11 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setIncomingCall } from "../Redux/slices/sokectSlice";
+import { socket } from "../Sokect-io/SokectConfig";
 
 export default function IncomingCallAlert() {
     const dispatch = useDispatch();
+    const userId = localStorage.getItem('client_u_Identity') || localStorage.getItem('consultant_u_Identity');
     const { incomingCall } = useSelector((state) => state.socket);
     console.log("incomingCall", incomingCall);
     if (!incomingCall) return console.log("No incoming call");
@@ -12,11 +14,8 @@ export default function IncomingCallAlert() {
     const { callerId, callType, channelName } = incomingCall;
 
     const handleAccept = () => {
+        socket.emit("call-accepted", { callerId, receiverId: userId, channelName , callType: incomingCall.callType});
         console.log("Call accepted", incomingCall);
-        // You can emit event to backend here if needed
-        // socket.emit("accept-call", { channelName, callerId });
-
-        // Close the alert
         dispatch(setIncomingCall(null));
     };
     const handleReject = () => {
@@ -32,17 +31,78 @@ export default function IncomingCallAlert() {
             position: "fixed",
             top: "20px",
             right: "20px",
-            padding: "20px",
-            backgroundColor: "#f8d7da",
-            color: "#721c24",
-            border: "1px solid #f5c6cb",
-            borderRadius: "8px",
-            zIndex: 1000
+            width: "320px",
+            backgroundColor: "#ffffff",
+            boxShadow: "0px 4px 14px rgba(0, 0, 0, 0.15)",
+            borderRadius: "12px",
+            zIndex: 1000,
+            padding: "10px",
+            fontFamily: "Arial, sans-serif",
         }}>
-            <p><strong>Incoming {callType} call</strong></p>
-            <p>From: {callerId}</p>
-            <button onClick={handleAccept} style={{ marginRight: "10px" }}>Accept</button>
-            <button onClick={handleReject}>Reject</button>
+            {/* Header */}
+            <div style={{ display: "flex", alignItems: "center", marginBottom: "12px" }}>
+                <img
+                    src="https://via.placeholder.com/60"
+                    alt="Caller Avatar"
+                    style={{
+                        width: "60px",
+                        height: "60px",
+                        borderRadius: "50%",
+                        marginRight: "12px",
+                        objectFit: "cover"
+                    }}
+                />
+                <div>
+                    <p style={{ margin: 0, fontSize: "18px", fontWeight: "600", color: "#222" }}>
+                        Incoming {callType} Call
+                    </p>
+                    <p style={{ margin: 0, fontSize: "14px", color: "#555" }}>
+                        From: {callerId}
+                    </p>
+                </div>
+            </div>
+
+            {/* Buttons */}
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <button
+                    onClick={handleAccept}
+                    style={{
+                        flex: 1,
+                        backgroundColor: "#28a745",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: "8px",
+                        padding: "5px",
+                        fontSize: "14px",
+                        cursor: "pointer",
+                        marginRight: "8px",
+                        transition: "background 0.2s ease"
+                    }}
+                    onMouseOver={(e) => (e.target.style.backgroundColor = "#218838")}
+                    onMouseOut={(e) => (e.target.style.backgroundColor = "#28a745")}
+                >
+                    Accept
+                </button>
+
+                <button
+                    onClick={handleReject}
+                    style={{
+                        flex: 1,
+                        backgroundColor: "#dc3545",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: "8px",
+                        padding: "5px",
+                        fontSize: "14px",
+                        cursor: "pointer",
+                        transition: "background 0.2s ease"
+                    }}
+                    onMouseOver={(e) => (e.target.style.backgroundColor = "#c82333")}
+                    onMouseOut={(e) => (e.target.style.backgroundColor = "#dc3545")}
+                >
+                    Reject
+                </button>
+            </div>
         </div>
     );
 }

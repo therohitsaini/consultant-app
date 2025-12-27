@@ -150,28 +150,32 @@ function ConsultantCards() {
      * Start Voice Call and Video Call
      */
 
-    const startCall = async ({receiverId, type}) => {
-        const channelName = `channel-${userId.slice(-6)}-${receiverId.slice(-6)}`;
-        const uid = Math.floor(Math.random() * 1000000);
-        const url = `${process.env.REACT_APP_BACKEND_HOST}/api/call/generate-token`;
-        const res = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ channelName, uid }),
-        });
-        const data = await res.json();
-        console.log("data", data)
-        if(data.token){
-            socket.emit("call-user", {
-                callerId: userId,
-                receiverId: receiverId,
-                channelName,
-                callType: type || "voice",
-            });
-        }
+    const startCall = async ({ receiverId, type }) => {
+        window.top.location.href = `https://${"rohit-12345839.myshopify.com"}/apps/consultant-theme/video-calling-page?receiverId=${receiverId}&callType=${type}`;
 
+
+        // const channelName = `channel-${userId.slice(-6)}-${receiverId.slice(-6)}`;
+        // const uid = Math.floor(Math.random() * 1000000);
+        // const url = `${process.env.REACT_APP_BACKEND_HOST}/api/call/generate-token`;
+        // const res = await fetch(url, {
+        //     method: "POST",
+        //     headers: {
+        //         "Content-Type": "application/json",
+        //     },
+        //     body: JSON.stringify({ channelName, uid }),
+        // });
+        // const data = await res.json();
+        // console.log("data", data)
+        // if (data.token) {
+        //     socket.emit("call-user", {
+        //         callerId: userId,
+        //         receiverId: receiverId,
+        //         channelName,
+        //         callType: type || "voice",
+        //     });
+        // }
+
+      
 
 
         // if (type === "voice") {
@@ -198,7 +202,6 @@ function ConsultantCards() {
 
         // navigate("/call");
     };
-    
 
     if (initialLoading || loading) {
         return (
@@ -436,7 +439,7 @@ function ConsultantCards() {
                                                     </button>
                                                     <button
                                                         className="calling-option-btn video-btn"
-                                                       
+
                                                     >
                                                         <div className="calling-option-content">
                                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

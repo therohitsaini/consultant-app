@@ -138,12 +138,10 @@ function TabNavigation({ children }) {
     };
     const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${consultantOverview?.consultant?.profileImage?.replace("\\", "/")}`;
 
-
     const isVideoCallPage = location.pathname === '/video-call' || location.pathname.startsWith('/video-call');
 
     return (
         <div className={`${styles.dashboardWrapper} ${isVideoCallPage ? styles.videoCallMode : ''}`}>
-            <IncomingCallAlert />
             <button
                 className={styles.mobileToggleButton}
                 onClick={toggleSidebar}

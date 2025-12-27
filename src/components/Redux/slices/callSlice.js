@@ -21,7 +21,6 @@ export const startVoiceCall = createAsyncThunk("call/startVoice",
     }
 );
 
-/* 📹 VIDEO CALL */
 export const startVideoCall = createAsyncThunk(
     "call/startVideo",
     async ({ token, channel, uid, appId }) => {
@@ -36,7 +35,6 @@ export const startVideoCall = createAsyncThunk(
     }
 );
 
-/* ❌ END CALL */
 export const endCall = createAsyncThunk(
     "call/end",
     async () => {
