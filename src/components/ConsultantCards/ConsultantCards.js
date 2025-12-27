@@ -16,6 +16,8 @@ function ConsultantCards() {
     const [shopId, setShopId] = useState(null);
     const { consultants, loading } = useSelector((state) => state.consultants);
     const params = new URLSearchParams(window.location.search);
+    const shop = params.get('shop');
+    console.log("shop", shop);
     const user_id = params.get('customerId');
     const shop_id = params.get('shopid');
     const [initialLoading, setInitialLoading] = useState(true);
@@ -119,9 +121,7 @@ function ConsultantCards() {
         );
     };
 
-    const handleCallingOption = (optionType, consultantId, price) => {
-        console.log(`Selected ${optionType} option for consultant ${consultantId} at price INR ${price}`);
-    };
+  
 
     useEffect(() => {
         if (!user_id) return console.log("User ID is required");
@@ -151,32 +151,27 @@ function ConsultantCards() {
      */
 
     const startCall = async ({ receiverId, type }) => {
-        window.top.location.href = `https://${"rohit-12345839.myshopify.com"}/apps/consultant-theme/video-calling-page?receiverId=${receiverId}&callType=${type}`;
-
-
-        // const channelName = `channel-${userId.slice(-6)}-${receiverId.slice(-6)}`;
-        // const uid = Math.floor(Math.random() * 1000000);
-        // const url = `${process.env.REACT_APP_BACKEND_HOST}/api/call/generate-token`;
-        // const res = await fetch(url, {
-        //     method: "POST",
-        //     headers: {
-        //         "Content-Type": "application/json",
-        //     },
-        //     body: JSON.stringify({ channelName, uid }),
-        // });
-        // const data = await res.json();
-        // console.log("data", data)
-        // if (data.token) {
-        //     socket.emit("call-user", {
-        //         callerId: userId,
-        //         receiverId: receiverId,
-        //         channelName,
-        //         callType: type || "voice",
-        //     });
-        // }
-
-      
-
+        const channelName = `channel-${userId.slice(-6)}-${receiverId.slice(-6)}`;
+        const uid = Math.floor(Math.random() * 1000000);
+        const url = `${process.env.REACT_APP_BACKEND_HOST}/api/call/generate-token`;
+        const res = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ channelName, uid }),
+        });
+        const data = await res.json();
+        console.log("data", data)
+        if (data.token) {
+            socket.emit("call-user", {
+                callerId: userId,
+                receiverId: receiverId,
+                channelName,
+                callType: type || "voice",
+            });
+            window.top.location.href = `https://${shop}/apps/consultant-theme/video-calling-page?callerId=${userId}&receiverId=${receiverId}&callType=${type}&token=${data.token}&channelName=${channelName}`;
+        }
 
         // if (type === "voice") {
         //     await dispatch(

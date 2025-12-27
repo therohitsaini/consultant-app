@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import styles from './VideoCallingPage.module.css';
 import AgoraRTC from 'agora-rtc-sdk-ng';
+import { useSelector } from 'react-redux';
 
 function VideoCallingPage() {
     const navigate = useNavigate();
@@ -9,6 +10,10 @@ function VideoCallingPage() {
     const [isMuted, setIsMuted] = useState(false);
     const [isVideoOff, setIsVideoOff] = useState(false);
     const [isAudioCall, setIsAudioCall] = useState(false);
+    const [callingUser, setCallingUser] = useState("calling.....");
+    const [callerDetails, setCallerDetails] = useState(null);
+
+    const { callAccepted } = useSelector((state) => state.socket);
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const consultantId = params.get("consultantId");
@@ -17,18 +22,27 @@ function VideoCallingPage() {
         console.log("consultantId:", consultantId);
         console.log("shopId:", shopId);
     }, []);
-    const client = AgoraRTC.createClient({
-        mode: "rtc",
-        codec: "vp8",
-    });
+    const params = new URLSearchParams(window.location.search);
+    const callerId = params.get("callerId");
+    const receiverId = params.get("receiverId");
+    const callType = params.get("callType");
+    const token = params.get("token");
+    const channelName = params.get("channelName");
+    console.log("callerId:", callerId);
+    console.log("receiverId:", receiverId);
+    console.log("callType:", callType);
+    console.log("token:", token);
+    console.log("channelName:", channelName);
 
 
     const conversation = location.state?.conversation || {
         id: 1,
         name: 'Sarah Johnson',
         avatar: 'SJ',
-        isOnline: true
+        isOnline: true,
+        callingUser: callingUser
     };
+
 
     const handleEndCall = () => {
         navigate(-1); // Go back to previous page
@@ -46,6 +60,28 @@ function VideoCallingPage() {
         setIsAudioCall(!isAudioCall);
     };
 
+
+    const getCallingUser = async () => {
+        const url = `${process.env.REACT_APP_BACKEND_HOST}/api/call/get-caller-receiver-details/${"69328ff18736b56002ef83df"}/${receiverId}`;
+        const res = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        const data = await res.json();
+        if (data?.success) {
+            setCallerDetails(data?.payload);
+        }
+    }
+    useEffect(() => {
+        getCallingUser();
+    }, [callerId, receiverId]);
+
+    const profileImage = `${process.env.REACT_APP_BACKEND_HOST}/${callerDetails?.receiver?.profileImage?.replace("\\", "/")}`;
+
+    console.log("callAccepted__________________", callAccepted);
+
     return (
         <div className={styles.videoCallContainer}>
             {/* Header */}
@@ -61,10 +97,10 @@ function VideoCallingPage() {
                 </button>
                 <div className={styles.callInfo}>
                     <div className={styles.callAvatar}>
-                        {conversation.avatar}
+                        <img className={styles.callAvatar} src={profileImage} alt="profile" />
                     </div>
                     <div>
-                        <div className={styles.callName}>{conversation.name}</div>
+                        <div className={styles.callName}>{callerDetails?.receiver?.fullname}</div>
                         <div className={styles.callStatus}>
                             {conversation.isOnline ? 'Online' : 'Offline'}
                         </div>
@@ -78,9 +114,10 @@ function VideoCallingPage() {
                 <div className={styles.remoteVideo}>
                     <div className={styles.videoPlaceholder}>
                         <div className={styles.avatarLarge}>
-                            {conversation.avatar}
+                            <img className={styles.avatarLarge} src={profileImage} alt="profile" />
                         </div>
-                        <p className={styles.videoPlaceholderText}>{conversation.name}</p>
+                        <p className={styles.videoPlaceholderText}>{callerDetails?.receiver?.fullname}</p>
+                        <p className={styles.videoPlaceholderText}>{conversation.callingUser}</p>
                     </div>
                 </div>
 

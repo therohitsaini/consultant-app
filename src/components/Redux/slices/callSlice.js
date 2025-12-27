@@ -6,7 +6,6 @@ const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
 let localAudioTrack = null;
 let localVideoTrack = null;
 
-/* 🔊 VOICE CALL */
 export const startVoiceCall = createAsyncThunk("call/startVoice",
     async ({ token, channel, uid, appId }) => {
         console.log("startVoiceCall______", token, channel, uid, appId)

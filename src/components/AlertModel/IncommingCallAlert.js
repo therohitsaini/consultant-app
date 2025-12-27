@@ -13,10 +13,25 @@ export default function IncomingCallAlert() {
 
     const { callerId, callType, channelName } = incomingCall;
 
-    const handleAccept = () => {
-        socket.emit("call-accepted", { callerId, receiverId: userId, channelName , callType: incomingCall.callType});
-        console.log("Call accepted", incomingCall);
-        dispatch(setIncomingCall(null));
+    const handleAccept = async () => {
+        const uid = Math.floor(Math.random() * 1000000);
+        const url = `${process.env.REACT_APP_BACKEND_HOST}/api/call/generate-token`;
+        const res = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ channelName, uid }),
+        });
+        const data = await res.json();
+        console.log("data____Reciver_____", data)
+        if (data.token) {
+            socket.emit("call-accepted", { callerId, receiverId: userId, channelName, callType: incomingCall.callType });
+            console.log("Call accepted", incomingCall);
+            dispatch(setIncomingCall(null));
+            window.top.location.href = `https://${"rohit-12345839.myshopify.com"}/apps/consultant-theme/video-calling-page?callerId=${"69328ff18736b56002ef83df"}&receiverId=${userId}&callType=${callType}&token=${data.token}&channelName=${channelName}`;
+
+        }
     };
     const handleReject = () => {
         console.log("Call rejected", incomingCall);
