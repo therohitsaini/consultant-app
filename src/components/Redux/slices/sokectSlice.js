@@ -15,7 +15,8 @@ const socketSlice = createSlice({
             isRunning: false,
         },
         autoChatEnded: null,
-    },
+        incomingCall: null,
+            },
     reducers: {
         connectSocket: (state, action) => {
             if (!socket.connected) {
@@ -43,8 +44,6 @@ const socketSlice = createSlice({
                     : msg
             );
         },
-
-
         setInsufficientBalanceError: (state, action) => {
             state.insufficientBalance = action.payload;
             console.log("state__insufficientBalance", state.insufficientBalance);
@@ -78,7 +77,11 @@ const socketSlice = createSlice({
             state.autoChatEnded = action.payload;
             console.log("state.autoChatEnded", state.autoChatEnded);
         },
-
+        setIncomingCall: (state, action) => {
+            console.log("setIncomingCall", action.payload);
+            state.incomingCall = action.payload;
+            console.log("state.incomingCall", state.incomingCall);
+        },
 
 
         clearMessages: (state) => {
@@ -99,7 +102,8 @@ export const { connectSocket,
     setChatAccepted,
     setChatTimerStarted,
     setChatTimerStopped,
-    setAutoChatEnded
+    setAutoChatEnded,
+    setIncomingCall,
 } =
     socketSlice.actions;
 

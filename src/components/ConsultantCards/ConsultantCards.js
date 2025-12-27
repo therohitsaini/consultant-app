@@ -153,7 +153,6 @@ function ConsultantCards() {
     const startCall = async ({receiverId, type}) => {
         const channelName = `channel-${userId.slice(-6)}-${receiverId.slice(-6)}`;
         const uid = Math.floor(Math.random() * 1000000);
-        console.log("channelName", channelName)
         const url = `${process.env.REACT_APP_BACKEND_HOST}/api/call/generate-token`;
         const res = await fetch(url, {
             method: "POST",
@@ -164,13 +163,16 @@ function ConsultantCards() {
         });
         const data = await res.json();
         console.log("data", data)
+        if(data.token){
+            socket.emit("call-user", {
+                callerId: userId,
+                receiverId: receiverId,
+                channelName,
+                callType: type || "voice",
+            });
+        }
 
-        socket.emit("call-user", {
-            callerId: userId,
-            receiverId: receiverId,
-            channelName,
-            callType: type,
-        });
+
 
         // if (type === "voice") {
         //     await dispatch(

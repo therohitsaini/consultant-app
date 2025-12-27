@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { socket } from "./SokectConfig";
 import { useDispatch } from "react-redux";
-import { setConnected, setActiveUsers, addMessage, setInsufficientBalanceError, markMessagesSeen, setChatAccepted, setChatTimerStarted, setChatTimerStopped, setAutoChatEnded } from "../Redux/slices/sokectSlice";
+import { setConnected, setActiveUsers, addMessage, setInsufficientBalanceError, markMessagesSeen, setChatAccepted, setChatTimerStarted, setChatTimerStopped, setAutoChatEnded, setIncomingCall } from "../Redux/slices/sokectSlice";
 
 export default function SocketProvider({ children }) {
     const dispatch = useDispatch();
@@ -65,7 +65,10 @@ export default function SocketProvider({ children }) {
             console.log("Auto chat ended", data);
             dispatch(setAutoChatEnded(data));
         };
-
+        const imcomminCall = (call) => {
+            console.log("Incoming call", call);
+            dispatch(setIncomingCall(call));
+        }
 
         socket.on("connect", handleConnect);
         socket.on("disconnect", handleDisconnect);
@@ -77,6 +80,7 @@ export default function SocketProvider({ children }) {
         socket.on("chatTimerStarted", handleChatTimerStarted);
         socket.on("chatEnded", handleChatEnded);
         socket.on("autoChatEnded", autoChatEnded);
+        socket.on("incoming-call", imcomminCall);
         // Cleanup function
         return () => {
             console.log("Cleaning up socket listeners");
@@ -90,6 +94,7 @@ export default function SocketProvider({ children }) {
             socket.off("chatTimerStarted", handleChatTimerStarted);
             socket.off("chatEnded", handleChatEnded);
             socket.off("autoChatEnded", autoChatEnded);
+            socket.off("incoming-call", imcomminCall);
         };
     }, [dispatch]);
 

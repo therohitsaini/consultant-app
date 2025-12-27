@@ -39,9 +39,9 @@ export default function FcmTokenWindow() {
                 // ✅ Parent window ko inform karo
                 if (window.opener) {
                     window.opener.postMessage(
-                        { tokenGenerated: true ,},
+                        { tokenGenerated: true, },
                         window.location.origin
-                        
+
                     );
                 }
 
@@ -59,8 +59,11 @@ export default function FcmTokenWindow() {
 
     return (
         <div style={{ padding: 30, textAlign: "center" }}>
-            <div>
-                loading...
+            <div className="page-loader">
+                <div className="loader-container">
+                    <div className="loader-spinner"></div>
+                    <p className="loader-text">Loading </p>
+                </div>
             </div>
         </div>
     );
