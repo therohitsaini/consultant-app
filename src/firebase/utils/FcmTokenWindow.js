@@ -9,11 +9,11 @@ export default function FcmTokenWindow() {
         const run = async () => {
             try {
                 // // 1️⃣ Permission
-                // const permission = await Notification.requestPermission();
-                // if (permission !== "granted") {
-                //     console.log("❌ Notification denied");
-                //     return;
-                // }
+                const permission = await Notification.requestPermission();
+                if (permission !== "granted") {
+                    console.log("❌ Notification denied");
+                    return;
+                }
 
                 // 2️⃣ Token generate
                 const fcmToken = await getToken(messaging, {
