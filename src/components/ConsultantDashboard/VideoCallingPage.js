@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import styles from './VideoCallingPage.module.css';
 import AgoraRTC from 'agora-rtc-sdk-ng';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { endCall, startVoiceCall } from '../Redux/slices/callSlice';
 
 function VideoCallingPage() {
     const navigate = useNavigate();
@@ -12,27 +13,46 @@ function VideoCallingPage() {
     const [isAudioCall, setIsAudioCall] = useState(false);
     const [callingUser, setCallingUser] = useState("calling.....");
     const [callerDetails, setCallerDetails] = useState(null);
-
-    const { callAccepted } = useSelector((state) => state.socket);
+    const [callerId, setCallerId] = useState(null);
+    const dispatch = useDispatch();
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const consultantId = params.get("consultantId");
         const shopId = params.get("shopId");
-
         console.log("consultantId:", consultantId);
         console.log("shopId:", shopId);
     }, []);
+    useEffect(() => {
+        const callerId = localStorage.getItem("client_u_Identity");
+        console.log("callerId:", callerId);
+        setCallerId(callerId);
+    }, []);
     const params = new URLSearchParams(window.location.search);
-    const callerId = params.get("callerId");
     const receiverId = params.get("receiverId");
     const callType = params.get("callType");
     const token = params.get("token");
-    const channelName = params.get("channelName");
-    console.log("callerId:", callerId);
-    console.log("receiverId:", receiverId);
-    console.log("callType:", callType);
+    const channelNameParam = params.get("channelName");
+    const uidParam = params.get("uid");
     console.log("token:", token);
-    console.log("channelName:", channelName);
+    console.log("channelName:", channelNameParam);
+    console.log("uid:", uidParam);
+    console.log("callType:", callType);
+
+    const { inCall, channel, type, muted } = useSelector((state) => state.call);
+    useEffect(() => {
+        dispatch(startVoiceCall({
+            token: token, channel: channelNameParam, uid: uidParam, appId: process.env.REACT_APP_AGORA_APP_ID
+        }));
+    }, [token, channelNameParam, uidParam]);
+
+
+    console.log("inCall:", inCall);
+    console.log("channel:", channel);
+    console.log("type:", type);
+    console.log("muted:", muted);
+
+
+
 
 
     const conversation = location.state?.conversation || {
@@ -45,7 +65,8 @@ function VideoCallingPage() {
 
 
     const handleEndCall = () => {
-        navigate(-1); // Go back to previous page
+        dispatch(endCall());
+        navigate(-1);
     };
 
     const handleMuteToggle = () => {
@@ -62,7 +83,7 @@ function VideoCallingPage() {
 
 
     const getCallingUser = async () => {
-        const url = `${process.env.REACT_APP_BACKEND_HOST}/api/call/get-caller-receiver-details/${"69328ff18736b56002ef83df"}/${receiverId}`;
+        const url = `${process.env.REACT_APP_BACKEND_HOST}/api/call/get-caller-receiver-details/${callerId}/${receiverId}`;
         const res = await fetch(url, {
             method: "GET",
             headers: {
@@ -80,7 +101,7 @@ function VideoCallingPage() {
 
     const profileImage = `${process.env.REACT_APP_BACKEND_HOST}/${callerDetails?.receiver?.profileImage?.replace("\\", "/")}`;
 
-    console.log("callAccepted__________________", callAccepted);
+
 
     return (
         <div className={styles.videoCallContainer}>
@@ -118,6 +139,10 @@ function VideoCallingPage() {
                         </div>
                         <p className={styles.videoPlaceholderText}>{callerDetails?.receiver?.fullname}</p>
                         <p className={styles.videoPlaceholderText}>{conversation.callingUser}</p>
+                        <p className={styles.videoPlaceholderText}>{inCall ? "In Call" : "Not in Call"}</p>
+                        <p className={styles.videoPlaceholderText}>{channel}</p>
+                        <p className={styles.videoPlaceholderText}>{type}</p>
+                        <p className={styles.videoPlaceholderText}>{muted ? "Muted" : "Unmuted"}</p>
                     </div>
                 </div>
 

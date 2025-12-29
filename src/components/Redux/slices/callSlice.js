@@ -6,24 +6,29 @@ const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
 let localAudioTrack = null;
 let localVideoTrack = null;
 
-export const startVoiceCall = createAsyncThunk("call/startVoice",
-    async ({ token, channel, uid, appId }) => {
-        console.log("startVoiceCall______", token, channel, uid, appId)
-        await client.join(appId, channel, token, uid);
+export const startVoiceCall = createAsyncThunk(
+    "call/startVoice",
+    async ({ token, channel, uid }, { rejectWithValue }) => {
+        try {
+            console.log("startVoiceCall______", token, channel, uid, process.env.REACT_APP_AGORA_APP_ID)
+            await client.join(process.env.REACT_APP_AGORA_APP_ID, channel, token, uid);
 
-        localAudioTrack =
-            await AgoraRTC.createMicrophoneAudioTrack();
+            localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+            await client.publish([localAudioTrack]);
 
-        await client.publish([localAudioTrack]);
-
-        return { channel, type: "voice" };
-    }
+            return { channel, type: "voice" };
+        } catch (error) {
+            console.error("START VOICE CALL FAILED", error);
+            return rejectWithValue(error.message);
+        }
+    }   
 );
+
 
 export const startVideoCall = createAsyncThunk(
     "call/startVideo",
-    async ({ token, channel, uid, appId }) => {
-        await client.join(appId, channel, token, uid);
+    async ({ token, channel, uid }) => {
+        await client.join(process.env.REACT_APP_AGORA_APP_ID, channel, token, uid);
 
         [localAudioTrack, localVideoTrack] =
             await AgoraRTC.createMicrophoneAndCameraTracks();

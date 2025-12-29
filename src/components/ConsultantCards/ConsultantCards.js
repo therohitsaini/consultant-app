@@ -9,6 +9,21 @@ import { socket } from '../Sokect-io/SokectConfig';
 import { connectSocket } from '../Redux/slices/sokectSlice';
 import { startVideoCall, startVoiceCall } from '../Redux/slices/callSlice';
 
+
+export const checkMicPermission = async () => {
+    try {
+        const result = await navigator.permissions.query({
+            name: "microphone"
+        });
+
+        return result.state; // granted | denied | prompt
+    } catch {
+        return "prompt";
+    }
+};
+
+
+
 function ConsultantCards() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -121,7 +136,7 @@ function ConsultantCards() {
         );
     };
 
-  
+
 
     useEffect(() => {
         if (!user_id) return console.log("User ID is required");
@@ -151,6 +166,11 @@ function ConsultantCards() {
      */
 
     const startCall = async ({ receiverId, type }) => {
+        const hasMicPermission = await checkMicPermission();
+        if (!hasMicPermission) {
+            alert("Please grant microphone permission to start the call");
+            return;
+        }
         const channelName = `channel-${userId.slice(-6)}-${receiverId.slice(-6)}`;
         const uid = Math.floor(Math.random() * 1000000);
         const url = `${process.env.REACT_APP_BACKEND_HOST}/api/call/generate-token`;
@@ -170,7 +190,10 @@ function ConsultantCards() {
                 channelName,
                 callType: type || "voice",
             });
-            window.top.location.href = `https://${shop}/apps/consultant-theme/video-calling-page?callerId=${userId}&receiverId=${receiverId}&callType=${type}&token=${data.token}&channelName=${channelName}`;
+            // dispatch(startVoiceCall({
+            //     token: data.token, channel: data.channelName, uid: data.uid, appId: data.appId
+            // }));
+            window.top.location.href = `https://${shop}/apps/consultant-theme/video-calling-page?callerId=${userId}&receiverId=${receiverId}&callType=${type}&uid=${uid}&channelName=${channelName}&token=${data.token}`;
         }
 
         // if (type === "voice") {
