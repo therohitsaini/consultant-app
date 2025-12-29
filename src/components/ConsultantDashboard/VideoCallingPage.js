@@ -15,6 +15,11 @@ function VideoCallingPage() {
     const [callerDetails, setCallerDetails] = useState(null);
     const [callerId, setCallerId] = useState(null);
     const dispatch = useDispatch();
+
+    if (navigator.permissions.query({ name: "microphone" }).state === "denied") {
+        console.error("Permission denied");
+    }
+
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const consultantId = params.get("consultantId");
@@ -27,29 +32,36 @@ function VideoCallingPage() {
         console.log("callerId:", callerId);
         setCallerId(callerId);
     }, []);
+
+
     const params = new URLSearchParams(window.location.search);
+    console.log("params:", params);
     const receiverId = params.get("receiverId");
     const callType = params.get("callType");
-    const token = params.get("token");
+    const token = decodeURIComponent(params.get("token"));
     const channelNameParam = params.get("channelName");
+    const callerIdParam = params.get("callerId");
     const uidParam = params.get("uid");
+    console.log("receiverId:", receiverId);
+    console.log("callType:", callType);
     console.log("token:", token);
     console.log("channelName:", channelNameParam);
+    console.log("callerId:", callerIdParam);
     console.log("uid:", uidParam);
-    console.log("callType:", callType);
+
 
     const { inCall, channel, type, muted } = useSelector((state) => state.call);
     useEffect(() => {
+
+        console.log("startVoiceCallButton______", token, channelNameParam, uidParam, process.env.REACT_APP_AGORA_APP_ID)
         dispatch(startVoiceCall({
-            token: token, channel: channelNameParam, uid: uidParam, appId: process.env.REACT_APP_AGORA_APP_ID
+            token: token, channel: channelNameParam, uid: uidParam, appId: "656422a01e774a4ba5b2dc0ac12e5fe5"
         }));
     }, [token, channelNameParam, uidParam]);
 
 
-    console.log("inCall:", inCall);
-    console.log("channel:", channel);
-    console.log("type:", type);
-    console.log("muted:", muted);
+
+
 
 
 
@@ -83,7 +95,7 @@ function VideoCallingPage() {
 
 
     const getCallingUser = async () => {
-        const url = `${process.env.REACT_APP_BACKEND_HOST}/api/call/get-caller-receiver-details/${callerId}/${receiverId}`;
+        const url = `${process.env.REACT_APP_BACKEND_HOST}/api/call/get-caller-receiver-details/${"69328ff18736b56002ef83df"}/${"691eafcff95528ab305eba59"}`;
         const res = await fetch(url, {
             method: "GET",
             headers: {
@@ -91,13 +103,14 @@ function VideoCallingPage() {
             },
         });
         const data = await res.json();
+        console.log("data:", data);
         if (data?.success) {
             setCallerDetails(data?.payload);
         }
     }
     useEffect(() => {
         getCallingUser();
-    }, [callerId, receiverId]);
+    }, [callerIdParam, receiverId]);
 
     const profileImage = `${process.env.REACT_APP_BACKEND_HOST}/${callerDetails?.receiver?.profileImage?.replace("\\", "/")}`;
 
@@ -117,6 +130,7 @@ function VideoCallingPage() {
                     </svg>
                 </button>
                 <div className={styles.callInfo}>
+
                     <div className={styles.callAvatar}>
                         <img className={styles.callAvatar} src={profileImage} alt="profile" />
                     </div>
@@ -144,6 +158,8 @@ function VideoCallingPage() {
                         <p className={styles.videoPlaceholderText}>{type}</p>
                         <p className={styles.videoPlaceholderText}>{muted ? "Muted" : "Unmuted"}</p>
                     </div>
+                    {/* <p onClick={startVoiceCallButton} className={styles.videoPlaceholderText}>startVoiceCallButton:</p> */}
+
                 </div>
 
                 {/* Local Video (You) */}

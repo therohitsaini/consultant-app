@@ -36,11 +36,21 @@ export default function IncomingCallAlert() {
             socket.emit("call-accepted", { callerId, receiverId: userId, channelName, callType: incomingCall.callType });
             console.log("Call accepted", incomingCall);
             dispatch(setIncomingCall(null));
-            // dispatch(startVoiceCall({
-            //     token: data.token, channel: data.channelName, uid: data.uid, appId: data.appId
-            // }));
-            window.top.location.href = `https://${"rohit-12345839.myshopify.com"}/apps/consultant-theme/video-calling-page?callerId=${"69328ff18736b56002ef83df"}&receiverId=${userId}&callType=${callType}&uid=${uid}&channelName=${channelName}&token=${data.token}`;
+            const tokenEncoded = encodeURIComponent(data.token);
+            const callUrl =
+                `https://training-gay-suitable-align.trycloudflare.com/video/calling/page` +
+                `?callerId=${callerId}` +
+                `&receiverId=${userId}` +
+                `&callType=${data.type}` +
+                `&uid=${data.uid}` +
+                `&channelName=${data.channelName}` +
+                `&token=${tokenEncoded}`;
 
+            window.open(
+                callUrl,
+                "callWindow",
+                "width=screen,height=screen,scrollbars=yes,resizable=yes"
+            );
         }
     };
     const handleReject = () => {

@@ -190,10 +190,21 @@ function ConsultantCards() {
                 channelName,
                 callType: type || "voice",
             });
-            // dispatch(startVoiceCall({
-            //     token: data.token, channel: data.channelName, uid: data.uid, appId: data.appId
-            // }));
-            window.top.location.href = `https://${shop}/apps/consultant-theme/video-calling-page?callerId=${userId}&receiverId=${receiverId}&callType=${type}&uid=${uid}&channelName=${channelName}&token=${data.token}`;
+            const tokenEncoded = encodeURIComponent(data.token);
+            const callUrl =
+                `https://training-gay-suitable-align.trycloudflare.com/video/calling/page` +
+                `?callerId=${userId}` +
+                `&receiverId=${receiverId}` +
+                `&callType=${data.type}` +
+                `&uid=${data.uid}` +
+                `&channelName=${data.channelName}` +
+                `&token=${tokenEncoded}`;
+
+            window.open(
+                callUrl,
+                "callWindow",
+                "width=screen,height=screen,scrollbars=yes,resizable=yes"
+            );
         }
 
         // if (type === "voice") {

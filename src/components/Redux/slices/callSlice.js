@@ -8,10 +8,19 @@ let localVideoTrack = null;
 
 export const startVoiceCall = createAsyncThunk(
     "call/startVoice",
-    async ({ token, channel, uid }, { rejectWithValue }) => {
+    async ({ token, channel, uid, appId }, { rejectWithValue }) => {
         try {
-            console.log("startVoiceCall______", token, channel, uid, process.env.REACT_APP_AGORA_APP_ID)
-            await client.join(process.env.REACT_APP_AGORA_APP_ID, channel, token, uid);
+            console.log("startVoiceCall______", token, channel, uid, appId);
+            if (appId) {
+                console.error("Agora App ID is required");
+            }
+
+            if (client.connectionState !== "DISCONNECTED") {
+                console.warn("Agora client already connected");
+                return { channel, type: "voice" };
+            }
+
+            await client.join(appId, channel, token, uid);
 
             localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
             await client.publish([localAudioTrack]);
@@ -21,8 +30,9 @@ export const startVoiceCall = createAsyncThunk(
             console.error("START VOICE CALL FAILED", error);
             return rejectWithValue(error.message);
         }
-    }   
+    }
 );
+
 
 
 export const startVideoCall = createAsyncThunk(
