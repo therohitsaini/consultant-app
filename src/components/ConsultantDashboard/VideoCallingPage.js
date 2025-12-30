@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './VideoCallingPage.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { endCall, startCall, toggleMute, toggleVideo } from '../Redux/slices/callSlice';
+import { initRingtone, playRingtone } from '../ringTone/ringingTune';
 
 function VideoCallingPage() {
     const navigate = useNavigate();
@@ -59,6 +60,8 @@ function VideoCallingPage() {
             }).catch((error) => {
                 console.error(`${callType} call failed:`, error);
             });
+            initRingtone();
+            playRingtone();
         }
     }, [dispatch, token, channelNameParam, uidParam, appIdParam, callType]);
 
@@ -265,8 +268,6 @@ function VideoCallingPage() {
             dispatch(toggleVideo());
         }
     };
-
-
 
 
 

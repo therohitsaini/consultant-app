@@ -8,6 +8,7 @@ import { Socket } from 'socket.io-client';
 import { socket } from '../Sokect-io/SokectConfig';
 import { connectSocket } from '../Redux/slices/sokectSlice';
 import { startVideoCall, startVoiceCall } from '../Redux/slices/callSlice';
+import { initRingtone, playRingtone, stopRingtone } from '../ringTone/ringingTune';
 
 
 export const checkMicPermission = async () => {
@@ -269,6 +270,7 @@ function ConsultantCards() {
                     <div className="hero-badge mb-3">
                         <span className="hero-badge-icon">⭐</span>
                         <span>Trusted by Thousands</span>
+                       
                     </div>
                     <h1 className="hero-title">
                         Find Your Perfect <span className="hero-title-highlight">Consultant</span>

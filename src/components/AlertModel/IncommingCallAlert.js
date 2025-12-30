@@ -5,6 +5,7 @@ import { setIncomingCall } from "../Redux/slices/sokectSlice";
 import { socket } from "../Sokect-io/SokectConfig";
 import { startVoiceCall } from "../Redux/slices/callSlice";
 import { checkMicPermission } from "../ConsultantCards/ConsultantCards";
+import { stopRingtone } from "../ringTone/ringingTune";
 
 export default function IncomingCallAlert() {
     const dispatch = useDispatch();
@@ -55,6 +56,7 @@ export default function IncomingCallAlert() {
     };
     const handleReject = () => {
         console.log("Call rejected", incomingCall);
+        stopRingtone();
         // Emit reject event if needed
         // socket.emit("reject-call", { channelName, callerId });
 
@@ -89,10 +91,10 @@ export default function IncomingCallAlert() {
                 />
                 <div>
                     <p style={{ margin: 0, fontSize: "15px", fontWeight: "600", color: "#222" }}>
-                         {callType} call
+                        {callType} call
                     </p>
                     <p style={{ margin: 0, fontSize: "14px", color: "#555" }}>
-                      {callerName} is calling you
+                        {callerName} is calling you
                     </p>
                 </div>
             </div>

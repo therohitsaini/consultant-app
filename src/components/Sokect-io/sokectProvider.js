@@ -2,25 +2,23 @@
 import { useEffect } from "react";
 import { socket } from "./SokectConfig";
 import { useDispatch } from "react-redux";
-import { setConnected, setActiveUsers, addMessage, setInsufficientBalanceError, markMessagesSeen, setChatAccepted, setChatTimerStarted, setChatTimerStopped, setAutoChatEnded, setIncomingCall, setCallAccepted } from "../Redux/slices/sokectSlice";
+import { setConnected, setActiveUsers, addMessage, setInsufficientBalanceError, markMessagesSeen, setChatAccepted, setChatTimerStarted, setChatTimerStopped, setAutoChatEnded, setIncomingCall, setCallAccepted, setCallEnded } from "../Redux/slices/sokectSlice";
 
 export default function SocketProvider({ children }) {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        // Check if socket is already connected
         if (socket.connected) {
             console.log("Socket already connected");
             dispatch(setConnected(true));
         }
 
-        // Listen for connect event (correct event name for socket.io)
         const handleConnect = () => {
             console.log("Connected to socket");
             dispatch(setConnected(true));
-            // Register with shop ID if needed
             const clientId = localStorage.getItem('client_u_Identity') || "690c374f605cb8b946503ccb";
             socket.emit("register", clientId);
+            console.log("Client ID", clientId);
         };
 
         const handleDisconnect = () => {
@@ -73,6 +71,10 @@ export default function SocketProvider({ children }) {
             console.log("Call accepted", data);
             dispatch(setCallAccepted(data));
         }
+        const callEnded = (data) => {
+            console.log("Call ended", data);
+            dispatch(setCallEnded(data));
+        }
 
         socket.on("connect", handleConnect);
         socket.on("disconnect", handleDisconnect);
@@ -86,7 +88,8 @@ export default function SocketProvider({ children }) {
         socket.on("autoChatEnded", autoChatEnded);
         socket.on("incoming-call", imcomminCall);
         socket.on("call-accepted-started", callAccepted);
-        // Cleanup function
+        socket.on("call-missed", callEnded);
+
         return () => {
             console.log("Cleaning up socket listeners");
             socket.off("connect", handleConnect);
@@ -101,6 +104,7 @@ export default function SocketProvider({ children }) {
             socket.off("autoChatEnded", autoChatEnded);
             socket.off("incoming-call", imcomminCall);
             socket.off("call-accepted-started", callAccepted);
+            socket.off("call-missed", callEnded);
         };
     }, [dispatch]);
 
