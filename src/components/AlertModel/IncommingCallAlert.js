@@ -10,10 +10,9 @@ export default function IncomingCallAlert() {
     const dispatch = useDispatch();
     const userId = localStorage.getItem('client_u_Identity') || localStorage.getItem('consultant_u_Identity');
     const { incomingCall } = useSelector((state) => state.socket);
-    console.log("incomingCall", incomingCall);
     if (!incomingCall) return console.log("No incoming call");
 
-    const { callerId, callType, channelName } = incomingCall;
+    const { callerId, callType, channelName, callerName } = incomingCall;
 
     const handleAccept = async () => {
         const hasMicPermission = await checkMicPermission();
@@ -37,20 +36,21 @@ export default function IncomingCallAlert() {
             console.log("Call accepted", incomingCall);
             dispatch(setIncomingCall(null));
             const tokenEncoded = encodeURIComponent(data.token);
+            const appIdParam = data.appId ? `&appId=${data.appId}` : '';
+            const callType = incomingCall.callType || "voice";
+            const returnUrl = "https://rohit-12345839.myshopify.com/apps/consultant-theme/consultant-dashboard";
             const callUrl =
-                `https://training-gay-suitable-align.trycloudflare.com/video/calling/page` +
+                `https://ever-era-education-obligations.trycloudflare.com/video/calling/page` +
                 `?callerId=${callerId}` +
                 `&receiverId=${userId}` +
-                `&callType=${data.type}` +
-                `&uid=${data.uid}` +
-                `&channelName=${data.channelName}` +
-                `&token=${tokenEncoded}`;
+                `&callType=${callType}` +
+                `&uid=${uid}` +
+                `&channelName=${channelName}` +
+                `&token=${tokenEncoded}` +
+                appIdParam +
+                `&returnUrl=${encodeURIComponent(returnUrl)}`;
 
-            window.open(
-                callUrl,
-                "callWindow",
-                "width=screen,height=screen,scrollbars=yes,resizable=yes"
-            );
+            window.top.location.href = callUrl;
         }
     };
     const handleReject = () => {
@@ -77,7 +77,7 @@ export default function IncomingCallAlert() {
             {/* Header */}
             <div style={{ display: "flex", alignItems: "center", marginBottom: "12px" }}>
                 <img
-                    src="https://via.placeholder.com/60"
+                    src="https://imgs.search.brave.com/8vitWtK7-18taVi4PjQG1jZwM0baiJg4CfpjJVibqtw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9wZnBt/YWtlci5jb20vaW1h/Z2VzL2xhbmRpbmcv/aGVhZHNob3RzL2Js/b2dfMC5qcGc"
                     alt="Caller Avatar"
                     style={{
                         width: "60px",
@@ -88,11 +88,11 @@ export default function IncomingCallAlert() {
                     }}
                 />
                 <div>
-                    <p style={{ margin: 0, fontSize: "18px", fontWeight: "600", color: "#222" }}>
-                        Incoming {callType} Call
+                    <p style={{ margin: 0, fontSize: "15px", fontWeight: "600", color: "#222" }}>
+                         {callType} call
                     </p>
                     <p style={{ margin: 0, fontSize: "14px", color: "#555" }}>
-                        From: {callerId}
+                      {callerName} is calling you
                     </p>
                 </div>
             </div>

@@ -191,20 +191,21 @@ function ConsultantCards() {
                 callType: type || "voice",
             });
             const tokenEncoded = encodeURIComponent(data.token);
+            const appIdParam = data.appId ? `&appId=${data.appId}` : '';
+            const returnUrl = "https://rohit-12345839.myshopify.com/apps/consultant-theme";
+            console.log("returnUrl", returnUrl);
             const callUrl =
-                `https://training-gay-suitable-align.trycloudflare.com/video/calling/page` +
+                `https://ever-era-education-obligations.trycloudflare.com/video/calling/page` +
                 `?callerId=${userId}` +
                 `&receiverId=${receiverId}` +
-                `&callType=${data.type}` +
-                `&uid=${data.uid}` +
-                `&channelName=${data.channelName}` +
-                `&token=${tokenEncoded}`;
-
-            window.open(
-                callUrl,
-                "callWindow",
-                "width=screen,height=screen,scrollbars=yes,resizable=yes"
-            );
+                `&callType=${type || "voice"}` +
+                `&uid=${uid}` +
+                `&channelName=${channelName}` +
+                `&token=${tokenEncoded}` +
+                appIdParam +
+                `&returnUrl=${encodeURIComponent(returnUrl)}`;
+            console.log("callUrl", callUrl);
+            window.top.location.href = callUrl;
         }
 
         // if (type === "voice") {
@@ -468,7 +469,10 @@ function ConsultantCards() {
                                                     </button>
                                                     <button
                                                         className="calling-option-btn video-btn"
-
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            startCall({ receiverId: consultant.id, type: 'video' })
+                                                        }}
                                                     >
                                                         <div className="calling-option-content">
                                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
