@@ -16,7 +16,7 @@ export default function SocketProvider({ children }) {
         const handleConnect = () => {
             console.log("Connected to socket");
             dispatch(setConnected(true));
-            const clientId = localStorage.getItem('client_u_Identity') || "690c374f605cb8b946503ccb";
+            const clientId = localStorage.getItem('client_u_Identity') || "69328ff18736b56002ef83df";
             socket.emit("register", clientId);
             console.log("Client ID", clientId);
         };

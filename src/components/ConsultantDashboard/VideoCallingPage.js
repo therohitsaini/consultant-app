@@ -4,21 +4,17 @@ import styles from './VideoCallingPage.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { endCall, startCall, toggleMute, toggleVideo } from '../Redux/slices/callSlice';
 import { initRingtone, playRingtone } from '../ringTone/ringingTune';
+import { socket } from '../Sokect-io/SokectConfig';
 
 function VideoCallingPage() {
     const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useDispatch();
-
-    // Refs for video elements
     const localVideoRef = useRef(null);
     const remoteVideoRef = useRef(null);
-
-    // State
     const [callerDetails, setCallerDetails] = useState(null);
     const [callerId, setCallerId] = useState(null);
-
-    // Get URL parameters
+    const { callEnded } = useSelector((state) => state.socket);
     const params = new URLSearchParams(window.location.search);
     const receiverId = params.get("receiverId");
     const callType = params.get("callType") || "voice";
@@ -27,13 +23,10 @@ function VideoCallingPage() {
     const callerIdParam = params.get("callerId");
     const uidParam = params.get("uid");
     const appIdParam = params.get("appId");
+    const callStartedRef = useRef(false);
 
 
-
-    // Redux state
     const { inCall, channel, type, muted, videoEnabled } = useSelector((state) => state.call);
-
-    // Determine if this is a video call from URL or Redux state
     const isVideoCall = type === "video" || callType === "video";
 
     // Initialize caller ID
@@ -45,10 +38,11 @@ function VideoCallingPage() {
 
     // Start call when component mounts
     useEffect(() => {
+        if (callStartedRef.current) return;
         if (token && channelNameParam && uidParam) {
             const appId = appIdParam || "656422a01e774a4ba5b2dc0ac12e5fe5";
             console.log(`Starting ${callType} call:`, { token, channel: channelNameParam, uid: uidParam, appId });
-
+            callStartedRef.current = true;
             dispatch(startCall({
                 token: token,
                 channel: channelNameParam,
@@ -268,6 +262,11 @@ function VideoCallingPage() {
             dispatch(toggleVideo());
         }
     };
+    useEffect(() => {
+        if (callEnded) {
+            handleEndCall();
+        }
+    }, [callEnded]);
 
 
 

@@ -193,10 +193,10 @@ function ConsultantCards() {
             });
             const tokenEncoded = encodeURIComponent(data.token);
             const appIdParam = data.appId ? `&appId=${data.appId}` : '';
-            const returnUrl = "https://rohit-12345839.myshopify.com/apps/consultant-theme";
+            const returnUrl = `https://${shop}/apps/consultant-theme`;
             console.log("returnUrl", returnUrl);
             const callUrl =
-                `https://ever-era-education-obligations.trycloudflare.com/video/calling/page` +
+                `https://refer-tax-concerts-vocal.trycloudflare.com/video/calling/page` +
                 `?callerId=${userId}` +
                 `&receiverId=${receiverId}` +
                 `&callType=${type || "voice"}` +
@@ -249,14 +249,14 @@ function ConsultantCards() {
         const targetShop = "rohit-12345839.myshopify.com";
         const hostQuery = "";
         console.log("targetShop", targetShop, "hostQuery", hostQuery)
-        window.top.location.href = `https://${targetShop}/apps/consultant-theme/view-profile?consultantId=${consultant_id}&shopId=${shop_id}${hostQuery}`;
+        window.top.location.href = `https://${shop}/apps/consultant-theme/view-profile?consultantId=${consultant_id}&shopId=${shop_id}${hostQuery}`;
     }
 
     const viewChatsPage = (consultantView) => {
         console.log("consultantView", consultantView);
         const targetShop = "rohit-12345839.myshopify.com";
         const hostQuery = "";
-        window.top.location.href = `https://${targetShop}/apps/consultant-theme/chats-c?consultantId=${consultantView}${hostQuery}`;
+        window.top.location.href = `https://${shop}/apps/consultant-theme/chats-c?consultantId=${consultantView}${hostQuery}`;
         // const hostQuery = "";
         // window.top.location.href = `https://${targetShop}/apps/consultant-theme/view-profile?consultantId=${consultantView}${hostQuery}`;
     }
@@ -270,7 +270,7 @@ function ConsultantCards() {
                     <div className="hero-badge mb-3">
                         <span className="hero-badge-icon">⭐</span>
                         <span>Trusted by Thousands</span>
-                       
+
                     </div>
                     <h1 className="hero-title">
                         Find Your Perfect <span className="hero-title-highlight">Consultant</span>

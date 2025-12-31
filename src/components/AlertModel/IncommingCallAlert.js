@@ -1,5 +1,5 @@
 // components/IncomingCallAlert.jsx
-import React from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setIncomingCall } from "../Redux/slices/sokectSlice";
 import { socket } from "../Sokect-io/SokectConfig";
@@ -10,7 +10,11 @@ import { stopRingtone } from "../ringTone/ringingTune";
 export default function IncomingCallAlert() {
     const dispatch = useDispatch();
     const userId = localStorage.getItem('client_u_Identity') || localStorage.getItem('consultant_u_Identity');
-    const { incomingCall } = useSelector((state) => state.socket);
+    const { incomingCall, callEnded } = useSelector((state) => state.socket);
+    useEffect(() => {
+        if (!callEnded) return;
+        handleReject();
+    }, [callEnded]);
     if (!incomingCall) return console.log("No incoming call");
 
     const { callerId, callType, channelName, callerName } = incomingCall;
@@ -54,14 +58,14 @@ export default function IncomingCallAlert() {
             window.top.location.href = callUrl;
         }
     };
+
     const handleReject = () => {
         console.log("Call rejected", incomingCall);
         stopRingtone();
-        // Emit reject event if needed
-        // socket.emit("reject-call", { channelName, callerId });
-
         dispatch(setIncomingCall(null));
     };
+
+
 
     return (
         <div style={{
