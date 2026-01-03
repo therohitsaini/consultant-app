@@ -194,9 +194,10 @@ function ConsultantCards() {
             const tokenEncoded = encodeURIComponent(data.token);
             const appIdParam = data.appId ? `&appId=${data.appId}` : '';
             const returnUrl = `https://${shop}/apps/consultant-theme`;
-            console.log("returnUrl", returnUrl);
+            const returnUrlEncoded = process.env.REACT_FRONTEND_URL
+            console.log("returnUrlEncoded", returnUrlEncoded);
             const callUrl =
-                `https://refer-tax-concerts-vocal.trycloudflare.com/video/calling/page` +
+                ` https://disclosure-nuke-showtimes-bloom.trycloudflare.com/video/calling/page` +
                 `?callerId=${userId}` +
                 `&receiverId=${receiverId}` +
                 `&callType=${type || "voice"}` +
