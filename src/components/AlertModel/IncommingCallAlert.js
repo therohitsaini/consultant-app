@@ -1,7 +1,7 @@
 // components/IncomingCallAlert.jsx
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { setIncomingCall } from "../Redux/slices/sokectSlice";
+import { setCallEnded, setIncomingCall } from "../Redux/slices/sokectSlice";
 import { socket } from "../Sokect-io/SokectConfig";
 import { startVoiceCall } from "../Redux/slices/callSlice";
 import { checkMicPermission } from "../ConsultantCards/ConsultantCards";
@@ -62,7 +62,9 @@ export default function IncomingCallAlert() {
     const handleReject = () => {
         console.log("Call rejected", incomingCall);
         stopRingtone();
+        socket.emit("reject-call", { callerId, receiverId: userId, channelName, callType: incomingCall.callType });
         dispatch(setIncomingCall(null));
+
     };
 
 

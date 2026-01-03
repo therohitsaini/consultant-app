@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { socket } from "./SokectConfig";
 import { useDispatch } from "react-redux";
-import { setConnected, setActiveUsers, addMessage, setInsufficientBalanceError, markMessagesSeen, setChatAccepted, setChatTimerStarted, setChatTimerStopped, setAutoChatEnded, setIncomingCall, setCallAccepted, setCallEnded } from "../Redux/slices/sokectSlice";
+import { setConnected, setActiveUsers, addMessage, setInsufficientBalanceError, markMessagesSeen, setChatAccepted, setChatTimerStarted, setChatTimerStopped, setAutoChatEnded, setIncomingCall, setCallAccepted, setCallEnded, setCallRejected } from "../Redux/slices/sokectSlice";
 
 export default function SocketProvider({ children }) {
     const dispatch = useDispatch();
@@ -75,6 +75,10 @@ export default function SocketProvider({ children }) {
             console.log("Call ended", data);
             dispatch(setCallEnded(data));
         }
+        const callRejected = (data) => {
+            console.log("Call rejected", data);
+            dispatch(setCallRejected(data));
+        }
 
         socket.on("connect", handleConnect);
         socket.on("disconnect", handleDisconnect);
@@ -89,6 +93,7 @@ export default function SocketProvider({ children }) {
         socket.on("incoming-call", imcomminCall);
         socket.on("call-accepted-started", callAccepted);
         socket.on("call-missed", callEnded);
+        socket.on("call-ended-rejected", callRejected);
 
         return () => {
             console.log("Cleaning up socket listeners");
@@ -105,6 +110,7 @@ export default function SocketProvider({ children }) {
             socket.off("incoming-call", imcomminCall);
             socket.off("call-accepted-started", callAccepted);
             socket.off("call-missed", callEnded);
+            socket.off("call-ended-rejected", callRejected);
         };
     }, [dispatch]);
 

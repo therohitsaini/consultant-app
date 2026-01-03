@@ -24,9 +24,15 @@ function VideoCallingPage() {
     const uidParam = params.get("uid");
     const appIdParam = params.get("appId");
     const callStartedRef = useRef(false);
-
     const { inCall, channel, type, muted, videoEnabled } = useSelector((state) => state.call);
+
     const isVideoCall = type === "video" || callType === "video";
+    const { callRejected } = useSelector((state) => state.socket);
+    useEffect(() => {
+        if (callRejected) {
+            handleEndCall();
+        }
+    }, [callRejected]);
 
     // Initialize caller ID
     useEffect(() => {
@@ -332,12 +338,22 @@ function VideoCallingPage() {
                             <p className={styles.videoPlaceholderText}>
                                 {callerDetails?.receiver?.fullname || "Calling..."}
                             </p>
-                            <p className={styles.videoPlaceholderText}>
-                                {inCall ? "In Call" : "Connecting..."}
-                            </p>
-                            <p className={styles.videoPlaceholderText}>
-                                {type === "voice" ? "Voice Call" : "Video Call"}
-                            </p>
+                            {
+                                callRejected ?
+                                    <p className={styles.videoPlaceholderText} style={{ color: 'red' }}>
+                                        Call Rejected
+                                    </p>
+                                    :
+                                    <>
+                                        <p className={styles.videoPlaceholderText}>
+                                            {inCall ? "In Call" : "Connecting..."}
+                                        </p>
+                                        <p className={styles.videoPlaceholderText}>
+                                            {type === "voice" ? "Voice Call" : "Video Call"}
+                                        </p>
+                                    </>
+                            }
+
                         </div>
                     )}
                 </div>

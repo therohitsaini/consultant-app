@@ -18,6 +18,7 @@ const socketSlice = createSlice({
         incomingCall: null,
         callAccepted: null,
         callEnded: null,
+        callRejected: null,
     },
     reducers: {
         connectSocket: (state, action) => {
@@ -94,7 +95,12 @@ const socketSlice = createSlice({
             state.callEnded = action.payload;
             console.log("state.callEnded", state.callEnded);
         },
-        
+        setCallRejected: (state, action) => {
+            console.log("setCallRejected", action.payload);
+            state.callRejected = action.payload;
+            console.log("state.callRejected", state.callRejected);
+        },
+
 
         clearMessages: (state) => {
             state.messages = [];
@@ -118,6 +124,7 @@ export const { connectSocket,
     setIncomingCall,
     setCallAccepted,
     setCallEnded,
+    setCallRejected,
 } =
     socketSlice.actions;
 
