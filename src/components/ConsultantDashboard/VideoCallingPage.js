@@ -25,7 +25,6 @@ function VideoCallingPage() {
     const appIdParam = params.get("appId");
     const callStartedRef = useRef(false);
 
-
     const { inCall, channel, type, muted, videoEnabled } = useSelector((state) => state.call);
     const isVideoCall = type === "video" || callType === "video";
 
@@ -268,6 +267,7 @@ function VideoCallingPage() {
         }
     }, [callEnded]);
 
+    console.log("callEnded", callEnded);
 
 
     return (

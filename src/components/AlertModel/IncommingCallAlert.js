@@ -45,7 +45,7 @@ export default function IncomingCallAlert() {
             const callType = incomingCall.callType || "voice";
             const returnUrl = "https://rohit-12345839.myshopify.com/apps/consultant-theme/consultant-dashboard";
             const callUrl =
-                `https://ever-era-education-obligations.trycloudflare.com/video/calling/page` +
+                `https://projectable-eely-minerva.ngrok-free.dev/video/calling/page` +
                 `?callerId=${callerId}` +
                 `&receiverId=${userId}` +
                 `&callType=${callType}` +

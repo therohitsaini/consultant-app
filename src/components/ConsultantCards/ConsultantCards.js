@@ -37,6 +37,13 @@ function ConsultantCards() {
     const user_id = params.get('customerId');
     const shop_id = params.get('shopid');
     const [initialLoading, setInitialLoading] = useState(true);
+    const { insufficientBalance } = useSelector((state) => state.socket);
+    // useEffect(() => {
+    //     if (insufficientBalance) {
+    //         alert("You have insufficient balance to start the call");
+    //         return;
+    //     }
+    // }, [insufficientBalance]);
 
 
     useEffect(() => {
@@ -139,28 +146,28 @@ function ConsultantCards() {
 
 
 
-    useEffect(() => {
-        if (!user_id) return console.log("User ID is required");
-        socket.on("connect", () => {
-            console.log("Connected to socket", socket.id);
-            socket.emit("register", user_id);
-            console.log("User ID registered", user_id);
-        });
+    // useEffect(() => {
+    //     if (!user_id) return console.log("User ID is required");
+    //     socket.on("connect", () => {
+    //         console.log("Connected to socket", socket.id);
+    //         socket.emit("register", user_id);
+    //         console.log("User ID registered", user_id);
+    //     });
 
 
-        socket.on("disconnect", () => {
-            console.log("Disconnected from socket", user_id);
-        });
+    //     socket.on("disconnect", () => {
+    //         console.log("Disconnected from socket", user_id);
+    //     });
 
-        socket.on("error", (error) => {
-            console.log("Socket error", error);
-        });
+    //     socket.on("error", (error) => {
+    //         console.log("Socket error", error);
+    //     });
 
-        socket.on("message", (message) => {
-            console.log("Socket message", message);
-        });
+    //     socket.on("message", (message) => {
+    //         console.log("Socket message", message);
+    //     });
 
-    }, [user_id]);
+    // }, [user_id]);
 
     /**
      * Start Voice Call and Video Call
@@ -197,7 +204,7 @@ function ConsultantCards() {
             const returnUrlEncoded = process.env.REACT_FRONTEND_URL
             console.log("returnUrlEncoded", returnUrlEncoded);
             const callUrl =
-                ` https://disclosure-nuke-showtimes-bloom.trycloudflare.com/video/calling/page` +
+                `https://projectable-eely-minerva.ngrok-free.dev/video/calling/page` +
                 `?callerId=${userId}` +
                 `&receiverId=${receiverId}` +
                 `&callType=${type || "voice"}` +
