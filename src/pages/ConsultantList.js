@@ -26,13 +26,18 @@ function ConsultantList() {
     const [active, setActive] = useState(false);
     const [toastContent, setToastContent] = useState('');
     const [isRefreshed, setIsRefreshed] = useState(false);
+    const [adminIdLocal, setAdminIdLocal] = useState(null);
     const dispatch = useDispatch();
     const { consultants, loading: consultantLoading } = useSelector((state) => state.consultants);
-
+    useEffect(() => {
+        const id = localStorage.getItem('doamin_V_id');
+        setAdminIdLocal(id);
+    }, []);
+    console.log("adminIdLocal", adminIdLocal);
 
     useEffect(() => {
-        dispatch(fetchConsultants());
-    }, [dispatch, isRefreshed]);
+        dispatch(fetchConsultants(adminIdLocal));
+    }, [dispatch, isRefreshed, adminIdLocal]);
 
     const consultantsData = consultants?.findConsultant || []
     const filteredConsultants = useMemo(() => {
@@ -119,7 +124,7 @@ function ConsultantList() {
             console.log("___", response.status)
             if (response.status === 200) {
                 console.log("active is on ")
-                dispatch(fetchConsultants());
+                dispatch(fetchConsultants(adminIdLocal));
                 setIsRefreshed((prev) => !prev);
             }
         } catch (err) {

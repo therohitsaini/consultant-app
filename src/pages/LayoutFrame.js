@@ -17,7 +17,7 @@ import {
     SettingsIcon,
 } from "@shopify/polaris-icons";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import Footer from "./Footer";
 
@@ -30,7 +30,19 @@ export default function LayoutFrame() {
     const [modalActive, setModalActive] = useState(false);
     const [supportSubject, setSupportSubject] = useState("");
     const [supportMessage, setSupportMessage] = useState("");
-
+    const [adminIdLocal, setAdminIdLocal] = useState(null);
+    const params = new URLSearchParams(window.location.search);
+    const host = params.get("host");
+    const adminId = params.get("adminId");
+    console.log("adminId", adminId);
+    useEffect(() => {
+        if (adminId) {
+         const id =   localStorage.setItem('doamin_V_id', adminId);
+         setAdminIdLocal(id);
+         console.log("id", id);
+        }
+    }, [adminId]);
+    console.log("adminIdLocal", adminIdLocal);
     const toggleMobileNav = useCallback(
         () => setMobileNavActive((v) => !v),
         []
@@ -84,7 +96,7 @@ export default function LayoutFrame() {
                             },
                         ],
                     },
-                      
+
                     {
                         label: "FAQ",
                         icon: QuestionCircleIcon,
@@ -112,7 +124,7 @@ export default function LayoutFrame() {
             onNavigationDismiss={toggleMobileNav}
         >
             {/* 🔥 PAGE CONTENT */}
-            <Outlet />
+            <Outlet adminIdLocal={adminIdLocal} />
             <Footer />
 
             {toastActive && (

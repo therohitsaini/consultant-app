@@ -20,8 +20,7 @@ function AddConsultant() {
     const [updateIsTrue, setUpdateIsTrue] = useState(false);
     const fileInputRef = useRef(null);
 
-
-
+    console.log("adminIdLocal__________ADD CONSULTANT", isSubmitting);
     // Single state object for all form fields
     const [formData, setFormData] = useState({
         fullName: '',
@@ -44,16 +43,27 @@ function AddConsultant() {
         pincode: '',
         dateOfBirth: '',
         pancardNumber: '',
+        chatPerMinute: '',
+        videoPerMinute: '',
+        voicePerMinute: '',
     });
     // Language tags
     const [textFieldValue, setTextFieldValue] = useState('');
     const [showDropdown, setShowDropdown] = useState(false);
-    console.log("formData,", formData)
     const [searchParams] = useSearchParams();
+    const [adminIdLocal, setAdminIdLocal] = useState(null);
     const consultantId = searchParams.get('id');
+    // const [adminIdLocal, setAdminIdLocal] = useState(null);
     const params = new URLSearchParams(window.location.search);
-    const adminId = params.get('adminId');
+    const adminId = params.get('adminId')
     console.log("adminId", adminId);
+
+    useEffect(() => {
+        const id = localStorage.getItem('doamin_V_id');
+        setAdminIdLocal(id);
+        console.log("adminIdLocal", adminIdLocal);
+    }, []);
+    console.log("adminIdLocal", localStorage.getItem('doamin_V_id'));
 
     useEffect(() => {
         if (consultantId) {
@@ -212,7 +222,7 @@ function AddConsultant() {
         }
 
         try {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/add-consultant/${"690c374f605cb8b946503ccb"}`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/add-consultant/${adminIdLocal}`, {
                 method: 'POST',
                 body: form,
             });
@@ -300,6 +310,9 @@ function AddConsultant() {
                 pincode: consultantDetails.pincode || '',
                 dateOfBirth: formattedDateOfBirth,
                 pancardNumber: consultantDetails.pan_cardNumber || consultantDetails.pancardNumber || '',
+                chatPerMinute: consultantDetails.chatPerMinute || '',
+                videoPerMinute: consultantDetails.videoPerMinute || '',
+                voicePerMinute: consultantDetails.voicePerMinute || '',
             });
 
             // Set profile image preview if available
@@ -499,15 +512,51 @@ function AddConsultant() {
                                 />
 
                                 {/* Charging per minute */}
-                                <TextField
+                                {/* <TextField
                                     label="Charging par minute"
                                     value={formData.chargingPerMinute}
                                     onChange={handleFieldChange('chargingPerMinute')}
                                     autoComplete="off"
-                                />
+                                /> */}
 
                             </FormLayout.Group>
 
+                        </FormLayout>
+                    </LegacyCard>
+                </Layout.Section>
+
+                <Layout.Section>
+                    <LegacyCard title="Add your consultant charges" sectioned>
+                        <FormLayout>
+                            <FormLayout.Group>
+                                {/* Display Name */}
+                                <TextField
+                                    type="number"
+                                    label="Chat per minute"
+                                    value={formData.chatPerMinute}
+                                    onChange={handleFieldChange('chatPerMinute')}
+                                    autoComplete="off"
+                                />
+                                {/* Video per minute */}
+
+                                <TextField
+                                    type="number"
+                                    label="Video per minute"
+                                    value={formData.videoPerMinute}
+                                    onChange={handleFieldChange('videoPerMinute')}
+                                    autoComplete="off"
+                                />
+                                {/* Voice per minute */}
+                                <TextField
+                                    type="number"
+                                    label="Voice per minute"
+                                    value={formData.voicePerMinute}
+                                    onChange={handleFieldChange('voicePerMinute')}
+                                    autoComplete="off"
+                                />
+                                {/* Audio per minute */}
+
+                            </FormLayout.Group>
                         </FormLayout>
                     </LegacyCard>
                 </Layout.Section>
@@ -626,14 +675,29 @@ function AddConsultant() {
                             </FormLayout.Group>
                         </FormLayout>
                         <div style={{ marginTop: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                            <Button
-                                primary
-                                onClick={submitConsultantData}
-                                loading={isSubmitting}
-                                disabled={isSubmitting}
-                            >
-                                {isSubmitting ? 'Submitting...' : 'Submit'}
-                            </Button>
+                          
+                            {
+                                updateIsTrue ?
+                                    <Button
+                                        primary
+                                        onClick={submitConsultantData}
+                                        loading={isSubmitting}
+                                        disabled={isSubmitting}
+                                    >
+                                        {isSubmitting ? 'Updating...' : 'Update'}
+                                    </Button>
+                                    :
+                                    <Button
+                                        primary
+                                        onClick={submitConsultantData}
+                                        loading={isSubmitting}
+                                        disabled={isSubmitting}
+                                    >
+                                        {isSubmitting ? 'Submitting...' : 'Submit'}
+                                    </Button>
+
+                            }
+
                         </div>
                         {submitError && (
                             <div style={{ marginTop: '16px' }}>

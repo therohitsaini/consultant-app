@@ -64,6 +64,7 @@ function AnimatedCount({ value }) {
 function Dashboard() {
     const [isBannerVisible, setIsBannerVisible] = useState(true);
     const [adminDetails, setAdminDetails] = useState(null);
+    const [adminIdLocal, setAdminIdLocal] = useState(null);
     const app = useAppBridge();
     const params = new URLSearchParams(window.location.search);
     const host = params.get("host");
@@ -71,10 +72,17 @@ function Dashboard() {
     console.log("adminId", adminId);
 
     useEffect(() => {
-        localStorage.setItem('doamin_V_id', adminId);
+        if (adminId) {
+            localStorage.setItem('doamin_V_id', adminId);
+
+        }
+    }, [adminId]);
+
+    useEffect(() => {
+        const id = localStorage.getItem('doamin_V_id');
+        setAdminIdLocal(id);
     }, []);
-
-
+    console.log("adminIdLocal", adminIdLocal);
     // Duplicate list for infinite loop
     const loopedApps = [...apps, ...apps];
     const dispatch = useDispatch();
@@ -86,8 +94,8 @@ function Dashboard() {
     const consultantCount = consultants?.findConsultant?.length || 0;
 
     useEffect(() => {
-        dispatch(fetchConsultants());
-    }, [dispatch]);
+        dispatch(fetchConsultants(adminIdLocal));
+    }, [dispatch, adminIdLocal]);
 
     useEffect(() => {
         dispatch(fetchUsers());
@@ -95,6 +103,7 @@ function Dashboard() {
 
     useEffect(() => {
         const getAdminDetails = async () => {
+            const adminId =  localStorage.getItem('doamin_V_id');
             const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/admin/${adminId}`);
             console.log("response", response);
             if (response.status === 200) {
