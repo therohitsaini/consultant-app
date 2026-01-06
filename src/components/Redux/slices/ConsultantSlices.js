@@ -21,7 +21,7 @@ export const fetchConsultants = createAsyncThunk(
                 },
             }
         );
-
+        console.log("response_________________", response.data)
         return response.data;
     }
 );
@@ -42,7 +42,7 @@ export const fetchConsultantById = createAsyncThunk("consultants/fetchById", asy
  */
 export const fetchChatHistory = createAsyncThunk("consultants/fetchChatHistory", async ({ shopId, userId, consultantId }) => {
     const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/chat/get/chat-history/${shopId}/${userId}/${consultantId}`);
- 
+
     return response.data;
 });
 
