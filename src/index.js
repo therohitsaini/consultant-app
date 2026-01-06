@@ -17,19 +17,7 @@ if ("serviceWorker" in navigator) {
     .catch((err) => console.error("SW registration failed:", err));
 }
 
-// index.js (React entry)
-const params = new URLSearchParams(window.location.search);
-const shop = params.get("shop");
-const host = params.get("host");
-const embedded = params.get("embedded");
 
-if (!shop || !host || embedded !== "1") {
-  document.body.innerHTML = `
-    <h2>Unauthorized access</h2>
-    <p>This app must be opened from Shopify Admin.</p>
-  `;
-  throw new Error("Invalid Shopify context");
-}
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

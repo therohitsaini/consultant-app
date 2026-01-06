@@ -21,6 +21,7 @@ import AdminSettings from "./pages/AdminSettings";
 import VaocherSettings from "./pages/VaocherSettings";
 import FcmTokenWindow from "./firebase/utils/FcmTokenWindow";
 import IncomingCallAlert from "./components/AlertModel/IncommingCallAlert";
+import AdminProtectRoute from "./components/ProtectRoute/AdminProtectRoute";
 
 function IframeHeightSync() {
   const location = useLocation();
@@ -78,29 +79,29 @@ export default function App() {
         <GlobalMessageNotification />
         <IncomingCallAlert />
         <Routes>
-          <Route element={<LayoutFrame />}>
-              <Route index element={<Dashboard />} />
-              <Route path="dashboard" element={<Dashboard />} />
-              <Route path="consultant-list" element={<ConsultantList />} />
-              <Route path="add-consultant" element={<AddConsultant />} />
-              <Route path="pricing" element={<Pricing />} />
-              <Route path="admin-settings" element={<AdminSettings />} />
-              <Route path="admin-settings/voucher" element={<VaocherSettings />} />
-              <Route path="faq" element={<Faq />} />
+          <Route element={<AdminProtectRoute><LayoutFrame /></AdminProtectRoute>}>
+            <Route index element={<Dashboard />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="consultant-list" element={<ConsultantList />} />
+            <Route path="add-consultant" element={<AddConsultant />} />
+            <Route path="pricing" element={<Pricing />} />
+            <Route path="admin-settings" element={<AdminSettings />} />
+            <Route path="admin-settings/voucher" element={<VaocherSettings />} />
+            <Route path="faq" element={<Faq />} />
           </Route>
-              <Route path="/consultant-cards" element={<ConsultantCards />} />
-              <Route path="/view-profile" element={<ViewProfile />} />
-              <Route path="/consultant-dashboard/*" element={<TabNavigation />} />
-              <Route path="/users-page/*" element={<TabNavigation />} />
-              <Route path="/consulant-chats/*" element={<TabNavigation />} />
-              <Route path="/video/calling/page" element={<VideoCallingPage />} />
-              <Route path="/chats" element={<UserChat />} />
-              <Route path="/login" element={<LoginForm />} />
-              <Route path="/fcm-token" element={<FcmTokenWindow />} />
-              <Route path="/profile" element={<ProfileSection />}>
-              <Route index element={<Voucher />} />
-              <Route path="voucher" element={<Voucher />} />
-              <Route path="history" element={<History />} />
+          <Route path="/consultant-cards" element={<ConsultantCards />} />
+          <Route path="/view-profile" element={<ViewProfile />} />
+          <Route path="/consultant-dashboard/*" element={<TabNavigation />} />
+          <Route path="/users-page/*" element={<TabNavigation />} />
+          <Route path="/consulant-chats/*" element={<TabNavigation />} />
+          <Route path="/video/calling/page" element={<VideoCallingPage />} />
+          <Route path="/chats" element={<UserChat />} />
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/fcm-token" element={<FcmTokenWindow />} />
+          <Route path="/profile" element={<ProfileSection />}>
+            <Route index element={<Voucher />} />
+            <Route path="voucher" element={<Voucher />} />
+            <Route path="history" element={<History />} />
           </Route>
         </Routes>
       </BrowserRouter>
