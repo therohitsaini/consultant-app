@@ -31,6 +31,7 @@ function ConsultantCards() {
     const [userId, setUserId] = useState(null);
     const [shopId, setShopId] = useState(null);
     const { consultants, loading } = useSelector((state) => state.consultants);
+    console.log("consultants_________________USESELECTOR", consultants)
     const params = new URLSearchParams(window.location.search);
     const shop = params.get('shop');
     console.log("shop", shop);
