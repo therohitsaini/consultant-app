@@ -71,7 +71,7 @@ function ConsultantCards() {
     useEffect(() => {
         dispatch(connectSocket(user_id))
     }, [user_id])
-
+    console.log("consultants_________________", consultants)
     const consultantsList = consultants?.findConsultant || consultants || [];
 
     const mappedConsultants = consultantsList?.map((consultant) => {
