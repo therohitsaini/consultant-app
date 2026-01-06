@@ -72,9 +72,15 @@ function ConsultantCards() {
         dispatch(connectSocket(user_id))
     }, [user_id])
     console.log("consultants_________________", consultants)
-    const consultantsList = consultants?.findConsultant || consultants || [];
+    // const consultantsList = consultants?.findConsultant || consultants || [];
+    const consultantsList = Array.isArray(consultants?.findConsultant)
+        ? consultants.findConsultant
+        : Array.isArray(consultants)
+            ? consultants
+            : [];
 
-    const mappedConsultants =consultantsList && consultantsList?.map((consultant) => {
+
+    const mappedConsultants = consultantsList && consultantsList.map((consultant) => {
         let languages = [];
         try {
             if (typeof consultant.language === 'string') {
