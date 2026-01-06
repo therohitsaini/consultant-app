@@ -75,9 +75,8 @@ function ConsultantCards() {
     // const consultantsList = consultants?.findConsultant || consultants || [];
     const consultantsList = Array.isArray(consultants?.findConsultant)
         ? consultants.findConsultant
-        : Array.isArray(consultants)
-            ? consultants
-            : [];
+        : [];
+    console.log("consultantsList_________________", consultantsList)
 
 
     const mappedConsultants = consultantsList && consultantsList.map((consultant) => {
