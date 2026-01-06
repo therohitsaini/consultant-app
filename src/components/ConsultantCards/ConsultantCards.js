@@ -74,7 +74,7 @@ function ConsultantCards() {
     console.log("consultants_________________", consultants)
     const consultantsList = consultants?.findConsultant || consultants || [];
 
-    const mappedConsultants = consultantsList?.map((consultant) => {
+    const mappedConsultants =consultantsList && consultantsList?.map((consultant) => {
         let languages = [];
         try {
             if (typeof consultant.language === 'string') {
