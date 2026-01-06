@@ -22,6 +22,7 @@ import VaocherSettings from "./pages/VaocherSettings";
 import FcmTokenWindow from "./firebase/utils/FcmTokenWindow";
 import IncomingCallAlert from "./components/AlertModel/IncommingCallAlert";
 import AdminProtectRoute from "./components/ProtectRoute/AdminProtectRoute";
+import { NavigationMenu, NavMenu } from "@shopify/app-bridge-react";
 
 function IframeHeightSync() {
   const location = useLocation();
@@ -74,10 +75,20 @@ export default function App() {
 
   return (
     <Fragment>
+      <NavMenu
+        navigationLinks={[
+          { label: "Dashboard", destination: "/" },
+          { label: "Consultants", destination: "/consultant-list" },
+          { label: "Pricing", destination: "/pricing" },
+          { label: "FAQ", destination: "/faq" },
+        ]}
+      />
+
       <BrowserRouter>
         <IframeHeightSync />
         <GlobalMessageNotification />
         <IncomingCallAlert />
+
         <Routes>
           <Route element={<AdminProtectRoute><LayoutFrame /></AdminProtectRoute>}>
             <Route index element={<Dashboard />} />

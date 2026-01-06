@@ -8,20 +8,17 @@ export default function FcmTokenWindow() {
     useEffect(() => {
         const run = async () => {
             try {
-                // // 1️⃣ Permission
                 const permission = await Notification.requestPermission();
                 if (permission !== "granted") {
                     console.log("❌ Notification denied");
                     return;
                 }
 
-                // 2️⃣ Token generate
                 const fcmToken = await getToken(messaging, {
                     vapidKey: "BB8E-fAs8w3xZZ3cL_R3jjnTHaNDu4LGcra1NJhX60UG0lxvzBHVzzblrvv7cm6FMaGo_o_r2hbiB1eibrtg1h0"
                 });
 
                 console.log("✅ FCM TOKEN:", fcmToken);
-
                 const params = new URLSearchParams(window.location.search);
                 const userId = params.get("userId");
                 const shopId = params.get("shopId");

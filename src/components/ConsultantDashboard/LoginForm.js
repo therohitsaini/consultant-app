@@ -107,10 +107,7 @@ const LoginForm = () => {
                 localStorage.setItem("client_u_Identity", userId);
                 localStorage.setItem("shop_o_Identity", shopId);
                 localStorage.setItem("varify_tokem", token);
-
-                // Generate FCM token in new tab/window
-
-                openTokenWindow();
+                openTokenWindow({userId, shopId});
                 // Call FcmToken utility function
                 // const cleanup = requestFcmTokenInNewWindow(
                 //     userId,

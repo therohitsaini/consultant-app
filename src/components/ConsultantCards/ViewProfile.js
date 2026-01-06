@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchConsultantById } from '../Redux/slices/ConsultantSlices';
 
 function ViewProfile() {
+    
     const navigate = useNavigate();
     const dispatch = useDispatch();
     // const { shop_id, consultant_id } = useParams();
@@ -53,6 +54,7 @@ function ViewProfile() {
             { name: 'Amit Patel', rating: 4, comment: 'Good experience overall. Would visit again.', date: '2 months ago' }
         ]
     };
+    
 
     const renderStars = (rating) => {
         const fullStars = Math.floor(rating);

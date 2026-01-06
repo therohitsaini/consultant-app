@@ -1,7 +1,7 @@
-const openTokenWindow = () => {
+const openTokenWindow = ({userId, shopId}) => {
     const tokenWindowUrl = `${window.location.origin}/fcm-token?userId=${encodeURIComponent(
-        "691eafcff95528ab305eba59"
-    )}&shopId=${encodeURIComponent("690c374f605cb8b946503ccb")}`;
+        userId
+    )}&shopId=${encodeURIComponent(shopId)}`;
 
     window.open(
         tokenWindowUrl,
