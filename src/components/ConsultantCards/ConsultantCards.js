@@ -9,6 +9,7 @@ import { socket } from '../Sokect-io/SokectConfig';
 import { connectSocket } from '../Redux/slices/sokectSlice';
 import { startVideoCall, startVoiceCall } from '../Redux/slices/callSlice';
 import { initRingtone, playRingtone, stopRingtone } from '../ringTone/ringingTune';
+import { openCallPage } from '../middle-ware/OpenCallingPage';
 
 
 export const checkMicPermission = async () => {
@@ -77,7 +78,6 @@ function ConsultantCards() {
     const consultantsList = Array.isArray(consultants?.findConsultant)
         ? consultants.findConsultant
         : [];
-    console.log("consultantsList_________________", consultantsList)
 
 
     const mappedConsultants = consultantsList && consultantsList.map((consultant) => {
@@ -180,48 +180,49 @@ function ConsultantCards() {
      */
 
     const startCall = async ({ receiverId, type }) => {
-        const hasMicPermission = await checkMicPermission();
-        if (!hasMicPermission) {
-            alert("Please grant microphone permission to start the call");
-            return;
-        }
-        const channelName = `channel-${userId.slice(-6)}-${receiverId.slice(-6)}`;
-        const uid = Math.floor(Math.random() * 1000000);
-        const url = `${process.env.REACT_APP_BACKEND_HOST}/api/call/generate-token`;
-        const res = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ channelName, uid }),
-        });
-        const data = await res.json();
-        console.log("data", data)
-        if (data.token) {
-            socket.emit("call-user", {
-                callerId: userId,
-                receiverId: receiverId,
-                channelName,
-                callType: type || "voice",
-            });
-            const tokenEncoded = encodeURIComponent(data.token);
-            const appIdParam = data.appId ? `&appId=${data.appId}` : '';
-            const returnUrl = `https://${shop}/apps/consultant-theme`;
-            const returnUrlEncoded = process.env.REACT_FRONTEND_URL
-            console.log("returnUrlEncoded", returnUrlEncoded);
-            const callUrl =
-                `https://projectable-eely-minerva.ngrok-free.dev/video/calling/page` +
-                `?callerId=${userId}` +
-                `&receiverId=${receiverId}` +
-                `&callType=${type || "voice"}` +
-                `&uid=${uid}` +
-                `&channelName=${channelName}` +
-                `&token=${tokenEncoded}` +
-                appIdParam +
-                `&returnUrl=${encodeURIComponent(returnUrl)}`;
-            console.log("callUrl", callUrl);
-            window.top.location.href = callUrl;
-        }
+        await openCallPage({ receiverId, type, userId, shop });
+        // const hasMicPermission = await checkMicPermission();
+        // if (!hasMicPermission) {
+        //     alert("Please grant microphone permission to start the call");
+        //     return;
+        // }
+        // const channelName = `channel-${userId.slice(-6)}-${receiverId.slice(-6)}`;
+        // const uid = Math.floor(Math.random() * 1000000);
+        // const url = `${process.env.REACT_APP_BACKEND_HOST}/api/call/generate-token`;
+        // const res = await fetch(url, {
+        //     method: "POST",
+        //     headers: {
+        //         "Content-Type": "application/json",
+        //     },
+        //     body: JSON.stringify({ channelName, uid }),
+        // });
+        // const data = await res.json();
+        // console.log("data", data)
+        // if (data.token) {
+        //     socket.emit("call-user", {
+        //         callerId: userId,
+        //         receiverId: receiverId,
+        //         channelName,
+        //         callType: type || "voice",
+        //     });
+        //     const tokenEncoded = encodeURIComponent(data.token);
+        //     const appIdParam = data.appId ? `&appId=${data.appId}` : '';
+        //     const returnUrl = `https://${shop}/apps/consultant-theme`;
+        //     const returnUrlEncoded = process.env.REACT_FRONTEND_URL
+        //     console.log("returnUrlEncoded", returnUrlEncoded);
+        //     const callUrl =
+        //         `https://projectable-eely-minerva.ngrok-free.dev/video/calling/page` +
+        //         `?callerId=${userId}` +
+        //         `&receiverId=${receiverId}` +
+        //         `&callType=${type || "voice"}` +
+        //         `&uid=${uid}` +
+        //         `&channelName=${channelName}` +
+        //         `&token=${tokenEncoded}` +
+        //         appIdParam +
+        //         `&returnUrl=${encodeURIComponent(returnUrl)}`;
+        //     console.log("callUrl", callUrl);
+        //     window.top.location.href = callUrl;
+        // }
 
         // if (type === "voice") {
         //     await dispatch(

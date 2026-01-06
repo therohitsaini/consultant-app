@@ -4,9 +4,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../components/ConsultantCards/ConsultantCards.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchConsultantById } from '../Redux/slices/ConsultantSlices';
+import { openCallPage } from '../middle-ware/OpenCallingPage';
 
 function ViewProfile() {
-    
+
     const navigate = useNavigate();
     const dispatch = useDispatch();
     // const { shop_id, consultant_id } = useParams();
@@ -28,7 +29,6 @@ function ViewProfile() {
 
     const consultantView = consultantOverview?.consultant;
     const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${consultantView?.profileImage?.replace("\\", "/")}`;
-    console.log("consultantOverview___________Latest Consultant", consultantView);
     // Default static consultant data
     const consultant = {
         id: "691dbba35e388352e3203b0b",
@@ -54,7 +54,14 @@ function ViewProfile() {
             { name: 'Amit Patel', rating: 4, comment: 'Good experience overall. Would visit again.', date: '2 months ago' }
         ]
     };
+
+
+    const startCall = async ({ receiverId, type }) => {
+        console.log("helloo???????????????????")
+        console.log("startCall_________________", receiverId, type);
+        await openCallPage({ receiverId, type, userId: "69328ff18736b56002ef83df", shop });
     
+    }
 
     const renderStars = (rating) => {
         const fullStars = Math.floor(rating);
@@ -172,7 +179,7 @@ function ViewProfile() {
                                         className="calling-option-btn chat-btn border-0"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            viewProfile( consultantView?._id);
+                                            viewProfile(consultantView?._id);
                                             // navigate(`/user-chat/${consultantView?._id}`);
                                         }}
                                     >
@@ -187,23 +194,21 @@ function ViewProfile() {
                                     <button
                                         className="calling-option-btn audio-btn"
                                         onClick={(e) => {
-                                            e.stopPropagation();
-                                            // handleCallingOption('audio', consultant.id, consultant.audioPrice);
+                                            startCall({ receiverId: consultantView?._id, type: 'voice' });
                                         }}
                                     >
                                         <div className="calling-option-content">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-phone-icon lucide-phone">
                                                 <path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384" />
                                             </svg>
-                                            <span className="calling-option-label">Audio</span>
+                                            <span className="calling-option-label">Voice Call</span>
                                         </div>
                                         <span className="calling-option-price">INR {consultant.audioPrice.toLocaleString()}</span>
                                     </button>
                                     <button
                                         className="calling-option-btn video-btn"
                                         onClick={(e) => {
-                                            e.stopPropagation();
-                                            // handleCallingOption('video', consultant.id, consultant.videoPrice);
+                                            // e.stopPropagation();
                                         }}
                                     >
                                         <div className="calling-option-content">
