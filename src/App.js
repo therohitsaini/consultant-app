@@ -22,39 +22,10 @@ import VaocherSettings from "./pages/VaocherSettings";
 import FcmTokenWindow from "./firebase/utils/FcmTokenWindow";
 import IncomingCallAlert from "./components/AlertModel/IncommingCallAlert";
 import AdminProtectRoute from "./components/ProtectRoute/AdminProtectRoute";
-import { NavigationMenu, NavMenu, useAppBridge } from "@shopify/app-bridge-react";
+import { NavigationMenu, NavMenu } from "@shopify/app-bridge-react";
 
 function IframeHeightSync() {
   const location = useLocation();
-  const { params, isShopifyAdmin } = useAppBridge();
-  const getNavLinks = () => {
-    if (!params?.shop || !params?.host) return [];
-
-    const baseParams = `shop=${params.shop}&host=${params.host}&embedded=1`;
-
-    return [
-      {
-        label: "Dashboard",
-        destination: `/?${baseParams}#/dashboard`,
-      },
-      {
-        label: "Consultants",
-        destination: `/?${baseParams}#/consultant-list`,
-      },
-      {
-        label: "Pricing",
-        destination: `/?${baseParams}#/pricing`,
-      },
-      {
-        label: "Admin Settings",
-        destination: `/?${baseParams}#/admin-settings`,
-      },
-      {
-        label: "FAQ",
-        destination: `/?${baseParams}#/faq`,
-      },
-    ];
-  };
 
   useEffect(() => {
     const sendHeight = () => {
@@ -104,7 +75,14 @@ export default function App() {
 
   return (
     <Fragment>
-     
+      <NavMenu
+        navigationLinks={[
+          { label: "Dashboard", destination: "/" },
+          { label: "Consultants", destination: "/consultant-list" },
+          { label: "Pricing", destination: "/pricing" },
+          { label: "FAQ", destination: "/faq" },
+        ]}
+      />
 
       <BrowserRouter>
         <IframeHeightSync />
