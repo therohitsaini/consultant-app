@@ -4,7 +4,7 @@ import { socket } from "../Sokect-io/SokectConfig";
 
 
 
-export const openCallPage = async ({ receiverId, type, userId ,shop}) => {
+export const openCallPage = async ({ receiverId, type, userId, shop }) => {
     console.log("openCallPage_________________", receiverId, type, userId, shop);
     const hasMicPermission = await checkMicPermission();
     if (!hasMicPermission) {
@@ -36,7 +36,7 @@ export const openCallPage = async ({ receiverId, type, userId ,shop}) => {
         const returnUrlEncoded = process.env.REACT_FRONTEND_URL
         console.log("returnUrlEncoded", returnUrlEncoded);
         const callUrl =
-            `https://projectable-eely-minerva.ngrok-free.dev/video/calling/page` +
+            `${process.env.REACT_FRONTEND_URL}/video/calling/page` +
             `?callerId=${userId}` +
             `&receiverId=${receiverId}` +
             `&callType=${type || "voice"}` +
