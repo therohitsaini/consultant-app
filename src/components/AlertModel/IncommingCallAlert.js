@@ -49,7 +49,7 @@ export default function IncomingCallAlert() {
             const callType = incomingCall.callType || "voice";
             const returnUrl = "https://rohit-12345839.myshopify.com/apps/consultant-theme/consultant-dashboard";
             const callUrl =
-                `https://going-dry-asus-unlock.trycloudflare.com/video/calling/page` +
+                `https://test-consultation-app.zend-apps.com/video/calling/page` +
                 `?callerId=${callerId}` +
                 `&receiverId=${userId}` +
                 `&callType=${callType}` +
