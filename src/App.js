@@ -25,27 +25,27 @@ import AdminProtectRoute from "./components/ProtectRoute/AdminProtectRoute";
 import { NavigationMenu, NavMenu } from "@shopify/app-bridge-react";
 import AdminMenu from "./pages/AdminMenu";
 
-function IframeHeightSync() {
-  const location = useLocation();
+// function IframeHeightSync() {
+//   const location = useLocation();
 
-  useEffect(() => {
-    const sendHeight = () => {
-      if (window.parent) {
-        window.parent.postMessage(
-          {
-            type: "AGORA_IFRAME_HEIGHT",
-            height: document.documentElement.scrollHeight,
-          },
-          "*"
-        );
-      }
-    };
+//   useEffect(() => {
+//     const sendHeight = () => {
+//       if (window.parent) {
+//         window.parent.postMessage(
+//           {
+//             type: "AGORA_IFRAME_HEIGHT",
+//             height: document.documentElement.scrollHeight,
+//           },
+//           "*"
+//         );
+//       }
+//     };
 
-    setTimeout(sendHeight, 300);
-  }, [location.pathname]);
+//     setTimeout(sendHeight, 300);
+//   }, [location.pathname]);
 
-  return null;
-}
+//   return null;
+// }
 
 
 export default function App() {
@@ -72,6 +72,42 @@ export default function App() {
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
   }, []);
+  const location = useLocation();
+
+  const getPageHeight = () => {
+    return Math.max(
+      document.body.scrollHeight,
+      document.documentElement.scrollHeight,
+      document.body.offsetHeight,
+      document.documentElement.offsetHeight,
+      document.body.clientHeight,
+      document.documentElement.clientHeight
+    );
+  };
+
+  const sendHeightToParent = () => {
+    if (!window.parent) return;
+
+    window.parent.postMessage(
+      {
+        type: "AGORA_IFRAME_HEIGHT",
+        height: getPageHeight(),
+      },
+      "*"
+    );
+  };
+
+  useEffect(() => {
+    sendHeightToParent();
+
+    const observer = new ResizeObserver(() => {
+      sendHeightToParent();
+    });
+
+    observer.observe(document.body);
+
+    return () => observer.disconnect();
+  }, [location.pathname]);
 
 
   return (
@@ -79,7 +115,7 @@ export default function App() {
 
 
       <BrowserRouter>
-        <IframeHeightSync />
+
         <GlobalMessageNotification />
         <IncomingCallAlert />
 
