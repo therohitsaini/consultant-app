@@ -1,81 +1,63 @@
 import React, { useEffect } from "react";
+export default function PopupNotification({ message, onClose }) {
+    if (!message) return null;
 
-export default function PopupNotification({ message, onClose,showNotification }) {
-    useEffect(() => {
-        const timer = setTimeout(() => onClose(), 5000000000);
-        return () => clearTimeout(timer);
-    }, [onClose]);
-    
-    console.log("showNotification____________________", showNotification)
-    // Handle both single object and array
-    const messageData = Array.isArray(message) ? message[0] : message;
-    console.log("messageData____________________", messageData?.text)
     return (
         <>
-            {/* Internal CSS */}
             <style>{`
-                .bs-popup {
-                    // position: fixed;
-                    bottom: 20px;       /* bottom */
-                    right: 20px;        /* right */
-                    width: 330px;
-                    background: rgba(20,20,20,0.4);
-                    backdrop-filter: blur(12px);
-                    -webkit-backdrop-filter: blur(12px);
-                    border-radius: 8px;
-                    padding: 1rem;
-                    z-index: 99999;
-                    color: #fff;
-                    box-shadow: 0px 8px 25px rgba(129, 81, 81, 0.3);
-                    animation: slideUp .4s ease forwards;
-                    // border: 1px solid red;
-                }
+          .bs-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 330px;
+            background: rgba(20,20,20,0.4);
+            backdrop-filter: blur(12px);
+            border-radius: 8px;
+            padding: 1rem;
+            z-index: 99999;
+            color: #fff;
+            animation: slideUp .4s ease forwards;
+          }
+  
+          @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+  
+          .bs-popup img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+          }
+  
+          .bs-close-btn {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 22px;
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+          }
+        `}</style>
 
-                /* Slide from bottom-right */
-                @keyframes slideUp {
-                    from { opacity: 0; transform: translateY(50px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-
-                .bs-popup img {
-                    width: 48px;
-                    height: 48px;
-                    border-radius: 50%;
-                    object-fit: cover;
-                }
-
-                .bs-close-btn {
-                    background: transparent;
-                    border: none;
-                    color: white;
-                    font-size: 22px;
-                    position: absolute;
-                    top: 8px;
-                    right: 12px;
-                    cursor: pointer;
-                }
-
-                .bs-popup p {
-                    margin: 0;
-                    opacity: .9;
-                }
-            `}</style>
-
-          {/* {showNotification && (     */}
-            <div className="bs-popup d-flex align-items-center gap-3 shadow-lg "  >
+            <div className="bs-popup d-flex align-items-center gap-3">
                 <button className="bs-close-btn" onClick={onClose}>×</button>
 
                 <img
-                    src={messageData?.avatar || "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg"}
-                    alt={messageData?.senderName || "User"}
+                    src={"https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg"}
+                    alt={message.senderName || "User"}
                 />
 
                 <div>
-                    <h5 className="fw-bold mb-1">{messageData?.senderName || "User"}</h5>
-                    <p>{messageData?.text || "New message received"}</p>
+                    <h5 className="fw-bold mb-1">
+                        {message.senderName|| "User"}
+                    </h5>
+                    <p>{message.text || "New message received"}</p>
                 </div>
             </div>
-        {/* )} */}
         </>
     );
 }
+

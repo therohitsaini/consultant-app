@@ -2,69 +2,55 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import GlobalToast from "./GlobalToast";
+import PopupNotification from "./MessageNotificationAlert";
 
 export default function GlobalMessageNotification() {
     const location = useLocation();
-    const [userId, setUserId] = useState(null);
-    const [shopId, setShopId] = useState(null);
     const [notificationMessage, setNotificationMessage] = useState(null);
-    const [showNotification, setShowNotification] = useState(true);
+    const [showNotification, setShowNotification] = useState(false);
     const lastProcessedMessageId = useRef(null);
-
-    const isConsultant = location.pathname.includes('/consultant-dashboard') || 
-                         location.pathname.includes('/consultant-chats-section') ||
-                         location.pathname.includes('/users-page') ||
-                         location.pathname.includes('/consulant-chats');
+    const [userId, setUserId] = useState(null);
 
     useEffect(() => {
-        const userId = localStorage.getItem('client_u_Identity');
-        const shopId = localStorage.getItem('shop_o_Identity');
-        setUserId(userId);
-        setShopId(shopId);
+        const id = localStorage.getItem("client_u_Identity");
+        setUserId(id);
     }, []);
-
-    const { messages: socketMessages } = useSelector((state) => state.socket);
-
+    const { messages: socketMessages } = useSelector(
+        (state) => state.socket
+    );
     useEffect(() => {
-        if (socketMessages && socketMessages.length > 0 && userId) {
-            const latestMessage = socketMessages[socketMessages.length - 1];
-            
-            if (latestMessage._id && latestMessage._id === lastProcessedMessageId.current) {
-                return;
-            }
+        if (!socketMessages?.length || userId !== socketMessages[socketMessages.length - 1].receiverId) return;
 
-            const isIncomingMessage = latestMessage.receiverId && 
-                                     String(latestMessage.receiverId) === String(userId) &&
-                                     String(latestMessage.senderId) !== String(userId);
+        const lastMessage = socketMessages.at(-1);
 
-            if (isIncomingMessage) {
-                const payload = {
-                    senderName: latestMessage.senderName || 
-                               (isConsultant ? "Client" : "Consultant"),
-                    text: latestMessage.text || "New message received",
-                    avatar: latestMessage.avatar || 
-                           latestMessage.senderAvatar ||
-                           "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg",
-                };
+        // 🔒 prevent duplicate notification
+        if (lastMessage?._id === lastProcessedMessageId.current) return;
 
-                setNotificationMessage(payload);
-                setShowNotification(true);
-                
-                if (latestMessage._id) {
-                    lastProcessedMessageId.current = latestMessage._id;
-                }
-            }
-        }
-    }, [socketMessages, userId, shopId, isConsultant]);
+        lastProcessedMessageId.current = lastMessage?._id;
+
+        setNotificationMessage(lastMessage);
+        setShowNotification(true);
+
+        // auto close
+        const timer = setTimeout(() => {
+            setShowNotification(false);
+        }, 6000);
+
+        return () => clearTimeout(timer);
+    }, [socketMessages]);
 
     return (
-        <GlobalToast
-            message={notificationMessage}
-            show={showNotification}
-            onClose={() => setShowNotification(false)}
-            duration={5000}
-        />
+        <>
+            {showNotification && notificationMessage && (
+                <PopupNotification
+                    message={notificationMessage}
+                    onClose={() => setShowNotification(false)}
+                    showNotification={showNotification}
+                />
+            )}
+        </>
     );
 }
+
 
 

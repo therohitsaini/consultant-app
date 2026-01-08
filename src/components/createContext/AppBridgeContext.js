@@ -14,10 +14,14 @@ export const AppBridgeProvider = ({ children }) => {
     let host = urlParams.get("host");
     const shop = urlParams.get("shop");
     const embedded = urlParams.get("embedded");
+    
+
+    
     if (!shop || !host || embedded !== "1") {
       return null;
     }
 
+    
     if (!host && window.location.hash) {
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
       host = hashParams.get("host");
@@ -41,6 +45,15 @@ export const AppBridgeProvider = ({ children }) => {
     }
 
     try {
+
+
+      console.log("-------------------------");
+      console.log("apiKey", apiKey);
+      console.log("host", host);
+
+
+
+
       const appInstance = createApp({
         apiKey: apiKey,
         host: host,
@@ -78,3 +91,51 @@ export const AppBridgeProvider = ({ children }) => {
   );
 };
 
+// import React, { createContext, useContext, useState, useEffect } from "react";
+
+// export const AppBridgeContext = createContext(null);
+
+// export const useAppBridge = () => useContext(AppBridgeContext);
+
+// export const AppBridgeProvider = ({ children }) => {
+//   const [shopifyParams, setShopifyParams] = useState(null);
+
+//   useEffect(() => {
+//     const params = new URLSearchParams(window.location.search);
+//     const data = {
+//       shop: params.get('shop'),
+//       host: params.get('host'),
+//       embedded: params.get('embedded'),
+//       adminId: params.get('adminId')
+//     };
+
+//     if (data.host && data.shop) {
+//       setShopifyParams(data);
+//       localStorage.setItem('shopify_params', JSON.stringify(data));
+//     }
+//   }, []);
+
+
+//   const mockApp = {
+//     dispatch: () => { },
+//     subscribe: () => () => { },
+//     getState: () => ({
+//       config: {
+//         host: shopifyParams?.host || '',
+//         apiKey: process.env.REACT_APP_SHOPIFY_API_KEY
+//       }
+//     }),
+//     featuresAvailable: () => true,
+//     hostOrigin: 'https://admin.shopify.com'
+//   };
+
+//   return (
+//     <AppBridgeContext.Provider value={{
+//       app: mockApp,
+//       params: shopifyParams,
+//       isShopifyAdmin: !!(shopifyParams?.host && shopifyParams?.shop)
+//     }}>
+//       {children}
+//     </AppBridgeContext.Provider>
+//   );
+// };

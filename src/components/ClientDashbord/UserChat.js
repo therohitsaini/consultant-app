@@ -14,6 +14,7 @@ const UserChat = () => {
     const [clientId, setClientId] = useState(null);
     const [shopId, setShopId] = useState(null);
     const [show, setShow] = useState(false);
+    const [refreshed, setRefreshed] = useState(false);
     const parms = new URLSearchParams(window.location.search);
     const consultantId = parms.get('consultantId');
     const shop = parms.get('shop');
@@ -388,6 +389,7 @@ const UserChat = () => {
             consultantId: consultantId
         });
         setSeconds(0);
+        setRefreshed(true);
     }
 
     useEffect(() => {
@@ -401,6 +403,7 @@ const UserChat = () => {
                 consultantId: consultantId
             });
             setSeconds(0);
+            setRefreshed(true);
         }
     }, [autoChatEnded]);
 

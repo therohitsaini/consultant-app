@@ -32,6 +32,7 @@ const ChatsPage = () => {
     const lastProcessedMessageId = useRef(null);
     const messagesEndRef = useRef(null);
     const messagesAreaRef = useRef(null);
+    const [refreshed, setRefreshed] = useState(false);
     const { userInRequest } = useSelector((state) => state.consultants);
     const isChatAccepted = useSelector((state) => state.socket.isChatAccepted);
     console.log("isChatAccepted____ChatsPage", isChatAccepted);
@@ -131,6 +132,8 @@ const ChatsPage = () => {
 
 
     const handleChatSelect = (chatData) => {
+        console.log("chatData", chatData);
+        localStorage.setItem("is_noti_true", chatData.userId);
         setChaterIds(chatData);
         setChatAccepted(chatData);
         const conversation = chatList.find(conv =>
@@ -276,6 +279,8 @@ const ChatsPage = () => {
 
     const isRequestModalOpen = chatList.filter((conversation) => conversation.isRequest === false);
     const isRequestModalClose = chatList.filter((conversation) => conversation.isRequest === true);
+    console.log("isRequestModalClose", isRequestModalClose);
+    console.log("isRequestModalOpen", isRequestModalOpen);
 
 
     // useEffect(() => {
@@ -364,7 +369,7 @@ const ChatsPage = () => {
                                 display: "flex",
                                 justifyContent: "end"
                             }}>
-                                <p onClick={() => setShowRequestModal(!showRequestModal)} style={{ fontSize: "14px", fontWeight: "600", padding: "10px", cursor: "pointer",  }}> <span style={{ color: "#63ba77" }}>Request</span> ({isRequestModalOpen.length})</p>
+                                <p onClick={() => setShowRequestModal(!showRequestModal)} style={{ fontSize: "14px", fontWeight: "600", padding: "10px", cursor: "pointer", }}> <span style={{ color: "#63ba77" }}>Request</span> ({isRequestModalOpen.length})</p>
                             </div>
                             {
                                 showRequestModal ? (

@@ -27,7 +27,10 @@ function ViewProfile() {
 
 
 
+
+
     const consultantView = consultantOverview?.consultant;
+    console.log("consultantView", consultantView);
     const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${consultantView?.profileImage?.replace("\\", "/")}`;
     // Default static consultant data
     const consultant = {
@@ -55,12 +58,11 @@ function ViewProfile() {
         ]
     };
 
-
     const startCall = async ({ receiverId, type }) => {
         console.log("helloo???????????????????")
         console.log("startCall_________________", receiverId, type);
         await openCallPage({ receiverId, type, userId: "69328ff18736b56002ef83df", shop });
-    
+
     }
 
     const renderStars = (rating) => {
@@ -189,7 +191,7 @@ function ViewProfile() {
                                             </svg>
                                             <span className="calling-option-label">Chat</span>
                                         </div>
-                                        <span className="calling-option-price">INR vv {consultant.chatPrice.toLocaleString()}</span>
+                                        <span className="calling-option-price">Coins {consultantView?.chatCost} per min</span>
                                     </button>
                                     <button
                                         className="calling-option-btn audio-btn"
@@ -203,12 +205,12 @@ function ViewProfile() {
                                             </svg>
                                             <span className="calling-option-label">Voice Call</span>
                                         </div>
-                                        <span className="calling-option-price">INR {consultant.audioPrice.toLocaleString()}</span>
+                                        <span className="calling-option-price">INR {consultantView?.voiceCallCost}</span>
                                     </button>
                                     <button
                                         className="calling-option-btn video-btn"
                                         onClick={(e) => {
-                                            // e.stopPropagation();
+                                            startCall({ receiverId: consultantView?._id, type: 'video' });
                                         }}
                                     >
                                         <div className="calling-option-content">
@@ -218,7 +220,7 @@ function ViewProfile() {
                                             </svg>
                                             <span className="calling-option-label">Video</span>
                                         </div>
-                                        <span className="calling-option-price">INR {consultant.videoPrice.toLocaleString()}</span>
+                                        <span className="calling-option-price">INR {consultantView?.videoCallCost}</span>
                                     </button>
                                 </div>
                             </div>

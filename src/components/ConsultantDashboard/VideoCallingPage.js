@@ -4,7 +4,7 @@ import styles from './VideoCallingPage.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { endCall, startCall, toggleMute, toggleVideo } from '../Redux/slices/callSlice';
 import { initRingtone, playRingtone } from '../ringTone/ringingTune';
-import { socket } from '../Sokect-io/SokectConfig';
+import { getSocket, socket } from '../Sokect-io/SokectConfig';
 
 function VideoCallingPage() {
     const navigate = useNavigate();
@@ -28,11 +28,15 @@ function VideoCallingPage() {
 
     const isVideoCall = type === "video" || callType === "video";
     const { callRejected } = useSelector((state) => state.socket);
+ 
     useEffect(() => {
         if (callRejected) {
             handleEndCall();
         }
     }, [callRejected]);
+ 
+
+
 
     // Initialize caller ID
     useEffect(() => {
@@ -40,6 +44,38 @@ function VideoCallingPage() {
         const finalCallerId = callerIdParam || callerIdFromStorage;
         setCallerId(finalCallerId);
     }, [callerIdParam]);
+
+
+    useEffect(() => {
+        const socket = getSocket();
+        const userId = localStorage.getItem("client_u_Identity");
+
+        if (!socket.connected) {
+            socket.connect();
+            socket.emit("register", userId);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!callerId || !receiverId || !channelNameParam || !callType) return;
+
+        const callKey = `call_started_${channelNameParam}`;
+        console.log("callKey", callKey);
+        console.log("effect triggered");
+
+        // reload / re-render protection
+        if (sessionStorage.getItem(callKey)) return;
+
+        console.log("calling user");
+        console.log("effect triggered");
+
+
+
+        sessionStorage.setItem(callKey, "true");
+
+    }, [callerId, receiverId, channelNameParam, callType]);
+
+
 
     // Start call when component mounts
     useEffect(() => {

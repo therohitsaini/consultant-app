@@ -1,11 +1,28 @@
+import axios from "axios";
 import { checkMicPermission } from "../ConsultantCards/ConsultantCards";
 import { socket } from "../Sokect-io/SokectConfig";
 
 
+const checkUserBalance = async ({ userId, consultantId, type }) => {
+    if (!userId || !consultantId) {
+        alert("Login to start the call");
+        return
+    }
+    try {
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/users/shopify/users/checked-balance/${userId}/${consultantId}`,);
+        return response.data.data;
+    } catch (error) {
+        return false;
+    }
+}
 
 
 export const openCallPage = async ({ receiverId, type, userId, shop }) => {
-    console.log("openCallPage_________________", receiverId, type, userId, shop);
+    const balance = await checkUserBalance({ userId, consultantId: receiverId, type: type });
+    if (!balance) {
+        alert("You have insufficient balance to consult with this consultant");
+        return;
+    }
     const hasMicPermission = await checkMicPermission();
     if (!hasMicPermission) {
         alert("Please grant microphone permission to start the call");
@@ -22,21 +39,22 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
         body: JSON.stringify({ channelName, uid }),
     });
     const data = await res.json();
-    console.log("data", data)
     if (data.token) {
+
         socket.emit("call-user", {
             callerId: userId,
-            receiverId: receiverId,
-            channelName,
+            receiverId,
+            channelName: channelName,
             callType: type || "voice",
         });
+
         const tokenEncoded = encodeURIComponent(data.token);
         const appIdParam = data.appId ? `&appId=${data.appId}` : '';
         const returnUrl = `https://${shop}/apps/consultant-theme`;
         const returnUrlEncoded = process.env.REACT_FRONTEND_URL
         console.log("returnUrlEncoded", returnUrlEncoded);
         const callUrl =
-            `${process.env.REACT_FRONTEND_URL}/video/calling/page` +
+            `${"https://going-dry-asus-unlock.trycloudflare.com"}/video/calling/page` +
             `?callerId=${userId}` +
             `&receiverId=${receiverId}` +
             `&callType=${type || "voice"}` +

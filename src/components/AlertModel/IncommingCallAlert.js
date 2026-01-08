@@ -2,7 +2,7 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setCallEnded, setIncomingCall } from "../Redux/slices/sokectSlice";
-import { socket } from "../Sokect-io/SokectConfig";
+import { getSocket, socket } from "../Sokect-io/SokectConfig";
 import { startVoiceCall } from "../Redux/slices/callSlice";
 import { checkMicPermission } from "../ConsultantCards/ConsultantCards";
 import { stopRingtone } from "../ringTone/ringingTune";
@@ -18,6 +18,10 @@ export default function IncomingCallAlert() {
     if (!incomingCall) return console.log("No incoming call");
 
     const { callerId, callType, channelName, callerName } = incomingCall;
+
+
+      
+
 
     const handleAccept = async () => {
         const hasMicPermission = await checkMicPermission();
@@ -45,7 +49,7 @@ export default function IncomingCallAlert() {
             const callType = incomingCall.callType || "voice";
             const returnUrl = "https://rohit-12345839.myshopify.com/apps/consultant-theme/consultant-dashboard";
             const callUrl =
-                `https://projectable-eely-minerva.ngrok-free.dev/video/calling/page` +
+                `https://going-dry-asus-unlock.trycloudflare.com/video/calling/page` +
                 `?callerId=${callerId}` +
                 `&receiverId=${userId}` +
                 `&callType=${callType}` +
@@ -54,8 +58,7 @@ export default function IncomingCallAlert() {
                 `&token=${tokenEncoded}` +
                 appIdParam +
                 `&returnUrl=${encodeURIComponent(returnUrl)}`;
-
-            window.top.location.href = callUrl;
+                 window.top.location.href = callUrl;
         }
     };
 
@@ -66,8 +69,6 @@ export default function IncomingCallAlert() {
         dispatch(setIncomingCall(null));
 
     };
-
-
 
     return (
         <div style={{

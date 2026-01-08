@@ -747,7 +747,7 @@
 
 .calling-option-price {
     font-size: 10px;
-    color: #FF6B35;
+    color: #0a0a0a;
     font-weight: 600;
     white-space: nowrap;
 }
@@ -755,7 +755,7 @@
 .chat-btn:hover svg,
 .audio-btn:hover svg,
 .video-btn:hover svg {
-    color: #FF6B35;
+    color: #a77e70;
 }
 
 /* ============================================

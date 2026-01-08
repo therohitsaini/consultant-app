@@ -95,11 +95,7 @@ function TabNavigation({ children }) {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // useEffect(() => {
-    //     if (localStorage.getItem('consultant_u_Identity')) {
-    //         setConsultantId(localStorage.getItem('consultant_u_Identity'));
-    //     }
-    // }, []);
+ 
 
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
@@ -112,12 +108,7 @@ function TabNavigation({ children }) {
             path: '/consultant-dashboard',
             active: location.pathname === '/consultant-dashboard'
         },
-        {
-            label: 'Users',
-            icon: <UsersIcon />,
-            path: '/users-page',
-            active: location.pathname === '/users-page'
-        },
+       
         {
             label: 'Chats',
             icon: <ChatIcon />,
@@ -133,7 +124,6 @@ function TabNavigation({ children }) {
         const hostQuery = "";
         console.log("targetShop", targetShop, "hostQuery", hostQuery)
         window.top.location.href = `https://${targetShop}/apps/consultant-theme${path}${hostQuery}`;
-
 
     };
     const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${consultantOverview?.consultant?.profileImage?.replace("\\", "/")}`;
@@ -191,7 +181,6 @@ function TabNavigation({ children }) {
                             </button>
                         </div>
 
-                        {/* Navigation Tabs */}
                         <nav className={styles.navTabs}>
                             <ul className={styles.navTabList}>
                                 {menuItems.map((item, index) => (
