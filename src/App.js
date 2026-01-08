@@ -72,8 +72,8 @@ export default function App() {
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
   }, []);
-  const location = useLocation();
-
+  const location = new URLSearchParams(window.location.search);
+  console.log("location", location);
   const getPageHeight = () => {
     return Math.max(
       document.body.scrollHeight,
@@ -107,7 +107,7 @@ export default function App() {
     observer.observe(document.body);
 
     return () => observer.disconnect();
-  }, [location.pathname]);
+  }, [location]);
 
 
   return (
