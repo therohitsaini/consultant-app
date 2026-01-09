@@ -11,10 +11,8 @@ export default function IncomingCallAlert() {
     const dispatch = useDispatch();
     const userId = localStorage.getItem('client_u_Identity') || localStorage.getItem('consultant_u_Identity');
     const { incomingCall, callEnded } = useSelector((state) => state.socket);
-    useEffect(() => {
-        if (!callEnded) return;
-        handleReject();
-    }, [callEnded]);
+    console.log("incomingCall", incomingCall);
+  
     if (!incomingCall) return console.log("No incoming call");
 
     const { callerId, callType, channelName, callerName } = incomingCall;
@@ -49,7 +47,7 @@ export default function IncomingCallAlert() {
             const callType = incomingCall.callType || "voice";
             const returnUrl = "https://rohit-12345839.myshopify.com/apps/consultant-theme/consultant-dashboard";
             const callUrl =
-                `https://test-consultation-app.zend-apps.com/video/calling/page` +
+                ` https://entrepreneurs-wash-swap-columbus.trycloudflare.com/video/calling/page` +
                 `?callerId=${callerId}` +
                 `&receiverId=${userId}` +
                 `&callType=${callType}` +
@@ -61,14 +59,18 @@ export default function IncomingCallAlert() {
                  window.top.location.href = callUrl;
         }
     };
-
+    // useEffect(() => {
+    //     if (!callEnded) return;
+    //     handleReject();
+    // }, [callEnded]);
     const handleReject = () => {
         console.log("Call rejected", incomingCall);
-        stopRingtone();
+   
         socket.emit("reject-call", { callerId, receiverId: userId, channelName, callType: incomingCall.callType });
         dispatch(setIncomingCall(null));
 
     };
+ 
 
     return (
         <div style={{

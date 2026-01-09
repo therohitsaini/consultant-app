@@ -25,17 +25,16 @@ function VideoCallingPage() {
     const appIdParam = params.get("appId");
     const callStartedRef = useRef(false);
     const { inCall, channel, type, muted, videoEnabled } = useSelector((state) => state.call);
-
+    console.log("inCall", inCall);
     const isVideoCall = type === "video" || callType === "video";
     const { callRejected } = useSelector((state) => state.socket);
- 
+    console.log("callRejected", callRejected);
+
     useEffect(() => {
         if (callRejected) {
             handleEndCall();
         }
     }, [callRejected]);
- 
-
 
 
     // Initialize caller ID

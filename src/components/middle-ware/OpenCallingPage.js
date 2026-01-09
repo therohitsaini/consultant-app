@@ -54,7 +54,7 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
         const returnUrlEncoded = process.env.REACT_FRONTEND_URL
         console.log("returnUrlEncoded", returnUrlEncoded);
         const callUrl =
-            `${"https://test-consultation-app.zend-apps.com"}/video/calling/page` +
+            `${" https://entrepreneurs-wash-swap-columbus.trycloudflare.com"}/video/calling/page` +
             `?callerId=${userId}` +
             `&receiverId=${receiverId}` +
             `&callType=${type || "voice"}` +
