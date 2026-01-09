@@ -1,11 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
-import GlobalToast from "./GlobalToast";
 import PopupNotification from "./MessageNotificationAlert";
 
 export default function GlobalMessageNotification() {
-    const location = useLocation();
     const [notificationMessage, setNotificationMessage] = useState(null);
     const [showNotification, setShowNotification] = useState(false);
     const lastProcessedMessageId = useRef(null);
@@ -13,26 +10,29 @@ export default function GlobalMessageNotification() {
 
     useEffect(() => {
         const id = localStorage.getItem("client_u_Identity");
-        setUserId(id);
+        if (id) setUserId(id);
     }, []);
-    const { messages: socketMessages } = useSelector(
-        (state) => state.socket
+
+    const socketMessages = useSelector(
+        (state) => state.socket.messages
     );
-    console.log("socketMessages", socketMessages);
+
     useEffect(() => {
-        if (!socketMessages?.length) return;
-
-        const lastMessage = socketMessages.at(-1);
-        if (!lastMessage) return;
-
-        // userId ready hona zaroori
+        // 🔒 basic safety checks
+        if (!Array.isArray(socketMessages)) return;
+        if (socketMessages.length === 0) return;
         if (!userId) return;
 
-        // sirf receiver ko notification
+        const lastIndex = socketMessages.length - 1;
+        const lastMessage = socketMessages[lastIndex];
+
+        if (!lastMessage) return;
+
+        // 🔔 sirf receiver ko notify
         if (lastMessage.receiverId !== userId) return;
 
-        // duplicate prevent
-        if (lastMessage._id === lastProcessedMessageId.current) return;
+        // 🔁 duplicate prevent
+        if (lastProcessedMessageId.current === lastMessage._id) return;
 
         lastProcessedMessageId.current = lastMessage._id;
 
@@ -46,19 +46,14 @@ export default function GlobalMessageNotification() {
         return () => clearTimeout(timer);
     }, [socketMessages, userId]);
 
-
     return (
         <>
             {showNotification && notificationMessage && (
                 <PopupNotification
                     message={notificationMessage}
                     onClose={() => setShowNotification(false)}
-                    showNotification={showNotification}
                 />
             )}
         </>
     );
 }
-
-
-
