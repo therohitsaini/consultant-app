@@ -18,6 +18,7 @@ export default function GlobalMessageNotification() {
     const { messages: socketMessages } = useSelector(
         (state) => state.socket
     );
+    console.log("socketMessages", socketMessages);
     useEffect(() => {
         if (!socketMessages?.length) return;
 
