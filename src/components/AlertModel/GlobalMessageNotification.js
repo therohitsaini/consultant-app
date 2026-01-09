@@ -19,25 +19,32 @@ export default function GlobalMessageNotification() {
         (state) => state.socket
     );
     useEffect(() => {
-        if (!socketMessages?.length || userId !== socketMessages[socketMessages.length - 1].receiverId) return;
+        if (!socketMessages?.length) return;
 
         const lastMessage = socketMessages.at(-1);
+        if (!lastMessage) return;
 
-        // 🔒 prevent duplicate notification
-        if (lastMessage?._id === lastProcessedMessageId.current) return;
+        // userId ready hona zaroori
+        if (!userId) return;
 
-        lastProcessedMessageId.current = lastMessage?._id;
+        // sirf receiver ko notification
+        if (lastMessage.receiverId !== userId) return;
+
+        // duplicate prevent
+        if (lastMessage._id === lastProcessedMessageId.current) return;
+
+        lastProcessedMessageId.current = lastMessage._id;
 
         setNotificationMessage(lastMessage);
         setShowNotification(true);
 
-        // auto close
         const timer = setTimeout(() => {
             setShowNotification(false);
         }, 6000);
 
         return () => clearTimeout(timer);
-    }, [socketMessages]);
+    }, [socketMessages, userId]);
+
 
     return (
         <>

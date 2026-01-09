@@ -210,6 +210,9 @@ const socketSlice = createSlice({
         },
         setCallRejected: (state, action) => {
             state.callRejected = action.payload;
+            if (state.callRejected) {
+                localStorage.setItem("callRejected", true);
+            }
         },
         clearMessages: (state) => {
             state.messages = [];
