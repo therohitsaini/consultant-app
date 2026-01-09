@@ -146,11 +146,11 @@ export default function SocketProvider({ children }) {
         const clientId =
             localStorage.getItem("client_u_Identity")
 
-        socket.connect();
-        socket.emit("register", clientId);
+
 
         const onConnect = () => {
             console.log("✅ Socket connected");
+            socket.emit("register", clientId);
             dispatch(setConnected(true));
         };
 
@@ -158,7 +158,7 @@ export default function SocketProvider({ children }) {
             console.log("❌ Socket disconnected");
             dispatch(setConnected(false));
         };
-
+        if (!socket.connected) socket.connect();
         socket.on("connect", onConnect);
         socket.on("disconnect", onDisconnect);
 
@@ -212,9 +212,23 @@ export default function SocketProvider({ children }) {
 
         return () => {
             console.log("🧹 Cleaning socket listeners");
-            socket.off();
-            // socket.disconnect();
+
+            socket.off("connect", onConnect);
+            socket.off("disconnect", onDisconnect);
+            socket.off("activeUsers");
+            socket.off("receiveMessage");
+            socket.off("seenUpdate");
+            socket.off("balanceError");
+            socket.off("userChatAccepted");
+            socket.off("chatTimerStarted");
+            socket.off("chatEnded");
+            socket.off("autoChatEnded");
+            socket.off("incoming-call");
+            socket.off("call-accepted-started");
+            socket.off("call-missed");
+            socket.off("call-ended-rejected");
         };
+
     }, [dispatch]);
 
     return children;
