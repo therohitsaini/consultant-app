@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../components/ConsultantCards/ConsultantCards.css';
@@ -6,6 +6,7 @@ import { fetchConsultants } from '../Redux/slices/ConsultantSlices';
 import { useDispatch, useSelector } from 'react-redux';
 import { connectSocket } from '../Redux/slices/sokectSlice';
 import { openCallPage } from '../middle-ware/OpenCallingPage';
+import TestRingtone from '../../pages/TestRingtone';
 
 
 
@@ -24,6 +25,7 @@ export const checkMicPermission = async () => {
 
 
 function ConsultantCards() {
+    const audioRef = useRef(null);
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [userId, setUserId] = useState(null);
@@ -36,9 +38,10 @@ function ConsultantCards() {
     const user_id = params.get('customerId');
     const shop_id = params.get('shopid');
     const [initialLoading, setInitialLoading] = useState(true);
+    const [isRing, setIsRing] = useState(true);
     const { insufficientBalance } = useSelector((state) => state.socket);
 
-
+ 
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -268,10 +271,15 @@ function ConsultantCards() {
     }
 
 
+
+
+
+
+
     return (
         <>
-       
 
+         
             <div className="container py-4">
                 {/* Hero Section */}
                 <div className="hero-section mb-5">

@@ -6,6 +6,7 @@ import { getSocket, socket } from "../Sokect-io/SokectConfig";
 import { startVoiceCall } from "../Redux/slices/callSlice";
 import { checkMicPermission } from "../ConsultantCards/ConsultantCards";
 import { stopRingtone } from "../ringTone/ringingTune";
+import TestRingtone from "../../pages/TestRingtone";
 
 export default function IncomingCallAlert() {
     const dispatch = useDispatch();
@@ -19,8 +20,6 @@ export default function IncomingCallAlert() {
 
 
       
-
-
     const handleAccept = async () => {
         const hasMicPermission = await checkMicPermission();
         if (!hasMicPermission) {
@@ -39,7 +38,7 @@ export default function IncomingCallAlert() {
         const data = await res.json();
         console.log("data____Reciver_____", data)
         if (data.token) {
-            socket.emit("call-accepted", { callerId, receiverId: userId, channelName, callType: incomingCall.callType });
+            socket.emit("call-accepted", { callerId, receiverId: userId, channelName, callType: incomingCall.callType ,shopId:"690c374f605cb8b946503ccb"});
             console.log("Call accepted", incomingCall);
             dispatch(setIncomingCall(null));
             const tokenEncoded = encodeURIComponent(data.token);
@@ -47,7 +46,7 @@ export default function IncomingCallAlert() {
             const callType = incomingCall.callType || "voice";
             const returnUrl = "https://rohit-12345839.myshopify.com/apps/consultant-theme/consultant-dashboard";
             const callUrl =
-                ` https://entrepreneurs-wash-swap-columbus.trycloudflare.com/video/calling/page` +
+                `https://focusing-monkey-home-calendar.trycloudflare.com/video/calling/page` +
                 `?callerId=${callerId}` +
                 `&receiverId=${userId}` +
                 `&callType=${callType}` +
@@ -55,6 +54,7 @@ export default function IncomingCallAlert() {
                 `&channelName=${channelName}` +
                 `&token=${tokenEncoded}` +
                 appIdParam +
+                `&userId=${userId}` +
                 `&returnUrl=${encodeURIComponent(returnUrl)}`;
                  window.top.location.href = callUrl;
         }
@@ -72,7 +72,9 @@ export default function IncomingCallAlert() {
     };
  
 
-    return (
+    return ( 
+        <>
+        <TestRingtone incomingCall={incomingCall} />
         <div style={{
             position: "fixed",
             top: "20px",
@@ -150,5 +152,6 @@ export default function IncomingCallAlert() {
                 </button>
             </div>
         </div>
+        </>
     );
 }

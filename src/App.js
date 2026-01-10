@@ -24,31 +24,38 @@ import IncomingCallAlert from "./components/AlertModel/IncommingCallAlert";
 import AdminProtectRoute from "./components/ProtectRoute/AdminProtectRoute";
 import { NavigationMenu, NavMenu } from "@shopify/app-bridge-react";
 import AdminMenu from "./pages/AdminMenu";
+import { Redirect } from "react-router-dom";
+import { useAppBridge } from "./components/createContext/AppBridgeContext";
 
-// function IframeHeightSync() {
-//   const location = useLocation();
 
-//   useEffect(() => {
-//     const sendHeight = () => {
-//       if (window.parent) {
-//         window.parent.postMessage(
-//           {
-//             type: "AGORA_IFRAME_HEIGHT",
-//             height: document.documentElement.scrollHeight,
-//           },
-//           "*"
-//         );
-//       }
-//     };
-
-//     setTimeout(sendHeight, 300);
-//   }, [location.pathname]);
-
-//   return null;
-// }
 
 
 export default function App() {
+  const params = new URLSearchParams(window.location.search);
+  const shop = params.get("shop");
+  console.log("shop", shop);
+
+  const checkInstalled = async () => {
+    if (!shop) return;
+    const url = `https://test-online-consultation.zend-apps.com/app/app/is-installed/${shop}`;
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+    console.log("data++++++++++++++================", data);
+    if (data?.installed === false) {
+      const target = `https://test-online-consultation.zend-apps.com/app/install?shop=${shop}`;
+      window.top.location.href = target;
+    }
+  }
+  useEffect(() => {
+    checkInstalled();
+  }, [shop]);
+
+
 
 
 

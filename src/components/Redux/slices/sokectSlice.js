@@ -204,6 +204,7 @@ const socketSlice = createSlice({
         },
         setCallAccepted: (state, action) => {
             state.callAccepted = action.payload;
+            console.log("setCallAccepted", state.callAccepted);
         },
         setCallEnded: (state, action) => {
             state.callEnded = action.payload;

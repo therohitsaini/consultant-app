@@ -52,9 +52,8 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
         const appIdParam = data.appId ? `&appId=${data.appId}` : '';
         const returnUrl = `https://${shop}/apps/consultant-theme`;
         const returnUrlEncoded = process.env.REACT_FRONTEND_URL
-        console.log("returnUrlEncoded", returnUrlEncoded);
         const callUrl =
-            `${" https://entrepreneurs-wash-swap-columbus.trycloudflare.com"}/video/calling/page` +
+            `${"https://focusing-monkey-home-calendar.trycloudflare.com"}/video/calling/page` +
             `?callerId=${userId}` +
             `&receiverId=${receiverId}` +
             `&callType=${type || "voice"}` +
@@ -62,6 +61,7 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
             `&channelName=${channelName}` +
             `&token=${tokenEncoded}` +
             appIdParam +
+            `&userId=${userId}` +
             `&returnUrl=${encodeURIComponent(returnUrl)}`;
         console.log("callUrl", callUrl);
         window.top.location.href = callUrl;

@@ -23,12 +23,36 @@ function VideoCallingPage() {
     const callerIdParam = params.get("callerId");
     const uidParam = params.get("uid");
     const appIdParam = params.get("appId");
+    const userId = params.get("userId");
     const callStartedRef = useRef(false);
     const { inCall, channel, type, muted, videoEnabled } = useSelector((state) => state.call);
     console.log("inCall", inCall);
     const isVideoCall = type === "video" || callType === "video";
     const { callRejected } = useSelector((state) => state.socket);
     console.log("callRejected", callRejected);
+
+
+
+    useEffect(() => {
+        localStorage.setItem("userId", userId);
+    }, [userId]);
+    useEffect(() => {
+        if (!userId) return;
+      
+        const socket = getSocket();
+      
+        socket.connect();
+      
+        socket.on("connect", () => {
+          socket.emit("register", userId);
+          console.log("✅ User registered from call page:", userId);
+        });
+      
+        return () => {
+          socket.off("connect");
+        };
+      }, [userId]);
+      
 
     useEffect(() => {
         if (callRejected) {
@@ -285,6 +309,7 @@ function VideoCallingPage() {
     // Handlers
     const handleEndCall = () => {
         dispatch(endCall());
+        socket.emit("call-ended", { callerId: callerId, receiverId: receiverId, channel: channelNameParam, callType: type });
         const returnUrl = params.get("returnUrl");
         if (returnUrl) {
             window.top.location.href = decodeURIComponent(returnUrl);
@@ -309,6 +334,7 @@ function VideoCallingPage() {
     }, [callEnded]);
 
     console.log("callEnded", callEnded);
+    console.log("callerDetails", callerDetails);
 
 
     return (
