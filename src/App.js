@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, redirect } from "react-router-dom";
 
 import LayoutFrame from "./pages/LayoutFrame";
 import Dashboard from "./pages/Dashboard";
@@ -24,7 +24,7 @@ import IncomingCallAlert from "./components/AlertModel/IncommingCallAlert";
 import AdminProtectRoute from "./components/ProtectRoute/AdminProtectRoute";
 import { NavigationMenu, NavMenu } from "@shopify/app-bridge-react";
 import AdminMenu from "./pages/AdminMenu";
-import { Redirect } from "react-router-dom";
+import { Redirect } from "@shopify/app-bridge/actions";
 import { useAppBridge } from "./components/createContext/AppBridgeContext";
 
 
@@ -34,9 +34,11 @@ export default function App() {
   const params = new URLSearchParams(window.location.search);
   const shop = params.get("shop");
   console.log("shop", shop);
-
+  const app = useAppBridge();
   const checkInstalled = async () => {
-    if (!shop) return;
+    if (!app || !shop) {
+      return console.warn("App Bridge not initialized or shop missing");
+    }
     const url = `https://test-online-consultation.zend-apps.com/app/app/is-installed/${shop}`;
     const response = await fetch(url, {
       method: "GET",
@@ -47,8 +49,11 @@ export default function App() {
     const data = await response.json();
     console.log("data++++++++++++++================", data);
     if (data?.installed === false) {
-      const target = `https://test-online-consultation.zend-apps.com/app/install?shop=${shop}`;
-      window.top.location.href = target;
+      const redirect = redirect.create(app);
+      redirect.dispatch(
+        Redirect.Action.REMOTE,
+        `https://test-online-consultation.zend-apps.com/app/install?shop=${shop}`
+      );
     }
   }
   useEffect(() => {

@@ -14,14 +14,15 @@ export const AppBridgeProvider = ({ children }) => {
     let host = urlParams.get("host");
     const shop = urlParams.get("shop");
     const embedded = urlParams.get("embedded");
-    
 
-    
-    if (!shop || !host || embedded !== "1") {
+
+    if (!shop || !host) {
+      console.warn("Missing shop or host");
       return null;
     }
 
-    
+
+
     if (!host && window.location.hash) {
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
       host = hashParams.get("host");
@@ -58,7 +59,7 @@ export const AppBridgeProvider = ({ children }) => {
         apiKey: apiKey,
         host: host,
         forceRedirect: true,
-        embedded: true,
+        // embedded: true,
       });
       console.log("✅ App Bridge initialized successfully with host:", host);
       return appInstance;
