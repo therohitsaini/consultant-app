@@ -7,9 +7,10 @@ import { AppProvider as PolarisAppProvider } from '@shopify/polaris';
 import en from "@shopify/polaris/locales/en.json";
 import { Provider } from 'react-redux';
 import { store } from './components/Redux/store/store';
-import { AppBridgeProvider } from './components/createContext/AppBridgeContext';
+import { AppBridgeProvider } from './components/createContext/AppBridgeProvider';
 import SocketProvider from './components/Sokect-io/sokectProvider';
 import ErrorBoundary from './components/ErrorBoundary';
+import SideMenu from './pages/AdminMenu';
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/firebase-messaging-sw.js")
@@ -25,6 +26,7 @@ root.render(
   // <React.StrictMode>
   <ErrorBoundary>
     <AppBridgeProvider >
+      <SideMenu />
       <PolarisAppProvider i18n={en}>
         <Provider store={store}>
           <SocketProvider>
