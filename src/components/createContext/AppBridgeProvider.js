@@ -21,7 +21,9 @@ export const AppBridgeProvider = ({ children }) => {
     const apiKey = process.env.REACT_APP_SHOPIFY_API_KEY;
 
     const app = useMemo(() => {
-        if (!host || !apiKey) return null;
+        if (!host || !apiKey) {
+            return console.warn("App Bridge: Missing host or API key.");
+        }
 
         return createApp({
             apiKey,

@@ -1,7 +1,6 @@
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-// import reportWebVitals from './reportWebVitals';
 import '@shopify/polaris/build/esm/styles.css';
 import { AppProvider as PolarisAppProvider } from '@shopify/polaris';
 import en from "@shopify/polaris/locales/en.json";
