@@ -12,6 +12,7 @@ import { fetchUsers } from '../components/Redux/slices/UserSlices';
 import { fetchConsultants } from '../components/Redux/slices/ConsultantSlices';
 import { apps } from '../components/FallbackData/FallbackData';
 import axios from 'axios';
+import ShowToast from './ShowToast';
 
 // Component to display animated count with motion
 function AnimatedCount({ value }) {
@@ -103,7 +104,7 @@ function Dashboard() {
 
     useEffect(() => {
         const getAdminDetails = async () => {
-            const adminId =  localStorage.getItem('doamin_V_id');
+            const adminId = localStorage.getItem('doamin_V_id');
             const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/admin/${adminId}`);
             console.log("response", response);
             if (response.status === 200) {
@@ -115,6 +116,13 @@ function Dashboard() {
             getAdminDetails();
         }
     }, [adminId]);
+
+    const apps = useAppBridge();
+
+    if (!app) {
+        return <div>Please open app from Shopify Admin</div>;
+    }
+
 
     return (
         <>
@@ -148,6 +156,7 @@ function Dashboard() {
                                 <BlockStack gap="200">
                                     <p>Manage your consultants efficiently and track their performance.</p>
                                     <p>Add new consultants, update their status, and monitor consultations.</p>
+                                    <ShowToast />
                                 </BlockStack>
                             </Banner>
                         </Layout.Section>

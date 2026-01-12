@@ -183,6 +183,7 @@ import ConsultantList from "./pages/ConsultantList";
 import AddConsultant from "./pages/AddConsultant";
 import Pricing from "./pages/Pricing";
 import Faq from "./pages/Faq";
+import AdminMenu from "./pages/AdminMenu";
 
 export default function App() {
   const params = new URLSearchParams(window.location.search);
@@ -218,12 +219,7 @@ export default function App() {
     <
       >
       {/* 🔥 SIDE MENU — YAHI SE INJECT HOTA HAI */}
-      <NavMenu>
-        <a href="/" rel="home">Dashboard</a>
-        <a href="/consultant-list">Consultants</a>
-        <a href="/pricing">Pricing</a>
-        <a href="/faq">FAQ</a>
-      </NavMenu>
+      <AdminMenu />
 
       {/* ❌ BrowserRouter hatao */}
       <MemoryRouter>
