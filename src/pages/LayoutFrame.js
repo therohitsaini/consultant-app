@@ -38,9 +38,9 @@ export default function LayoutFrame() {
     console.log("adminId", adminId);
     useEffect(() => {
         if (adminId) {
-         const id =   localStorage.setItem('doamin_V_id', adminId);
-         setAdminIdLocal(id);
-         console.log("id", id);
+            const id = localStorage.setItem('doamin_V_id', adminId);
+            setAdminIdLocal(id);
+            console.log("id", id);
         }
     }, [adminId]);
     console.log("adminIdLocal", adminIdLocal);
@@ -124,9 +124,10 @@ export default function LayoutFrame() {
             showMobileNavigation={mobileNavActive}
             onNavigationDismiss={toggleMobileNav}
         >
+            <AdminMenu />
+
             {/* 🔥 PAGE CONTENT */}
             <Outlet adminIdLocal={adminIdLocal} />
-            <AdminMenu />
             <Footer />
 
             {toastActive && (

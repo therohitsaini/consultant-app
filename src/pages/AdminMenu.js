@@ -2,7 +2,9 @@ import { TitleBar, NavMenu } from '@shopify/app-bridge-react';
 import { useAppBridge } from '../components/createContext/AppBridgeContext';
 
 const AdminMenu = () => {
-    const app = useAppBridge(); // App Bridge instance
+    const app = useAppBridge();
+    console.log("app", app);
+    // App Bridge instance
 
     const navMenuItems = [
         { label: 'Dashboard', destination: '/dashboard' },
