@@ -20,7 +20,7 @@ import {
 import { useState, useCallback, useEffect } from "react";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import Footer from "./Footer";
-import AdminMenu from "./AdminMenu";
+
 
 export default function LayoutFrame() {
     const navigate = useNavigate();
@@ -124,7 +124,6 @@ export default function LayoutFrame() {
             showMobileNavigation={mobileNavActive}
             onNavigationDismiss={toggleMobileNav}
         >
-            <AdminMenu />
 
             {/* 🔥 PAGE CONTENT */}
             <Outlet adminIdLocal={adminIdLocal} />

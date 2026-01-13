@@ -10,6 +10,7 @@ import { store } from './components/Redux/store/store';
 import { AppBridgeProvider } from './components/createContext/AppBridgeContext';
 import SocketProvider from './components/Sokect-io/sokectProvider';
 import ErrorBoundary from './components/ErrorBoundary';
+import AdminMenu from './pages/AdminMenu';
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/firebase-messaging-sw.js")
@@ -25,6 +26,7 @@ root.render(
   // <React.StrictMode>
   <ErrorBoundary>
     <AppBridgeProvider >
+      <AdminMenu />
       <PolarisAppProvider i18n={en}>
         <Provider store={store}>
           <SocketProvider>
