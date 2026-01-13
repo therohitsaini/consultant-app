@@ -1,22 +1,41 @@
-// AdminNavigation.js
-import { NavMenu, TitleBar } from '@shopify/app-bridge-react';
+import { NavMenu } from '@shopify/app-bridge-react';
 import { useAppBridge } from '../components/createContext/AppBridgeContext';
+import { useEffect } from 'react';
 
-const AdminMenu = () => {
+export function AdminMenu() {
     const app = useAppBridge();
-    if (!app) return <div>Loading...</div>; // prevent errors if App Bridge not initialized
-    console.log("app_____________", app);
-    return (
-        <>
-            <TitleBar title="Consultant App" />
-            <NavMenu>
-                <a href="/" rel="home">Home</a>
-                <a href="/dashboard">Dashboard</a>
-                <a href="/consultants">Consultants</a>
-                <a href="/settings">Settings</a>
-            </NavMenu>
-        </>
-    );
-};
 
-export default AdminMenu;
+    //   useEffect(() => {
+    //     // Debug: Check if App Bridge script is loaded
+    //     console.log('🔍 AdminMenu Debug:', {
+    //       appInitialized: !!app,
+    //       windowShopify: typeof window !== 'undefined' && typeof window.shopify !== 'undefined',
+    //       uiNavMenuExists: typeof window !== 'undefined' && customElements.get('ui-nav-menu'),
+    //     });
+
+    //     // Check if ui-nav-menu web component is registered
+    //     if (typeof window !== 'undefined') {
+    //       customElements.whenDefined('ui-nav-menu').then(() => {
+    //         console.log('✅ ui-nav-menu web component is registered');
+    //       }).catch(() => {
+    //         console.warn('⚠️ ui-nav-menu web component not found - App Bridge script may not be loaded');
+    //       });
+    //     }
+    //   }, [app]);
+
+    // Only render NavMenu if App Bridge is initialized
+    if (!app) {
+        console.warn('⚠️ AdminMenu: App Bridge not initialized, NavMenu will not render');
+        return null;
+    }
+
+    return (
+        <NavMenu>
+            {/* First link must have rel="home" and href="/" for home route */}
+            <a href="/" rel="home">Dashboard  </a>
+            <a href="/consultant-list">Consultant List</a>
+            <a href="/pricing">Pricing</a>
+            <a href="/faq">FAQ</a>
+        </NavMenu>
+    );
+}

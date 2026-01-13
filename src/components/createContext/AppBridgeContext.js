@@ -8,26 +8,34 @@ export const useAppBridge = () => {
   return app;
 };
 
+
+
 export const AppBridgeProvider = ({ children }) => {
   const getHost = () => {
     const urlParams = new URLSearchParams(window.location.search);
     let host = urlParams.get("host");
     const shop = urlParams.get("shop");
-    const embedded = urlParams.get("embedded");
 
-
-    if (!shop || !host) {
-      console.warn("Missing shop or host");
-      return null;
+    // First try to get host from URL params
+    if (host) {
+      return host;
     }
 
-
-
-    if (!host && window.location.hash) {
+    // If not found, try to get from hash
+    if (window.location.hash) {
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
       host = hashParams.get("host");
+      if (host) {
+        return host;
+      }
     }
-    return host;
+
+    // If still not found, log warning
+    if (!shop || !host) {
+      console.warn("Missing shop or host parameter. App should be accessed through Shopify admin.");
+    }
+
+    return host || null;
   };
 
   const host = getHost();
@@ -59,7 +67,7 @@ export const AppBridgeProvider = ({ children }) => {
         apiKey: apiKey,
         host: host,
         forceRedirect: true,
-        // embedded: true,
+        embedded: true, // Required for NavMenu to work in Shopify admin
       });
       console.log("✅ App Bridge initialized successfully with host:", host);
       return appInstance;

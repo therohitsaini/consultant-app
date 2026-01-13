@@ -69,13 +69,12 @@ function Dashboard() {
     const app = useAppBridge();
     const params = new URLSearchParams(window.location.search);
     const host = params.get("host");
-    const adminId = params.get("adminId");
+    const adminId ="690c374f605cb8b946503ccb";
     console.log("adminId", adminId);
 
     useEffect(() => {
         if (adminId) {
-            localStorage.setItem('doamin_V_id', adminId);
-
+            localStorage.setItem('doamin_V_id', "690c374f605cb8b946503ccb");
         }
     }, [adminId]);
 
@@ -128,10 +127,10 @@ function Dashboard() {
         <>
             {/* App Bridge TitleBar - Shopify frame mein title bar dikhane ke liye */}
             {app && (
-                <TitleBar title="Dashboard" />
+                <TitleBar title="" />
             )}
             <Page
-                title="Dashboard"
+                title="vc-consultant app"
                 primaryAction={<LanguageSelector />}
                 secondaryActions={[
                     {
