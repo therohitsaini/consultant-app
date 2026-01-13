@@ -4,7 +4,7 @@ import { useAppBridge } from '../components/createContext/AppBridgeContext';
 
 const AdminMenu = () => {
   const app = useAppBridge();
-  if (!app) return null; // prevent errors if App Bridge not initialized
+  if (!app) return <div>Loading...</div>; // prevent errors if App Bridge not initialized
 
   return (
     <>
