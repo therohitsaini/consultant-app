@@ -219,7 +219,7 @@ export default function App() {
     <
       >
       {/* 🔥 SIDE MENU — YAHI SE INJECT HOTA HAI */}
-      <AdminMenu />
+      // <AdminMenu />
 
       {/* ❌ BrowserRouter hatao */}
       <MemoryRouter>

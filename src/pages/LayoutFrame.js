@@ -20,6 +20,7 @@ import {
 import { useState, useCallback, useEffect } from "react";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import Footer from "./Footer";
+import AdminMenu from "./AdminMenu";
 
 export default function LayoutFrame() {
     const navigate = useNavigate();
@@ -125,6 +126,7 @@ export default function LayoutFrame() {
         >
             {/* 🔥 PAGE CONTENT */}
             <Outlet adminIdLocal={adminIdLocal} />
+            <AdminMenu />
             <Footer />
 
             {toastActive && (
