@@ -1,22 +1,22 @@
-import { TitleBar, NavMenu } from '@shopify/app-bridge-react';
+// AdminNavigation.js
+import { NavMenu, TitleBar } from '@shopify/app-bridge-react';
 import { useAppBridge } from '../components/createContext/AppBridgeContext';
 
 const AdminMenu = () => {
-    const app = useAppBridge();
-    console.log("app", app);
-    // App Bridge instance
+  const app = useAppBridge();
+  if (!app) return null; // prevent errors if App Bridge not initialized
 
-    const navMenuItems = [
-        { label: 'Dashboard', destination: '/dashboard' },
-        { label: 'Consultants', destination: '/consultants' },
-        { label: 'Settings', destination: '/settings' },
-    ];
-
-    return (
-        <>
-            <TitleBar title="My App" />
-            <NavMenu showNavigationMenu items={navMenuItems} />
-        </>
-    );
+  return (
+    <>
+      <TitleBar title="Consultant App" />
+      <NavMenu>
+        <a href="/" rel="home">Home</a>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/consultants">Consultants</a>
+        <a href="/settings">Settings</a>
+      </NavMenu>
+    </>
+  );
 };
+
 export default AdminMenu;
