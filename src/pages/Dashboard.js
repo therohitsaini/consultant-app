@@ -117,11 +117,11 @@ function Dashboard() {
         }
     }, [adminId]);
 
-    const apps = useAppBridge();
+    // const apps = useAppBridge();
 
-    if (!app) {
-        return <div>Please open app from Shopify Admin</div>;
-    }
+    // if (!app) {
+    //     return <div>Please open app from Shopify Admin</div>;
+    // }
 
 
     return (
@@ -156,7 +156,7 @@ function Dashboard() {
                                 <BlockStack gap="200">
                                     <p>Manage your consultants efficiently and track their performance.</p>
                                     <p>Add new consultants, update their status, and monitor consultations.</p>
-                                    <ShowToast />
+                                    {/* <ShowToast /> */}
                                 </BlockStack>
                             </Banner>
                         </Layout.Section>
