@@ -90,6 +90,8 @@ function IndexTableList({
     renderRow ? renderRow(item, index) : null
   ).filter(Boolean);
 
+  console.log("rowMarkup", sortOptions);
+
   return (
     <LegacyCard>
       <IndexFilters

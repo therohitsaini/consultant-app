@@ -29,13 +29,17 @@ export function AdminMenu() {
         return null;
     }
 
+
     return (
         <NavMenu>
             {/* First link must have rel="home" and href="/" for home route */}
             <a href="/" rel="home">Dashboard  </a>
             <a href="/consultant-list">Consultant List</a>
+            <a href="/setting/history"> Activity History</a>
             <a href="/pricing">Pricing</a>
             <a href="/faq">FAQ</a>
+            <a href="/setting/history">Recharge History</a>
+           
         </NavMenu>
     );
 }

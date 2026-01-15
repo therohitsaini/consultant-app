@@ -21,11 +21,11 @@ import AdminSettings from "./pages/AdminSettings";
 import VaocherSettings from "./pages/VaocherSettings";
 import FcmTokenWindow from "./firebase/utils/FcmTokenWindow";
 import IncomingCallAlert from "./components/AlertModel/IncommingCallAlert";
-import AdminProtectRoute from "./components/ProtectRoute/AdminProtectRoute";
-import { NavigationMenu } from "@shopify/app-bridge-react";
-import AdminMenu, { MyApp } from "./pages/AdminMenu";
 import { Redirect } from "@shopify/app-bridge/actions";
 import { useAppBridge } from "./components/createContext/AppBridgeContext";
+import { UseAppInstall } from "./components/ProtectRoute/UseAppInstall";
+import ProtectAdminRoute from "./components/ProtectRoute/ProtectAdminRoute";
+import UserTransHistory from "./pages/UserTransHistory";
 
 
 
@@ -35,28 +35,41 @@ export default function App() {
   const shop = params.get("shop");
   const adminId = params.get("AdminId");
   console.log("shop", shop, "adminId", adminId);
+  // const [installed, setInstalled] = useState(false);
   const app = useAppBridge();
-  console.log("app", app);
+  const installed = UseAppInstall(shop, app);
 
 
-  const getInstallUrl = async () => {
-    try {
-      const response = await fetch(`https://test-online-consultation.zend-apps.com/app/install/${shop}`);
-      const data = await response.json();
-      console.log("data", data);
-      const installUrl = data?.installUrl;
-      console.log("installUrl", installUrl);
-      if (installUrl.installed === false) {
-        window.top.location.href = installUrl.installUrl;
-      }
-    } catch (error) {
-      console.log("error", error);
-    }
-  }
+  // const app = useAppBridge();
 
-  useEffect(() => {
-    getInstallUrl();
-  }, [shop]);
+  // const getInstallUrl = async () => {
+  //   try {
+  //     const response = await fetch(
+  //       `https://test-online-consultation.zend-apps.com/app/install/${shop}`
+  //     );
+
+  //     const data = await response.json();
+  //     console.log("data", data);
+
+  //     if (!data.installed && data.installUrl) {
+  //       console.log("Redirecting to install URL via App Bridge...");
+  //       setInstalled(true);
+  //       const redirect = Redirect.create(app);
+  //       redirect.dispatch(Redirect.Action.REMOTE, data.installUrl);
+  //       return;
+  //     }
+  //   } catch (error) {
+  //     console.log("error", error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   if (shop) {
+  //     getInstallUrl();
+  //   }
+  // }, [shop]);
+
+
 
   useEffect(() => {
     const handleMessage = (event) => {
@@ -116,24 +129,26 @@ export default function App() {
   }, [location]);
 
 
+  // if (installed) {
+  //   return <div>Redirecting to install URL...</div>;
+  // }
+
   return (
     <Fragment>
-
-
       <BrowserRouter>
-
         <GlobalMessageNotification />
         <IncomingCallAlert />
-
         <Routes>
           <Route element={
-            <LayoutFrame />
-
+            <ProtectAdminRoute installed={installed}>
+              <LayoutFrame />
+            </ProtectAdminRoute>
           }>
             <Route index element={<Dashboard />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="consultant-list" element={<ConsultantList />} />
             <Route path="add-consultant" element={<AddConsultant />} />
+            <Route path="/setting/history" element={<UserTransHistory />} />
             <Route path="pricing" element={<Pricing />} />
             <Route path="admin-settings" element={<AdminSettings />} />
             <Route path="admin-settings/voucher" element={<VaocherSettings />} />
@@ -161,80 +176,4 @@ export default function App() {
 
 
 
-// import React, { Fragment, useEffect, useState } from "react";
 
-// import { BrowserRouter, Routes, Route } from "react-router-dom";
-// import { MemoryRouter } from "react-router-dom";
-
-// import { Redirect } from "@shopify/app-bridge/actions";
-// import { useAppBridge } from "./components/createContext/AppBridgeContext";
-
-// import LayoutFrame from "./pages/LayoutFrame";
-// import Dashboard from "./pages/Dashboard";
-// import ConsultantList from "./pages/ConsultantList";
-// import AddConsultant from "./pages/AddConsultant";
-// import Pricing from "./pages/Pricing";
-// import Faq from "./pages/Faq";
-
-// export default function App() {
-//   const [checking, setChecking] = useState(true);
-//   const params = new URLSearchParams(window.location.search);
-//   const shop = params.get("shop");
-//   const host = params.get("host");
-
-//   const app = useAppBridge();
-//   // useEffect(() => {
-//   //   if (!app || !shop) return;
-
-//   //   const checkInstalled = async () => {
-//   //     try {
-//   //       const res = await fetch(
-//   //         `https://test-online-consultation.zend-apps.com/app/app/is-installed/${shop}`
-//   //       );
-//   //       const data = await res.json();
-//   //       console.log("data", data.installed);
-
-//   //       if (data.installed === false) {
-//   //         console.log("App not installed, redirecting to install route...");
-//   //         // Redirect user to backend install route
-//   //         window.location.href = `https://test-online-consultation.zend-apps.com/app/install?shop=${shop}`;
-//   //         return;
-//   //       }
-
-//   //       // App is installed, continue loading React app
-//   //       setChecking(false);
-//   //     } catch (err) {
-//   //       console.error("Error checking installation:", err);
-//   //     }
-//   //   };
-
-//   //   checkInstalled();
-//   // }, [shop, app]);
-
-//   // // Show loading until installation check is complete
-//   // if (checking) {
-//   //   return <div>Checking app installation...</div>;
-//   // }
-
-//   // return <div>Loading...</div>; // Show loading while checking
-
-//   // if (!app) return null;
-
-//   return (
-//     <>
-//       {/* Navigation menu is rendered in index.js via AdminMenu component */}
-//       {/* ❌ BrowserRouter hatao */}
-//       <BrowserRouter>
-//         <Routes>
-//           <Route element={<LayoutFrame />}>
-//             <Route path="/" element={<Dashboard />} />
-//             <Route path="/consultant-list" element={<ConsultantList />} />
-//             <Route path="/add-consultant" element={<AddConsultant />} />
-//             <Route path="/pricing" element={<Pricing />} />
-//             <Route path="/faq" element={<Faq />} />
-//           </Route>
-//         </Routes>
-//       </BrowserRouter>
-//     </>
-//   );
-// }

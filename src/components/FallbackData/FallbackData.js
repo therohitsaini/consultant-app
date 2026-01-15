@@ -24,7 +24,7 @@ export const headings = [
     { title: 'Contact' },
     { title: 'Profession' },
     { title: 'Experience' },
-    { title: 'Conversion Fees', alignment: 'end' },
+    { title: 'Conversion Fees', alignment: 'end'     },
     { title: 'Status' },
     { title: 'Action' },
 ];
@@ -75,105 +75,6 @@ export const genderOptions = [
     { label: 'Other', value: 'other' },
 ];
 
-
-export const consultantsData = [
-    {
-        id: 1,
-        name: 'Arlene McCoy',
-        image: '',
-        profession: 'Psychologist - Adult, Adolescent',
-        languages: ['Hindi', 'English'],
-        experience: 12,
-        rating: 4.5,
-        testimonials: 23,
-        startingPrice: 1200,
-        chatPrice: 800,
-        audioPrice: 1200,
-        videoPrice: 1500,
-        expertise: ['Depression', 'Anxiety', 'Family', 'Couple'],
-        isActive: true
-    },
-    {
-        id: 2,
-        name: 'Kalabhairavar',
-        image: '',
-        profession: 'Vedic, Numerology',
-        languages: ['Tamil', 'English'],
-        experience: 10,
-        rating: 4.8,
-        testimonials: 45,
-        startingPrice: 800,
-        chatPrice: 500,
-        audioPrice: 800,
-        videoPrice: 1000,
-        expertise: ['Vedic Astrology', 'Numerology', 'Palmistry'],
-        isActive: false
-    },
-    {
-        id: 3,
-        name: 'Nivansh',
-        image: '',
-        profession: 'Vedic, Numerology, Vastu',
-        languages: ['Hindi', 'Bhojpuri'],
-        experience: 8,
-        rating: 4.7,
-        testimonials: 32,
-        startingPrice: 1000,
-        chatPrice: 600,
-        audioPrice: 1000,
-        videoPrice: 1200,
-        expertise: ['Vastu', 'Numerology', 'Feng Shui'],
-        isActive: true
-    },
-    {
-        id: 4,
-        name: 'Sahaskrit',
-        image: '',
-        profession: 'Vedic, Face Reading',
-        languages: ['Hindi', 'English'],
-        experience: 15,
-        rating: 4.9,
-        testimonials: 67,
-        startingPrice: 1500,
-        chatPrice: 1000,
-        audioPrice: 1500,
-        videoPrice: 1800,
-        expertise: ['Face Reading', 'Vedic', 'Palmistry'],
-        isActive: true
-    },
-    {
-        id: 5,
-        name: 'Jigneshwar',
-        image: '/images/team/team1.avif',
-        profession: 'Vedic',
-        languages: ['Hindi', 'Bengali'],
-        experience: 6,
-        rating: 4.6,
-        testimonials: 28,
-        startingPrice: 700,
-        chatPrice: 400,
-        audioPrice: 700,
-        videoPrice: 900,
-        expertise: ['Vedic', 'Astrology', 'Remedies'],
-        isActive: false
-    },
-    {
-        id: 6,
-        name: 'Shonaaya',
-        image: '/images/team/t6.jpg',
-        profession: 'Numerology, Tarot, Face Reading',
-        languages: ['Hindi', 'Punjabi'],
-        experience: 9,
-        rating: 4.8,
-        testimonials: 41,
-        startingPrice: 1100,
-        chatPrice: 700,
-        audioPrice: 1100,
-        videoPrice: 1300,
-        expertise: ['Tarot', 'Numerology', 'Crystal Healing'],
-        isActive: true
-    }
-];
 
 
 

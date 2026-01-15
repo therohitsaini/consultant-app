@@ -69,9 +69,9 @@ function Dashboard() {
     const app = useAppBridge();
     const params = new URLSearchParams(window.location.search);
     const host = params.get("host");
-    const id = params.get("AdminId");
+
     const adminId = "690c374f605cb8b946503ccb";
-    console.log("adminId", id);
+   
 
     useEffect(() => {
         if (adminId) {
@@ -104,8 +104,8 @@ function Dashboard() {
 
     useEffect(() => {
         const getAdminDetails = async () => {
-            const adminId = localStorage.getItem('doamin_V_id');
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/admin/${adminId}`);
+       
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/admin/${adminIdLocal}`);
             console.log("response", response);
             if (response.status === 200) {
                 console.log("response", response.data);
