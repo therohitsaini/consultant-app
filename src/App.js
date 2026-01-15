@@ -36,34 +36,27 @@ export default function App() {
   const adminId = params.get("AdminId");
   console.log("shop", shop, "adminId", adminId);
   const app = useAppBridge();
-  // const checkInstalled = async () => {
-  //   if (!app || !shop) {
-  //     return console.warn("App Bridge not initialized or shop missing");
-  //   }
-  //   const url = `https://test-online-consultation.zend-apps.com/app/app/is-installed/${shop}`;
-  //   const response = await fetch(url, {
-  //     method: "GET",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //   });
-  //   const data = await response.json();
-  //   console.log("data++++++++++++++================", data);
-  //   if (data?.installed === false) {
-  //     const redirect = redirect.create(app);
-  //     redirect.dispatch(
-  //       Redirect.Action.REMOTE,
-  //       `https://test-online-consultation.zend-apps.com/app/install?shop=${shop}`
-  //     );
-  //   }
-  // }
-  // useEffect(() => {
-  //   checkInstalled();
-  // }, [shop]);
+  console.log("app", app);
 
 
+  const getInstallUrl = async () => {
+    try {
+      const response = await fetch(`https://test-online-consultation.zend-apps.com/app/install/${shop}`);
+      const data = await response.json();
+      console.log("data", data);
+      const installUrl = data?.installUrl;
+      console.log("installUrl", installUrl);
+      if (installUrl.installed === false) {
+        window.top.location.href = installUrl.installUrl;
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
+  }
 
-
+  useEffect(() => {
+    getInstallUrl();
+  }, [shop]);
 
   useEffect(() => {
     const handleMessage = (event) => {
@@ -146,16 +139,16 @@ export default function App() {
             <Route path="admin-settings/voucher" element={<VaocherSettings />} />
             <Route path="faq" element={<Faq />} />
           </Route>
-            <Route path="/consultant-cards" element={<ConsultantCards />} />
-            <Route path="/view-profile" element={<ViewProfile />} />
-            <Route path="/consultant-dashboard/*" element={<TabNavigation />} />
-            <Route path="/users-page/*" element={<TabNavigation />} />
-            <Route path="/consulant-chats/*" element={<TabNavigation />} />
-            <Route path="/video/calling/page" element={<VideoCallingPage />} />
-            <Route path="/chats" element={<UserChat />} />
-            <Route path="/login" element={<LoginForm />} />
-            <Route path="/fcm-token" element={<FcmTokenWindow />} />
-            <Route path="/profile" element={<ProfileSection />}>
+          <Route path="/consultant-cards" element={<ConsultantCards />} />
+          <Route path="/view-profile" element={<ViewProfile />} />
+          <Route path="/consultant-dashboard/*" element={<TabNavigation />} />
+          <Route path="/users-page/*" element={<TabNavigation />} />
+          <Route path="/consulant-chats/*" element={<TabNavigation />} />
+          <Route path="/video/calling/page" element={<VideoCallingPage />} />
+          <Route path="/chats" element={<UserChat />} />
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/fcm-token" element={<FcmTokenWindow />} />
+          <Route path="/profile" element={<ProfileSection />}>
             <Route index element={<Voucher />} />
             <Route path="voucher" element={<Voucher />} />
             <Route path="history" element={<History />} />
