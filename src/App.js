@@ -145,16 +145,16 @@ export default function App() {
             <Route path="admin-settings/voucher" element={<VaocherSettings />} />
             <Route path="faq" element={<Faq />} />
           </Route>
-          <Route path="/consultant-cards" element={<ConsultantCards />} />
-          <Route path="/view-profile" element={<ViewProfile />} />
-          <Route path="/consultant-dashboard/*" element={<TabNavigation />} />
-          <Route path="/users-page/*" element={<TabNavigation />} />
-          <Route path="/consulant-chats/*" element={<TabNavigation />} />
-          <Route path="/video/calling/page" element={<VideoCallingPage />} />
-          <Route path="/chats" element={<UserChat />} />
-          <Route path="/login" element={<LoginForm />} />
-          <Route path="/fcm-token" element={<FcmTokenWindow />} />
-          <Route path="/profile" element={<ProfileSection />}>
+            <Route path="/consultant-cards" element={<ConsultantCards />} />
+            <Route path="/view-profile" element={<ViewProfile />} />
+            <Route path="/consultant-dashboard/*" element={<TabNavigation />} />
+            <Route path="/users-page/*" element={<TabNavigation />} />
+            <Route path="/consulant-chats/*" element={<TabNavigation />} />
+            <Route path="/video/calling/page" element={<VideoCallingPage />} />
+            <Route path="/chats" element={<UserChat />} />
+            <Route path="/login" element={<LoginForm />} />
+            <Route path="/fcm-token" element={<FcmTokenWindow />} />
+            <Route path="/profile" element={<ProfileSection />}>
             <Route index element={<Voucher />} />
             <Route path="voucher" element={<Voucher />} />
             <Route path="history" element={<History />} />

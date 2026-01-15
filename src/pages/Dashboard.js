@@ -69,8 +69,9 @@ function Dashboard() {
     const app = useAppBridge();
     const params = new URLSearchParams(window.location.search);
     const host = params.get("host");
-    const adminId ="690c374f605cb8b946503ccb";
-    console.log("adminId", adminId);
+    const id = params.get("AdminId");
+    const adminId = "690c374f605cb8b946503ccb";
+    console.log("adminId", id);
 
     useEffect(() => {
         if (adminId) {
