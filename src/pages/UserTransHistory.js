@@ -6,99 +6,8 @@ import { IndexTable, Text } from '@shopify/polaris'
 import { fetchActivityHistory } from '../components/Redux/slices/adminSlice'
 import { useDispatch, useSelector } from 'react-redux'
 
-// Default transaction history data
-const defaultTransactionData = [
-    {
-        id: '1',
-        type: 'Chat',
-        date: '2024-01-15',
-        time: '10:30 AM',
-        duration: '45 min',
-        user: 'John Doe',
-        consultant: 'Dr. John Smith',
-        amount: '$25.00',
-        status: 'Completed'
-    },
-    {
-        id: '2',
-        type: 'Call',
-        date: '2024-01-14',
-        time: '2:15 PM',
-        duration: '30 min',
-        user: 'Sarah Johnson',
-        consultant: 'Dr. Sarah Johnson',
-        amount: '$35.00',
-        status: 'Completed'
-    },
-    {
-        id: '3',
-        type: 'Voice Call',
-        date: '2024-01-13',
-        time: '4:45 PM',
-        duration: '60 min',
-        user: 'Michael Brown',
-        consultant: 'Dr. Michael Brown',
-        amount: '$50.00',
-        status: 'Completed'
-    },
-    {
-        id: '4',
-        type: 'Chat',
-        date: '2024-01-12',
-        time: '9:00 AM',
-        duration: '20 min',
-        user: 'Emily Davis',
-        consultant: 'Dr. Emily Davis',
-        amount: '$15.00',
-        status: 'Completed'
-    },
-    {
-        id: '5',
-        type: 'Call',
-        date: '2024-01-11',
-        time: '3:30 PM',
-        duration: '25 min',
-        user: 'Robert Wilson',
-        consultant: 'Dr. Robert Wilson',
-        amount: '$30.00',
-        status: 'Completed'
-    },
-    {
-        id: '6',
-        type: 'Voice Call',
-        date: '2024-01-10',
-        time: '11:20 AM',
-        duration: '50 min',
-        user: 'Lisa Anderson',
-        consultant: 'Dr. Lisa Anderson',
-        amount: '$45.00',
-        status: 'Completed'
-    },
-    {
-        id: '7',
-        type: 'Chat',
-        date: '2024-01-09',
-        time: '1:00 PM',
-        duration: '35 min',
-        user: 'James Taylor',
-        consultant: 'Dr. James Taylor',
-        amount: '$20.00',
-        status: 'Completed'
-    },
-    {
-        id: '8',
-        type: 'Call',
-        date: '2024-01-08',
-        time: '5:15 PM',
-        duration: '40 min',
-        user: 'Maria Garcia',
-        consultant: 'Dr. Maria Garcia',
-        amount: '$40.00',
-        status: 'Completed'
-    }
-]
 
-// Headings for transaction history
+
 const transactionHeadings = [
     { title: 'Sr. No.' },
     { title: 'Type' },
@@ -111,7 +20,6 @@ const transactionHeadings = [
     { title: 'Status' }
 ]
 
-// Sort options for transaction history
 const transactionSortOptions = [
     { label: 'Date', value: 'date asc', directionLabel: 'Oldest First' },
     { label: 'Date', value: 'date desc', directionLabel: 'Newest First' },
@@ -123,21 +31,48 @@ const transactionSortOptions = [
     { label: 'Duration', value: 'duration desc', directionLabel: 'Longest First' }
 ]
 
-// Tab strings for filtering
 const transactionItemStrings = ['All', 'Chat', 'Call', 'Voice Call']
 
 function UserTransHistory() {
     const { activityHistory } = useSelector((state) => state.admin);
-    console.log("activityHistory", activityHistory);
     const dispatch = useDispatch();
     const [adminIdLocal, setAdminIdLocal] = useState(null);
+    const [page, setPage] = useState(1);
+    const limit = 10;
+
     useEffect(() => {
         const id = localStorage.getItem('doamin_V_id');
         setAdminIdLocal(id);
     }, []);
     useEffect(() => {
-        dispatch(fetchActivityHistory(adminIdLocal));
+        dispatch(fetchActivityHistory( adminIdLocal, page, limit ));
     }, [dispatch, adminIdLocal]);
+
+
+    const formatDate = (iso) =>
+        new Date(iso).toLocaleDateString();
+
+    const formatTime = (iso) =>
+        new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const getDuration = (start, end) => {
+        const diff = (new Date(end) - new Date(start)) / 1000;
+        const min = Math.floor(diff / 60);
+        return `${min} min`;
+    };
+    const tableData = activityHistory?.data?.map((item) => ({
+        id: item._id,
+        type: item.type?.toUpperCase(),
+        date: formatDate(item.createdAt),
+        time: formatTime(item.startTime),
+        duration: getDuration(item.startTime, item.endTime),
+        user: item.senderId?.slice(-6),        // ya actual user name later
+        consultant: item.receiverId?.slice(-6), // ya actual consultant name
+        amount: `$${item.amount}`,
+        status: item.status
+    })) || [];
+
+
 
     const renderTransactionRow = useCallback((transaction, index) => {
         const { id, type, date, time, duration, user, consultant, amount, status } = transaction
@@ -208,7 +143,7 @@ function UserTransHistory() {
                         <IndexTableList
                             itemStrings={transactionItemStrings}
                             sortOptions={transactionSortOptions}
-                            data={defaultTransactionData}
+                            data={tableData}
                             headings={transactionHeadings}
                             renderRow={renderTransactionRow}
                             resourceName={{ singular: 'transaction', plural: 'transactions' }}
@@ -216,6 +151,9 @@ function UserTransHistory() {
                             onTabChange={() => { }}
                             onQueryChange={() => { }}
                             onSortChange={() => { }}
+                            page={page} setPage={setPage}
+                            limit={limit}
+                            activityHistory={activityHistory}
                         />
                     </Layout.Section>
                 </Layout>

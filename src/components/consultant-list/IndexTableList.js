@@ -4,6 +4,7 @@ import {
   IndexFilters,
   useSetIndexFiltersMode,
   useBreakpoints,
+  Pagination,
 } from '@shopify/polaris';
 import { useState, useCallback } from 'react';
 
@@ -31,14 +32,20 @@ function IndexTableList({
   onTabChange,
   onQueryChange,
   onSortChange,
+  page, setPage,
+  limit,
+  activityHistory
 }) {
   const tabs = itemStrings.map((item, index) => ({
     content: item,
     index,
-    onAction: () => {},
+    onAction: () => { },
     id: `${item}-${index}`,
     isLocked: index === 0,
   }));
+
+  console.log("tabs", tabs,"------",limit);
+  console.log("sortOptions", activityHistory);
 
   const [selected, setSelected] = useState(0);
   const [sortSelected, setSortSelected] = useState(sortOptions.length > 0 ? [sortOptions[0].value] : []);
@@ -86,7 +93,7 @@ function IndexTableList({
     return true;
   };
 
-  const rowMarkup = data?.map((item, index) => 
+  const rowMarkup = data?.map((item, index) =>
     renderRow ? renderRow(item, index) : null
   ).filter(Boolean);
 
@@ -95,7 +102,6 @@ function IndexTableList({
   return (
     <LegacyCard>
       <IndexFilters
-        
         sortOptions={sortOptions}
         sortSelected={sortSelected}
         queryValue={queryValue}
@@ -127,6 +133,12 @@ function IndexTableList({
       >
         {rowMarkup}
       </IndexTable>
+      <Pagination
+        hasPrevious={page > 1}
+        hasNext={page * limit < activityHistory?.total}
+        onPrevious={() => setPage((p) => p - 1)}
+        onNext={() => setPage((p) => p + 1)}
+      />
     </LegacyCard>
   );
 }

@@ -140,9 +140,9 @@ export default function App() {
         <IncomingCallAlert />
         <Routes>
           <Route element={
-            <ProtectAdminRoute installed={installed}>
+            // <ProtectAdminRoute installed={installed}>
               <LayoutFrame />
-            </ProtectAdminRoute>
+            // </ProtectAdminRoute>
           }>
             <Route index element={<Dashboard />} />
             <Route path="dashboard" element={<Dashboard />} />
