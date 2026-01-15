@@ -33,7 +33,8 @@ import { useAppBridge } from "./components/createContext/AppBridgeContext";
 export default function App() {
   const params = new URLSearchParams(window.location.search);
   const shop = params.get("shop");
-  console.log("shop", shop);
+  const adminId = params.get("AdminId");
+  console.log("shop", shop, "adminId", adminId);
   const app = useAppBridge();
   // const checkInstalled = async () => {
   //   if (!app || !shop) {
