@@ -2,9 +2,12 @@ import { NavMenu } from '@shopify/app-bridge-react';
 import { useAppBridge } from '../components/createContext/AppBridgeContext';
 import { useEffect } from 'react';
 
+
+
 export function AdminMenu() {
     const app = useAppBridge();
 
+    
     //   useEffect(() => {
     //     // Debug: Check if App Bridge script is loaded
     //     console.log('🔍 AdminMenu Debug:', {

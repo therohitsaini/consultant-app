@@ -71,7 +71,7 @@ function Dashboard() {
     const host = params.get("host");
 
     const adminId = "690c374f605cb8b946503ccb";
-   
+
 
     useEffect(() => {
         if (adminId) {
@@ -84,18 +84,15 @@ function Dashboard() {
         setAdminIdLocal(id);
     }, []);
     console.log("adminIdLocal", adminIdLocal);
-    // Duplicate list for infinite loop
-    const loopedApps = [...apps, ...apps];
     const dispatch = useDispatch();
     const { users, loading } = useSelector((state) => state.users);
     const { consultants, loading: consultantLoading } = useSelector((state) => state.consultants);
-
-    // Get target values
+    console.log("consultants", consultants)
     const userCount = users?.data?.length || 0;
     const consultantCount = consultants?.findConsultant?.length || 0;
 
     useEffect(() => {
-        dispatch(fetchConsultants(adminIdLocal));
+        dispatch(fetchConsultants({ adminIdLocal, app }));
     }, [dispatch, adminIdLocal]);
 
     useEffect(() => {
@@ -104,7 +101,6 @@ function Dashboard() {
 
     useEffect(() => {
         const getAdminDetails = async () => {
-       
             const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/admin/${adminIdLocal}`);
             console.log("response", response);
             if (response.status === 200) {
@@ -117,11 +113,7 @@ function Dashboard() {
         }
     }, [adminId]);
 
-    // const apps = useAppBridge();
 
-    // if (!app) {
-    //     return <div>Please open app from Shopify Admin</div>;
-    // }
 
 
     return (

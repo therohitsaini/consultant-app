@@ -1,5 +1,6 @@
 import { createContext, useContext, useMemo, useEffect } from "react";
 import createApp from "@shopify/app-bridge";
+import { getSessionToken } from "@shopify/app-bridge-utils";
 
 export const AppBridgeContext = createContext(null);
 
@@ -54,21 +55,13 @@ export const AppBridgeProvider = ({ children }) => {
     }
 
     try {
-
-
-      console.log("-------------------------");
-      console.log("apiKey", apiKey);
-      console.log("host", host);
-
-
-
-
       const appInstance = createApp({
         apiKey: apiKey,
         host: host,
         forceRedirect: true,
-        embedded: true, // Required for NavMenu to work in Shopify admin
+        embedded: true,
       });
+    
       console.log("✅ App Bridge initialized successfully with host:", host);
       return appInstance;
     } catch (error) {
@@ -100,51 +93,3 @@ export const AppBridgeProvider = ({ children }) => {
   );
 };
 
-// import React, { createContext, useContext, useState, useEffect } from "react";
-
-// export const AppBridgeContext = createContext(null);
-
-// export const useAppBridge = () => useContext(AppBridgeContext);
-
-// export const AppBridgeProvider = ({ children }) => {
-//   const [shopifyParams, setShopifyParams] = useState(null);
-
-//   useEffect(() => {
-//     const params = new URLSearchParams(window.location.search);
-//     const data = {
-//       shop: params.get('shop'),
-//       host: params.get('host'),
-//       embedded: params.get('embedded'),
-//       adminId: params.get('adminId')
-//     };
-
-//     if (data.host && data.shop) {
-//       setShopifyParams(data);
-//       localStorage.setItem('shopify_params', JSON.stringify(data));
-//     }
-//   }, []);
-
-
-//   const mockApp = {
-//     dispatch: () => { },
-//     subscribe: () => () => { },
-//     getState: () => ({
-//       config: {
-//         host: shopifyParams?.host || '',
-//         apiKey: process.env.REACT_APP_SHOPIFY_API_KEY
-//       }
-//     }),
-//     featuresAvailable: () => true,
-//     hostOrigin: 'https://admin.shopify.com'
-//   };
-
-//   return (
-//     <AppBridgeContext.Provider value={{
-//       app: mockApp,
-//       params: shopifyParams,
-//       isShopifyAdmin: !!(shopifyParams?.host && shopifyParams?.shop)
-//     }}>
-//       {children}
-//     </AppBridgeContext.Provider>
-//   );
-// };

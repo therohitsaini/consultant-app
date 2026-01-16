@@ -32,9 +32,7 @@ function IndexTableList({
   onTabChange,
   onQueryChange,
   onSortChange,
-  page, setPage,
-  limit,
-  activityHistory
+ 
 }) {
   const tabs = itemStrings.map((item, index) => ({
     content: item,
@@ -44,8 +42,6 @@ function IndexTableList({
     isLocked: index === 0,
   }));
 
-  console.log("tabs", tabs,"------",limit);
-  console.log("sortOptions", activityHistory);
 
   const [selected, setSelected] = useState(0);
   const [sortSelected, setSortSelected] = useState(sortOptions.length > 0 ? [sortOptions[0].value] : []);
@@ -133,12 +129,7 @@ function IndexTableList({
       >
         {rowMarkup}
       </IndexTable>
-      <Pagination
-        hasPrevious={page > 1}
-        hasNext={page * limit < activityHistory?.total}
-        onPrevious={() => setPage((p) => p - 1)}
-        onNext={() => setPage((p) => p + 1)}
-      />
+     
     </LegacyCard>
   );
 }

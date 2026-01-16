@@ -40,6 +40,7 @@ function ConsultantList() {
     }, [dispatch, isRefreshed, adminIdLocal]);
 
     const consultantsData = consultants?.findConsultant || []
+    console.log("consultantsData", consultantsData)
     const filteredConsultants = useMemo(() => {
         if (!consultantsData) return [];
 
