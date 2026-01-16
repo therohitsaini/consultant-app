@@ -20,6 +20,10 @@ import { useState, useCallback } from 'react';
  * @param {Function} onTabChange - Optional callback when tab changes: (selectedIndex) => void
  * @param {Function} onQueryChange - Optional callback when query changes: (query) => void
  * @param {Function} onSortChange - Optional callback when sort changes: (sortValue) => void
+ * @param {Number} page - Current page number (1-based)
+ * @param {Function} setPage - Function to set page number
+ * @param {Number} limit - Number of items per page
+ * @param {Number} totalItems - Total number of items across all pages
  */
 function IndexTableList({
   itemStrings = [],
@@ -32,7 +36,11 @@ function IndexTableList({
   onTabChange,
   onQueryChange,
   onSortChange,
- 
+  page,
+  setPage,
+  limit,
+  totalItems,
+  setType,
 }) {
   const tabs = itemStrings.map((item, index) => ({
     content: item,
@@ -51,11 +59,11 @@ function IndexTableList({
   const handleTabChange = useCallback(
     (selectedIndex) => {
       setSelected(selectedIndex);
-      if (onTabChange) {
-        onTabChange(selectedIndex);
+      if (setType) {
+        setType(selectedIndex);
       }
     },
-    [onTabChange]
+    [setType]
   );
 
   const handleFiltersQueryChange = useCallback(
@@ -93,7 +101,25 @@ function IndexTableList({
     renderRow ? renderRow(item, index) : null
   ).filter(Boolean);
 
-  console.log("rowMarkup", sortOptions);
+  // Calculate pagination values
+  const hasPagination = page !== undefined && setPage !== undefined && limit !== undefined;
+  const totalPages = hasPagination && totalItems !== undefined ? Math.ceil(totalItems / limit) : 1;
+  const currentPage = page || 1;
+  const startItem = hasPagination ? (currentPage - 1) * limit + 1 : 1;
+  const endItem = hasPagination ? Math.min(currentPage * limit, totalItems || data.length) : data.length;
+  const totalCount = totalItems !== undefined ? totalItems : data.length;
+
+  const handlePreviousPage = useCallback(() => {
+    if (currentPage > 1 && setPage) {
+      setPage(currentPage - 1);
+    }
+  }, [currentPage, setPage]);
+
+  const handleNextPage = useCallback(() => {
+    if (currentPage < totalPages && setPage) {
+      setPage(currentPage + 1);
+    }
+  }, [currentPage, totalPages, setPage]);
 
   return (
     <LegacyCard>
@@ -129,7 +155,17 @@ function IndexTableList({
       >
         {rowMarkup}
       </IndexTable>
-     
+      {hasPagination && totalPages > 1 && (
+        <div style={{ padding: '16px', display: 'flex', justifyContent: 'center' }}>
+          <Pagination
+            label={`Showing ${startItem} to ${endItem} of ${totalCount} ${resourceName.plural}`}
+            hasPrevious={currentPage > 1}
+            onPrevious={handlePreviousPage}
+            hasNext={currentPage < totalPages}
+            onNext={handleNextPage}
+          />
+        </div>
+      )}
     </LegacyCard>
   );
 }

@@ -10,12 +10,12 @@ import { useDispatch, useSelector } from 'react-redux'
 
 const transactionHeadings = [
     { title: 'Sr. No.' },
-    { title: 'Type' },
-    { title: 'Date' },
-    { title: 'Time' },
-    { title: 'Duration' },
     { title: 'User' },
     { title: 'Consultant' },
+    { title: 'Date' },
+    { title: 'Time' },
+    { title: 'Type' },
+    { title: 'Duration' },
     { title: 'Amount', alignment: 'end' },
     { title: 'Status' }
 ]
@@ -31,22 +31,27 @@ const transactionSortOptions = [
     { label: 'Duration', value: 'duration desc', directionLabel: 'Longest First' }
 ]
 
-const transactionItemStrings = ['All', 'Chat', 'Call', 'Voice Call']
+const transactionItemStrings = ['All', 'Chat', 'Voice Call', 'Video Call',]
 
 function UserTransHistory() {
     const { activityHistory, loading } = useSelector((state) => state.admin);
     const dispatch = useDispatch();
     const [adminIdLocal, setAdminIdLocal] = useState(null);
     const [page, setPage] = useState(1);
+    const [type, setType] = useState(0);
     const limit = 10;
-    console.log("activityHistory", activityHistory);
+    console.log("type", type);
+
+
     useEffect(() => {
         const id = localStorage.getItem('doamin_V_id');
         setAdminIdLocal(id);
     }, []);
     useEffect(() => {
-        dispatch(fetchActivityHistory(adminIdLocal, page, limit));
-    }, [dispatch, adminIdLocal]);
+        if (adminIdLocal) {
+            dispatch(fetchActivityHistory({ adminIdLocal, page, limit, type }));
+        }
+    }, [dispatch, adminIdLocal, page, limit, type]);
 
 
     const formatDate = (iso) =>
@@ -71,37 +76,17 @@ function UserTransHistory() {
         amount: `$${item.amount}`,
         status: item.status
     })) || [];
-    console.log("tableData", activityHistory);
 
     const renderTransactionRow = useCallback((transaction, index) => {
-        const { id, type, date, time, duration, user, consultant, amount, status } = transaction
+        const { id, user, type, date, time, duration, consultant, amount, status } = transaction
+        const serialNumber = (page - 1) * limit + index + 1;
 
         return (
 
             <IndexTable.Row id={id} key={id} position={index}>
                 <IndexTable.Cell>
                     <Text as="span" alignment="start" variant="bodyMd" fontWeight="bold" numeric>
-                        {index + 1}
-                    </Text>
-                </IndexTable.Cell>
-                <IndexTable.Cell>
-                    <Text variant="bodyMd" as="span" textTransform="small-caps">
-                        {type}
-                    </Text>
-                </IndexTable.Cell>
-                <IndexTable.Cell>
-                    <Text variant="bodyMd" as="span">
-                        {date}
-                    </Text>
-                </IndexTable.Cell>
-                <IndexTable.Cell>
-                    <Text variant="bodyMd" as="span">
-                        {time}
-                    </Text>
-                </IndexTable.Cell>
-                <IndexTable.Cell>
-                    <Text variant="bodyMd" as="span">
-                        {duration}
+                        {serialNumber}
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
@@ -115,58 +100,89 @@ function UserTransHistory() {
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
+                    <Text variant="bodyMd" as="span">
+                        {date}
+                    </Text>
+                </IndexTable.Cell>
+                <IndexTable.Cell>
+                    <Text variant="bodyMd" as="span">
+                        {time}
+                    </Text>
+                </IndexTable.Cell>
+                <IndexTable.Cell>
+
+                    <div style={{ textTransform: 'lowercase' }}>
+                        <Text variant="bodyMd" as="span"  >
+                            {type.charAt(0).toUpperCase() + type.slice(1)}
+                        </Text>
+                    </div>
+                </IndexTable.Cell>
+
+
+                <IndexTable.Cell>
+                    <Text variant="bodyMd" as="span">
+                        {duration}
+                    </Text>
+                </IndexTable.Cell>
+
+
+                <IndexTable.Cell>
                     <Text as="span" alignment="end" numeric>
                         {amount}
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
+                    <div style={{ color: status === "active" ? "green" : "black" }}>
                     <Text variant="bodyMd" as="span">
                         {status}
                     </Text>
-                </IndexTable.Cell>
-            </IndexTable.Row>
-        )
-    }, [])
-
-    return (
-        <Fragment>
-            {loading ? (
-                <div style={{  padding: '10px', margin: '10px', height: '90vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <Spinner accessibilityLabel="Spinner example" size="large" />
                 </div>
-            ) : (
+            </IndexTable.Cell>
+            </IndexTable.Row >
+        )
+}, [page, limit])
 
-                <Page
-                    title="Activity History"
-                    primaryAction={{
-                        icon: PlusIcon,
-                        content: 'Add Activity',
-                        url: '/add-activity',
-                    }}
-                >
-                    <Layout>
-                        <Layout.Section>
-                            <IndexTableList
-                                itemStrings={transactionItemStrings}
-                                sortOptions={transactionSortOptions}
-                                data={tableData}
-                                headings={transactionHeadings}
-                                renderRow={renderTransactionRow}
-                                resourceName={{ singular: 'transaction', plural: 'transactions' }}
-                                queryPlaceholder="Search transactions"
-                                onTabChange={() => { }}
-                                onQueryChange={() => { }}
-                                onSortChange={() => { }}
-                                page={page} setPage={setPage}
-                                limit={limit}
-                            // activityHistory={activityHistory}
-                            />
-                        </Layout.Section>
-                    </Layout>
-                </Page>
-            )}
-        </Fragment>
-    )
+return (
+    <Fragment>
+        {loading ? (
+            <div style={{ padding: '10px', margin: '10px', height: '90vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <Spinner accessibilityLabel="Spinner example" size="large" />
+            </div>
+        ) : (
+
+            <Page
+                title="Activity History"
+                primaryAction={{
+                    icon: PlusIcon,
+                    content: 'Add Activity',
+                    url: '/add-activity',
+                }}
+            >
+                <Layout>
+                    <Layout.Section>
+                        <IndexTableList
+                            itemStrings={transactionItemStrings}
+                            sortOptions={transactionSortOptions}
+                            data={tableData}
+                            headings={transactionHeadings}
+                            renderRow={renderTransactionRow}
+                            resourceName={{ singular: 'transaction', plural: 'transactions' }}
+                            queryPlaceholder="Search transactions"
+                            onTabChange={() => { }}
+                            onQueryChange={() => { }}
+                            onSortChange={() => { }}
+                            page={page}
+                            setPage={setPage}
+                            setType={setType}
+                            limit={limit}
+                            totalItems={activityHistory?.totalItems || activityHistory?.data?.length || 0}
+                        />
+                    </Layout.Section>
+                </Layout>
+            </Page>
+        )}
+    </Fragment>
+)
 }
 
 export default UserTransHistory

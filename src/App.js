@@ -26,6 +26,7 @@ import { useAppBridge } from "./components/createContext/AppBridgeContext";
 import { UseAppInstall } from "./components/ProtectRoute/UseAppInstall";
 import ProtectAdminRoute from "./components/ProtectRoute/ProtectAdminRoute";
 import UserTransHistory from "./pages/UserTransHistory";
+import WalletHistroy from "./pages/WalletHistroy";
 
 
 
@@ -37,7 +38,7 @@ export default function App() {
   console.log("shop", shop, "adminId", adminId);
   // const [installed, setInstalled] = useState(false);
   const app = useAppBridge();
-  const installed = UseAppInstall(shop, app);
+  const {installed,accessDenied} = UseAppInstall(shop, app);
 
 
   // const app = useAppBridge();
@@ -140,15 +141,16 @@ export default function App() {
         <IncomingCallAlert />
         <Routes>
           <Route element={
-            // <ProtectAdminRoute installed={installed}>
+            <ProtectAdminRoute installed={installed}>
               <LayoutFrame />
-            // </ProtectAdminRoute>
+            </ProtectAdminRoute>
           }>
             <Route index element={<Dashboard />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="consultant-list" element={<ConsultantList />} />
             <Route path="add-consultant" element={<AddConsultant />} />
             <Route path="/setting/history" element={<UserTransHistory />} />
+            <Route path="/setting/wallet-history" element={<WalletHistroy />} />
             <Route path="pricing" element={<Pricing />} />
             <Route path="admin-settings" element={<AdminSettings />} />
             <Route path="admin-settings/voucher" element={<VaocherSettings />} />

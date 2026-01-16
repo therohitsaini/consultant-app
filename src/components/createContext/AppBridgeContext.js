@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useEffect } from "react";
 import createApp from "@shopify/app-bridge";
-import { getSessionToken } from "@shopify/app-bridge-utils";
+
 
 export const AppBridgeContext = createContext(null);
 
@@ -17,12 +17,10 @@ export const AppBridgeProvider = ({ children }) => {
     let host = urlParams.get("host");
     const shop = urlParams.get("shop");
 
-    // First try to get host from URL params
     if (host) {
       return host;
     }
 
-    // If not found, try to get from hash
     if (window.location.hash) {
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
       host = hashParams.get("host");
@@ -31,7 +29,6 @@ export const AppBridgeProvider = ({ children }) => {
       }
     }
 
-    // If still not found, log warning
     if (!shop || !host) {
       console.warn("Missing shop or host parameter. App should be accessed through Shopify admin.");
     }
@@ -41,7 +38,6 @@ export const AppBridgeProvider = ({ children }) => {
 
   const host = getHost();
   const apiKey = process.env.REACT_APP_SHOPIFY_API_KEY;
-  console.log("apiKey", apiKey)
 
   const app = useMemo(() => {
     if (!host) {
@@ -61,7 +57,8 @@ export const AppBridgeProvider = ({ children }) => {
         forceRedirect: true,
         embedded: true,
       });
-    
+   
+
       console.log("✅ App Bridge initialized successfully with host:", host);
       return appInstance;
     } catch (error) {
