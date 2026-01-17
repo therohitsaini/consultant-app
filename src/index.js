@@ -27,6 +27,7 @@ root.render(
       <PolarisAppProvider i18n={en}>
         <Provider store={store}>
           <SocketProvider>
+            
             <App />
           </SocketProvider>
         </Provider>

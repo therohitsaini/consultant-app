@@ -1,16 +1,34 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios'
-import { useAppBridge } from '../../createContext/AppBridgeContext'
 import { getAppBridgeToken } from '../../../utils/getAppBridgeToken'
 
 
 
-export const fetchActivityHistory = createAsyncThunk("admin/fetchActivityHistory", async ({ adminIdLocal, page, limit = 10, type = 'all' }) => {
-    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/activity/transactions/${adminIdLocal}?page=${page}&limit=${limit}?type=${type}`, {
+
+export const fetchAdminDetails = createAsyncThunk("admin/fetchAdminDetails", async ({ adminIdLocal, app }) => {
+    console.log("adminIdLocal", adminIdLocal)
+    const token = await getAppBridgeToken(app);
+    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/admin/${adminIdLocal}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+    console.log("response", response.data?.data)
+    return response.data?.data
+})
+
+export const fetchActivityHistory = createAsyncThunk("admin/fetchActivityHistory", async ({ adminIdLocal, page, limit = 11, type = 'all', app, searchQuery }) => {
+    console.log("app__________REDUX", page, limit, type, app);
+    const token = await getAppBridgeToken(app);
+    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/activity/transactions/${adminIdLocal}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
         params: {
             page,
             limit,
-            type
+            type,
+            searchQuery
         }
     })
     return response.data
@@ -31,6 +49,26 @@ export const fetchWalletHistory = createAsyncThunk("admin/fetchWalletHistory", a
     return response.data
 })
 
+export const fetchShopAllUsers = createAsyncThunk("admin/fetchShopAllUsers", async ({ adminIdLocal, app }) => {
+    const token = await getAppBridgeToken(app);
+    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/shop/all-user/${adminIdLocal}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+    return response.data
+})
+export const fetchShopAllConsultants = createAsyncThunk("admin/fetchShopAllConsultants", async ({ adminIdLocal, app }) => {
+    const token = await getAppBridgeToken(app);
+    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/shop/all-consultant/${adminIdLocal}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+    return response.data
+})
+
+
 const adminSlice = createSlice({
     name: "admin",
     initialState: {
@@ -38,6 +76,9 @@ const adminSlice = createSlice({
         walletHistory: [],
         loading: false,
         error: null,
+        shopAllUsers: [],
+        shopAllConsultants: [],
+        adminDetails_: [],
     },
     extraReducers: (builder) => {
         builder
@@ -60,6 +101,39 @@ const adminSlice = createSlice({
                 state.walletHistory = action.payload;
             })
             .addCase(fetchWalletHistory.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
+            .addCase(fetchShopAllUsers.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchShopAllUsers.fulfilled, (state, action) => {
+                state.loading = false;
+                state.shopAllUsers = action.payload;
+            })
+            .addCase(fetchShopAllUsers.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
+            .addCase(fetchShopAllConsultants.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchShopAllConsultants.fulfilled, (state, action) => {
+                state.loading = false;
+                state.shopAllConsultants = action.payload;
+            })
+            .addCase(fetchShopAllConsultants.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
+            .addCase(fetchAdminDetails.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchAdminDetails.fulfilled, (state, action) => {
+                state.loading = false;
+                state.adminDetails_ = action.payload;
+            })
+            .addCase(fetchAdminDetails.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
             })

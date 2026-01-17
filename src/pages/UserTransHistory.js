@@ -5,6 +5,7 @@ import { PlusIcon } from '@shopify/polaris-icons'
 import { IndexTable, Text } from '@shopify/polaris'
 import { fetchActivityHistory } from '../components/Redux/slices/adminSlice'
 import { useDispatch, useSelector } from 'react-redux'
+import { useAppBridge } from '../components/createContext/AppBridgeContext'
 
 
 
@@ -34,24 +35,26 @@ const transactionSortOptions = [
 const transactionItemStrings = ['All', 'Chat', 'Voice Call', 'Video Call',]
 
 function UserTransHistory() {
+    const app = useAppBridge();
+    console.log("app", app);
     const { activityHistory, loading } = useSelector((state) => state.admin);
     const dispatch = useDispatch();
     const [adminIdLocal, setAdminIdLocal] = useState(null);
+    const [searchQuery, setSearchQuery] = useState("");
     const [page, setPage] = useState(1);
     const [type, setType] = useState(0);
-    const limit = 10;
-    console.log("type", type);
+    const limit = 11;
 
-
+    console.log("searchQuery", searchQuery)
     useEffect(() => {
         const id = localStorage.getItem('doamin_V_id');
         setAdminIdLocal(id);
     }, []);
     useEffect(() => {
         if (adminIdLocal) {
-            dispatch(fetchActivityHistory({ adminIdLocal, page, limit, type }));
+            dispatch(fetchActivityHistory({ adminIdLocal, page, limit, type, app, searchQuery }));
         }
-    }, [dispatch, adminIdLocal, page, limit, type]);
+    }, [dispatch, adminIdLocal, page, limit, type, searchQuery]);
 
 
     const formatDate = (iso) =>
@@ -133,22 +136,18 @@ function UserTransHistory() {
                 </IndexTable.Cell>
                 <IndexTable.Cell>
                     <div style={{ color: status === "active" ? "green" : "black" }}>
-                    <Text variant="bodyMd" as="span">
-                        {status}
-                    </Text>
-                </div>
-            </IndexTable.Cell>
+                        <Text variant="bodyMd" as="span">
+                            {status}
+                        </Text>
+                    </div>
+                </IndexTable.Cell>
             </IndexTable.Row >
         )
-}, [page, limit])
+    }, [page, limit])
 
-return (
-    <Fragment>
-        {loading ? (
-            <div style={{ padding: '10px', margin: '10px', height: '90vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <Spinner accessibilityLabel="Spinner example" size="large" />
-            </div>
-        ) : (
+    return (
+        <Fragment>
+      
 
             <Page
                 title="Activity History"
@@ -169,20 +168,24 @@ return (
                             resourceName={{ singular: 'transaction', plural: 'transactions' }}
                             queryPlaceholder="Search transactions"
                             onTabChange={() => { }}
-                            onQueryChange={() => { }}
+
+                            onQueryChange={(value) => {
+                                setSearchQuery(value);
+                                setPage(1);
+                            }}
                             onSortChange={() => { }}
                             page={page}
                             setPage={setPage}
                             setType={setType}
                             limit={limit}
                             totalItems={activityHistory?.totalItems || activityHistory?.data?.length || 0}
+                            loading={loading}
                         />
                     </Layout.Section>
                 </Layout>
             </Page>
-        )}
-    </Fragment>
-)
+        </Fragment>
+    )
 }
 
 export default UserTransHistory

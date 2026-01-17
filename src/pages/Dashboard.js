@@ -13,6 +13,7 @@ import { fetchConsultants } from '../components/Redux/slices/ConsultantSlices';
 import { apps } from '../components/FallbackData/FallbackData';
 import axios from 'axios';
 import ShowToast from './ShowToast';
+import { fetchAdminDetails, fetchShopAllConsultants, fetchShopAllUsers } from '../components/Redux/slices/adminSlice';
 
 // Component to display animated count with motion
 function AnimatedCount({ value }) {
@@ -65,14 +66,16 @@ function AnimatedCount({ value }) {
 function Dashboard() {
     const [isBannerVisible, setIsBannerVisible] = useState(true);
     const [adminDetails, setAdminDetails] = useState(null);
+
     const [adminIdLocal, setAdminIdLocal] = useState(null);
     const app = useAppBridge();
     const params = new URLSearchParams(window.location.search);
+
     const host = params.get("host");
 
     const adminId = "690c374f605cb8b946503ccb";
 
-
+    console.log("adminIdLocal", adminIdLocal)
     useEffect(() => {
         if (adminId) {
             localStorage.setItem('doamin_V_id', "690c374f605cb8b946503ccb");
@@ -83,42 +86,29 @@ function Dashboard() {
         const id = localStorage.getItem('doamin_V_id');
         setAdminIdLocal(id);
     }, []);
-    console.log("adminIdLocal", adminIdLocal);
+
     const dispatch = useDispatch();
-    const { users, loading } = useSelector((state) => state.users);
-    const { consultants, loading: consultantLoading } = useSelector((state) => state.consultants);
-    console.log("consultants", consultants)
-    const userCount = users?.data?.length || 0;
-    const consultantCount = consultants?.findConsultant?.length || 0;
+    const { shopAllUsers, loading: shopAllUsersLoading } = useSelector((state) => state.admin);
+    const { shopAllConsultants, loading: shopAllConsultantsLoading } = useSelector((state) => state.admin);
+    const { adminDetails_, loading: adminDetailsLoading } = useSelector((state) => state.admin);
+    const userCount = shopAllUsers?.data?.length || 0;
+    const consultantCount = shopAllConsultants?.data?.length || 0;
 
     useEffect(() => {
-        dispatch(fetchConsultants({ adminIdLocal, app }));
+        dispatch(fetchShopAllUsers({ adminIdLocal, app }));
+        dispatch(fetchShopAllConsultants({ adminIdLocal, app }));
+        dispatch(fetchAdminDetails({ adminIdLocal, app }));
     }, [dispatch, adminIdLocal]);
 
     useEffect(() => {
-        dispatch(fetchUsers());
-    }, [dispatch]);
-
-    useEffect(() => {
-        const getAdminDetails = async () => {
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/admin/${adminIdLocal}`);
-            console.log("response", response);
-            if (response.status === 200) {
-                console.log("response", response.data);
-                setAdminDetails(response?.data?.data);
-            }
+        if (adminDetails_) {
+            setAdminDetails(adminDetails_);
         }
-        if (adminId) {
-            getAdminDetails();
-        }
-    }, [adminId]);
-
-
+    }, [adminDetails_]);
 
 
     return (
         <>
-            {/* App Bridge TitleBar - Shopify frame mein title bar dikhane ke liye */}
             {app && (
                 <TitleBar title="" />
             )}
@@ -206,7 +196,7 @@ function Dashboard() {
                                             </div>
                                             <div style={{ flex: 1, }}>
                                                 <Text variant="headingLg" as="h2" fontWeight="bold">
-                                                    0%
+                                                    {adminDetails?.adminPercentage?.$numberDecimal || 0}%
                                                 </Text>
                                                 <Text variant="bodyMd" as="p" tone="subdued">
                                                     Conversion Rate

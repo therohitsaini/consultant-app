@@ -1,14 +1,26 @@
 import { Banner, Layout, Page, BlockStack, LegacyCard, FormLayout, TextField, Tag, DropZone, LegacyStack, Text, Select, Button, Spinner, Grid } from '@shopify/polaris';
 import { ConfettiIcon, ExternalIcon } from '@shopify/polaris-icons';
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { availableTags, genderOptions } from '../components/FallbackData/FallbackData';
 import { useSearchParams } from 'react-router-dom';
+import { useAppBridge } from '../components/createContext/AppBridgeContext';
+import { Redirect } from '@shopify/app-bridge/actions';
 
 
 
 function AddConsultant() {
-    // Banner
+    const app = useAppBridge();
+    const redirect = useMemo(() => {
+        if (!app) return null;
+        return Redirect.create(app);
+    }, [app]);
+
+    const goToAddConsultant = () => {
+        if (!redirect) return;
+        redirect.dispatch(Redirect.Action.APP, '/consultant-list');
+    };
+
     const [isBannerVisible, setIsBannerVisible] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState('');
@@ -339,7 +351,7 @@ function AddConsultant() {
 
     return (
         <Page
-            backAction={{ content: 'Consultant List', url: '/consultant-list' }}
+            backAction={{ content: 'Consultant List', onAction: goToAddConsultant }}
             title={updateIsTrue ? 'Update Consultant settings' : 'Add Consultant settings'}
             secondaryActions={[
                 {
@@ -675,7 +687,7 @@ function AddConsultant() {
                             </FormLayout.Group>
                         </FormLayout>
                         <div style={{ marginTop: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                          
+
                             {
                                 updateIsTrue ?
                                     <Button

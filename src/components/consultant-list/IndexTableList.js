@@ -5,6 +5,7 @@ import {
   useSetIndexFiltersMode,
   useBreakpoints,
   Pagination,
+  Spinner,
 } from '@shopify/polaris';
 import { useState, useCallback } from 'react';
 
@@ -41,6 +42,7 @@ function IndexTableList({
   limit,
   totalItems,
   setType,
+  loading,
 }) {
   const tabs = itemStrings.map((item, index) => ({
     content: item,
@@ -150,11 +152,30 @@ function IndexTableList({
         condensed={useBreakpoints().smDown}
         selectable={false}
         resourceName={resourceName}
-        itemCount={data?.length || 0}
+        itemCount={loading ? 1 : data.length}
         headings={headings}
       >
-        {rowMarkup}
+        {loading ? (
+          <IndexTable.Row>
+            <IndexTable.Cell colSpan={headings.length}>
+              <div
+                style={{
+                  padding: '40px',
+                  display: 'flex',
+                  justifyContent: 'center',
+                }}
+              >
+                <Spinner size="large" />
+              </div>
+            </IndexTable.Cell>
+          </IndexTable.Row>
+        ) : (
+          data.map((item, index) =>
+            renderRow ? renderRow(item, index) : null
+          )
+        )}
       </IndexTable>
+
       {hasPagination && totalPages > 1 && (
         <div style={{ padding: '16px', display: 'flex', justifyContent: 'center' }}>
           <Pagination

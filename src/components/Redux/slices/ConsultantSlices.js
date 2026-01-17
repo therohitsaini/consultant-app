@@ -7,24 +7,13 @@ import { getAppBridgeToken } from "../../../utils/getAppBridgeToken";
 
 export const fetchConsultants = createAsyncThunk(
     "consultants/fetch",
-    async (adminIdLocal, app) => {
-        console.log("adminIdLocal__________REDUX", adminIdLocal);
-        const token = await getAppBridgeToken(app);
-        console.log("token__________REDUX", token);
+    async (adminIdLocal,app ) => {
+        // const token = await getAppBridgeToken(app);
+        console.log("token__________REDUX", app);
         const response = await axios.get(
             `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/api-find-consultant/${adminIdLocal}`,
-            {
-                headers: {
-                    "Cache-Control": "no-cache",
-                    "Pragma": "no-cache",
-                    "Expires": "0",
-                    "Authorization": `Bearer ${token}`,
-                },
-                params: {
-                    _t: Date.now(), // extra cache-buster
-                },
-            }
         );
+        console.log("response__________REDUX", response);
         return response.data;
     }
 );

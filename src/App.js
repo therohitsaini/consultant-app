@@ -26,6 +26,7 @@ import { UseAppInstall } from "./components/ProtectRoute/UseAppInstall";
 import ProtectAdminRoute from "./components/ProtectRoute/ProtectAdminRoute";
 import UserTransHistory from "./pages/UserTransHistory";
 import WalletHistroy from "./pages/WalletHistroy";
+import ManualDebetCreditBlance from "./pages/ManualDebetCreditBlance";
 
 
 
@@ -150,6 +151,7 @@ export default function App() {
             <Route path="add-consultant" element={<AddConsultant />} />
             <Route path="/setting/history" element={<UserTransHistory />} />
             <Route path="/setting/wallet-history" element={<WalletHistroy />} />
+            <Route path="/setting/wallet-management" element={<ManualDebetCreditBlance />} />
             <Route path="pricing" element={<Pricing />} />
             <Route path="admin-settings/voucher" element={<VaocherSettings />} />
             <Route path="faq" element={<Faq />} />

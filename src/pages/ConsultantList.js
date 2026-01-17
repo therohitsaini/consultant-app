@@ -11,11 +11,30 @@ import { headings, itemStrings, sortOptions } from '../components/FallbackData/F
 import { Toast, ToastModel } from '../components/AlertModel/Tost';
 import axios from 'axios';
 import { useAppBridge } from '../components/createContext/AppBridgeContext';
+import { Redirect } from '@shopify/app-bridge/actions';
 
 
 
 
 function ConsultantList() {
+    const app = useAppBridge();
+    const dispatch = useDispatch();
+
+    const redirect = useMemo(() => {
+        if (!app) return null;
+        return Redirect.create(app);
+    }, [app]);
+
+    const goToAddConsultant = () => {
+        if (!redirect) return;
+        redirect.dispatch(Redirect.Action.APP, '/add-consultant');
+    };
+
+    const goToEditConsultant = (id) => {
+        if (!redirect) return;
+        redirect.dispatch(Redirect.Action.APP, `/add-consultant?id=${id}`);
+    };
+
     const navigate = useNavigate();
     const [isBannerVisible, setIsBannerVisible] = useState(true);
     const [selectedTab, setSelectedTab] = useState(0);
@@ -28,14 +47,13 @@ function ConsultantList() {
     const [toastContent, setToastContent] = useState('');
     const [isRefreshed, setIsRefreshed] = useState(false);
     const [adminIdLocal, setAdminIdLocal] = useState(null);
-    const dispatch = useDispatch();
-    const app = useAppBridge();
+    console.log("app", app);
     const { consultants, loading: consultantLoading } = useSelector((state) => state.consultants);
     useEffect(() => {
         const id = localStorage.getItem('doamin_V_id');
         setAdminIdLocal(id);
     }, []);
-    console.log("adminIdLocal", adminIdLocal);
+    console.log("consultants", consultants);
 
     useEffect(() => {
         dispatch(fetchConsultants(adminIdLocal, app));
@@ -104,7 +122,6 @@ function ConsultantList() {
         console.log("consultant _id", _id);
     }, []);
 
-    // Handle edit button click - navigate to add-consultant with ID
     const handleEdit = useCallback((_id) => {
         navigate(`/add-consultant?id=${_id}`);
     }, [navigate]);
@@ -124,9 +141,7 @@ function ConsultantList() {
                     'Content-Type': 'application/json',
                 },
             });
-            console.log("___", response.status)
             if (response.status === 200) {
-                console.log("active is on ")
                 dispatch(fetchConsultants(adminIdLocal));
                 setIsRefreshed((prev) => !prev);
             }
@@ -165,7 +180,7 @@ function ConsultantList() {
         const displayPhone = phone || contact;
 
         return (
-            
+
 
             <IndexTable.Row _id={_id} key={_id} position={index}>
                 <IndexTable.Cell>
@@ -263,7 +278,7 @@ function ConsultantList() {
                             icon={EditIcon}
                             accessibilityLabel="Edit consultant"
                             onClick={(e) => {
-                                e.stopPropagation(); 
+                                e.stopPropagation();
                                 handleEdit(_id);
                             }}
                         />
@@ -274,7 +289,7 @@ function ConsultantList() {
                             tone="critical"
                             accessibilityLabel="Delete consultant"
                             onClick={(e) => {
-                                e.stopPropagation(); 
+                                e.stopPropagation();
                                 handleDeleteClick(_id);
                             }}
                         />
@@ -294,66 +309,66 @@ function ConsultantList() {
                     <Spinner accessibilityLabel="Spinner example" size="large" />
                 </div>
             ) : (
-              <Fragment>
-            <UserAlert
-                isUserAlertVisible={isUserAlertVisible}
-                setIsUserAlertVisible={setIsUserAlertVisible}
-                handleDelete={handleDelete}
-                consultantId={consultantId}
+                <Fragment>
+                    <UserAlert
+                        isUserAlertVisible={isUserAlertVisible}
+                        setIsUserAlertVisible={setIsUserAlertVisible}
+                        handleDelete={handleDelete}
+                        consultantId={consultantId}
 
-            />
-            <ToastModel active={active} setActive={setActive} toastContent={toastContent} />
-            <Page
-                title="Consultant List"
-                primaryAction={{
-                    icon: PlusIcon,
-                    content: 'Add Consultant',
-                    url: '/add-consultant',
-                }}
-                secondaryActions={[
-                    {
-                        content: 'Publish App',
-                        external: true,
-                        icon: ExternalIcon,
-                    },
-                ]}
-            >
-                <Layout>
+                    />
+                    <ToastModel active={active} setActive={setActive} toastContent={toastContent} />
+                    <Page
+                        title="Consultant List"
+                        primaryAction={{
+                            icon: PlusIcon,
+                            content: 'Add Consultant',
+                            onAction: goToAddConsultant,
+                        }}
+                        secondaryActions={[
+                            {
+                                content: 'Publish App',
+                                external: true,
+                                icon: ExternalIcon,
+                            },
+                        ]}
+                    >
+                        <Layout>
 
-                    { /* Banner */}
-                    {isBannerVisible && (
-                        <Layout.Section>
-                            <Banner
-                                title="Hi om suman. Welcome To: Your Shopify Store"
-                                tone="info"
-                                onDismiss={() => setIsBannerVisible(false)}
-                                icon={ConfettiIcon}
-                            >
-                                <BlockStack gap="200">
-                                    <p>Make sure you know how these changes affect your store.</p>
-                                    <p>Make sure you know how these changes affect your store.</p>
-                                </BlockStack>
-                            </Banner>
-                        </Layout.Section>
-                    )}
+                            { /* Banner */}
+                            {isBannerVisible && (
+                                <Layout.Section>
+                                    <Banner
+                                        title="Hi om suman. Welcome To: Your Shopify Store"
+                                        tone="info"
+                                        onDismiss={() => setIsBannerVisible(false)}
+                                        icon={ConfettiIcon}
+                                    >
+                                        <BlockStack gap="200">
+                                            <p>Make sure you know how these changes affect your store.</p>
+                                            <p>Make sure you know how these changes affect your store.</p>
+                                        </BlockStack>
+                                    </Banner>
+                                </Layout.Section>
+                            )}
 
-                    <Layout.Section>
-                        <IndexTableList
-                            itemStrings={itemStrings}
-                            sortOptions={sortOptions}
-                            data={sortedConsultants}
-                            headings={headings}
-                            renderRow={renderConsultantRow}
-                            resourceName={{ singular: 'consultant', plural: 'consultants' }}
-                            queryPlaceholder="Search consultants"
-                            onTabChange={setSelectedTab}
-                            onQueryChange={setQueryValue}
-                            onSortChange={setSortValue}
-                        />
-                    </Layout.Section>
-                </Layout>
-            </Page>
-            </Fragment>
+                            <Layout.Section>
+                                <IndexTableList
+                                    itemStrings={itemStrings}
+                                    sortOptions={sortOptions}
+                                    data={sortedConsultants}
+                                    headings={headings}
+                                    renderRow={renderConsultantRow}
+                                    resourceName={{ singular: 'consultant', plural: 'consultants' }}
+                                    queryPlaceholder="Search consultants"
+                                    onTabChange={setSelectedTab}
+                                    onQueryChange={setQueryValue}
+                                    onSortChange={setSortValue}
+                                />
+                            </Layout.Section>
+                        </Layout>
+                    </Page>
+                </Fragment>
             )}
         </Fragment>
     );
