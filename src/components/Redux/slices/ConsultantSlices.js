@@ -1,13 +1,16 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { getAppBridgeToken } from "../../../utils/getAppBridgeToken";
 
 // API call using createAsyncThunk
 
 
 export const fetchConsultants = createAsyncThunk(
     "consultants/fetch",
-    async (adminIdLocal) => {
+    async (adminIdLocal, app) => {
         console.log("adminIdLocal__________REDUX", adminIdLocal);
+        const token = await getAppBridgeToken(app);
+        console.log("token__________REDUX", token);
         const response = await axios.get(
             `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/api-find-consultant/${adminIdLocal}`,
             {
@@ -15,6 +18,7 @@ export const fetchConsultants = createAsyncThunk(
                     "Cache-Control": "no-cache",
                     "Pragma": "no-cache",
                     "Expires": "0",
+                    "Authorization": `Bearer ${token}`,
                 },
                 params: {
                     _t: Date.now(), // extra cache-buster

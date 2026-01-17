@@ -1,4 +1,4 @@
-import { Banner, Layout, Page, BlockStack, Grid, LegacyCard, Text, ButtonGroup, Button, Thumbnail } from '@shopify/polaris';
+import { Banner, Layout, Page, BlockStack, Grid, LegacyCard, Text, ButtonGroup, Button, Thumbnail, Spinner } from '@shopify/polaris';
 import { ConfettiIcon, ExternalIcon, PlusIcon, EditIcon, DuplicateIcon, DeleteIcon } from '@shopify/polaris-icons';
 import { useEffect, useState, useCallback, useMemo, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +10,7 @@ import { UserAlert } from '../components/AlertModel/UserAlert';
 import { headings, itemStrings, sortOptions } from '../components/FallbackData/FallbackData';
 import { Toast, ToastModel } from '../components/AlertModel/Tost';
 import axios from 'axios';
+import { useAppBridge } from '../components/createContext/AppBridgeContext';
 
 
 
@@ -28,6 +29,7 @@ function ConsultantList() {
     const [isRefreshed, setIsRefreshed] = useState(false);
     const [adminIdLocal, setAdminIdLocal] = useState(null);
     const dispatch = useDispatch();
+    const app = useAppBridge();
     const { consultants, loading: consultantLoading } = useSelector((state) => state.consultants);
     useEffect(() => {
         const id = localStorage.getItem('doamin_V_id');
@@ -36,7 +38,7 @@ function ConsultantList() {
     console.log("adminIdLocal", adminIdLocal);
 
     useEffect(() => {
-        dispatch(fetchConsultants(adminIdLocal));
+        dispatch(fetchConsultants(adminIdLocal, app));
     }, [dispatch, isRefreshed, adminIdLocal]);
 
     const consultantsData = consultants?.findConsultant || []
@@ -163,6 +165,7 @@ function ConsultantList() {
         const displayPhone = phone || contact;
 
         return (
+            
 
             <IndexTable.Row _id={_id} key={_id} position={index}>
                 <IndexTable.Cell>
@@ -260,7 +263,7 @@ function ConsultantList() {
                             icon={EditIcon}
                             accessibilityLabel="Edit consultant"
                             onClick={(e) => {
-                                e.stopPropagation(); // Row click trigger avoid
+                                e.stopPropagation(); 
                                 handleEdit(_id);
                             }}
                         />
@@ -271,7 +274,7 @@ function ConsultantList() {
                             tone="critical"
                             accessibilityLabel="Delete consultant"
                             onClick={(e) => {
-                                e.stopPropagation(); // Row click trigger avoid
+                                e.stopPropagation(); 
                                 handleDeleteClick(_id);
                             }}
                         />
@@ -286,6 +289,12 @@ function ConsultantList() {
 
     return (
         <Fragment>
+            {consultantLoading ? (
+                <div style={{ padding: '10px', margin: '10px', height: '90vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <Spinner accessibilityLabel="Spinner example" size="large" />
+                </div>
+            ) : (
+              <Fragment>
             <UserAlert
                 isUserAlertVisible={isUserAlertVisible}
                 setIsUserAlertVisible={setIsUserAlertVisible}
@@ -344,6 +353,8 @@ function ConsultantList() {
                     </Layout.Section>
                 </Layout>
             </Page>
+            </Fragment>
+            )}
         </Fragment>
     );
 }
