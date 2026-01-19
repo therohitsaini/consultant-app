@@ -150,7 +150,7 @@ function UserTransHistory() {
       
 
             <Page
-                title="Activity History"
+                title="Activity History"    
                 primaryAction={{
                     icon: PlusIcon,
                     content: 'Add Activity',
