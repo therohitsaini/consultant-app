@@ -18,7 +18,6 @@ export const fetchAdminDetails = createAsyncThunk("admin/fetchAdminDetails", asy
 })
 
 export const fetchActivityHistory = createAsyncThunk("admin/fetchActivityHistory", async ({ adminIdLocal, page, limit = 11, type = 'all', app, searchQuery }) => {
-    console.log("app__________REDUX", page, limit, type, app);
     const token = await getAppBridgeToken(app);
     const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/activity/transactions/${adminIdLocal}`, {
         headers: {
@@ -45,8 +44,9 @@ export const fetchWalletHistory = createAsyncThunk("admin/fetchWalletHistory", a
             limit
         }
     })
+    console.log("response_________WALLET HISTORY", response.data.data);
+    return response.data.data
 
-    return response.data
 })
 
 export const fetchShopAllUsers = createAsyncThunk("admin/fetchShopAllUsers", async ({ adminIdLocal, app }) => {

@@ -40,38 +40,6 @@ export default function App() {
   const app = useAppBridge();
   const {installed,accessDenied} = UseAppInstall(shop, app);
 
-
-  // const app = useAppBridge();
-
-  // const getInstallUrl = async () => {
-  //   try {
-  //     const response = await fetch(
-  //       `https://test-online-consultation.zend-apps.com/app/install/${shop}`
-  //     );
-
-  //     const data = await response.json();
-  //     console.log("data", data);
-
-  //     if (!data.installed && data.installUrl) {
-  //       console.log("Redirecting to install URL via App Bridge...");
-  //       setInstalled(true);
-  //       const redirect = Redirect.create(app);
-  //       redirect.dispatch(Redirect.Action.REMOTE, data.installUrl);
-  //       return;
-  //     }
-  //   } catch (error) {
-  //     console.log("error", error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   if (shop) {
-  //     getInstallUrl();
-  //   }
-  // }, [shop]);
-
-
-
   useEffect(() => {
     const handleMessage = (event) => {
 

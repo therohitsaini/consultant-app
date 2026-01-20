@@ -34,17 +34,17 @@ const transactionSortOptions = [
 
 function WalletHistroy() {
     const app = useAppBridge();
-    console.log("app", app);
-    const { walletHistory, loading: walletLoading } = useSelector((state) => state.admin);
-
-    const dispatch = useDispatch();
     const [adminIdLocal, setAdminIdLocal] = useState(null);
-    const [page, setPage] = useState(1);
-    const limit = 10;
     useEffect(() => {
         const id = localStorage.getItem('doamin_V_id');
         setAdminIdLocal(id);
     }, []);
+    const { walletHistory, loading: walletLoading } = useSelector((state) => state.admin);
+    console.log("walletHistory", walletHistory);
+    const dispatch = useDispatch();
+    const [page, setPage] = useState(1);
+    const limit = 10;
+
 
     useEffect(() => {
         dispatch(fetchWalletHistory({ adminIdLocal, page, limit, app }));

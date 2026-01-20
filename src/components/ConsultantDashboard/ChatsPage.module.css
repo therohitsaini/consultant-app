@@ -314,7 +314,7 @@
     font-size: 18px;
     color: #6b7280;
     cursor: pointer;
-    border: none;
+    border:1px solid #1069c2;
     background: transparent;
     padding: 4px;
     border-radius: 999px;

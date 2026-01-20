@@ -10,7 +10,7 @@ export const UseAppInstall = (shop, app) => {
     useEffect(() => {
 
         const checkInstall = async () => {
-            if (!shop || !app) {
+            if (!shop) {
                 alert("Access denied");
                 setAccessDenied(true);
                 return;

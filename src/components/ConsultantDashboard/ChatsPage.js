@@ -7,6 +7,7 @@ import { fetchChatHistory, updateUserRequestById } from '../Redux/slices/Consult
 import { useDispatch, useSelector } from 'react-redux';
 import { addMessage } from '../Redux/slices/sokectSlice';
 import { BsThreeDotsVertical } from "react-icons/bs";
+import { Toast } from '@shopify/polaris';
 
 const ChatsPage = () => {
     const navigate = useNavigate();
@@ -33,18 +34,17 @@ const ChatsPage = () => {
     const messagesEndRef = useRef(null);
     const messagesAreaRef = useRef(null);
     const [refreshed, setRefreshed] = useState(false);
+    const [userControlMenu, setUserControlMenu] = useState(null);
     const { userInRequest } = useSelector((state) => state.consultants);
     const isChatAccepted = useSelector((state) => state.socket.isChatAccepted);
-    console.log("isChatAccepted____ChatsPage", isChatAccepted);
-
-
+    console.log("isChatAccepted_________", isChatAccepted);
     useEffect(() => {
         const clientId = localStorage.getItem('client_u_Identity');
         const shopId = localStorage.getItem('shop_o_Identity');
         setConsultantId(clientId);
         setShopId(shopId);
     }, []);
-
+    console.log("userControlMenu_________", userControlMenu);
 
     useEffect(() => {
         const checkMobile = () => {
@@ -132,8 +132,6 @@ const ChatsPage = () => {
 
 
     const handleChatSelect = (chatData) => {
-        console.log("chatData", chatData);
-        localStorage.setItem("is_noti_true", chatData.userId);
         setChaterIds(chatData);
         setChatAccepted(chatData);
         const conversation = chatList.find(conv =>
@@ -186,7 +184,7 @@ const ChatsPage = () => {
 
     useEffect(() => {
         getChatList();
-    }, [messages, userInRequest, shopId, consultantId, chatAccepted]);
+    }, [messages, userInRequest, shopId, consultantId, chatAccepted, refreshed]);
 
     const sendChat = () => {
         if (text.trim() === "" || !chaterIds) return;
@@ -214,12 +212,6 @@ const ChatsPage = () => {
                 text: text,
                 timestamp: new Date().toISOString()
             };
-            const optimisticMessage = {
-                _id: `temp-${Date.now()}`,
-                ...messageData
-            };
-            // setChatMessagesData(prev => [...prev, optimisticMessage]);
-
             socket.emit("sendMessage", messageData);
             setText("");
             dispatch(addMessage(messageData))
@@ -272,24 +264,13 @@ const ChatsPage = () => {
 
 
     const updateUser = (conversation) => {
-
+        console.log("conversation", conversation);
         dispatch(updateUserRequestById({ shopId: conversation.shop.id, userId: conversation.sender.id, consultantId: consultantId }));
     }
 
 
     const isRequestModalOpen = chatList.filter((conversation) => conversation.isRequest === false);
     const isRequestModalClose = chatList.filter((conversation) => conversation.isRequest === true);
-    console.log("isRequestModalClose", isRequestModalClose);
-    console.log("isRequestModalOpen", isRequestModalOpen);
-
-
-    // useEffect(() => {
-    //     if (!consultantId || !chaterIds?.userId) return
-    //     socket.emit("markSeen", {
-    //         senderId: chaterIds?.userId,
-    //         receiverId: consultantId
-    //     });
-    // }, [consultantId, chaterIds?.userId, chatMessagesData])
 
     const acceptUserChat = (data) => {
         if (!data || !consultantId) return;
@@ -329,9 +310,37 @@ const ChatsPage = () => {
 
         return () => clearInterval(interval);
     }, [chatTimer.isRunning, chatTimer.startTime]);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    const stopChatTimer = () => {
+        socket.emit("endChat", {
+            transactionId: chatTimer.transactionId,
+            startTime: chatTimer.startTime,
+            isRunning: chatTimer.isRunning,
+            shopId: chatTimer.shopId,
+            userId: consultantId,
+            consultantId: consultantId
+        });
+        setSeconds(0);
+        setRefreshed(true);
+    }
+    const handlerUserControlMenu = (conversation) => {
+        setUserControlMenu(conversation?.chatListId);
+    }
 
-
-
+    const HandleRemoveUser = async (conversation) => {
+        const senderId = conversation?.sender?.id;
+        try {
+            const response = await axios.delete(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/remove/user/chat-list/${conversation.chatListId}/${senderId}`);
+            console.log("response_________", response);
+            if (response.ok) {
+                setUserControlMenu(null);
+                setRefreshed(prev => !prev);
+            }
+        } catch (error) {
+            console.log("error_________", error);
+        }
+    }
     return (
         <Fragment>
             <div className={styles.pageContainer}>
@@ -420,49 +429,46 @@ const ChatsPage = () => {
                                                                         type="button"
                                                                         className={styles.unreadBadgeIcon}
                                                                         onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            setOpenMenuConversationId(
-                                                                                openMenuConversationId === conversation.id ? null : conversation.id
-                                                                            );
+                                                                            handlerUserControlMenu(conversation);
+                                                                            // setOpenMenuConversationId(
+                                                                            //     openMenuConversationId === conversation.id ? null : conversation.id
+                                                                            // );
                                                                         }}
                                                                     >
                                                                         <BsThreeDotsVertical />
                                                                     </button>
 
-                                                                    {openMenuConversationId === conversation.id && (
-                                                                        <div
-                                                                            className={styles.moreMenu}
-                                                                            onClick={(e) => e.stopPropagation()}
-                                                                        >
-                                                                            <button
-                                                                                type="button"
-                                                                                className={styles.moreMenuItem}
-                                                                                onClick={() => {
-                                                                                    // TODO: add your add logic here
-                                                                                    // setOpenMenuConversationId(null);
-                                                                                    updateUser(conversation);
-                                                                                }}
+                                                                    {
+                                                                        userControlMenu === conversation?.chatListId && (
+                                                                            <div
+                                                                                className={styles.moreMenu}
+                                                                                onClick={(e) => e.stopPropagation()}
                                                                             >
-                                                                                Add
-                                                                            </button>
-                                                                            <button
-                                                                                type="button"
-                                                                                className={styles.moreMenuItem}
-                                                                                onClick={() => {
-                                                                                    // TODO: add your remove logic here
-                                                                                    console.log("Remove clicked for", conversation.id);
-                                                                                    setOpenMenuConversationId(null);
-                                                                                }}
-                                                                            >
-                                                                                Remove
-                                                                            </button>
-                                                                        </div>
-                                                                    )}
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className={styles.moreMenuItem}
+                                                                                    onClick={() => {
+                                                                                        // TODO: add your add logic here
+                                                                                        // setOpenMenuConversationId(null);
+                                                                                        updateUser(conversation);
+                                                                                    }}
+                                                                                >
+                                                                                    Add
+                                                                                </button>
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className={styles.moreMenuItem}
+                                                                                    onClick={() => {
+                                                                                        HandleRemoveUser(conversation);
+                                                                                    }}
+                                                                                >
+                                                                                    Remove
+                                                                                </button>
+                                                                            </div>
+                                                                        )}
                                                                 </div>
                                                             </div>
-                                                            {/* <div className={`${styles.conversationStatus} ${conversation.isOnline ? styles.statusOnline : styles.statusOffline}`}>
-                                                                {conversation.lastActive}
-                                                            </div> */}
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -541,6 +547,36 @@ const ChatsPage = () => {
                                                                                 <span className={styles.unreadBadge}>
                                                                                     {"5+"}
                                                                                 </span>
+                                                                                <div className={styles.moreMenuWrapper}>
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        className={styles.unreadBadgeIcon}
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            setUserControlMenu(conversation?.chatListId);
+                                                                                        }}
+                                                                                        onClose={() => setUserControlMenu(null)}
+                                                                                    >
+                                                                                        <BsThreeDotsVertical />
+                                                                                    </button>
+
+                                                                                    {userControlMenu === conversation?.chatListId && (
+                                                                                        <div
+                                                                                            className={styles.moreMenu}
+                                                                                            onClick={(e) => e.stopPropagation()}
+                                                                                        >
+                                                                                            <button
+                                                                                                type="button"
+                                                                                                className={styles.moreMenuItem}
+                                                                                                onClick={() => {
+                                                                                                    HandleRemoveUser(conversation);
+                                                                                                }}
+                                                                                            >
+                                                                                                Remove
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    )}
+                                                                                </div>
                                                                                 {/* )} */}
                                                                             </div>
                                                                             <div className={`${styles.conversationStatus} ${conversation.isOnline ? styles.statusOnline : styles.statusOffline}`}>
@@ -610,11 +646,29 @@ const ChatsPage = () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                            {chatTimer.isRunning && (
-                                                <div className={styles.chatTimer}>
-                                                    <p> Timer: {seconds}</p>
-                                                </div>
-                                            )}
+                                            {
+                                                chatTimer.isRunning && (
+                                                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", mr: "10px" }}>
+                                                        <p> Timer: {minutes}:{remainingSeconds}</p>
+                                                        <div>
+                                                            <button
+                                                                onClick={stopChatTimer}
+                                                                style={{
+                                                                    padding: "5px 12px",
+                                                                    backgroundColor: "#ff4d4f",
+                                                                    color: "#fff",
+                                                                    border: "none",
+                                                                    borderRadius: "4px",
+                                                                    cursor: "pointer",
+                                                                    fontSize: "13px"
+                                                                }}
+                                                            >
+                                                                Stop Chat
+                                                            </button>
+                                                        </div>
+
+                                                    </div>
+                                                )}
                                             <div className={styles.chatHeaderActions} style={{ display: 'flex', gap: '8px' }}>
                                                 <button
                                                     className={styles.headerButton}
