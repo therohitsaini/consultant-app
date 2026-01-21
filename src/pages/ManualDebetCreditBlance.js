@@ -1,6 +1,6 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react'
 import IndexTableList from '../components/consultant-list/IndexTableList'
-import { Page, Layout, Spinner, ButtonGroup, Button } from '@shopify/polaris'
+import { Page, Layout, Spinner, ButtonGroup, Button, Toast } from '@shopify/polaris'
 import { DuplicateIcon, EditIcon, PlusIcon } from '@shopify/polaris-icons'
 import { IndexTable, Text } from '@shopify/polaris'
 import { fetchWalletHistory } from '../components/Redux/slices/adminSlice'
@@ -17,9 +17,9 @@ const walletManagementHeadings = [
     { title: 'Amount' },
     { title: "Direction" },
     { title: " Reference Type" },
-    { title: "  status" },
-    { title: "  description" },
-    { title: "  Action" },
+    { title: "Status" },
+    { title: "Description" },
+    { title: " Action" },
 ];
 
 const transactionSortOptions = [
@@ -41,20 +41,22 @@ function ManualDebetCreditBlance() {
     const [adminIdLocal, setAdminIdLocal] = useState(null);
     const [userDetails, setUserDetails] = useState({});
     const [page, setPage] = useState(1);
+    const [type, setType] = useState(0);
     const [active, setActive] = useState(false);
+    const [refresh, setRefresh] = useState(false);
     const [updateFormData, setUpdateFormData] = useState({
         userId: '',
         mainType: '',
         amount: '',
         description: '',
     });
-    console.log("updateFormData", updateFormData);
+    const limit = 10;
+
     const openUpdateWalletModal = (userId, fullname) => {
         setActive(true);
         setUserDetails({ userId, fullname });
     }
 
-    const limit = 10;
     useEffect(() => {
         const id = localStorage.getItem('doamin_V_id');
         setAdminIdLocal(id);
@@ -62,19 +64,28 @@ function ManualDebetCreditBlance() {
 
     useEffect(() => {
         dispatch(fetchWalletHistory({ adminIdLocal, page, limit, app }));
-    }, [dispatch, adminIdLocal, page, limit]);
+    }, [dispatch, adminIdLocal, page, limit, refresh]);
 
+
+    /** 
+     * Update Wallet
+     * 
+     */
     const updateWallet = async () => {
-        const response = await axios.post(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/update-wallet`, {
-            adminIdLocal,
-            // amount,
-            ...updateFormData, userId: userDetails.userId,
-        });
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/update-wallet/${adminIdLocal}`, {
+                ...updateFormData, userId: userDetails.userId,
+            });
+            if (response.data.success === true) {
+                setRefresh((prev) => !prev);
+                Toast.success("Wallet updated successfully");
+            } else {
+                Toast.error("Failed to update wallet");
+            }
+        } catch (error) {
+            Toast.error("Failed to update wallet");
+        }
     }
-    useEffect(() => {
-        updateWallet();
-    }, [adminIdLocal,]);
-
 
     const formatDate = (iso) =>
         new Date(iso).toLocaleDateString();
@@ -82,7 +93,6 @@ function ManualDebetCreditBlance() {
     const tableData = walletHistory?.map((item) => ({
         id: item._id,
         userId: item.userId._id,
-        consultantId: item.consultantId._id,
         shop_id: item.shop_id,
         fullname: item.userId.fullname || '-',
         userType: item.userId.userType || '-',
@@ -96,7 +106,7 @@ function ManualDebetCreditBlance() {
     })) || [];
 
     const renderWalletRow = useCallback((wallet, index) => {
-        const { id, userId, consultantId, shop_Id, fullname, userType, amount, referenceType, direction, status, description } = wallet
+        const { id, userId, shop_Id, fullname, userType, amount, referenceType, direction, status, description } = wallet
         const serialNumber = (page - 1) * limit + index + 1;
 
         return (
@@ -118,10 +128,10 @@ function ManualDebetCreditBlance() {
                 </IndexTable.Cell>
                 <IndexTable.Cell>
                     <Text as="span" alignment="end" numeric>
-                        ${amount}
+                        ${amount.toFixed(2)}
                     </Text>
                 </IndexTable.Cell>
-                <div style={{ color: direction === "credit" ? "green" : "red" }}>
+                <div style={{ color: direction === "credit" ? "green" : "grey" }}>
                     <IndexTable.Cell>
                         <Text variant="bodyMd" as="span">
                             {direction === "credit" ? "Credit" : "Debit"}
@@ -134,7 +144,7 @@ function ManualDebetCreditBlance() {
                         {referenceType}
                     </Text>
                 </IndexTable.Cell>
-                <div style={{ color: status === "success" ? "green" : "red" }}>
+                <div style={{ color: status === "success" ? "green" : "grey" }}>
                     <IndexTable.Cell>
                         <Text variant="bodyMd" as="span">
                             {status}
@@ -155,7 +165,7 @@ function ManualDebetCreditBlance() {
                             accessibilityLabel="Edit consultant"
                             onClick={(e) => {
                                 e.stopPropagation();
-                                openUpdateWalletModal(userId, fullname, consultantId, shop_Id);
+                                openUpdateWalletModal(userId, fullname, shop_Id);
                                 // handleEdit(_id);
                             }}
                         />
@@ -170,7 +180,7 @@ function ManualDebetCreditBlance() {
 
     return (
         <Fragment>
-            <UpdateUserDetailsModal open={active} onClose={() => setActive(false)} userDetails={userDetails} updateFormData={updateFormData} setUpdateFormData={setUpdateFormData} />
+            <UpdateUserDetailsModal open={active} onClose={() => setActive(false)} userDetails={userDetails} updateFormData={updateFormData} setUpdateFormData={setUpdateFormData} updateWallet={updateWallet} />
             <Page
                 title="Wallet History"
             // primaryAction={{
@@ -189,11 +199,12 @@ function ManualDebetCreditBlance() {
                             renderRow={renderWalletRow}
                             resourceName={{ singular: 'wallet', plural: 'wallets' }}
                             queryPlaceholder="Search wallets"
-                            onTabChange={() => { }}
+                            onTabChange={(value) => setType(value)}
                             onQueryChange={() => { }}
                             onSortChange={() => { }}
                             page={page}
                             setPage={setPage}
+                            setType={setType}
                             limit={limit}
                             totalItems={walletHistory?.totalItems || walletHistory?.data?.length || 0}
                             loading={walletLoading}

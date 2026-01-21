@@ -43,7 +43,7 @@ function UserTransHistory() {
     const [searchQuery, setSearchQuery] = useState("");
     const [page, setPage] = useState(1);
     const [type, setType] = useState(0);
-    const limit = 11;
+    const limit = 10;
 
     console.log("searchQuery", searchQuery)
     useEffect(() => {

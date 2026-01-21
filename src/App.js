@@ -20,13 +20,12 @@ import History from "./pages/History";
 import VaocherSettings from "./pages/VaocherSettings";
 import FcmTokenWindow from "./firebase/utils/FcmTokenWindow";
 import IncomingCallAlert from "./components/AlertModel/IncommingCallAlert";
-import { Redirect } from "@shopify/app-bridge/actions";
 import { useAppBridge } from "./components/createContext/AppBridgeContext";
 import { UseAppInstall } from "./components/ProtectRoute/UseAppInstall";
 import ProtectAdminRoute from "./components/ProtectRoute/ProtectAdminRoute";
 import UserTransHistory from "./pages/UserTransHistory";
-import WalletHistroy from "./pages/WalletHistroy";
 import ManualDebetCreditBlance from "./pages/ManualDebetCreditBlance";
+import NotFound from "./pages/NotFound";
 
 
 
@@ -113,12 +112,12 @@ export default function App() {
               <LayoutFrame />
             </ProtectAdminRoute>
           }>
+            <Route path="/not-found" element={<NotFound />} />
             <Route index element={<Dashboard />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="consultant-list" element={<ConsultantList />} />
             <Route path="add-consultant" element={<AddConsultant />} />
             <Route path="/setting/history" element={<UserTransHistory />} />
-            <Route path="/setting/wallet-history" element={<WalletHistroy />} />
             <Route path="/setting/wallet-management" element={<ManualDebetCreditBlance />} />
             <Route path="pricing" element={<Pricing />} />
             <Route path="admin-settings/voucher" element={<VaocherSettings />} />

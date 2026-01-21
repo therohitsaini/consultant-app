@@ -1,5 +1,6 @@
 import { createContext, useContext, useMemo, useEffect } from "react";
 import createApp from "@shopify/app-bridge";
+import { Navigate } from "react-router-dom";
 
 
 export const AppBridgeContext = createContext(null);
@@ -80,6 +81,7 @@ export const AppBridgeProvider = ({ children }) => {
         apiKey: apiKey ? "SET" : "NOT SET",
         message: "App Bridge will not work without host and API key",
       });
+      <Navigate to="/not-found" />
     }
   }, [host, apiKey, app]);
 

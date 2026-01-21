@@ -1,6 +1,7 @@
 // hooks/useAppInstall.js
 import { useState, useEffect } from "react";
 import { Redirect } from "@shopify/app-bridge/actions";
+import { Navigate } from "react-router-dom";
 
 export const UseAppInstall = (shop, app) => {
     const [installed, setInstalled] = useState(false);
@@ -10,9 +11,8 @@ export const UseAppInstall = (shop, app) => {
     useEffect(() => {
 
         const checkInstall = async () => {
-            if (!shop) {
-                alert("Access denied");
-                setAccessDenied(true);
+            if (!shop.endsWith(".myshopify.com")) {
+                <Navigate to="/not-found" />
                 return;
             }
             console.log("🔍 Checking install status for shop:", shop);

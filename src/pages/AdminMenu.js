@@ -39,7 +39,6 @@ export function AdminMenu() {
             <a href="/" rel="home">Dashboard  </a>
             <a href="/consultant-list">Consultant Directory</a>
             <a href="/setting/history"> Activity History</a>
-            <a href="/setting/wallet-history">Wallet History</a>
             <a href="/setting/wallet-management">Wallet Management</a>
             <a href="/pricing">Pricing</a>
             <a href="/faq">FAQ</a>

@@ -9,11 +9,11 @@ import {
 } from '@shopify/polaris';
 import { useState } from 'react';
 
-export default function UpdateUserDetailsModal({ open, onClose, userDetails, updateFormData, setUpdateFormData }) {
+export default function UpdateUserDetailsModal({ open, onClose, userDetails, updateFormData, setUpdateFormData, updateWallet }) {
     const { userId, fullname } = userDetails;
     const [user, setUser] = useState('');
 
- 
+
     console.log("updateFormData", updateFormData);
 
     const handleChange = (field) => {
@@ -41,7 +41,7 @@ export default function UpdateUserDetailsModal({ open, onClose, userDetails, upd
             primaryAction={{
                 content: 'Save',
                 onAction: () => {
-                 
+                    updateWallet();
                     onClose();
                 },
             }}
