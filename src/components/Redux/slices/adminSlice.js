@@ -13,11 +13,10 @@ export const fetchAdminDetails = createAsyncThunk("admin/fetchAdminDetails", asy
             Authorization: `Bearer ${token}`
         }
     })
-    console.log("response", response.data?.data)
     return response.data?.data
 })
 
-export const fetchActivityHistory = createAsyncThunk("admin/fetchActivityHistory", async ({ adminIdLocal, page, limit = 11, type = 'all', app, searchQuery }) => {
+export const fetchActivityHistory = createAsyncThunk("admin/fetchActivityHistory", async ({ adminIdLocal, page, limit, type = 'all', app, searchQuery }) => {
     const token = await getAppBridgeToken(app);
     const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/activity/transactions/${adminIdLocal}`, {
         headers: {
@@ -33,15 +32,16 @@ export const fetchActivityHistory = createAsyncThunk("admin/fetchActivityHistory
     return response.data
 })
 
-export const fetchWalletHistory = createAsyncThunk("admin/fetchWalletHistory", async ({ adminIdLocal, page = 1, limit = 10, app }) => {
+export const fetchWalletHistory = createAsyncThunk("admin/fetchWalletHistory", async ({ adminIdLocal, page = 1, limit = 10, app, searchQuery }) => {
     const token = await getAppBridgeToken(app);
-    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/user/consultant/${adminIdLocal}?page=${page}&limit=${limit}`, {
+    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/user/consultant/${adminIdLocal}`, {
         headers: {
             Authorization: `Bearer ${token}`
         },
         params: {
             page,
-            limit
+            limit,
+            search: searchQuery
         }
     })
     return response.data

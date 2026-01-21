@@ -46,6 +46,7 @@ function ManualDebetCreditBlance() {
     const [active, setActive] = useState(false);
     const [toastActive, setToastActive] = useState(false);
     const [refresh, setRefresh] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
     const [updateFormData, setUpdateFormData] = useState({
         userId: '',
         mainType: '',
@@ -53,7 +54,7 @@ function ManualDebetCreditBlance() {
         description: '',
     });
     const limit = 10;
-
+    console.log("searchQuery", searchQuery);
     const openUpdateWalletModal = (userId, fullname) => {
         setActive(true);
         setUserDetails({ userId, fullname });
@@ -65,8 +66,8 @@ function ManualDebetCreditBlance() {
     }, []);
 
     useEffect(() => {
-        dispatch(fetchWalletHistory({ adminIdLocal, page, limit, app }));
-    }, [dispatch, adminIdLocal, page, limit, refresh]);
+        dispatch(fetchWalletHistory({ adminIdLocal, page, limit, app, searchQuery }));
+    }, [dispatch, adminIdLocal, page, limit, refresh, searchQuery]);
 
 
     /** 
@@ -92,18 +93,18 @@ function ManualDebetCreditBlance() {
         new Date(iso).toLocaleDateString();
 
     const tableData = walletHistory?.data?.map((item) => ({
-        id: item._id,
-        userId: item.userId._id,
-        shop_id: item.shop_id,
-        fullname: item.userId.fullname || '-',
-        userType: item.userId.userType || '-',
-        amount: item.amount || '-',
-        transactionType: item.transactionType || '-',
-        referenceType: item.referenceType || '-',
-        direction: item.direction || '-',
-        status: item.status || '-',
-        description: item.description || '-',
-        updatedAt: formatDate(item.updatedAt),
+        id: item?._id,
+        userId: item?.userId?._id,
+        shop_id: item?.shop_id,
+        fullname: item?.userId?.fullname || '-',
+        userType: item?.userId?.userType || '-',
+        amount: item?.amount || '-',
+        transactionType: item?.transactionType || '-',
+        referenceType: item?.referenceType || '-',
+        direction: item?.direction || '-',
+        status: item?.status || '-',
+        description: item?.description || '-',
+        updatedAt: formatDate(item?.updatedAt),
     })) || [];
 
     const renderWalletRow = useCallback((wallet, index) => {
@@ -201,7 +202,7 @@ function ManualDebetCreditBlance() {
                             resourceName={{ singular: 'wallet', plural: 'wallets' }}
                             queryPlaceholder="Search wallets"
                             onTabChange={(value) => setType(value)}
-                            onQueryChange={() => { }}
+                            onQueryChange={(value) => { setSearchQuery(value); setPage(1); }}
                             onSortChange={() => { }}
                             page={page}
                             setPage={setPage}
