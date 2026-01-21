@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useAppBridge } from '../components/createContext/AppBridgeContext'
 import UpdateUserDetailsModal from './UpdateUserDetailsModal'
 import axios from 'axios'
+import { ToastModel } from '../components/AlertModel/Tost'
 
 
 const walletManagementHeadings = [
@@ -43,6 +44,7 @@ function ManualDebetCreditBlance() {
     const [page, setPage] = useState(1);
     const [type, setType] = useState(0);
     const [active, setActive] = useState(false);
+    const [toastActive, setToastActive] = useState(false);
     const [refresh, setRefresh] = useState(false);
     const [updateFormData, setUpdateFormData] = useState({
         userId: '',
@@ -78,19 +80,18 @@ function ManualDebetCreditBlance() {
             });
             if (response.data.success === true) {
                 setRefresh((prev) => !prev);
-                Toast.success("Wallet updated successfully");
             } else {
-                Toast.error("Failed to update wallet");
+                setToastActive(true);
             }
         } catch (error) {
-            Toast.error("Failed to update wallet");
+            setToastActive(true);
         }
     }
 
     const formatDate = (iso) =>
         new Date(iso).toLocaleDateString();
 
-    const tableData = walletHistory?.map((item) => ({
+    const tableData = walletHistory?.data?.map((item) => ({
         id: item._id,
         userId: item.userId._id,
         shop_id: item.shop_id,

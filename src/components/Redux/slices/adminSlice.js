@@ -44,8 +44,7 @@ export const fetchWalletHistory = createAsyncThunk("admin/fetchWalletHistory", a
             limit
         }
     })
-    console.log("response_________WALLET HISTORY", response.data.data);
-    return response.data.data
+    return response.data
 
 })
 
