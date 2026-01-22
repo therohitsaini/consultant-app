@@ -66,21 +66,21 @@ function AnimatedCount({ value }) {
 function Dashboard() {
     const [isBannerVisible, setIsBannerVisible] = useState(true);
     const [adminDetails, setAdminDetails] = useState(null);
-
     const [adminIdLocal, setAdminIdLocal] = useState(null);
     const app = useAppBridge();
     const params = new URLSearchParams(window.location.search);
-
+    const id = params.get("AdminId");
+    console.log("app___________", id);
     const host = params.get("host");
 
-    const adminId = "690c374f605cb8b946503ccb";
+    // const adminId = "690c374f605cb8b946503ccb";
 
-    console.log("adminIdLocal", adminIdLocal)
-    useEffect(() => {
-        if (adminId) {
-            localStorage.setItem('doamin_V_id', "690c374f605cb8b946503ccb");
-        }
-    }, [adminId]);
+    // console.log("adminIdLocal", adminIdLocal)
+    // useEffect(() => {
+    //     if (adminId) {
+    //         localStorage.setItem('doamin_V_id', "690c374f605cb8b946503ccb");
+    //     }
+    // }, [adminId]);
 
     useEffect(() => {
         const id = localStorage.getItem('doamin_V_id');

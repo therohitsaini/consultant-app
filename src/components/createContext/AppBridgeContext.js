@@ -17,6 +17,8 @@ export const AppBridgeProvider = ({ children }) => {
     const urlParams = new URLSearchParams(window.location.search);
     let host = urlParams.get("host");
     const shop = urlParams.get("shop");
+    const adminId = urlParams.get("AdminId");
+    console.log("adminId___________", host);
 
     if (host) {
       return host;

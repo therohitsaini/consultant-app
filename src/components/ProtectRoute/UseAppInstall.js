@@ -2,11 +2,11 @@
 import { useState, useEffect } from "react";
 import { Redirect } from "@shopify/app-bridge/actions";
 import { Navigate } from "react-router-dom";
+import { getAppBridgeToken } from "../../utils/getAppBridgeToken";
 
 export const UseAppInstall = (shop, app) => {
     const [installed, setInstalled] = useState(false);
     const [accessDenied, setAccessDenied] = useState(false);
-
 
     useEffect(() => {
 
@@ -15,11 +15,15 @@ export const UseAppInstall = (shop, app) => {
                 <Navigate to="/not-found" />
                 return;
             }
-            console.log("🔍 Checking install status for shop:", shop);
+            const token = await getAppBridgeToken(app);
             try {
                 const response = await fetch(
                     `${process.env.REACT_APP_BACKEND_HOST}/app/install/${shop}`
-                );
+                    , {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    });
                 const data = await response.json();
                 if (!data.installed && data.installUrl) {
                     const redirect = Redirect.create(app);

@@ -6,15 +6,19 @@ import { availableTags, genderOptions } from '../components/FallbackData/Fallbac
 import { useSearchParams } from 'react-router-dom';
 import { useAppBridge } from '../components/createContext/AppBridgeContext';
 import { Redirect } from '@shopify/app-bridge/actions';
+import { getAppBridgeToken } from '../utils/getAppBridgeToken';
 
 
 
 function AddConsultant() {
     const app = useAppBridge();
+
     const redirect = useMemo(() => {
         if (!app) return null;
         return Redirect.create(app);
     }, [app]);
+
+    console.log("app___________", app);
 
     const goToAddConsultant = () => {
         if (!redirect) return;
@@ -32,7 +36,6 @@ function AddConsultant() {
     const [updateIsTrue, setUpdateIsTrue] = useState(false);
     const fileInputRef = useRef(null);
 
-    console.log("adminIdLocal__________ADD CONSULTANT", isSubmitting);
     // Single state object for all form fields
     const [formData, setFormData] = useState({
         fullName: '',
@@ -68,21 +71,17 @@ function AddConsultant() {
     // const [adminIdLocal, setAdminIdLocal] = useState(null);
     const params = new URLSearchParams(window.location.search);
     const adminId = params.get('adminId')
-    console.log("adminId", adminId);
 
     useEffect(() => {
         const id = localStorage.getItem('doamin_V_id');
         setAdminIdLocal(id);
-        console.log("adminIdLocal", adminIdLocal);
     }, []);
-    console.log("adminIdLocal", localStorage.getItem('doamin_V_id'));
 
     useEffect(() => {
         if (consultantId) {
             setUpdateIsTrue(true);
         }
     }, [consultantId]);
-    console.log("consultantDetails", consultantDetails)
 
     const handleFieldChange = useCallback((fieldName) => {
         return (value) => {
@@ -210,6 +209,8 @@ function AddConsultant() {
     }, []);
 
     const submitConsultantData = useCallback(async () => {
+        const token = await getAppBridgeToken(app);
+        console.log("token___________", token);
         setIsSubmitting(true);
         setSubmitError('');
         setSubmitSuccess(false);
@@ -237,10 +238,12 @@ function AddConsultant() {
             const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/add-consultant/${adminIdLocal}`, {
                 method: 'POST',
                 body: form,
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             });
 
             const responseData = await response.json();
-            console.log("responseData", responseData);
             if (response.ok) {
                 setSubmitSuccess(true);
                 setTextFieldValue('');
@@ -258,14 +261,18 @@ function AddConsultant() {
             setIsSubmitting(false);
         }
     }, [formData, profileFile]);
+    
 
     const getConsultantById = async () => {
         if (!consultantId) return;
-
+        const token = await getAppBridgeToken(app);
         try {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/consultantid/${consultantId}`);
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/consultantid/${consultantId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             const data = await response.json();
-            console.log("responseData", data);
 
             if (response.ok && data.consultant) {
                 setConsultantDetails(data.consultant);
@@ -284,19 +291,16 @@ function AddConsultant() {
 
     useEffect(() => {
         if (consultantDetails && consultantDetails.email) {
-            // Format dateOfBirth if it's a Date object or ISO string
             let formattedDateOfBirth = '';
             if (consultantDetails.dateOfBirth) {
                 const date = new Date(consultantDetails.dateOfBirth);
                 if (!isNaN(date.getTime())) {
-                    // Format as YYYY-MM-DD for input field
                     formattedDateOfBirth = date.toISOString().split('T')[0];
                 } else {
                     formattedDateOfBirth = consultantDetails.dateOfBirth;
                 }
             }
 
-            // Populate formData when consultantDetails is loaded
             setFormData({
                 fullName: consultantDetails.fullname || consultantDetails.fullName || '',
                 email: consultantDetails.email || '',

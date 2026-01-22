@@ -34,8 +34,6 @@ export default function App() {
   const params = new URLSearchParams(window.location.search);
   const shop = params.get("shop");
   const adminId = params.get("AdminId");
-  console.log("shop", shop, "adminId", adminId);
-  // const [installed, setInstalled] = useState(false);
   const app = useAppBridge();
   const {installed,accessDenied} = UseAppInstall(shop, app);
 
@@ -59,8 +57,8 @@ export default function App() {
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
   }, []);
+
   const location = new URLSearchParams(window.location.search);
-  console.log("location", location);
   const getPageHeight = () => {
     return Math.max(
       document.body.scrollHeight,
