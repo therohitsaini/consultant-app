@@ -161,7 +161,7 @@ function ConsultantList() {
             });
             if (response.ok) {
                 setActive(true);
-                setToastContent("Consultant deleted successfully");
+                console.log("Consultant deleted successfully");
                 setIsUserAlertVisible(false);
                 setIsRefreshed((prev) => !prev);
 
@@ -317,7 +317,7 @@ function ConsultantList() {
                         consultantId={consultantId}
 
                     />
-                    <ToastModel active={active} setActive={setActive} toastContent={toastContent} />
+                    {/* <ToastModel active={active} setActive={setActive} toastContent={toastContent} /> */}
                     <Page
                         title="Consultant List"
                         primaryAction={{
