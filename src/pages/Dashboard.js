@@ -1,6 +1,6 @@
 import { Layout, Banner, BlockStack, CalloutCard, Page, Grid, LegacyCard, Text, Box } from '@shopify/polaris';
 import { ConfettiIcon, ExternalIcon } from '@shopify/polaris-icons';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { animate } from 'framer-motion';
 import { TitleBar } from '@shopify/app-bridge-react';
 import { useAppBridge } from '../components/createContext/AppBridgeContext';
@@ -13,7 +13,7 @@ import { fetchConsultants } from '../components/Redux/slices/ConsultantSlices';
 import { apps } from '../components/FallbackData/FallbackData';
 import axios from 'axios';
 import ShowToast from './ShowToast';
-import { fetchAdminDetails, fetchShopAllConsultants, fetchShopAllUsers } from '../components/Redux/slices/adminSlice';
+import { fetchAdminDetails, fetchShopAllConsultants, fetchShopAllUsers, manageAppStatus } from '../components/Redux/slices/adminSlice';
 
 // Component to display animated count with motion
 function AnimatedCount({ value }) {
@@ -64,13 +64,17 @@ function AnimatedCount({ value }) {
 }
 
 function Dashboard() {
+    const dispatch = useDispatch();
     const [isBannerVisible, setIsBannerVisible] = useState(true);
     const [adminDetails, setAdminDetails] = useState(null);
     const [adminIdLocal, setAdminIdLocal] = useState(null);
+    const [enabled, setEnabled] = useState(null);
+    const appStatus = useSelector((state) => state.admin.appStatus);
+    const { adminDetails_, loading: adminDetailsLoading } = useSelector((state) => state.admin);
+
     const app = useAppBridge();
     const params = new URLSearchParams(window.location.search);
     const id = params.get("adminId");
-    console.log("app___________", id);
     const host = params.get("host");
 
 
@@ -79,10 +83,23 @@ function Dashboard() {
         setAdminIdLocal(id);
     }, []);
 
-    const dispatch = useDispatch();
+    useEffect(() => {
+        if (adminDetails_) {
+            setEnabled(adminDetails_?.appEnabled);
+        }
+    }, [adminDetails_]);
+
+    useEffect(() => {
+        if (adminIdLocal) {
+            dispatch(fetchAdminDetails({ adminIdLocal, app }));
+        }
+    }, [adminIdLocal, appStatus]);
+
+    const handleToggle = useCallback(() => {
+        dispatch(manageAppStatus({ adminIdLocal, app, status: !enabled }));
+    }, [enabled]);
     const { shopAllUsers, loading: shopAllUsersLoading } = useSelector((state) => state.admin);
     const { shopAllConsultants, loading: shopAllConsultantsLoading } = useSelector((state) => state.admin);
-    const { adminDetails_, loading: adminDetailsLoading } = useSelector((state) => state.admin);
     const userCount = shopAllUsers?.data?.length || 0;
     const consultantCount = shopAllConsultants?.data?.length || 0;
 
@@ -263,12 +280,24 @@ function Dashboard() {
 
                     { /* App Status */}
                     <Layout.Section>
-                        <AppStatus />
+                        <AppStatus
+                            enabled={enabled}
+                            setEnabled={setEnabled}
+                            handleToggle={handleToggle}
+                            adminDetails_={adminDetails_}
+                            adminDetailsLoading={adminDetailsLoading}
+                            appStatus={appStatus?.appEnabled}
+                        />
                     </Layout.Section>
 
                     { /* Setup Guide */}
                     <Layout.Section>
-                        <SetupGuideNew />
+                        <SetupGuideNew
+                            appStatus={appStatus?.appEnabled}
+                            enabled={enabled}
+                            consultantCount={consultantCount}
+
+                        />
                     </Layout.Section>
 
                     { /* CalloutCard */}

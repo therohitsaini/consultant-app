@@ -1,4 +1,4 @@
-import { useState, useId } from 'react';
+import { useState, useId, useEffect } from 'react';
 import {
   BlockStack,
   Card,
@@ -27,12 +27,21 @@ import { useAppStatus } from '../ProtectRoute/AppStatusProvider';
 
 
 
-export const SetupGuideNew = () => {
- 
+export const SetupGuideNew = ({ appStatus, enabled, consultantCount }) => {
+  console.log("consultantCount", consultantCount);
   const [showGuide, setShowGuide] = useState(true);
+  const [items, setItems] = useState([]);
 
-  const [items, setItems] = useState(ITEMS);
+  const validation= {
+    appStatus: appStatus || enabled,
+    consultantCount: consultantCount,
+  }
 
+  useEffect(() => {
+    setItems(ITEMS({validation}));
+  }, [validation.appStatus, validation.consultantCount]);
+
+  console.log("items", appStatus || enabled);
   const onStepComplete = async (id) => {
     try {
       await new Promise((res) =>

@@ -18,8 +18,6 @@ function AddConsultant() {
         return Redirect.create(app);
     }, [app]);
 
-    console.log("app___________", app);
-
     const goToAddConsultant = () => {
         if (!redirect) return;
         redirect.dispatch(Redirect.Action.APP, '/consultant-list');
@@ -34,6 +32,7 @@ function AddConsultant() {
     const [profileImagePreview, setProfileImagePreview] = useState(null);
     const [consultantDetails, setConsultantDetails] = useState(null)
     const [updateIsTrue, setUpdateIsTrue] = useState(false);
+    const [toastContent, setToastContent] = useState(false);
     const fileInputRef = useRef(null);
 
     // Single state object for all form fields
@@ -68,12 +67,9 @@ function AddConsultant() {
     const [searchParams] = useSearchParams();
     const [adminIdLocal, setAdminIdLocal] = useState(null);
     const consultantId = searchParams.get('id');
-    // const [adminIdLocal, setAdminIdLocal] = useState(null);
-    const params = new URLSearchParams(window.location.search);
-    const adminId = params.get('adminId')
 
     useEffect(() => {
-        const id = localStorage.getItem('doamin_V_id');
+        const id = localStorage.getItem('domain_V_id');
         setAdminIdLocal(id);
     }, []);
 
@@ -210,7 +206,6 @@ function AddConsultant() {
 
     const submitConsultantData = useCallback(async () => {
         const token = await getAppBridgeToken(app);
-        console.log("token___________", token);
         setIsSubmitting(true);
         setSubmitError('');
         setSubmitSuccess(false);
@@ -261,7 +256,7 @@ function AddConsultant() {
             setIsSubmitting(false);
         }
     }, [formData, profileFile]);
-    
+
 
     const getConsultantById = async () => {
         if (!consultantId) return;
@@ -729,6 +724,7 @@ function AddConsultant() {
                                 </Banner>
                             </div>
                         )}
+
                     </LegacyCard>
                 </Layout.Section>
 

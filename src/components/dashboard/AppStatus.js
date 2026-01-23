@@ -9,42 +9,9 @@ import {
     useBreakpoints,
 } from '@shopify/polaris';
 import { InfoIcon } from '@shopify/polaris-icons';
-import { useState, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useAppBridge } from '../createContext/AppBridgeContext';
-import { manageAppStatus } from '../Redux/slices/adminSlice';
-import { useEffect } from 'react';
-import { fetchAdminDetails } from '../Redux/slices/adminSlice';
-
-export function AppStatus() {
-    const [enabled, setEnabled] = useState(null);
-    const dispatch = useDispatch();
-    const [adminIdLocal, setAdminIdLocal] = useState(null);
-    const appStatus = useSelector((state) => state.admin.appStatus);
-    const app = useAppBridge();
-    const { adminDetails_, loading: adminDetailsLoading } = useSelector((state) => state.admin);
-    
-    useEffect(() => {
-        const id = localStorage.getItem('domain_V_id');
-        setAdminIdLocal(id);
-    }, []);
-
-    useEffect(() => {
-        if (adminIdLocal) {
-            dispatch(fetchAdminDetails({ adminIdLocal, app }));
-        }
-    }, [adminIdLocal, appStatus]);
-
-    useEffect(() => {
-        if (adminDetails_) {
-            setEnabled(adminDetails_?.appEnabled);
-        }
-    }, [adminDetails_]);
 
 
-    const handleToggle = useCallback(() => {
-        dispatch(manageAppStatus({ adminIdLocal, app, status: !enabled }));
-    }, [enabled]);
+export function AppStatus({ enabled, handleToggle, adminDetailsLoading, appStatus }) {
 
     const contentStatus = enabled ? 'Disable App' : 'Enable App';
     const toggleId = 'app-status-toggle-uuid';
