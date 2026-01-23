@@ -26,6 +26,7 @@ import ProtectAdminRoute from "./components/ProtectRoute/ProtectAdminRoute";
 import UserTransHistory from "./pages/UserTransHistory";
 import ManualDebetCreditBlance from "./pages/ManualDebetCreditBlance";
 import NotFound from "./pages/NotFound";
+import ProtectStoreFront from "./components/ProtectRoute/ProtectStoreFront";
 
 
 
@@ -35,7 +36,7 @@ export default function App() {
   const shop = params.get("shop");
   const adminId = params.get("AdminId");
   const app = useAppBridge();
-  const {installed,accessDenied} = UseAppInstall(shop, app);
+  const { installed, accessDenied } = UseAppInstall(shop, app);
 
   useEffect(() => {
     const handleMessage = (event) => {
@@ -121,19 +122,72 @@ export default function App() {
             <Route path="admin-settings/voucher" element={<VaocherSettings />} />
             <Route path="faq" element={<Faq />} />
           </Route>
-            <Route path="/consultant-cards" element={<ConsultantCards />} />
-            <Route path="/view-profile" element={<ViewProfile />} />
-            <Route path="/consultant-dashboard/*" element={<TabNavigation />} />
-            <Route path="/users-page/*" element={<TabNavigation />} />
-            <Route path="/consulant-chats/*" element={<TabNavigation />} />
-            <Route path="/video/calling/page" element={<VideoCallingPage />} />
-            <Route path="/chats" element={<UserChat />} />
-            <Route path="/login" element={<LoginForm />} />
-            <Route path="/fcm-token" element={<FcmTokenWindow />} />
-            <Route path="/profile" element={<ProfileSection />}>
-            <Route index element={<Voucher />} />
-            <Route path="voucher" element={<Voucher />} />
-            <Route path="history" element={<History />} />
+
+          <Route path="/consultant-cards" element={
+            <ProtectStoreFront>
+              <ConsultantCards />
+            </ProtectStoreFront>
+          } />
+          <Route path="/view-profile" element={
+            <ProtectStoreFront>
+              <ViewProfile />
+            </ProtectStoreFront>
+          } />
+          <Route path="/consultant-dashboard/*" element={
+            <ProtectStoreFront>
+              <TabNavigation />
+            </ProtectStoreFront>
+          } />
+          <Route path="/users-page/*" element={
+            <ProtectStoreFront>
+              <TabNavigation />
+            </ProtectStoreFront>
+          } />
+          <Route path="/consulant-chats/*" element={
+            <ProtectStoreFront>
+              <TabNavigation />
+            </ProtectStoreFront>
+          } />
+          <Route path="/video/calling/page" element={
+            <ProtectStoreFront>
+              <VideoCallingPage />
+            </ProtectStoreFront>
+          } />
+          <Route path="/chats" element={
+            <ProtectStoreFront>
+              <UserChat />
+            </ProtectStoreFront>
+          } />
+          <Route path="/login" element={
+            <ProtectStoreFront>
+              <LoginForm />
+            </ProtectStoreFront>
+          } />
+          <Route path="/fcm-token" element={
+            <ProtectStoreFront>
+              <FcmTokenWindow />
+            </ProtectStoreFront>
+          } />
+          <Route path="/profile" element={
+            <ProtectStoreFront>
+              <ProfileSection />
+            </ProtectStoreFront>
+          }>
+            <Route index element={
+              <ProtectStoreFront>
+                <Voucher />
+              </ProtectStoreFront>
+            } />
+            <Route path="voucher" element={
+              <ProtectStoreFront>
+                <Voucher />
+              </ProtectStoreFront>
+            } />
+            <Route path="history" element={
+              <ProtectStoreFront>
+                <History />
+              </ProtectStoreFront>
+            } />
           </Route>
         </Routes>
       </BrowserRouter>

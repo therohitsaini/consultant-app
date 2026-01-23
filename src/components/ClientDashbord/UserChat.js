@@ -334,9 +334,7 @@ const UserChat = () => {
             senderId: consultantId,
             receiverId: clientId
         });
-        // console.log("Messages marked as seen");
     }, [clientId, consultantId,])
-    console.log("chatMessagesData____UserChat", chatMessagesData);
     const backToViewProfile = () => {
         const targetShop = shop;
         const hostQuery = "";
@@ -421,7 +419,7 @@ const UserChat = () => {
                             <div className={styles.chatHeader}>
                                 <div className={styles.chatHeaderInfo}>
                                     <button
-                                        onCLick={() => backToViewProfile()}
+                                        onClick={() => backToViewProfile()}
                                         className={styles.backButton}
                                         title="Go Back"
                                     >

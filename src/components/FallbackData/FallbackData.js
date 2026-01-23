@@ -24,14 +24,14 @@ export const headings = [
     { title: 'Contact' },
     { title: 'Profession' },
     { title: 'Experience' },
-    { title: 'Conversion Fees', alignment: 'end'     },
+    { title: 'Conversion Fees', alignment: 'end' },
     { title: 'Status' },
     { title: 'Action' },
 ];
 
 export const itemStrings = [
 
-   
+
 ];
 
 
@@ -101,3 +101,48 @@ export const ChatIcon = () => (
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
     </svg>
 );
+
+ export const ITEMS = [
+    {
+        id: 0,
+        title: "App Status Configuration",
+        description:
+            "Go to the top of the dashboard page and click the Enable/Disable button to activate or deactivate the consultant management system.",
+        complete: true,
+        primaryButton: {
+            content: "Go to Dashboard",
+            props: {
+                external: false,
+            },
+        },
+    },
+    {
+        id: 1,
+        title: "Add Your First Consultant",
+        description:
+            "Navigate to the Consultant List page and click on 'Add Consultant' button. Fill in all the required details including name, email, contact, profession, experience, and conversion fees.",
+        complete: true,
+        primaryButton: {
+            content: "Add Consultant",
+            props: {
+                external: false,
+            },
+        },
+    },
+    {
+        id: 2,
+        title: "Manage Consultant Status",
+        description:
+            "Use the toggle switch in the Status column to activate or deactivate consultants. Active consultants are available for consultations, while inactive ones are temporarily disabled.",
+        complete: true,
+        primaryButton: {
+            content: "View Consultants",
+            props: {
+                external: false,
+            },
+        },
+    },
+
+
+
+];

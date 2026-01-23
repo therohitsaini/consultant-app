@@ -18,18 +18,23 @@ import {
 } from '@shopify/polaris';
 import { MenuHorizontalIcon, ChevronDownIcon, ChevronUpIcon, CheckIcon, XIcon } from "@shopify/polaris-icons";
 import styles from '../../css/SetupGuide.module.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { useAppBridge } from '../createContext/AppBridgeContext';
+import { manageAppStatus } from '../Redux/slices/adminSlice';
+import { ITEMS } from '../FallbackData/FallbackData';
+import { useAppStatus } from '../ProtectRoute/AppStatusProvider';
 
 
 
 
 export const SetupGuideNew = () => {
+ 
   const [showGuide, setShowGuide] = useState(true);
+
   const [items, setItems] = useState(ITEMS);
 
-  // Example of step complete handler, adjust for your use case
   const onStepComplete = async (id) => {
     try {
-      // API call to update completion state in DB, etc.
       await new Promise((res) =>
         setTimeout(() => {
           res();
@@ -58,98 +63,13 @@ export const SetupGuideNew = () => {
   );
 };
 
-// EXAMPLE DATA - COMPONENT API
-const ITEMS = [
-  {
-    id: 0,
-    title: "App Status Configuration",
-    description:
-      "Go to the top of the dashboard page and click the Enable/Disable button to activate or deactivate the consultant management system.",
-    complete: false,
-    primaryButton: {
-      content: "Go to Dashboard",
-      props: {
-        external: false,
-      },
-    },
-  },
-  {
-    id: 1,
-    title: "Add Your First Consultant",
-    description:
-      "Navigate to the Consultant List page and click on 'Add Consultant' button. Fill in all the required details including name, email, contact, profession, experience, and conversion fees.",
-    complete: false,
-    primaryButton: {
-      content: "Add Consultant",
-      props: {
-        external: false,
-      },
-    },
-  },
-  {
-    id: 2,
-    title: "Manage Consultant Status",
-    description:
-      "Use the toggle switch in the Status column to activate or deactivate consultants. Active consultants are available for consultations, while inactive ones are temporarily disabled.",
-    complete: false,
-    primaryButton: {
-      content: "View Consultants",
-      props: {
-        external: false,
-      },
-    },
-  },
-  {
-    id: 3,
-    title: "Filter Consultants",
-    description:
-      "Use the filter tabs (All, Chat, Voice Call, Video Call) to view consultants by their consultation type. You can also use the search bar to find consultants by name, email, or profession.",
-    complete: false,
-    primaryButton: {
-      content: "View Consultants",
-      props: {
-        external: false,
-      },
-    },
-  },
-  {
-    id: 4,
-    title: "Edit Consultant Information",
-    description:
-      "Click on the Edit icon in the Action column to update consultant details. You can modify their contact information, profession, experience, and conversion fees at any time.",
-    complete: false,
-    primaryButton: {
-      content: "View Consultants",
-      props: {
-        external: false,
-      },
-    },
-  },
-  {
-    id: 5,
-    title: "Monitor Dashboard Statistics",
-    description:
-      "Check the dashboard to view key metrics including total clients, conversion rate, total consultations, and total revenue. These statistics help you track your consultant management performance.",
-    complete: false,
-    primaryButton: {
-      content: "View Dashboard",
-      props: {
-        external: false,
-      },
-    },
-  },
-];
-
-
-
-
-
 export const SetupGuide = ({ onDismiss, onStepComplete, items }) => {
   const [expanded, setExpanded] = useState(items.findIndex((item) => !item.complete));
   const [isGuideOpen, setIsGuideOpen] = useState(true);
   const [popoverActive, setPopoverActive] = useState(false);
   const accessId = useId();
   const completedItemsLength = items.filter((item) => item.complete).length;
+
 
   return (
     <Card padding='0'>

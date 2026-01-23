@@ -19,6 +19,7 @@ const checkUserBalance = async ({ userId, consultantId, type }) => {
 
 export const openCallPage = async ({ receiverId, type, userId, shop }) => {
     const balance = await checkUserBalance({ userId, consultantId: receiverId, type: type });
+    console.log("balance", balance);
     if (!balance) {
         alert("You have insufficient balance to consult with this consultant");
         return;
@@ -53,7 +54,7 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
         const returnUrl = `https://${shop}/apps/consultant-theme`;
         const returnUrlEncoded = process.env.REACT_FRONTEND_URL
         const callUrl =
-            `${"https://focusing-monkey-home-calendar.trycloudflare.com"}/video/calling/page` +
+            `${"https://relevant-call-theoretical-structured.trycloudflare.com"}/video/calling/page` +
             `?callerId=${userId}` +
             `&receiverId=${receiverId}` +
             `&callType=${type || "voice"}` +

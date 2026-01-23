@@ -47,7 +47,7 @@ function UserTransHistory() {
 
     console.log("searchQuery", searchQuery)
     useEffect(() => {
-        const id = localStorage.getItem('doamin_V_id');
+        const id = localStorage.getItem('domain_V_id');
         setAdminIdLocal(id);
     }, []);
     useEffect(() => {

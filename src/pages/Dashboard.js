@@ -69,21 +69,13 @@ function Dashboard() {
     const [adminIdLocal, setAdminIdLocal] = useState(null);
     const app = useAppBridge();
     const params = new URLSearchParams(window.location.search);
-    const id = params.get("AdminId");
+    const id = params.get("adminId");
     console.log("app___________", id);
     const host = params.get("host");
 
-    // const adminId = "690c374f605cb8b946503ccb";
-
-    // console.log("adminIdLocal", adminIdLocal)
-    // useEffect(() => {
-    //     if (adminId) {
-    //         localStorage.setItem('doamin_V_id', "690c374f605cb8b946503ccb");
-    //     }
-    // }, [adminId]);
 
     useEffect(() => {
-        const id = localStorage.getItem('doamin_V_id');
+        const id = localStorage.getItem('domain_V_id');
         setAdminIdLocal(id);
     }, []);
 

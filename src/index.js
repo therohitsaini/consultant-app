@@ -10,6 +10,7 @@ import { AppBridgeProvider } from './components/createContext/AppBridgeContext';
 import SocketProvider from './components/Sokect-io/sokectProvider';
 import ErrorBoundary from './components/ErrorBoundary';
 import { AdminMenu } from './pages/AdminMenu';
+import { AppStatusProvider } from './components/ProtectRoute/AppStatusProvider';
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/firebase-messaging-sw.js")
@@ -27,8 +28,9 @@ root.render(
       <PolarisAppProvider i18n={en}>
         <Provider store={store}>
           <SocketProvider>
-            
-            <App />
+            <AppStatusProvider>
+              <App />
+            </AppStatusProvider>
           </SocketProvider>
         </Provider>
       </PolarisAppProvider>

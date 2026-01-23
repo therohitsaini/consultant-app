@@ -17,8 +17,11 @@ export const AppBridgeProvider = ({ children }) => {
     const urlParams = new URLSearchParams(window.location.search);
     let host = urlParams.get("host");
     const shop = urlParams.get("shop");
-    const adminId = urlParams.get("AdminId");
-    console.log("adminId___________", host);
+    const adminId = urlParams.get("adminId");
+    console.log("adminId___________", adminId);
+    if (adminId) {
+      localStorage.setItem("domain_V_id", adminId);
+    }
 
     if (host) {
       return host;
@@ -60,7 +63,7 @@ export const AppBridgeProvider = ({ children }) => {
         forceRedirect: true,
         embedded: true,
       });
-   
+
 
       console.log("✅ App Bridge initialized successfully with host:", host);
       return appInstance;

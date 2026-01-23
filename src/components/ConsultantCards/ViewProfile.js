@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../components/ConsultantCards/ConsultantCards.css';
@@ -7,30 +7,28 @@ import { fetchConsultantById } from '../Redux/slices/ConsultantSlices';
 import { openCallPage } from '../middle-ware/OpenCallingPage';
 
 function ViewProfile() {
-
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    // const { shop_id, consultant_id } = useParams();
+    const [userId, setUserId] = useState(null);
     const params = new URLSearchParams(window.location.search);
     const consultant_id = params.get("consultantId");
     const shop_id = params.get("shopId");
     const shop = params.get("shop");
+    useEffect(() => {
+        setUserId(localStorage.getItem("client_u_Identity"));
+    }, []);
+
     const { consultantOverview, loading } = useSelector((state) => state.consultants);
     useEffect(() => {
         dispatch(fetchConsultantById({ shop_id, consultant_id }));
     }, [dispatch, shop_id, consultant_id]);
 
-    // Ensure page opens at the top when this component is mounted
     useEffect(() => {
         window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     }, []);
 
 
-
-
-
     const consultantView = consultantOverview?.consultant;
-    console.log("consultantView", consultantView);
     const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${consultantView?.profileImage?.replace("\\", "/")}`;
     // Default static consultant data
     const consultant = {
@@ -59,10 +57,7 @@ function ViewProfile() {
     };
 
     const startCall = async ({ receiverId, type }) => {
-        console.log("helloo???????????????????")
-        console.log("startCall_________________", receiverId, type);
-        await openCallPage({ receiverId, type, userId: "69328ff18736b56002ef83df", shop });
-
+        await openCallPage({ receiverId, type, userId, shop });
     }
 
     const renderStars = (rating) => {
@@ -91,17 +86,14 @@ function ViewProfile() {
     };
 
     const viewProfile = (consultantView) => {
-        console.log("consultantView______", consultantView);
         const targetShop = shop;
         const hostQuery = "";
-        console.log("targetShop", targetShop, "hostQuery", hostQuery)
         window.top.location.href = `https://${targetShop}/apps/consultant-theme/chats-c?consultantId=${consultantView}${hostQuery}`;
     }
     const backToHome = () => {
         const targetShop = shop;
         const hostQuery = "";
-        console.log("targetShop", targetShop, "hostQuery", hostQuery)
-        window.top.location.href = `https://${targetShop}/apps/consultant-theme/consultant-cards${hostQuery}`;
+        window.top.location.href = `https://${targetShop}/apps/consultant-theme/${hostQuery}`;
     }
 
     return (

@@ -66,6 +66,18 @@ export const fetchShopAllConsultants = createAsyncThunk("admin/fetchShopAllConsu
     })
     return response.data
 })
+export const manageAppStatus = createAsyncThunk("admin/manageAppStatus", async ({ adminIdLocal, app, status }) => {
+    console.log("status", status);
+    const token = await getAppBridgeToken(app);
+    const response = await axios.post(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/app-enable-and-disable/${adminIdLocal}`, {
+        appStatus: status
+    }, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+    return response.data
+})
 
 
 const adminSlice = createSlice({
@@ -78,6 +90,7 @@ const adminSlice = createSlice({
         shopAllUsers: [],
         shopAllConsultants: [],
         adminDetails_: [],
+        appStatus: null,
     },
     extraReducers: (builder) => {
         builder
@@ -133,6 +146,17 @@ const adminSlice = createSlice({
                 state.adminDetails_ = action.payload;
             })
             .addCase(fetchAdminDetails.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
+            .addCase(manageAppStatus.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(manageAppStatus.fulfilled, (state, action) => {
+                state.loading = false;
+                state.appStatus = action.payload;
+            })
+            .addCase(manageAppStatus.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
             })
