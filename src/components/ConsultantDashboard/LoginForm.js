@@ -89,7 +89,8 @@ const LoginForm = () => {
 
         try {
             const response = await axios.post(
-                `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/login-consultant`,
+                // `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/login-consultant`,
+                `http://localhost:5001/api-consultant/login-consultant`,
                 formData
             );
 
@@ -107,7 +108,7 @@ const LoginForm = () => {
                 localStorage.setItem("client_u_Identity", userId);
                 localStorage.setItem("shop_o_Identity", shopId);
                 localStorage.setItem("varify_tokem", token);
-                openTokenWindow({userId, shopId});
+                openTokenWindow({ userId, shopId });
                 // Call FcmToken utility function
                 // const cleanup = requestFcmTokenInNewWindow(
                 //     userId,

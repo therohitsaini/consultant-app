@@ -107,9 +107,9 @@ export default function App() {
         <IncomingCallAlert />
         <Routes>
           <Route element={
-            <ProtectAdminRoute installed={installed}>
+            // <ProtectAdminRoute installed={installed}>
               <LayoutFrame />
-            </ProtectAdminRoute>
+            // </ProtectAdminRoute>
           }>
             <Route path="/not-found" element={<NotFound />} />
             <Route index element={<Dashboard />} />
@@ -159,14 +159,14 @@ export default function App() {
             </ProtectStoreFront>
           } />
           <Route path="/login" element={
-            <ProtectStoreFront>
+            // <ProtectStoreFront>
               <LoginForm />
-            </ProtectStoreFront>
+           
           } />
           <Route path="/fcm-token" element={
-            <ProtectStoreFront>
+            // <ProtectStoreFront>
               <FcmTokenWindow />
-            </ProtectStoreFront>
+        
           } />
           <Route path="/profile" element={
             <ProtectStoreFront>

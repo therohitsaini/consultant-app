@@ -522,13 +522,7 @@ function AddConsultant() {
                                     autoComplete="off"
                                 />
 
-                                {/* Charging per minute */}
-                                {/* <TextField
-                                    label="Charging par minute"
-                                    value={formData.chargingPerMinute}
-                                    onChange={handleFieldChange('chargingPerMinute')}
-                                    autoComplete="off"
-                                /> */}
+                             
 
                             </FormLayout.Group>
 

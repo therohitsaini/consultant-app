@@ -53,7 +53,6 @@ function ConsultantList() {
         const id = localStorage.getItem('domain_V_id');
         setAdminIdLocal(id);
     }, []);
-    console.log("consultants", consultants);
 
     useEffect(() => {
         dispatch(fetchConsultants(adminIdLocal, app));
