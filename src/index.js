@@ -23,7 +23,7 @@ root.render(
   // <React.StrictMode>
   
   <ErrorBoundary>
-    {/* <AppBridgeProvider > */}
+    <AppBridgeProvider >
     <AdminMenu />
       <PolarisAppProvider i18n={en}>
         <Provider store={store}>
@@ -34,7 +34,7 @@ root.render(
           </SocketProvider>
         </Provider>
       </PolarisAppProvider>
-    {/* </AppBridgeProvider> */}
+    </AppBridgeProvider>
   </ErrorBoundary>
   // </React.StrictMode>
 );
