@@ -7,7 +7,7 @@ import { fetchChatHistory, updateUserRequestById } from '../Redux/slices/Consult
 import { useDispatch, useSelector } from 'react-redux';
 import { addMessage } from '../Redux/slices/sokectSlice';
 import { BsThreeDotsVertical } from "react-icons/bs";
-import { Toast } from '@shopify/polaris';
+import ReactToast from '../AlertModel/ReactToast';
 
 const ChatsPage = () => {
     const navigate = useNavigate();
@@ -27,7 +27,6 @@ const ChatsPage = () => {
     const [showNotification, setShowNotification] = useState(false);
     const [notificationMessage, setNotificationMessage] = useState(null);
     const [showRequestModal, setShowRequestModal] = useState(false);
-    const [openMenuConversationId, setOpenMenuConversationId] = useState(null);
     const [chatAccepted, setChatAccepted] = useState(null);
     const lastNotificationMessageId = useRef(null);
     const lastProcessedMessageId = useRef(null);
@@ -35,9 +34,11 @@ const ChatsPage = () => {
     const messagesAreaRef = useRef(null);
     const [refreshed, setRefreshed] = useState(false);
     const [userControlMenu, setUserControlMenu] = useState(null);
+    const [showChatEndToast, setShowChatEndToast] = useState(false);
+    const [showChatEndPop, setShowChatEndPop] = useState(false);
+    const prevIsRunningRef = useRef(null);
     const { userInRequest } = useSelector((state) => state.consultants);
     const isChatAccepted = useSelector((state) => state.socket.isChatAccepted);
-    console.log("isChatAccepted_________", isChatAccepted);
     useEffect(() => {
         const clientId = localStorage.getItem('client_u_Identity');
         const shopId = localStorage.getItem('shop_o_Identity');
@@ -264,8 +265,9 @@ const ChatsPage = () => {
 
 
     const updateUser = (conversation) => {
-        console.log("conversation", conversation);
         dispatch(updateUserRequestById({ shopId: conversation.shop.id, userId: conversation.sender.id, consultantId: consultantId }));
+        setUserControlMenu(null);
+        setRefreshed(prev => !prev);
     }
 
 
@@ -322,7 +324,11 @@ const ChatsPage = () => {
             consultantId: consultantId
         });
         setSeconds(0);
-        setRefreshed(true);
+        setRefreshed(prev => !prev);
+        // Refresh chat list
+        getChatList();
+        // Show center pop
+        setShowChatEndPop(true);
     }
     const handlerUserControlMenu = (conversation) => {
         setUserControlMenu(conversation?.chatListId);
@@ -332,15 +338,28 @@ const ChatsPage = () => {
         const senderId = conversation?.sender?.id;
         try {
             const response = await axios.delete(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/remove/user/chat-list/${conversation.chatListId}/${senderId}`);
-            console.log("response_________", response);
-            if (response.ok) {
+            if (response.status === 200 || response.status === 204) {
                 setUserControlMenu(null);
-                setRefreshed(prev => !prev);
+                window.location.reload();
             }
         } catch (error) {
             console.log("error_________", error);
         }
     }
+    useEffect(() => {
+        // Check if chatTimer.isRunning changed from true to false (chat ended)
+        // Don't show toast on first render (when prevIsRunningRef.current is null)
+        if (prevIsRunningRef.current === true && chatTimer.isRunning === false) {
+            setShowChatEndToast(true);
+            // Refresh chat list when chat ends
+            getChatList();
+            // Show center pop
+            setShowChatEndPop(true);
+        }
+        // Update the ref to track the previous value
+        prevIsRunningRef.current = chatTimer.isRunning;
+    }, [chatTimer.isRunning]);
+
     return (
         <Fragment>
             <div className={styles.pageContainer}>
@@ -439,7 +458,7 @@ const ChatsPage = () => {
                                                                     </button>
 
                                                                     {
-                                                                        userControlMenu === conversation?.chatListId && (
+                                                                        !userControlMenu || userControlMenu === conversation?.chatListId && (
                                                                             <div
                                                                                 className={styles.moreMenu}
                                                                                 onClick={(e) => e.stopPropagation()}
@@ -560,7 +579,7 @@ const ChatsPage = () => {
                                                                                         <BsThreeDotsVertical />
                                                                                     </button>
 
-                                                                                    {userControlMenu === conversation?.chatListId && (
+                                                                                    {!userControlMenu || userControlMenu === conversation?.chatListId && (
                                                                                         <div
                                                                                             className={styles.moreMenu}
                                                                                             onClick={(e) => e.stopPropagation()}
@@ -692,7 +711,22 @@ const ChatsPage = () => {
 
                                         {/* Messages Area */}
                                         <div className={styles.messagesArea} ref={messagesAreaRef}>
-                                            {chatAccepted?.isChatAccepted === "request" ? (
+                                            {showChatEndPop ? (
+                                                <div className={styles.mainChatReqBox}>
+                                                    <div className={styles.chatRequestBox}>
+                                                        <div className={styles.chatIcon}>🔒</div>
+
+                                                        <div className={styles.chatRequestContent}>
+                                                            <h4>Chat Ended</h4>
+                                                            <p>The chat session has been ended successfully</p>
+                                                        </div>
+
+                                                        <button onClick={() => setShowChatEndPop(false)} className={styles.acceptBtn}>
+                                                            OK
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : chatAccepted?.isChatAccepted === "request" ? (
                                                 <div className={styles.mainChatReqBox}>
                                                     <div className={styles.chatRequestBox}>
                                                         <div className={styles.chatIcon}>💬</div>
@@ -794,6 +828,11 @@ const ChatsPage = () => {
                     </div>
                 </div>
             </div>
+            <ReactToast 
+                show={showChatEndToast} 
+                message="Chat ended" 
+                onClose={() => setShowChatEndToast(false)} 
+            />
         </Fragment>
     );
 };

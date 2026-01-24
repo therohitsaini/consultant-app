@@ -32,6 +32,7 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
     const channelName = `channel-${userId.slice(-6)}-${receiverId.slice(-6)}`;
     const uid = Math.floor(Math.random() * 1000000);
     const url = `${process.env.REACT_APP_BACKEND_HOST}/api/call/generate-token`;
+    console.log("url", url);
     const res = await fetch(url, {
         method: "POST",
         headers: {
@@ -40,6 +41,7 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
         body: JSON.stringify({ channelName, uid }),
     });
     const data = await res.json();
+    console.log("data", data);
     if (data.token) {
 
         socket.emit("call-user", {
@@ -54,7 +56,7 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
         const returnUrl = `https://${shop}/apps/consultant-theme`;
         const returnUrlEncoded = process.env.REACT_FRONTEND_URL
         const callUrl =
-            `${"https://relevant-call-theoretical-structured.trycloudflare.com"}/video/calling/page` +
+            `${"https://nylon-superior-integrating-directions.trycloudflare.com"}/video/calling/page` +
             `?callerId=${userId}` +
             `&receiverId=${receiverId}` +
             `&callType=${type || "voice"}` +
