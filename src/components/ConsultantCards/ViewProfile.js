@@ -56,6 +56,7 @@ function ViewProfile() {
         ]
     };
 
+    console.log("consultantView", consultantView);
     const startCall = async ({ receiverId, type }) => {
         await openCallPage({ receiverId, type, userId, shop });
     }
@@ -183,7 +184,7 @@ function ViewProfile() {
                                             </svg>
                                             <span className="calling-option-label">Chat</span>
                                         </div>
-                                        <span className="calling-option-price">Coins {consultantView?.chatCost} per min</span>
+                                        <span className="calling-option-price">Coins {consultantView?.chatPerMinute} per min</span>
                                     </button>
                                     <button
                                         className="calling-option-btn audio-btn"
@@ -197,7 +198,7 @@ function ViewProfile() {
                                             </svg>
                                             <span className="calling-option-label">Voice Call</span>
                                         </div>
-                                        <span className="calling-option-price">INR {consultantView?.voiceCallCost}</span>
+                                        <span className="calling-option-price">INR {consultantView?.voicePerMinute}</span>
                                     </button>
                                     <button
                                         className="calling-option-btn video-btn"
@@ -212,7 +213,7 @@ function ViewProfile() {
                                             </svg>
                                             <span className="calling-option-label">Video</span>
                                         </div>
-                                        <span className="calling-option-price">INR {consultantView?.videoCallCost}</span>
+                                        <span className="calling-option-price">INR {consultantView?.videoPerMinute}</span>
                                     </button>
                                 </div>
                             </div>

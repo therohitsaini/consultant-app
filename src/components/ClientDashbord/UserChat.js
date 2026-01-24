@@ -41,7 +41,7 @@ const UserChat = () => {
     const shouldAutoScrollRef = useRef(true);
     const { insufficientBalance } = useSelector((state) => state.socket);
     const [showChatEndToast, setShowChatEndToast] = useState(false);
-    const [showChatEndPop, setShowChatEndPop] = useState(false);
+    const [showChatEndPop, setShowChatEndPop] = useState(true);
     const prevIsRunningRef = useRef(null);
 
     useEffect(() => {
@@ -318,7 +318,6 @@ const UserChat = () => {
             }
         };
 
-        // Listen for receiveMessage event directly
         socket.on("receiveMessage", handleDirectMessage);
 
         return () => {
@@ -357,7 +356,7 @@ const UserChat = () => {
             const diff = Math.floor(
                 (Date.now() - new Date(chatTimer.startTime)) / 1000
             );
-            setSeconds(diff); // total seconds
+            setSeconds(diff);
         }, 1000);
 
         return () => clearInterval(interval);
@@ -380,6 +379,7 @@ const UserChat = () => {
         setRefreshed(true);
         setShowChatEndToast(true);
         setShowChatEndPop(true);
+        localStorage.removeItem("chatTimer");
     }
 
     useEffect(() => {
@@ -400,7 +400,6 @@ const UserChat = () => {
     }, [autoChatEnded]);
 
     useEffect(() => {
-        // Chat end notify (avoid first render)
         if (prevIsRunningRef.current === true && chatTimer.isRunning === false) {
             setShowChatEndToast(true);
             setShowChatEndPop(true);
@@ -411,7 +410,7 @@ const UserChat = () => {
     return (
         <Fragment>
             <InsufficientBalanceModal show={show} setShow={setShow} insufficientBalance={insufficientBalance} />
-            {showChatEndPop && (
+            {/* {showChatEndPop && (
                 <div className={styles.chatEndOverlay}>
                     <div className={styles.chatEndBox}>
                         <div className={styles.chatEndIcon}>🔒</div>
@@ -427,7 +426,7 @@ const UserChat = () => {
                         </button>
                     </div>
                 </div>
-            )}
+            )} */}
             <div className={styles.chatPageContainer}>
                 <div
                     className={styles.container}
@@ -466,28 +465,29 @@ const UserChat = () => {
                                     </div>
                                 </div>
                                 <div className={styles.chatHeaderActions}>
-                                    {chatTimer.isRunning && (
-                                        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", mr: "10px" }}>
-                                            <p> Timer: {minutes}:{remainingSeconds}</p>
-                                            <div>
-                                                <button
-                                                    onClick={stopChatTimer}
-                                                    style={{
-                                                        padding: "5px 12px",
-                                                        backgroundColor: "#ff4d4f",
-                                                        color: "#fff",
-                                                        border: "none",
-                                                        borderRadius: "4px",
-                                                        cursor: "pointer",
-                                                        fontSize: "13px"
-                                                    }}
-                                                >
-                                                    Stop Chat
-                                                </button>
-                                            </div>
+                                    {
+                                        chatTimer.isRunning && (
+                                            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", mr: "10px" }}>
+                                                <p> Timer: {minutes}:{remainingSeconds}</p>
+                                                <div>
+                                                    <button
+                                                        onClick={stopChatTimer}
+                                                        style={{
+                                                            padding: "5px 12px",
+                                                            backgroundColor: "#ff4d4f",
+                                                            color: "#fff",
+                                                            border: "none",
+                                                            borderRadius: "4px",
+                                                            cursor: "pointer",
+                                                            fontSize: "13px"
+                                                        }}
+                                                    >
+                                                        Stop Chat
+                                                    </button>
+                                                </div>
 
-                                        </div>
-                                    )}
+                                            </div>
+                                        )}
                                     <button
                                         className={styles.headerButton}
                                         title="Video Call"
@@ -511,46 +511,64 @@ const UserChat = () => {
 
                             {/* Messages Area */}
                             <div className={styles.messagesArea} ref={messagesAreaRef}>
-                                {chatMessagesData.length === 0 ? (
-                                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90vh' }}>
-                                        <p>No messages yet. Start the conversation!</p>
+                                {/* UNLOCK : Messages Area */}
+                                {showChatEndPop && (
+                                    <div className={styles.chatEndOverlay}>
+                                        <div className={styles.chatEndBox}>
+                                            <div className={styles.chatEndIcon}>🔒</div>
+                                            <div className={styles.chatEndContent}>
+                                                <h4>Chat Ended</h4>
+                                                <p>Your chat session has ended.</p>
+                                            </div>
+                                            <button
+                                                className={styles.chatEndButton}
+                                                onClick={() => setShowChatEndPop(false)}
+                                            >
+                                                OK
+                                            </button>
+                                        </div>
                                     </div>
-                                ) : (
-                                    <>
-                                        {chatMessagesData.map((message) => {
-                                            // User's messages should be on right, consultant's on left
-                                            const isOwn = message.senderId === clientId;
-
-                                            // Format timestamp
-                                            const timestamp = new Date(message.timestamp).toLocaleTimeString([], {
-                                                hour: "2-digit",
-                                                minute: "2-digit",
-                                                hour12: true
-                                            });
-
-                                            return (
-                                                <div
-                                                    key={message._id}
-                                                    className={`${styles.messageContainer} ${isOwn ? styles.messageContainerRight : styles.messageContainerLeft}`}
-                                                >
-                                                    <div className={`${styles.messageBubble} ${isOwn ? styles.messageBubbleOwn : styles.messageBubbleOther}`}>
-                                                        {!isOwn && (
-                                                            <div className={styles.messageSender}>
-                                                                {consultantOverview?.consultant?.fullname || 'Consultant'}
-                                                            </div>
-                                                        )}
-                                                        <div className={styles.messageText}>
-                                                            {message.text}
-                                                        </div>
-                                                        <div className={styles.messageTimestamp}>
-                                                            {timestamp}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    </>
                                 )}
+
+                                {
+                                    chatMessagesData.length === 0 ? (
+                                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90vh' }}>
+                                            <p>No messages yet. Start the conversation!</p>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            {
+                                                chatMessagesData.map((message) => {
+                                                    const isOwn = message.senderId === clientId;
+                                                    const timestamp = new Date(message.timestamp).toLocaleTimeString([], {
+                                                        hour: "2-digit",
+                                                        minute: "2-digit",
+                                                        hour12: true
+                                                    });
+
+                                                    return (
+                                                        <div
+                                                            key={message._id}
+                                                            className={`${styles.messageContainer} ${isOwn ? styles.messageContainerRight : styles.messageContainerLeft}`}
+                                                        >
+                                                            <div className={`${styles.messageBubble} ${isOwn ? styles.messageBubbleOwn : styles.messageBubbleOther}`}>
+                                                                {!isOwn && (
+                                                                    <div className={styles.messageSender}>
+                                                                        {consultantOverview?.consultant?.fullname || 'Consultant'}
+                                                                    </div>
+                                                                )}
+                                                                <div className={styles.messageText}>
+                                                                    {message.text}
+                                                                </div>
+                                                                <div className={styles.messageTimestamp}>
+                                                                    {timestamp}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                        </>
+                                    )}
                             </div>
 
                             {/* Message Input */}

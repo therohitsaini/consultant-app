@@ -131,6 +131,28 @@
 // export default socketSlice.reducer;
 import { createSlice } from "@reduxjs/toolkit";
 
+const getPersistedChatTimer = () => {
+    if (typeof window === "undefined") return null;
+    try {
+        const raw = localStorage.getItem("chatTimer");
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || !parsed.startTime || !parsed.transactionId) return null;
+        return {
+            transactionId: parsed.transactionId,
+            startTime: parsed.startTime,
+            isRunning: Boolean(parsed.isRunning),
+            userId: parsed.userId || null,
+            shopId: parsed.shopId || null,
+            consultantId: parsed.consultantId || null,
+        };
+    } catch (error) {
+        return null;
+    }
+};
+
+const persistedChatTimer = getPersistedChatTimer();
+
 const socketSlice = createSlice({
     name: "socket",
     initialState: {
@@ -139,7 +161,7 @@ const socketSlice = createSlice({
         messages: [],
         insufficientBalance: null,
         isChatAccepted: null,
-        chatTimer: {
+        chatTimer: persistedChatTimer || {
             transactionId: null,
             startTime: null,
             isRunning: false,
@@ -185,6 +207,11 @@ const socketSlice = createSlice({
                 shopId: action.payload.shopId,
                 consultantId: action.payload.consultantId,
             });
+            try {
+                localStorage.setItem("chatTimer", JSON.stringify(state.chatTimer));
+            } catch (error) {
+                // ignore storage errors
+            }
         },
         setChatTimerStopped: (state) => {
             state.chatTimer = {
@@ -195,6 +222,11 @@ const socketSlice = createSlice({
                 shopId: null,
                 consultantId: null,
             };
+            try {
+                localStorage.removeItem("chatTimer");
+            } catch (error) {
+                // ignore storage errors
+            }
         },
         setAutoChatEnded: (state, action) => {
             state.autoChatEnded = action.payload;

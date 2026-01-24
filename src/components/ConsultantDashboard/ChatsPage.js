@@ -331,6 +331,7 @@ const ChatsPage = () => {
         getChatList();
         // Show center pop
         setShowChatEndPop(true);
+        localStorage.removeItem("chatTimer");
     }
     const handlerUserControlMenu = (conversation) => {
         setUserControlMenu(conversation?.chatListId);

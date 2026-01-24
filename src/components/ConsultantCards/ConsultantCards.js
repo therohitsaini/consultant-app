@@ -41,7 +41,7 @@ function ConsultantCards() {
     const [isRing, setIsRing] = useState(true);
     const { insufficientBalance } = useSelector((state) => state.socket);
 
- 
+
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -102,9 +102,9 @@ function ConsultantCards() {
             rating: 4.5,
             testimonials: 0,
             isActive: consultant.isActive || false,
-            chatPrice: parseInt(consultant.fees) || 500,
-            audioPrice: parseInt(consultant.fees) || 800,
-            videoPrice: parseInt(consultant.fees) || 1000,
+            chatPrice: parseInt(consultant?.chatPerMinute) || 0,
+            audioPrice: parseInt(consultant?.voicePerMinute) || 0,
+            videoPrice: parseInt(consultant?.videoPerMinute) || 0,
         };
     });
 
@@ -174,6 +174,7 @@ function ConsultantCards() {
 
 
     const startCall = async ({ receiverId, type }) => {
+        console.log("startCall____ConsultantCards____receiverId", receiverId,  type);
         await openCallPage({ receiverId, type, userId, shop });
 
         // const hasMicPermission = await checkMicPermission();
@@ -280,7 +281,7 @@ function ConsultantCards() {
     return (
         <>
 
-         
+
             <div className="container py-4">
                 {/* Hero Section */}
                 <div className="hero-section mb-5">
