@@ -45,7 +45,6 @@ function UserTransHistory() {
     const [type, setType] = useState(0);
     const limit = 10;
 
-    console.log("searchQuery", searchQuery)
     useEffect(() => {
         const id = localStorage.getItem('domain_V_id');
         setAdminIdLocal(id);
@@ -151,17 +150,13 @@ function UserTransHistory() {
 
             <Page
                 title="Activity History"    
-                primaryAction={{
-                    icon: PlusIcon,
-                    content: 'Add Activity',
-                    url: '/add-activity',
-                }}
+               
             >
                 <Layout>
                     <Layout.Section>
                         <IndexTableList
                             itemStrings={transactionItemStrings}
-                            sortOptions={transactionSortOptions}
+                            sortOptions={[]}
                             data={tableData}
                             headings={transactionHeadings}
                             renderRow={renderTransactionRow}

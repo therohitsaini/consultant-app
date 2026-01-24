@@ -352,13 +352,7 @@ function AddConsultant() {
         <Page
             backAction={{ content: 'Consultant List', onAction: goToAddConsultant }}
             title={updateIsTrue ? 'Update Consultant settings' : 'Add Consultant settings'}
-            secondaryActions={[
-                {
-                    content: 'Publish App',
-                    external: true,
-                    icon: ExternalIcon,
-                },
-            ]}
+           
         >
             <Layout>
 
@@ -409,16 +403,18 @@ function AddConsultant() {
                                                     autoComplete="email"
                                                 />
                                             </FormLayout.Group>
-                                            <FormLayout.Group>
-                                                {/* Password */}
-                                                <TextField
-                                                    label="Password"
-                                                    type="password"
-                                                    value={formData.password}
-                                                    onChange={handleFieldChange('password')}
-                                                    autoComplete="off"
-                                                />
-                                            </FormLayout.Group>
+                                            {!updateIsTrue && (
+                                                <FormLayout.Group>
+                                                    <TextField
+                                                        label="Password"
+                                                        type="password"
+                                                        value={formData.password}
+                                                        onChange={handleFieldChange('password')}
+                                                        autoComplete="off"
+                                                    />
+                                                </FormLayout.Group>
+                                            )}
+                                          
                                         </FormLayout>
                                     </Grid.Cell>
                                     {/* Profile Image */}

@@ -1,5 +1,5 @@
 import { Layout, Banner, BlockStack, CalloutCard, Page, Grid, LegacyCard, Text, Box } from '@shopify/polaris';
-import { ConfettiIcon, ExternalIcon } from '@shopify/polaris-icons';
+import { ConfettiIcon, ExternalIcon, PlusIcon } from '@shopify/polaris-icons';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { animate } from 'framer-motion';
 import { TitleBar } from '@shopify/app-bridge-react';
@@ -14,13 +14,19 @@ import { apps } from '../components/FallbackData/FallbackData';
 import axios from 'axios';
 import ShowToast from './ShowToast';
 import { fetchAdminDetails, fetchShopAllConsultants, fetchShopAllUsers, manageAppStatus } from '../components/Redux/slices/adminSlice';
+import { Redirect } from '@shopify/app-bridge/actions';
+import { useMemo } from 'react';
+
 
 // Component to display animated count with motion
 function AnimatedCount({ value }) {
+
     const targetValue = value || 0;
     const [displayValue, setDisplayValue] = useState(targetValue);
     const [isAnimating, setIsAnimating] = useState(false);
     const prevValueRef = useRef(targetValue);
+
+
 
     useEffect(() => {
         if (value === undefined || value === null) {
@@ -65,6 +71,17 @@ function AnimatedCount({ value }) {
 
 function Dashboard() {
     const dispatch = useDispatch();
+    const app = useAppBridge();
+    const redirect = useMemo(() => {
+        if (!app) return null;
+        return Redirect.create(app);
+    }, [app]);
+
+    const goToConsultantList = () => {
+        if (!redirect) return;
+        redirect.dispatch(Redirect.Action.APP, '/consultant-list');
+    };
+
     const [isBannerVisible, setIsBannerVisible] = useState(true);
     const [adminDetails, setAdminDetails] = useState(null);
     const [adminIdLocal, setAdminIdLocal] = useState(null);
@@ -72,7 +89,7 @@ function Dashboard() {
     const appStatus = useSelector((state) => state.admin.appStatus);
     const { adminDetails_, loading: adminDetailsLoading } = useSelector((state) => state.admin);
 
-    const app = useAppBridge();
+   
     const params = new URLSearchParams(window.location.search);
     const id = params.get("adminId");
     const host = params.get("host");
@@ -307,7 +324,8 @@ function Dashboard() {
                             illustration="/jqv_intro.png"
                             primaryAction={{
                                 content: 'View All Consultants',
-                                url: '/consultant-list',
+                                onAction: goToConsultantList,
+                                icon: PlusIcon,
                             }}
                         >
                             <p>

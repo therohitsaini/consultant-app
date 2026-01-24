@@ -58,6 +58,7 @@ export const fetchShopAllUsers = createAsyncThunk("admin/fetchShopAllUsers", asy
     return response.data
 })
 export const fetchShopAllConsultants = createAsyncThunk("admin/fetchShopAllConsultants", async ({ adminIdLocal, app }) => {
+    console.log("adminIdLocal", )
     const token = await getAppBridgeToken(app);
     const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/shop/all-consultant/${adminIdLocal}`, {
         headers: {

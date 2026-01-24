@@ -60,7 +60,8 @@ function ConsultantCards() {
     }, []);
 
     useEffect(() => {
-        dispatch(fetchConsultants(shop_id));
+        if (!shop_id) return;
+        dispatch(fetchConsultants({ adminIdLocal: shop_id }));
     }, [dispatch, shop_id]);
 
     useEffect(() => {

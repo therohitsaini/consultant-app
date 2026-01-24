@@ -41,22 +41,21 @@ function ConsultantList() {
     const [queryValue, setQueryValue] = useState('');
     const [sortValue, setSortValue] = useState(['name asc']);
     const [isUserAlertVisible, setIsUserAlertVisible] = useState(false);
-    const [consultantsIdSelected, setConsultantsIdSelected] = useState([]);
     const [consultantId, setConsultantId] = useState(null);
     const [active, setActive] = useState(false);
-    const [toastContent, setToastContent] = useState('');
     const [isRefreshed, setIsRefreshed] = useState(false);
     const [adminIdLocal, setAdminIdLocal] = useState(null);
-    console.log("app", app);
     const { consultants, loading: consultantLoading } = useSelector((state) => state.consultants);
     useEffect(() => {
-        const id = localStorage.getItem('domain_V_id');
+        const id = localStorage.getItem('domain_V_id') || '690c374f605cb8b946503ccb';
         setAdminIdLocal(id);
     }, []);
+    console.log("adminIdLocal", consultants);
 
     useEffect(() => {
-        dispatch(fetchConsultants(adminIdLocal, app));
-    }, [dispatch, isRefreshed, adminIdLocal]);
+        if (!adminIdLocal) return;
+        dispatch(fetchConsultants({ adminIdLocal, app }));
+    }, [dispatch, isRefreshed, adminIdLocal, app]);
 
     const consultantsData = consultants?.findConsultant || []
     console.log("consultantsData", consultantsData)
@@ -87,7 +86,6 @@ function ConsultantList() {
         });
     }, [consultantsData, selectedTab, queryValue, itemStrings]);
 
-    // Sort consultants
     const sortedConsultants = useMemo(() => {
         if (!filteredConsultants.length || !sortValue[0]) return filteredConsultants;
 
@@ -98,12 +96,10 @@ function ConsultantList() {
             let aValue = a[field];
             let bValue = b[field];
 
-            // Handle numeric values
             if (field === 'experience' || field === 'conversionFees') {
                 aValue = parseFloat(aValue) || 0;
                 bValue = parseFloat(bValue) || 0;
             } else {
-                // Handle string values
                 aValue = String(aValue || '').toLowerCase();
                 bValue = String(bValue || '').toLowerCase();
             }
@@ -141,7 +137,7 @@ function ConsultantList() {
                 },
             });
             if (response.status === 200) {
-                dispatch(fetchConsultants(adminIdLocal));
+                dispatch(fetchConsultants({ adminIdLocal, app }));
                 setIsRefreshed((prev) => !prev);
             }
         } catch (err) {
@@ -172,9 +168,9 @@ function ConsultantList() {
         }
     }
 
-    // Render row function for consultants
     const renderConsultantRow = useCallback((consultant, index) => {
-        const { _id, fullname, email, phone, contact, profession, experience, fees, consultantStatus
+        const { _id, fullname, email, phone, contact, profession, experience, chatPerMinute
+            , consultantStatus, voicePerMinute, videoPerMinute
         } = consultant;
         const displayPhone = phone || contact;
 
@@ -210,10 +206,20 @@ function ConsultantList() {
                 <IndexTable.Cell>{email}</IndexTable.Cell>
                 <IndexTable.Cell>{displayPhone}</IndexTable.Cell>
                 <IndexTable.Cell>{profession}</IndexTable.Cell>
-                <IndexTable.Cell>{experience}</IndexTable.Cell>
+                <IndexTable.Cell>{experience + " years"}</IndexTable.Cell>
                 <IndexTable.Cell>
                     <Text as="span" alignment="center" numeric>
-                        ${fees}
+                        ${chatPerMinute || "-"}
+                    </Text>
+                </IndexTable.Cell>
+                <IndexTable.Cell>
+                    <Text as="span" alignment="center" numeric>
+                        ${voicePerMinute || "-"}
+                    </Text>
+                </IndexTable.Cell>
+                <IndexTable.Cell>
+                    <Text as="span" alignment="center" numeric>
+                        ${videoPerMinute || "-"}
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
@@ -281,7 +287,6 @@ function ConsultantList() {
                                 handleEdit(_id);
                             }}
                         />
-                        <Button variant="tertiary" icon={DuplicateIcon} accessibilityLabel="Duplicate consultant" />
                         <Button
                             variant="tertiary"
                             icon={DeleteIcon}
@@ -303,11 +308,7 @@ function ConsultantList() {
 
     return (
         <Fragment>
-            {consultantLoading ? (
-                <div style={{ padding: '10px', margin: '10px', height: '90vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <Spinner accessibilityLabel="Spinner example" size="large" />
-                </div>
-            ) : (
+           
                 <Fragment>
                     <UserAlert
                         isUserAlertVisible={isUserAlertVisible}
@@ -324,13 +325,7 @@ function ConsultantList() {
                             content: 'Add Consultant',
                             onAction: goToAddConsultant,
                         }}
-                        secondaryActions={[
-                            {
-                                content: 'Publish App',
-                                external: true,
-                                icon: ExternalIcon,
-                            },
-                        ]}
+                       
                     >
                         <Layout>
 
@@ -353,8 +348,9 @@ function ConsultantList() {
 
                             <Layout.Section>
                                 <IndexTableList
+                                    loading={consultantLoading}
                                     itemStrings={itemStrings}
-                                    sortOptions={sortOptions}
+                                    sortOptions={[]}
                                     data={sortedConsultants}
                                     headings={headings}
                                     renderRow={renderConsultantRow}
@@ -368,7 +364,7 @@ function ConsultantList() {
                         </Layout>
                     </Page>
                 </Fragment>
-            )}
+          
         </Fragment>
     );
 }

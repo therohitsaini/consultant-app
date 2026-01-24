@@ -39,13 +39,16 @@ const ChatsPage = () => {
     const prevIsRunningRef = useRef(null);
     const { userInRequest } = useSelector((state) => state.consultants);
     const isChatAccepted = useSelector((state) => state.socket.isChatAccepted);
+    const { chatTimer } = useSelector(state => state.socket);
+    const [seconds, setSeconds] = useState(0);
+    console.log("chatTimer____ChatsPage", chatTimer);
+
     useEffect(() => {
         const clientId = localStorage.getItem('client_u_Identity');
         const shopId = localStorage.getItem('shop_o_Identity');
         setConsultantId(clientId);
         setShopId(shopId);
     }, []);
-    console.log("userControlMenu_________", userControlMenu);
 
     useEffect(() => {
         const checkMobile = () => {
@@ -294,9 +297,7 @@ const ChatsPage = () => {
             });
         }
     }, [socket]);
-    const { chatTimer } = useSelector(state => state.socket);
-    const [seconds, setSeconds] = useState(0);
-    console.log("chatTimer____ChatsPage", chatTimer);
+
     useEffect(() => {
         if (!chatTimer.isRunning || !chatTimer.startTime) return;
 
@@ -312,6 +313,7 @@ const ChatsPage = () => {
 
         return () => clearInterval(interval);
     }, [chatTimer.isRunning, chatTimer.startTime]);
+
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     const stopChatTimer = () => {
@@ -320,7 +322,7 @@ const ChatsPage = () => {
             startTime: chatTimer.startTime,
             isRunning: chatTimer.isRunning,
             shopId: chatTimer.shopId,
-            userId: consultantId,
+            userId: chaterIds?.userId,
             consultantId: consultantId
         });
         setSeconds(0);
@@ -343,21 +345,24 @@ const ChatsPage = () => {
                 window.location.reload();
             }
         } catch (error) {
-            console.log("error_________", error);
+            console.log("error", error);
         }
     }
     useEffect(() => {
-        // Check if chatTimer.isRunning changed from true to false (chat ended)
-        // Don't show toast on first render (when prevIsRunningRef.current is null)
         if (prevIsRunningRef.current === true && chatTimer.isRunning === false) {
             setShowChatEndToast(true);
-            // Refresh chat list when chat ends
             getChatList();
-            // Show center pop
             setShowChatEndPop(true);
         }
-        // Update the ref to track the previous value
         prevIsRunningRef.current = chatTimer.isRunning;
+    }, [chatTimer.isRunning]);
+
+
+    useEffect(() => {
+        if (chatTimer.isRunning) {
+            localStorage.setItem("chatTimer", JSON.stringify(chatTimer));
+            console.log("chatTimer____ChatsPage_localstorage", chatTimer);
+        } 
     }, [chatTimer.isRunning]);
 
     return (
@@ -828,10 +833,10 @@ const ChatsPage = () => {
                     </div>
                 </div>
             </div>
-            <ReactToast 
-                show={showChatEndToast} 
-                message="Chat ended" 
-                onClose={() => setShowChatEndToast(false)} 
+            <ReactToast
+                show={showChatEndToast}
+                message="Chat ended"
+                onClose={() => setShowChatEndToast(false)}
             />
         </Fragment>
     );

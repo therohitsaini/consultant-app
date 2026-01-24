@@ -7,7 +7,7 @@ import { getAppBridgeToken } from "../../../utils/getAppBridgeToken";
 
 export const fetchConsultants = createAsyncThunk(
     "consultants/fetch",
-    async (adminIdLocal,app ) => {
+    async ({ adminIdLocal, app }) => {
         // const token = await getAppBridgeToken(app);
         console.log("token__________REDUX", app);
         const response = await axios.get(

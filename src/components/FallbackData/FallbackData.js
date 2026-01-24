@@ -23,8 +23,10 @@ export const headings = [
     { title: 'Email _id' },
     { title: 'Contact' },
     { title: 'Profession' },
-    { title: 'Experience' },
-    { title: 'Conversion Fees', alignment: 'end' },
+    { title: 'Experience', alignment: 'end' },
+    { title: 'Chats', alignment: 'end' },
+    { title: 'Voice Calls', alignment: 'end' },
+    { title: 'Video Calls', alignment: 'end' },
     { title: 'Status' },
     { title: 'Action' },
 ];
@@ -112,7 +114,7 @@ export const ChatIcon = () => (
         primaryButton: {
             content: "Go to Dashboard",
             props: {
-                external: false,
+                external: true,
             },
         },
     },

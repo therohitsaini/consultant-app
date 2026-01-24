@@ -5,6 +5,7 @@ import { socket } from '../Sokect-io/SokectConfig';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchChatHistory, fetchConsultantById, updateUserRequestById } from '../Redux/slices/ConsultantSlices';
 import InsufficientBalanceModal from '../AlertModel/InsuffientBalance';
+import ReactToast from '../AlertModel/ReactToast';
 
 
 const UserChat = () => {
@@ -39,6 +40,9 @@ const UserChat = () => {
     const lastNotificationMessageId = useRef(null);
     const shouldAutoScrollRef = useRef(true);
     const { insufficientBalance } = useSelector((state) => state.socket);
+    const [showChatEndToast, setShowChatEndToast] = useState(false);
+    const [showChatEndPop, setShowChatEndPop] = useState(false);
+    const prevIsRunningRef = useRef(null);
 
     useEffect(() => {
         if (insufficientBalance) {
@@ -346,20 +350,6 @@ const UserChat = () => {
     const [seconds, setSeconds] = useState(0);
     console.log("chatTimer____ChatsPage", chatTimer);
 
-
-
-
-    // useEffect(() => {
-    //     if (!chatTimer.isRunning || !chatTimer.startTime) return;
-    //     const interval = setInterval(() => {
-    //         const diff = Math.floor(
-    //             (Date.now() - new Date(chatTimer.startTime)) / 1000
-    //         );
-    //         setSeconds(diff);
-    //     }, 1000);
-
-    //     return () => clearInterval(interval);
-    // }, [chatTimer.isRunning, chatTimer.startTime]);
     useEffect(() => {
         if (!chatTimer.isRunning || !chatTimer.startTime) return;
 
@@ -388,6 +378,8 @@ const UserChat = () => {
         });
         setSeconds(0);
         setRefreshed(true);
+        setShowChatEndToast(true);
+        setShowChatEndPop(true);
     }
 
     useEffect(() => {
@@ -402,12 +394,40 @@ const UserChat = () => {
             });
             setSeconds(0);
             setRefreshed(true);
+            setShowChatEndToast(true);
+            setShowChatEndPop(true);
         }
     }, [autoChatEnded]);
+
+    useEffect(() => {
+        // Chat end notify (avoid first render)
+        if (prevIsRunningRef.current === true && chatTimer.isRunning === false) {
+            setShowChatEndToast(true);
+            setShowChatEndPop(true);
+        }
+        prevIsRunningRef.current = chatTimer.isRunning;
+    }, [chatTimer.isRunning]);
 
     return (
         <Fragment>
             <InsufficientBalanceModal show={show} setShow={setShow} insufficientBalance={insufficientBalance} />
+            {showChatEndPop && (
+                <div className={styles.chatEndOverlay}>
+                    <div className={styles.chatEndBox}>
+                        <div className={styles.chatEndIcon}>🔒</div>
+                        <div className={styles.chatEndContent}>
+                            <h4>Chat Ended</h4>
+                            <p>Your chat session has ended.</p>
+                        </div>
+                        <button
+                            className={styles.chatEndButton}
+                            onClick={() => setShowChatEndPop(false)}
+                        >
+                            OK
+                        </button>
+                    </div>
+                </div>
+            )}
             <div className={styles.chatPageContainer}>
                 <div
                     className={styles.container}
@@ -565,6 +585,11 @@ const UserChat = () => {
                     </div>
                 </div>
             </div>
+            <ReactToast
+                show={showChatEndToast}
+                message="Chat ended"
+                onClose={() => setShowChatEndToast(false)}
+            />
         </Fragment>
     );
 };

@@ -185,17 +185,13 @@ function ManualDebetCreditBlance() {
             <UpdateUserDetailsModal open={active} onClose={() => setActive(false)} userDetails={userDetails} updateFormData={updateFormData} setUpdateFormData={setUpdateFormData} updateWallet={updateWallet} />
             <Page
                 title="Wallet History"
-            // primaryAction={{
-            //     icon: PlusIcon,
-            //     content: 'Add Wallet',
-            //     url: '/add-wallet',
-            // }}
+          
             >
                 <Layout>
                     <Layout.Section>
                         <IndexTableList
                             itemStrings={[]}
-                            sortOptions={transactionSortOptions}
+                            sortOptions={[]}
                             data={tableData}
                             headings={walletManagementHeadings}
                             renderRow={renderWalletRow}
