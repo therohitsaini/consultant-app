@@ -11,6 +11,7 @@ import SocketProvider from './components/Sokect-io/sokectProvider';
 import ErrorBoundary from './components/ErrorBoundary';
 import { AdminMenu } from './pages/AdminMenu';
 import { AppStatusProvider } from './components/ProtectRoute/AppStatusProvider';
+import ToastProvider from './components/AlertModel/ToastProvider';
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/firebase-messaging-sw.js")
@@ -21,18 +22,20 @@ if ("serviceWorker" in navigator) {
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   // <React.StrictMode>
-  
+
   <ErrorBoundary>
     <AppBridgeProvider >
-    <AdminMenu />
+      <AdminMenu />
       <PolarisAppProvider i18n={en}>
-        <Provider store={store}>
-          <SocketProvider>
-            <AppStatusProvider>
-              <App />
-            </AppStatusProvider>
-          </SocketProvider>
-        </Provider>
+        <ToastProvider>
+          <Provider store={store}>
+            <SocketProvider>
+              <AppStatusProvider>
+                <App />
+              </AppStatusProvider>
+            </SocketProvider>
+          </Provider>
+        </ToastProvider>
       </PolarisAppProvider>
     </AppBridgeProvider>
   </ErrorBoundary>

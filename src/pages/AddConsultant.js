@@ -7,6 +7,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useAppBridge } from '../components/createContext/AppBridgeContext';
 import { Redirect } from '@shopify/app-bridge/actions';
 import { getAppBridgeToken } from '../utils/getAppBridgeToken';
+import { usePolarisToast } from '../components/AlertModel/PolariesTostContext';
 
 
 
@@ -34,6 +35,7 @@ function AddConsultant() {
     const [updateIsTrue, setUpdateIsTrue] = useState(false);
     const [toastContent, setToastContent] = useState(false);
     const fileInputRef = useRef(null);
+    const { showToast } = usePolarisToast();
 
     // Single state object for all form fields
     const [formData, setFormData] = useState({
@@ -66,7 +68,7 @@ function AddConsultant() {
     const [showDropdown, setShowDropdown] = useState(false);
     const [searchParams] = useSearchParams();
     const [adminIdLocal, setAdminIdLocal] = useState(null);
-    const consultantId = searchParams.get('id');
+    const consultantId = searchParams.get('id') || "6973b0d5cf6678cae20c2854";
 
     useEffect(() => {
         const id = localStorage.getItem('domain_V_id');
@@ -177,25 +179,26 @@ function AddConsultant() {
                 marginTop: '4px',
             }}
         >
-            {filteredTags.map((tag) => (
-                <div
-                    key={tag}
-                    onClick={() => handleTagSelect(tag)}
-                    style={{
-                        padding: '8px 12px',
-                        cursor: 'pointer',
-                        borderBottom: '1px solid #e1e3e5',
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#f6f6f7';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'white';
-                    }}
-                >
-                    <Text variant="bodyMd">{tag}</Text>
-                </div>
-            ))}
+            {
+                filteredTags.map((tag) => (
+                    <div
+                        key={tag}
+                        onClick={() => handleTagSelect(tag)}
+                        style={{
+                            padding: '8px 12px',
+                            cursor: 'pointer',
+                            borderBottom: '1px solid #e1e3e5',
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#f6f6f7';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'white';
+                        }}
+                    >
+                        <Text variant="bodyMd">{tag}</Text>
+                    </div>
+                ))}
         </div>
     );
 
@@ -203,6 +206,7 @@ function AddConsultant() {
     const handleFileButtonClick = useCallback(() => {
         fileInputRef.current?.click();
     }, []);
+
 
     const submitConsultantData = useCallback(async () => {
         const token = await getAppBridgeToken(app);
@@ -230,7 +234,7 @@ function AddConsultant() {
         }
 
         try {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/add-consultant/${adminIdLocal}`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api-consultant/add-consultant/${adminIdLocal}`, {
                 method: 'POST',
                 body: form,
                 headers: {
@@ -239,8 +243,9 @@ function AddConsultant() {
             });
 
             const responseData = await response.json();
+            console.log('Response data:', responseData);
             if (response.ok) {
-                setSubmitSuccess(true);
+                showToast(responseData?.message);
                 setTextFieldValue('');
                 setProfileFile(null);
                 setProfileImageUrl(null);
@@ -257,17 +262,63 @@ function AddConsultant() {
         }
     }, [formData, profileFile]);
 
+    const updateConsultantData = async () => {
+        const token = await getAppBridgeToken(app);
+        setIsSubmitting(true);
+        setSubmitError('');
+        setSubmitSuccess(false);
+        const form = new FormData();
+        if (profileFile) {
+            form.append("profileImage", profileFile);
+        }
+        Object.keys(formData).forEach((key) => {
+            const value = formData[key];
+            if (value !== '' && value !== null && value !== undefined && key !== 'profileImage') {
+                if (Array.isArray(value)) {
+                    form.append(key, JSON.stringify(value));
+                } else {
+                    form.append(key, value);
+                }
+            }
+        });
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api-consultant/update-consultant/${consultantId}`, {
+                method: 'PUT',
+                body: form,
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            const responseData = await response.json();
+            console.log('Response data:', responseData);
+            if (response.ok) {
+                showToast(responseData?.message);
+                // showToast('Consultant updated successfully 🎉');
+            } else {
+                showToast(responseData?.missingFields, true);
+            }
+        } catch (error) {
+            console.error('Error updating consultant data:', error);
+            setSubmitError(
+                error.message || 'Failed to update consultant data. Please try again.'
+            );
+        } finally {
+            setIsSubmitting(false);
+        }
+    }
+
 
     const getConsultantById = async () => {
         if (!consultantId) return;
         const token = await getAppBridgeToken(app);
         try {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/consultantid/${consultantId}`, {
+            const response = await fetch(`${"http://localhost:5001"}/api-consultant/consultantid/${consultantId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
             const data = await response.json();
+            console.log('Consultant data fetched:', data);
 
             if (response.ok && data.consultant) {
                 setConsultantDetails(data.consultant);
@@ -348,12 +399,14 @@ function AddConsultant() {
         }
     }, [consultantDetails])
 
+
     return (
         <Page
             backAction={{ content: 'Consultant List', onAction: goToAddConsultant }}
             title={updateIsTrue ? 'Update Consultant settings' : 'Add Consultant settings'}
-           
+
         >
+
             <Layout>
 
                 { /* Banner */}
@@ -414,7 +467,7 @@ function AddConsultant() {
                                                     />
                                                 </FormLayout.Group>
                                             )}
-                                          
+
                                         </FormLayout>
                                     </Grid.Cell>
                                     {/* Profile Image */}
@@ -471,35 +524,36 @@ function AddConsultant() {
                                     </Grid.Cell>
                                 </Grid>
                             </FormLayout.Group>
+                            <div style={{ marginTop: updateIsTrue ? '20px' : '0px' }}>
+                                <FormLayout.Group >
 
-                            <FormLayout.Group>
+                                    {/* Phone Number */}
+                                    <TextField
+                                        label="Phone Number"
+                                        type="tel"
+                                        value={formData.phoneNumber}
+                                        onChange={handleFieldChange('phoneNumber')}
+                                        autoComplete="off"
+                                    />
 
-                                {/* Phone Number */}
-                                <TextField
-                                    label="Phone Number"
-                                    type="tel"
-                                    value={formData.phoneNumber}
-                                    onChange={handleFieldChange('phoneNumber')}
-                                    autoComplete="off"
-                                />
+                                    {/* Profession */}
+                                    <TextField
+                                        label="Profession"
+                                        value={formData.profession}
+                                        onChange={handleFieldChange('profession')}
+                                        autoComplete="off"
+                                    />
 
-                                {/* Profession */}
-                                <TextField
-                                    label="Profession"
-                                    value={formData.profession}
-                                    onChange={handleFieldChange('profession')}
-                                    autoComplete="off"
-                                />
+                                    {/* Specialization */}
+                                    <TextField
+                                        label="Specialization"
+                                        value={formData.specialization}
+                                        onChange={handleFieldChange('specialization')}
+                                        autoComplete="off"
+                                    />
 
-                                {/* Specialization */}
-                                <TextField
-                                    label="Specialization"
-                                    value={formData.specialization}
-                                    onChange={handleFieldChange('specialization')}
-                                    autoComplete="off"
-                                />
-
-                            </FormLayout.Group>
+                                </FormLayout.Group>
+                            </div>
                             <FormLayout.Group>
 
                                 {/* License / ID Number */}
@@ -518,7 +572,7 @@ function AddConsultant() {
                                     autoComplete="off"
                                 />
 
-                             
+
 
                             </FormLayout.Group>
 
@@ -681,7 +735,7 @@ function AddConsultant() {
                                 updateIsTrue ?
                                     <Button
                                         primary
-                                        onClick={submitConsultantData}
+                                        onClick={updateConsultantData}
                                         loading={isSubmitting}
                                         disabled={isSubmitting}
                                     >
