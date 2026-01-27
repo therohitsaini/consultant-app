@@ -10,8 +10,20 @@ import {
     BlockStack,
 } from '@shopify/polaris';
 import axios from 'axios';
+import { useAppBridge } from '../components/createContext/AppBridgeContext';
+import { useMemo } from 'react';
+import { Redirect } from '@shopify/app-bridge/actions';
 
-function VaocherSettings() {
+function VoucherSettings() {
+    const app = useAppBridge();
+    const redirect = useMemo(() => {
+        if (!app) return null;
+        return Redirect.create(app);
+    }, [app]);
+    const backToVoucherManagement = () => {
+        if (!redirect) return;
+        redirect.dispatch(Redirect.Action.APP, '/admin-settings/voucher-management');
+    }
     const [formData, setFormData] = useState({
         totalCoin: '',
         extraCoin: '',
@@ -23,7 +35,7 @@ function VaocherSettings() {
 
     // Get adminId from URL params
     const params = new URLSearchParams(window.location.search);
-    const adminId = params.get('adminId') || '690c374f605cb8b946503ccb'; 
+    const adminId = params.get('adminId') 
 
     const handleFieldChange = useCallback((fieldName) => {
         return (value) => {
@@ -112,13 +124,9 @@ function VaocherSettings() {
 
     return (
         <Page
+        backAction={{ content: 'Voucher Management', onAction: backToVoucherManagement }}
             title="Voucher Settings"
-            primaryAction={{
-                content: 'Save Settings',
-                onAction: handleSubmit,
-                loading: isSubmitting,
-                disabled: isSubmitting,
-            }}
+          
         >
             <Layout>
                 <Layout.Section>
@@ -176,7 +184,7 @@ function VaocherSettings() {
                                         loading={isSubmitting}
                                         disabled={isSubmitting}
                                     >
-                                        {existingData ? 'Update Settings' : 'Save Settings'}
+                                        {existingData ? 'Update Settings' : 'Save '}
                                     </Button>
                                 </div>
                             </FormLayout>
@@ -201,5 +209,5 @@ function VaocherSettings() {
     );
 }
 
-export default VaocherSettings;
+export default VoucherSettings;
 

@@ -17,7 +17,7 @@ import GlobalMessageNotification from "./components/AlertModel/GlobalMessageNoti
 import ProfileSection from "./components/ClientDashbord/ProfileSection";
 import Voucher from "./pages/Voucher";
 import History from "./pages/History";
-import VaocherSettings from "./pages/VaocherSettings";
+import VoucherSettings from "./pages/VoucherSettings";
 import FcmTokenWindow from "./firebase/utils/FcmTokenWindow";
 import IncomingCallAlert from "./components/AlertModel/IncommingCallAlert";
 import { useAppBridge } from "./components/createContext/AppBridgeContext";
@@ -27,6 +27,7 @@ import UserTransHistory from "./pages/UserTransHistory";
 import ManualDebetCreditBlance from "./pages/ManualDebetCreditBlance";
 import NotFound from "./pages/NotFound";
 import ProtectStoreFront from "./components/ProtectRoute/ProtectStoreFront";
+import VoucherTable from "./pages/VoucherTable";
 
 
 
@@ -107,8 +108,9 @@ export default function App() {
         <IncomingCallAlert />
         <Routes>
           <Route element={
-            // <ProtectAdminRoute installed={installed}>
+            <ProtectAdminRoute installed={installed}>
               <LayoutFrame />
+            </ProtectAdminRoute>
           }>
             <Route path="/not-found" element={<NotFound />} />
             <Route index element={<Dashboard />} />
@@ -118,7 +120,8 @@ export default function App() {
             <Route path="/setting/history" element={<UserTransHistory />} />
             <Route path="/setting/wallet-management" element={<ManualDebetCreditBlance />} />
             <Route path="pricing" element={<Pricing />} />
-            <Route path="admin-settings/voucher" element={<VaocherSettings />} />
+            <Route path="/admin-settings/voucher" element={<VoucherSettings />} />
+            <Route path="/admin-settings/voucher-management" element={<VoucherTable />} />
             <Route path="faq" element={<Faq />} />
           </Route>
 
@@ -133,24 +136,24 @@ export default function App() {
             </ProtectStoreFront>
           } />
           <Route path="/consultant-dashboard/*" element={
-            // <ProtectStoreFront>
+            <ProtectStoreFront>
               <TabNavigation />
-        
+            </ProtectStoreFront>
           } />
           <Route path="/users-page/*" element={
-            // <ProtectStoreFront>
+            <ProtectStoreFront>
               <TabNavigation />
-            // </ProtectStoreFront>
+            </ProtectStoreFront>
           } />
           <Route path="/consulant-chats/*" element={
-            // <ProtectStoreFront>
+            <ProtectStoreFront>
               <TabNavigation />
-            // </ProtectStoreFront>
+            </ProtectStoreFront>
           } />
           <Route path="/video/calling/page" element={
-            <ProtectStoreFront>
+            // <ProtectStoreFront>
               <VideoCallingPage />
-            </ProtectStoreFront>
+            // </ProtectStoreFront>
           } />
           <Route path="/chats" element={
             <ProtectStoreFront>
@@ -158,9 +161,9 @@ export default function App() {
             </ProtectStoreFront>
           } />
           <Route path="/login" element={
-            // <ProtectStoreFront>
+            <ProtectStoreFront>
               <LoginForm />
-           
+            </ProtectStoreFront>
           } />
           <Route path="/fcm-token" element={
             // <ProtectStoreFront>

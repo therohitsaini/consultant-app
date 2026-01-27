@@ -72,13 +72,7 @@ function Pricing() {
     return (
         <Page
             title="Pricing"
-            secondaryActions={[
-                {
-                    content: 'Publish App',
-                    external: true,
-                    icon: ExternalIcon,
-                },
-            ]}
+            
         >
             <Layout>
                 {/* Banner */}

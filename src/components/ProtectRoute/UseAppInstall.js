@@ -16,6 +16,8 @@ export const UseAppInstall = (shop, app) => {
                 return;
             }
             const token = await getAppBridgeToken(app);
+            const url = `${process.env.REACT_APP_BACKEND_HOST}/app/install/${shop}`;
+            console.log("url", url);
             try {
                 const response = await fetch(
                     `${process.env.REACT_APP_BACKEND_HOST}/app/install/${shop}`

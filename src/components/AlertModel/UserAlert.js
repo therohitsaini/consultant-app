@@ -36,3 +36,38 @@ export function UserAlert({ isUserAlertVisible, setIsUserAlertVisible, handleDel
     </Modal>
   );
 }
+export function UserAlertVoucher({ isUserAlertVisible, setIsUserAlertVisible, handleDelete, voucherId }) {
+
+  const handleChange = () => {
+    setIsUserAlertVisible(false);
+  }
+
+
+
+  return (
+    <Modal
+      activator={true}
+      open={isUserAlertVisible}
+      onClose={handleChange}
+      title="Delete Voucher"
+      primaryAction={{
+        content: 'Delete Voucher',
+        onAction: () => handleDelete(voucherId),
+      }}
+      secondaryActions={[
+        {
+          content: 'Cancel',
+          onAction: handleChange,
+        },
+      ]}
+    >
+      <Modal.Section>
+        <TextContainer>
+          <p>
+            Are you sure you want to delete this voucher?
+          </p>
+        </TextContainer>
+      </Modal.Section>
+    </Modal>
+  );
+}

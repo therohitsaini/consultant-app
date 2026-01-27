@@ -6,17 +6,21 @@ import { getAppBridgeToken } from '../../../utils/getAppBridgeToken'
 
 
 export const fetchAdminDetails = createAsyncThunk("admin/fetchAdminDetails", async ({ adminIdLocal, app }) => {
-    console.log("adminIdLocal", adminIdLocal)
+    console.log("adminIdLocal__________REDUX", adminIdLocal)
+    console.log("app__________REDUX", app)
     const token = await getAppBridgeToken(app);
+    console.log("token__________REDUX", token)
     const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/admin/${adminIdLocal}`, {
         headers: {
             Authorization: `Bearer ${token}`
         }
     })
+    console.log("response__________REDUX", response.data?.data)
     return response.data?.data
 })
 
 export const fetchActivityHistory = createAsyncThunk("admin/fetchActivityHistory", async ({ adminIdLocal, page, limit, type = 'all', app, searchQuery }) => {
+    console.log("type", type)
     const token = await getAppBridgeToken(app);
     const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/activity/transactions/${adminIdLocal}`, {
         headers: {
@@ -58,7 +62,7 @@ export const fetchShopAllUsers = createAsyncThunk("admin/fetchShopAllUsers", asy
     return response.data
 })
 export const fetchShopAllConsultants = createAsyncThunk("admin/fetchShopAllConsultants", async ({ adminIdLocal, app }) => {
-    console.log("adminIdLocal", )
+    console.log("adminIdLocal",)
     const token = await getAppBridgeToken(app);
     const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/shop/all-consultant/${adminIdLocal}`, {
         headers: {
@@ -67,12 +71,29 @@ export const fetchShopAllConsultants = createAsyncThunk("admin/fetchShopAllConsu
     })
     return response.data
 })
+
+// ____________________----- manage app status --------____________________
+
 export const manageAppStatus = createAsyncThunk("admin/manageAppStatus", async ({ adminIdLocal, app, status }) => {
     console.log("status", status);
     const token = await getAppBridgeToken(app);
     const response = await axios.post(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/app-enable-and-disable/${adminIdLocal}`, {
         appStatus: status
     }, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+    return response.data
+})
+
+
+export const deleteVoucher = createAsyncThunk("admin/deleteVoucher", async ({ adminIdLocal, app, voucherId }) => {
+    console.log("adminIdLocal", adminIdLocal)
+    console.log("app", app)
+    console.log("voucherId", voucherId)
+    const token = await getAppBridgeToken(app);
+    const response = await axios.delete(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/voucher-delete/${adminIdLocal}/${voucherId}`, {
         headers: {
             Authorization: `Bearer ${token}`
         }
@@ -92,6 +113,7 @@ const adminSlice = createSlice({
         shopAllConsultants: [],
         adminDetails_: [],
         appStatus: null,
+        deletedVoucher: null,
     },
     extraReducers: (builder) => {
         builder
@@ -158,6 +180,17 @@ const adminSlice = createSlice({
                 state.appStatus = action.payload;
             })
             .addCase(manageAppStatus.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
+            .addCase(deleteVoucher.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(deleteVoucher.fulfilled, (state, action) => {
+                state.loading = false;
+                state.deletedVoucher = action.payload;
+            })
+            .addCase(deleteVoucher.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
             })

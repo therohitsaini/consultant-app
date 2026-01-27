@@ -8,6 +8,7 @@ import { useAppBridge } from '../components/createContext/AppBridgeContext';
 import { Redirect } from '@shopify/app-bridge/actions';
 import { getAppBridgeToken } from '../utils/getAppBridgeToken';
 import { usePolarisToast } from '../components/AlertModel/PolariesTostContext';
+import { ContextualSaveBar } from "@shopify/polaris";
 
 
 
@@ -36,8 +37,7 @@ function AddConsultant() {
     const [toastContent, setToastContent] = useState(false);
     const fileInputRef = useRef(null);
     const { showToast } = usePolarisToast();
-
-    // Single state object for all form fields
+    const [dirty, setDirty] = useState(false);
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
@@ -68,8 +68,7 @@ function AddConsultant() {
     const [showDropdown, setShowDropdown] = useState(false);
     const [searchParams] = useSearchParams();
     const [adminIdLocal, setAdminIdLocal] = useState(null);
-    const consultantId = searchParams.get('id') || "6973b0d5cf6678cae20c2854";
-
+    const consultantId = searchParams.get('id');
     useEffect(() => {
         const id = localStorage.getItem('domain_V_id');
         setAdminIdLocal(id);
@@ -234,7 +233,7 @@ function AddConsultant() {
         }
 
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api-consultant/add-consultant/${adminIdLocal}`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/add-consultant/${adminIdLocal}`, {
                 method: 'POST',
                 body: form,
                 headers: {
@@ -282,7 +281,7 @@ function AddConsultant() {
             }
         });
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api-consultant/update-consultant/${consultantId}`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/update-consultant/${consultantId}`, {
                 method: 'PUT',
                 body: form,
                 headers: {
@@ -312,7 +311,7 @@ function AddConsultant() {
         if (!consultantId) return;
         const token = await getAppBridgeToken(app);
         try {
-            const response = await fetch(`${"http://localhost:5001"}/api-consultant/consultantid/${consultantId}`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/consultantid/${consultantId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -377,17 +376,12 @@ function AddConsultant() {
                 voicePerMinute: consultantDetails.voicePerMinute || '',
             });
 
-            // Set profile image preview if available
             if (consultantDetails.profileImage) {
-                // Convert Windows path (backslashes) to forward slashes
                 let imagePath = consultantDetails.profileImage.replace(/\\/g, "/");
 
-                // If path doesn't start with http, prepend backend host URL
                 if (!imagePath.startsWith('http')) {
-                    const backendHost = process.env.REACT_APP_BACKEND_HOST || 'http://localhost:5001';
-                    // Remove trailing slash from backend host if present
+                    const backendHost = process.env.REACT_APP_BACKEND_HOST;
                     const baseUrl = backendHost.replace(/\/$/, '');
-                    // Remove leading slash from image path if present
                     imagePath = imagePath.replace(/^\//, '');
                     imagePath = `${baseUrl}/${imagePath}`;
                 }
@@ -406,28 +400,22 @@ function AddConsultant() {
             title={updateIsTrue ? 'Update Consultant settings' : 'Add Consultant settings'}
 
         >
+            {dirty && (
+                <ContextualSaveBar
+                    message="Unsaved changes"
+                    saveAction={{
+                        onAction: updateIsTrue ? updateConsultantData : submitConsultantData,
+                        loading: isSubmitting,
+                    }}
+                    discardAction={{
+                        onAction: "handleDiscard",
+                    }}
+                />
+            )}
+
+
 
             <Layout>
-
-                { /* Banner */}
-                {isBannerVisible && (
-                    <Layout.Section>
-                        <Banner
-                            title="Hi Admin. Welcome To: Your Shopify Store"
-                            tone="info"
-                            onDismiss={() => setIsBannerVisible(false)}
-                            icon={ConfettiIcon}
-                        >
-                            <BlockStack gap="200">
-                                <p>Make sure you know how these changes affect your store.</p>
-                                <p>Make sure you know how these changes affect your store.</p>
-                            </BlockStack>
-                        </Banner>
-                    </Layout.Section>
-                )}
-
-                {/* Add Consultant settings */}
-
 
                 <Layout.Section>
                     <LegacyCard title="Add Consultant settings" sectioned>
@@ -444,6 +432,7 @@ function AddConsultant() {
                                                     value={formData.fullName}
                                                     onChange={handleFieldChange('fullName')}
                                                     autoComplete="off"
+                                                    onBlur={() => setDirty(true)}
                                                 />
                                             </FormLayout.Group>
                                             <FormLayout.Group>
@@ -454,6 +443,7 @@ function AddConsultant() {
                                                     value={formData.email}
                                                     onChange={handleFieldChange('email')}
                                                     autoComplete="email"
+                                                    onBlur={() => setDirty(true)}
                                                 />
                                             </FormLayout.Group>
                                             {!updateIsTrue && (
@@ -464,6 +454,7 @@ function AddConsultant() {
                                                         value={formData.password}
                                                         onChange={handleFieldChange('password')}
                                                         autoComplete="off"
+                                                        onBlur={() => setDirty(true)}
                                                     />
                                                 </FormLayout.Group>
                                             )}
@@ -480,40 +471,43 @@ function AddConsultant() {
                                                 accept="image/*"
                                                 onChange={handleFileInputChange}
                                                 style={{ display: 'none', }}
+                                                onBlur={() => setDirty(true)}
                                             />
                                             <DropZone
                                                 onDrop={handleDropZoneDrop}
                                                 accept="image/*"
                                                 type="image"
                                                 allowMultiple={false}
+                                                onBlur={() => setDirty(true)}
                                             >
-                                                {profileImageUrl ? (
-                                                    <div style={{ width: '100%', height: '100%', textAlign: 'center', padding: '10px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                                        <img
-                                                            src={profileImageUrl || './images/teamdefault.png'}
-                                                            alt="Profile Preview"
-                                                            style={{
-                                                                width: 90,
-                                                                height: 90,
-                                                                borderRadius: '8px',
-                                                                objectFit: 'cover'
-                                                            }}
-                                                        />
-                                                    </div>
-                                                ) : (
-                                                    <div style={{ width: '100%', height: '100%', textAlign: 'center', padding: '10px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                                        <img
-                                                            src="./images\flag\teamdefault.png"
-                                                            alt="Default Profile"
-                                                            style={{
-                                                                width: 90,
-                                                                height: 90,
-                                                                borderRadius: '8px',
-                                                                objectFit: 'cover'
-                                                            }}
-                                                        />
-                                                    </div>
-                                                )}
+                                                {
+                                                    profileImageUrl ? (
+                                                        <div style={{ width: '100%', height: '100%', textAlign: 'center', padding: '10px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                                            <img
+                                                                src={profileImageUrl || './images/teamdefault.png'}
+                                                                alt="Profile Preview"
+                                                                style={{
+                                                                    width: 90,
+                                                                    height: 90,
+                                                                    borderRadius: '8px',
+                                                                    objectFit: 'cover'
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    ) : (
+                                                        <div style={{ width: '100%', height: '100%', textAlign: 'center', padding: '10px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                                            <img
+                                                                src="./images\flag\teamdefault.png"
+                                                                alt="Default Profile"
+                                                                style={{
+                                                                    width: 90,
+                                                                    height: 90,
+                                                                    borderRadius: '8px',
+                                                                    objectFit: 'cover'
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    )}
                                             </DropZone>
                                             <div style={{ marginTop: '8px', textAlign: 'center' }}>
                                                 <Button size="slim" onClick={handleFileButtonClick}>
@@ -534,6 +528,7 @@ function AddConsultant() {
                                         value={formData.phoneNumber}
                                         onChange={handleFieldChange('phoneNumber')}
                                         autoComplete="off"
+                                        onBlur={() => setDirty(true)}
                                     />
 
                                     {/* Profession */}
@@ -542,6 +537,7 @@ function AddConsultant() {
                                         value={formData.profession}
                                         onChange={handleFieldChange('profession')}
                                         autoComplete="off"
+                                        onBlur={() => setDirty(true)}
                                     />
 
                                     {/* Specialization */}
@@ -550,6 +546,7 @@ function AddConsultant() {
                                         value={formData.specialization}
                                         onChange={handleFieldChange('specialization')}
                                         autoComplete="off"
+                                        onBlur={() => setDirty(true)}
                                     />
 
                                 </FormLayout.Group>
@@ -562,6 +559,7 @@ function AddConsultant() {
                                     value={formData.licenseIdNumber}
                                     onChange={handleFieldChange('licenseIdNumber')}
                                     autoComplete="off"
+                                    onBlur={() => setDirty(true)}
                                 />
 
                                 {/* Year of Experience */}
@@ -570,6 +568,7 @@ function AddConsultant() {
                                     value={formData.yearOfExperience}
                                     onChange={handleFieldChange('yearOfExperience')}
                                     autoComplete="off"
+                                    onBlur={() => setDirty(true)}
                                 />
 
 
@@ -591,6 +590,7 @@ function AddConsultant() {
                                     value={formData.chatPerMinute}
                                     onChange={handleFieldChange('chatPerMinute')}
                                     autoComplete="off"
+                                    onBlur={() => setDirty(true)}
                                 />
                                 {/* Video per minute */}
 
@@ -600,6 +600,7 @@ function AddConsultant() {
                                     value={formData.videoPerMinute}
                                     onChange={handleFieldChange('videoPerMinute')}
                                     autoComplete="off"
+                                    onBlur={() => setDirty(true)}
                                 />
                                 {/* Voice per minute */}
                                 <TextField
@@ -608,6 +609,7 @@ function AddConsultant() {
                                     value={formData.voicePerMinute}
                                     onChange={handleFieldChange('voicePerMinute')}
                                     autoComplete="off"
+                                    onBlur={() => setDirty(true)}
                                 />
                                 {/* Audio per minute */}
 
@@ -635,6 +637,7 @@ function AddConsultant() {
                                             placeholder="Search tags"
                                             autoComplete="off"
                                             verticalContent={verticalContentMarkup}
+
                                         />
                                         {dropdownMarkup}
                                     </div>
@@ -655,6 +658,7 @@ function AddConsultant() {
                                     value={formData.displayName}
                                     onChange={handleFieldChange('displayName')}
                                     autoComplete="off"
+                                    onBlur={() => setDirty(true)}
                                 />
                                 {/* Gender */}
                                 <Select
@@ -662,6 +666,7 @@ function AddConsultant() {
                                     options={genderOptions}
                                     onChange={handleFieldChange('gender')}
                                     value={formData.gender}
+                                    onBlur={() => setDirty(true)}
                                 />
 
                                 {/* House Number */}
@@ -670,6 +675,7 @@ function AddConsultant() {
                                     value={formData.houseNumber}
                                     onChange={handleFieldChange('houseNumber')}
                                     autoComplete="off"
+                                    onBlur={() => setDirty(true)}
                                 />
                             </FormLayout.Group>
                             <FormLayout.Group>
@@ -680,6 +686,7 @@ function AddConsultant() {
                                     value={formData.streetArea}
                                     onChange={handleFieldChange('streetArea')}
                                     autoComplete="off"
+                                    onBlur={() => setDirty(true)}
                                 />
 
                                 {/* Landmark */}
@@ -688,6 +695,7 @@ function AddConsultant() {
                                     value={formData.landmark}
                                     onChange={handleFieldChange('landmark')}
                                     autoComplete="off"
+                                    onBlur={() => setDirty(true)}
                                 />
 
                                 {/* Address */}
@@ -696,6 +704,7 @@ function AddConsultant() {
                                     value={formData.address}
                                     onChange={handleFieldChange('address')}
                                     autoComplete="off"
+                                    onBlur={() => setDirty(true)}
                                 />
 
                             </FormLayout.Group>
@@ -708,6 +717,7 @@ function AddConsultant() {
                                     type="number"
                                     onChange={handleFieldChange('pincode')}
                                     autoComplete="off"
+                                    onBlur={() => setDirty(true)}
                                 />
 
                                 {/* Date of Birth */}
@@ -717,6 +727,7 @@ function AddConsultant() {
                                     value={formData.dateOfBirth}
                                     onChange={handleFieldChange('dateOfBirth')}
                                     autoComplete="off"
+                                    onBlur={() => setDirty(true)}
                                 />
 
                                 {/* Pancard Number */}
@@ -725,6 +736,7 @@ function AddConsultant() {
                                     value={formData.pancardNumber}
                                     onChange={handleFieldChange('pancardNumber')}
                                     autoComplete="off"
+                                    onBlur={() => setDirty(true)}
                                 />
 
                             </FormLayout.Group>
@@ -754,20 +766,7 @@ function AddConsultant() {
                             }
 
                         </div>
-                        {submitError && (
-                            <div style={{ marginTop: '16px' }}>
-                                <Banner tone="critical" onDismiss={() => setSubmitError('')}>
-                                    <p>{submitError}</p>
-                                </Banner>
-                            </div>
-                        )}
-                        {submitSuccess && (
-                            <div style={{ marginTop: '16px' }}>
-                                <Banner tone="success" onDismiss={() => setSubmitSuccess(false)}>
-                                    <p>Consultant added successfully!</p>
-                                </Banner>
-                            </div>
-                        )}
+                       
 
                     </LegacyCard>
                 </Layout.Section>

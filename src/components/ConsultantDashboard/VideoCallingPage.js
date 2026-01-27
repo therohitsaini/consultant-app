@@ -38,21 +38,21 @@ function VideoCallingPage() {
     }, [userId]);
     useEffect(() => {
         if (!userId) return;
-      
+
         const socket = getSocket();
-      
+
         socket.connect();
-      
+
         socket.on("connect", () => {
-          socket.emit("register", userId);
-          console.log("✅ User registered from call page:", userId);
+            socket.emit("register", userId);
+            console.log("✅ User registered from call page:", userId);
         });
-      
+
         return () => {
-          socket.off("connect");
+            socket.off("connect");
         };
-      }, [userId]);
-      
+    }, [userId]);
+
 
     useEffect(() => {
         if (callRejected) {
@@ -123,7 +123,6 @@ function VideoCallingPage() {
         }
     }, [dispatch, token, channelNameParam, uidParam, appIdParam, callType]);
 
-    // Setup local video track when call type is video - Always show for both caller and receiver
     useEffect(() => {
         if (isVideoCall) {
             let isPlaying = false;
@@ -180,11 +179,10 @@ function VideoCallingPage() {
         }
     }, [isVideoCall, inCall, type]);
 
-    // Setup remote video track - check more aggressively
     useEffect(() => {
         if (isVideoCall && inCall) {
             let attempts = 0;
-            const maxAttempts = 20; // Check for 10 seconds (20 * 500ms)
+            const maxAttempts = 20;
 
             const checkAndPlayRemoteVideo = () => {
                 if (!remoteVideoRef.current) {
@@ -306,7 +304,6 @@ function VideoCallingPage() {
         ? `${process.env.REACT_APP_BACKEND_HOST}/${callerDetails.receiver.profileImage.replace("\\", "/")}`
         : null;
 
-    // Handlers
     const handleEndCall = () => {
         dispatch(endCall());
         socket.emit("call-ended", { callerId: callerId, receiverId: receiverId, channel: channelNameParam, callType: type });

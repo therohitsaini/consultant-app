@@ -63,10 +63,12 @@ function UserTransHistory() {
         new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     const getDuration = (start, end) => {
-        const diff = (new Date(end) - new Date(start)) / 1000;
-        const min = Math.floor(diff / 60);
-        return `${min} min`;
+        const diff = Math.floor((new Date(end) - new Date(start)) / 1000);
+        const m = String(Math.floor(diff / 60)).padStart(2, '0');
+        const s = String(diff % 60).padStart(2, '0');
+        return `${m}:${s}`;
     };
+
     const tableData = activityHistory?.data?.map((item) => ({
         id: item._id,
         type: item.type?.toUpperCase(),
@@ -78,7 +80,7 @@ function UserTransHistory() {
         amount: `$${item.amount}`,
         status: item.status
     })) || [];
-
+    console.log("tableData", tableData);
     const renderTransactionRow = useCallback((transaction, index) => {
         const { id, user, type, date, time, duration, consultant, amount, status } = transaction
         const serialNumber = (page - 1) * limit + index + 1;
@@ -146,11 +148,11 @@ function UserTransHistory() {
 
     return (
         <Fragment>
-      
+
 
             <Page
-                title="Activity History"    
-               
+                title="Activity History"
+
             >
                 <Layout>
                     <Layout.Section>

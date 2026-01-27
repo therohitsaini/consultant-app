@@ -5,7 +5,7 @@ import '../../components/ConsultantCards/ConsultantCards.css';
 import { fetchConsultants } from '../Redux/slices/ConsultantSlices';
 import { useDispatch, useSelector } from 'react-redux';
 import { connectSocket } from '../Redux/slices/sokectSlice';
-import { openCallPage } from '../middle-ware/OpenCallingPage';
+import { checkUserBalance, openCallPage } from '../middle-ware/OpenCallingPage';
 import TestRingtone from '../../pages/TestRingtone';
 
 
@@ -174,7 +174,7 @@ function ConsultantCards() {
 
 
     const startCall = async ({ receiverId, type }) => {
-        console.log("startCall____ConsultantCards____receiverId", receiverId,  type);
+        console.log("startCall____ConsultantCards____receiverId", receiverId, type);
         await openCallPage({ receiverId, type, userId, shop });
 
         // const hasMicPermission = await checkMicPermission();
@@ -263,13 +263,17 @@ function ConsultantCards() {
         window.top.location.href = `https://${shop}/apps/consultant-theme/view-profile?consultantId=${consultant_id}&shopId=${shop_id}${hostQuery}`;
     }
 
-    const viewChatsPage = (consultantView) => {
-        console.log("consultantView", consultantView);
-        const targetShop = "rohit-12345839.myshopify.com";
+    const viewChatsPage = async (consultantView) => {
+        const balance = await checkUserBalance({ userId, consultantId: consultantView, type: 'chat' });
+        console.log("balance", balance);
+        if (!balance.userBalance) {
+            alert("You have insufficient balance to chat with this consultant");
+            return;
+        }
+
         const hostQuery = "";
         window.top.location.href = `https://${shop}/apps/consultant-theme/chats-c?consultantId=${consultantView}${hostQuery}`;
-        // const hostQuery = "";
-        // window.top.location.href = `https://${targetShop}/apps/consultant-theme/view-profile?consultantId=${consultantView}${hostQuery}`;
+      
     }
 
 
