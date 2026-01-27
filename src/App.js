@@ -136,19 +136,16 @@ export default function App() {
             </ProtectStoreFront>
           } />
           <Route path="/consultant-dashboard/*" element={
-            <ProtectStoreFront>
+            // <ProtectStoreFront>
               <TabNavigation />
-            </ProtectStoreFront>
           } />
           <Route path="/users-page/*" element={
-            <ProtectStoreFront>
+            // <ProtectStoreFront>
               <TabNavigation />
-            </ProtectStoreFront>
           } />
           <Route path="/consulant-chats/*" element={
-            <ProtectStoreFront>
+            // <ProtectStoreFront>
               <TabNavigation />
-            </ProtectStoreFront>
           } />
           <Route path="/video/calling/page" element={
             // <ProtectStoreFront>

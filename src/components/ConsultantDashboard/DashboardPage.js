@@ -1,8 +1,28 @@
-import React from 'react';
+import React, { use, useEffect, useState } from 'react';
 import styles from '../../components/ConsultantDashboard/DashboardPage.module.css';
+import { fetchConsultantById } from '../Redux/slices/ConsultantSlices';
+import { useDispatch, useSelector } from 'react-redux';
 
 const DashboardPage = () => {
-    // Sample data - in real app, this would come from API/state
+    const [userId, setUserId] = useState(null);
+    const [userData, setUserData] = useState(null);
+    const [shopId, setShopId] = useState(null);
+    const dispatch = useDispatch();
+    const { consultantOverview } = useSelector((state) => state.consultants);
+    console.log("consultantOverview________________", consultantOverview)
+
+    useEffect(() => {
+        const storedUserId = localStorage.getItem('client_u_Identity');
+        setUserId(storedUserId);
+        setShopId(localStorage.getItem('shop_o_Identity'));
+    }, []);
+    console.log("USER DATA IN DASHBOARD:", userData);
+    console.log("USER ID IN DASHBOARD:", userId);
+    useEffect(() => {
+        if (shopId && userId) {
+            dispatch(fetchConsultantById({ shop_id: shopId, consultant_id: userId }));
+        }
+    }, [shopId, userId]);
     const stats = {
         totalClients: 124,
         activeConsultations: 18,
@@ -20,16 +40,29 @@ const DashboardPage = () => {
 
     const getStatusBadge = (status) => {
         const badges = {
-            'Active': styles.badgePrimary,
-            'Completed': styles.badgeSuccess,
-            'Scheduled': styles.badgeWarning
+            'true': styles.badgeSuccess,
+            'false': styles.badgeSecondary,
         };
         return badges[status] || styles.badgeSecondary;
     };
 
     // Simple line chart SVG data
-    const chartData = [45, 52, 48, 61, 55, 68, 72, 65, 70, 75, 80, 78];
-
+    const getLatestUser = async () => {
+        try {
+            const url = `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/get/consultant/${"691dbba35e388352e3203b0b"}`;
+            const response = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+            const data = await response.json();
+            console.log("Latest User Data:", data);
+            // if (response.ok) {
+            setUserData(data?.payload);
+            // }
+        } catch (error) {
+            return "Consultant";
+        }
+    }
+    useEffect(() => {
+        getLatestUser();
+    }, []);
     return (
         <div className={styles.pageContainer}>
             {/* Header Section */}
@@ -52,7 +85,7 @@ const DashboardPage = () => {
                                     Total Clients
                                 </p>
                                 <h3 className={styles.statValue}>
-                                    {stats.totalClients}
+                                    {userData?.length}
                                 </h3>
                             </div>
                             <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
@@ -84,7 +117,7 @@ const DashboardPage = () => {
                                     Active Consultations
                                 </p>
                                 <h3 className={styles.statValue}>
-                                    {stats.activeConsultations}
+                                    {userData?.filter(consultation => consultation.isActive).length}
                                 </h3>
                             </div>
                             <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
@@ -113,7 +146,7 @@ const DashboardPage = () => {
                                     Monthly Revenue
                                 </p>
                                 <h3 className={styles.statValue}>
-                                    ${(stats.monthlyRevenue / 1000).toFixed(1)}k
+                                    ${consultantOverview?.consultant?.walletBalance + ".0"}k
                                 </h3>
                             </div>
                             <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
@@ -168,7 +201,7 @@ const DashboardPage = () => {
                 </div>
             </div>
 
-           
+
 
             {/* Recent Consultations */}
             <div className={styles.tableCard}>
@@ -194,46 +227,77 @@ const DashboardPage = () => {
                                     <th className={styles.tableHeadCell}>Type</th>
                                     <th className={styles.tableHeadCell}>Date</th>
                                     <th className={styles.tableHeadCell}>Status</th>
-                                    <th className={`${styles.tableHeadCell} ${styles.tableHeadCellRight}`}>Amount</th>
+                                    <th className={`${styles.tableHeadCell} ${styles.tableHeadCellRight}`}>isRequest</th>
                                     <th className={`${styles.tableHeadCell} ${styles.tableHeadCellRight}`}>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {recentConsultations.map((consultation) => (
-                                    <tr key={consultation.id} className={styles.tableRow}>
-                                        <td className={styles.tableCell}>
-                                            <div className={`${styles.userInfo} ${styles.flex} ${styles.flexCenter}`}>
-                                                <div className={styles.userAvatar}>
-                                                    {consultation.client.split(' ').map(n => n[0]).join('')}
-                                                </div>
-                                                <div>
-                                                    <div className={styles.userName}>
-                                                        {consultation.client}
+                                {
+                                    userData?.map((consultation) => {
+                                        console.log("Consultation Record:", consultation);
+                                        return (
+                                            <tr key={consultation._id} className={styles.tableRow}>
+                                                <td className={styles.tableCell}>
+                                                    <div className={`${styles.userInfo} ${styles.flex} ${styles.flexCenter}`}>
+                                                        <div className={styles.userAvatar}>
+                                                            {consultation.fullname
+                                                                ?.split(" ")
+                                                                .map((n) => n[0])
+                                                                .join("")}
+                                                        </div>
+                                                        <div>
+                                                            <div className={styles.userName}>
+                                                                {consultation.fullname}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className={styles.tableCell} style={{ fontSize: '14px', color: '#6c757d' }}>
-                                            {consultation.type}
-                                        </td>
-                                        <td className={styles.tableCell} style={{ fontSize: '14px', color: '#6c757d' }}>
-                                            {new Date(consultation.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                                        </td>
-                                        <td className={styles.tableCell}>
-                                            <span className={`${styles.badge} ${getStatusBadge(consultation.status)}`}>
-                                                {consultation.status}
-                                            </span>
-                                        </td>
-                                        <td className={`${styles.tableCell} ${styles.tableCellRight} ${styles.amount}`}>
-                                            ${consultation.amount.toLocaleString()}
-                                        </td>
-                                        <td className={`${styles.tableCell} ${styles.tableCellRight}`}>
-                                            <button className={styles.viewButton}>
-                                                View
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
+                                                </td>
+
+                                                <td
+                                                    className={styles.tableCell}
+                                                    style={{ fontSize: "14px", color: "#6c757d" }}
+                                                >
+                                                    {consultation.userType}
+                                                </td>
+
+                                                <td
+                                                    className={styles.tableCell}
+                                                    style={{ fontSize: "14px", color: "#6c757d" }}
+                                                >
+                                                    {new Date(consultation.createdAt).toLocaleDateString("en-US", {
+                                                        month: "short",
+                                                        day: "numeric",
+                                                        year: "numeric",
+                                                    })}
+                                                </td>
+
+                                                <td className={styles.tableCell}>
+                                                    <span
+                                                        className={`${styles.badge} ${getStatusBadge(
+                                                            consultation.isActive
+                                                        )}`}
+                                                    >
+                                                        {consultation.
+                                                            isActive ? "Active" : "Inactive"}
+                                                    </span>
+                                                </td>
+
+                                                <td
+                                                    className={`${styles.tableCell} ${styles.tableCellRight} ${styles.amount}`}
+                                                >
+                                                    {consultation?.isRequest ? "Request" : "listed"}
+                                                </td>
+
+                                                <td
+                                                    className={`${styles.tableCell} ${styles.tableCellRight}`}
+                                                >
+                                                    <button className={styles.viewButton}>View</button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                }
+
                             </tbody>
                         </table>
                     </div>

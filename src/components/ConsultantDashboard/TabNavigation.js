@@ -95,7 +95,7 @@ function TabNavigation({ children }) {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
- 
+
 
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
@@ -108,9 +108,15 @@ function TabNavigation({ children }) {
             path: '/consultant-dashboard',
             active: location.pathname === '/consultant-dashboard'
         },
-       
+
         {
             label: 'Chats',
+            icon: <ChatIcon />,
+            path: '/consultant-chats-section',
+            active: location.pathname === '/consultant-chats-section'
+        },
+        {
+            label: 'Test Hash',
             icon: <ChatIcon />,
             path: '/consultant-chats-section',
             active: location.pathname === '/consultant-chats-section'
