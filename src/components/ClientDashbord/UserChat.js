@@ -45,6 +45,9 @@ const UserChat = () => {
     const [showChatEndPop, setShowChatEndPop] = useState(true);
     const prevIsRunningRef = useRef(null);
     const { userDetails } = useSelector((state) => state.users);
+    const { confirmChat } = useSelector((state) => state.socket);
+
+    console.log("confirmChat____UserChat", confirmChat)
     console.log("userDetails____UserChat", userDetails)
     useEffect(() => {
         if (insufficientBalance) {
@@ -53,7 +56,7 @@ const UserChat = () => {
     }, [insufficientBalance]);
     useEffect(() => {
         dispatch(fetchUserDetailsByIds(clientId));
-    }, [clientId])
+    }, [clientId, refreshed])
     useEffect(() => {
         dispatch(fetchConsultantById({ shop_id: shopId, consultant_id: consultantId }))
     }, [shopId, consultantId]);
@@ -187,7 +190,8 @@ const UserChat = () => {
         }
     }, [socketMessages, clientId, consultantId, shopId, consultantOverview]);
 
-    const sendChat = () => {
+    const sendChat = (text = "") => {
+        setText(text);
         console.log("text____UserChat", text)
         if (text.trim() === "" || !clientId || !consultantId || !shopId) return;
 
@@ -209,11 +213,7 @@ const UserChat = () => {
         sendMessage();
 
         function sendMessage() {
-            // if (insufficientBalanceError) {
-            //     // setShow(true);
-            //     alert("Insufficient balance. Please recharge your account.");
-            //     return;
-            // }
+        
             const messageData = {
                 senderId: clientId,
                 receiverId: consultantId,
@@ -223,7 +223,6 @@ const UserChat = () => {
 
             };
 
-            // Optimistically add message to UI immediately
             const optimisticMessage = {
                 _id: `temp-${Date.now()}`,
                 ...messageData
@@ -382,7 +381,7 @@ const UserChat = () => {
             consultantId: consultantId
         });
         setSeconds(0);
-        setRefreshed(true);
+        setRefreshed((prev) => !prev);
         setShowChatEndToast(true);
         setShowChatEndPop(true);
         localStorage.removeItem("chatTimer");
@@ -399,7 +398,7 @@ const UserChat = () => {
                 consultantId: consultantId
             });
             setSeconds(0);
-            setRefreshed(true);
+            setRefreshed((prev) => !prev);
             setShowChatEndToast(true);
             setShowChatEndPop(true);
         }
@@ -412,6 +411,15 @@ const UserChat = () => {
         }
         prevIsRunningRef.current = chatTimer.isRunning;
     }, [chatTimer.isRunning]);
+
+    const startCHatHandler = () => {
+        socket.emit("acceptUserChat", {
+            userId: confirmChat.userId,
+            shopId: confirmChat.shopId,
+            consultantId: confirmChat.consultantId
+        });
+        setRefreshed((prev) => !prev);
+    }
 
     return (
         <Fragment>
@@ -527,18 +535,25 @@ const UserChat = () => {
                                                 <h4>chat unlock </h4>
                                                 <p>Your chat session has unlocked.</p>
                                             </div>
-                                            <button
-                                                className={styles.chatEndButton}
-                                                onClick={() => {
-                                                    setText("Hello");
-                                                    setTimeout(() => {
-                                                        sendChat();   // auto send
-                                                    }, 100);
-                                                }}
-
-                                            >
-                                                OK
-                                            </button>
+                                            {
+                                                confirmChat ? <button
+                                                    className={styles.chatEndButton}
+                                                    onClick={() => {
+                                                        startCHatHandler();
+                                                    }}
+                                                >
+                                                    Accept chat
+                                                </button>
+                                                    :
+                                                    <button
+                                                        className={styles.chatEndButton}
+                                                        onClick={() => {
+                                                            sendChat("Hello");   // auto send
+                                                        }}
+                                                    >
+                                                        start chat
+                                                    </button>
+                                            }
                                         </div>
                                     </div>
                                 )}

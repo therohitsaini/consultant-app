@@ -254,6 +254,7 @@ const socketSlice = createSlice({
         },
         setConfirmChat: (state, action) => {
             state.confirmChat = action.payload;
+            console.log("setConfirmChat", state.confirmChat);
         },
         // connectSocket is a no-op reducer for compatibility
         // Socket connection is handled in sokectProvider.js
