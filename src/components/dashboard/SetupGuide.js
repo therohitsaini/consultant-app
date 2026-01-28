@@ -140,7 +140,7 @@ export const SetupGuide = ({ onDismiss, onStepComplete, items }) => {
           </Text>
           <div style={{ marginTop: '.8rem' }}>
             <InlineStack blockAlign='center' gap='200'>
-              {
+              {/* {
                 completedItemsLength === items.length ? (
                   <div style={{ maxHeight: '1rem' }}>
                     <InlineStack wrap={false} gap='100'>
@@ -158,7 +158,7 @@ export const SetupGuide = ({ onDismiss, onStepComplete, items }) => {
                   <Text as='span' variant='bodySm'>
                     {`${completedItemsLength} / ${items.length} completed`}
                   </Text>
-                )}
+                )} */}
 
               {completedItemsLength !== items.length ? (
                 <div style={{ width: '100px' }}>

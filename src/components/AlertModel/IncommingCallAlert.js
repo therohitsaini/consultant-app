@@ -19,8 +19,6 @@ export default function IncomingCallAlert() {
 
     const { callerId, callType, channelName, callerName } = incomingCall;
 
-
-
     const handleAccept = async () => {
         const hasMicPermission = await checkMicPermission();
         if (!hasMicPermission) {

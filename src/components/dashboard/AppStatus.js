@@ -49,7 +49,7 @@ export function AppStatus({ enabled, handleToggle, adminDetailsLoading, appStatu
                 </label>
                 <InlineStack gap="200" align="center" blockAlign="center">
                     {settingStatusMarkup}
-                    {helpLink}
+                    {/* {helpLink} */}
                 </InlineStack>
             </InlineStack>
         </InlineStack>
