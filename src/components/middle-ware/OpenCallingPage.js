@@ -82,7 +82,7 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
         const returnUrl = `https://${shop}/apps/consultant-theme`;
 
         const callUrl =
-            `https://discussed-studies-require-advertising.trycloudflare.com/video/calling/page` +
+            `https://test-consultation-app.zend-apps.com/video/calling/page` +
             `?callerId=${userId}` +
             `&receiverId=${receiverId}` +
             `&callType=${type || "voice"}` +
