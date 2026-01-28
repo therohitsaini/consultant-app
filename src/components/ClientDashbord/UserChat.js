@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchChatHistory, fetchConsultantById, updateUserRequestById } from '../Redux/slices/ConsultantSlices';
 import InsufficientBalanceModal from '../AlertModel/InsuffientBalance';
 import ReactToast from '../AlertModel/ReactToast';
+import { fetchUserDetailsByIds } from '../Redux/slices/UserSlices';
 
 
 const UserChat = () => {
@@ -19,7 +20,7 @@ const UserChat = () => {
     const parms = new URLSearchParams(window.location.search);
     const consultantId = parms.get('consultantId');
     const shop = parms.get('shop');
-
+    console.log("text____UserChat", text)
 
     useEffect(() => {
         const storedClientId = localStorage.getItem('client_u_Identity');
@@ -43,13 +44,16 @@ const UserChat = () => {
     const [showChatEndToast, setShowChatEndToast] = useState(false);
     const [showChatEndPop, setShowChatEndPop] = useState(true);
     const prevIsRunningRef = useRef(null);
-
+    const { userDetails } = useSelector((state) => state.users);
+    console.log("userDetails____UserChat", userDetails)
     useEffect(() => {
         if (insufficientBalance) {
             setShow(true);
         }
     }, [insufficientBalance]);
-
+    useEffect(() => {
+        dispatch(fetchUserDetailsByIds(clientId));
+    }, [clientId])
     useEffect(() => {
         dispatch(fetchConsultantById({ shop_id: shopId, consultant_id: consultantId }))
     }, [shopId, consultantId]);
@@ -80,6 +84,8 @@ const UserChat = () => {
             }, 400);
         }
     }, [chatHistory, show]);
+
+    console.log("chatHistory____UserChat", chatHistory)
 
     useEffect(() => {
         if (!clientId || !consultantId || !shopId) {
@@ -182,7 +188,7 @@ const UserChat = () => {
     }, [socketMessages, clientId, consultantId, shopId, consultantOverview]);
 
     const sendChat = () => {
-
+        console.log("text____UserChat", text)
         if (text.trim() === "" || !clientId || !consultantId || !shopId) return;
 
         if (!socket.connected) {
@@ -410,23 +416,7 @@ const UserChat = () => {
     return (
         <Fragment>
             <InsufficientBalanceModal show={show} setShow={setShow} insufficientBalance={insufficientBalance} />
-            {/* {showChatEndPop && (
-                <div className={styles.chatEndOverlay}>
-                    <div className={styles.chatEndBox}>
-                        <div className={styles.chatEndIcon}>🔒</div>
-                        <div className={styles.chatEndContent}>
-                            <h4>Chat Ended</h4>
-                            <p>Your chat session has ended.</p>
-                        </div>
-                        <button
-                            className={styles.chatEndButton}
-                            onClick={() => setShowChatEndPop(false)}
-                        >
-                            OK
-                        </button>
-                    </div>
-                </div>
-            )} */}
+
             <div className={styles.chatPageContainer}>
                 <div
                     className={styles.container}
@@ -512,7 +502,7 @@ const UserChat = () => {
                             {/* Messages Area */}
                             <div className={styles.messagesArea} ref={messagesAreaRef}>
                                 {/* UNLOCK : Messages Area */}
-                                {showChatEndPop && (
+                                {/* {showChatEndPop && (
                                     <div className={styles.chatEndOverlay}>
                                         <div className={styles.chatEndBox}>
                                             <div className={styles.chatEndIcon}>🔒</div>
@@ -528,7 +518,31 @@ const UserChat = () => {
                                             </button>
                                         </div>
                                     </div>
+                                )} */}
+                                {userDetails?.data?.chatLock === "true" && (
+                                    <div className={styles.chatEndOverlay}>
+                                        <div className={styles.chatEndBox}>
+                                            <div className={styles.chatEndIcon}>🔒</div>
+                                            <div className={styles.chatEndContent}>
+                                                <h4>chat unlock </h4>
+                                                <p>Your chat session has unlocked.</p>
+                                            </div>
+                                            <button
+                                                className={styles.chatEndButton}
+                                                onClick={() => {
+                                                    setText("Hello");
+                                                    setTimeout(() => {
+                                                        sendChat();   // auto send
+                                                    }, 100);
+                                                }}
+
+                                            >
+                                                OK
+                                            </button>
+                                        </div>
+                                    </div>
                                 )}
+
 
                                 {
                                     chatMessagesData.length === 0 ? (

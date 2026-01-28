@@ -174,6 +174,7 @@ const socketSlice = createSlice({
         callAccepted: null,
         callEnded: null,
         callRejected: null,
+        confirmChat: null,
     },
     reducers: {
         setConnected: (state, action) => {
@@ -251,6 +252,9 @@ const socketSlice = createSlice({
         clearMessages: (state) => {
             state.messages = [];
         },
+        setConfirmChat: (state, action) => {
+            state.confirmChat = action.payload;
+        },
         // connectSocket is a no-op reducer for compatibility
         // Socket connection is handled in sokectProvider.js
         connectSocket: (state, action) => {
@@ -276,6 +280,7 @@ export const {
     setCallRejected,
     clearMessages,
     connectSocket,
+    setConfirmChat,
 } = socketSlice.actions;
 
 export default socketSlice.reducer;

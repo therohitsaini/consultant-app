@@ -90,13 +90,7 @@ function Faq() {
     return (
         <Page
             title="Faq"
-            secondaryActions={[
-                {
-                    content: 'Add Consultant',
-                    external: true,
-                    icon: ExternalIcon,
-                },
-            ]}
+            
         >
             <Layout>
 

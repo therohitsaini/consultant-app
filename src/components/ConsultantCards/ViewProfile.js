@@ -4,7 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../components/ConsultantCards/ConsultantCards.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchConsultantById } from '../Redux/slices/ConsultantSlices';
-import { openCallPage } from '../middle-ware/OpenCallingPage';
+import { checkUserBalance, openCallPage } from '../middle-ware/OpenCallingPage';
 
 function ViewProfile() {
     const navigate = useNavigate();
@@ -16,8 +16,10 @@ function ViewProfile() {
     const shop = params.get("shop");
     useEffect(() => {
         setUserId(localStorage.getItem("client_u_Identity"));
+
     }, []);
 
+    
     const { consultantOverview, loading } = useSelector((state) => state.consultants);
     useEffect(() => {
         dispatch(fetchConsultantById({ shop_id, consultant_id }));
@@ -86,7 +88,13 @@ function ViewProfile() {
         alert(`You selected ${optionType.toUpperCase()} call option.\nConsultant ID: ${consultantId}\nPrice: INR ${price.toLocaleString()}`);
     };
 
-    const viewProfile = (consultantView) => {
+    const viewProfile = async (consultantView) => {
+        const balance = await checkUserBalance({ userId, consultantId: consultantView, type: 'chat' });
+
+        if (!balance) {
+            alert("You have insufficient balance");
+            return;
+        }
         const targetShop = shop;
         const hostQuery = "";
         window.top.location.href = `https://${targetShop}/apps/consultant-theme/chats-c?consultantId=${consultantView}${hostQuery}`;

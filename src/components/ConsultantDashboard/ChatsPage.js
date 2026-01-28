@@ -41,7 +41,9 @@ const ChatsPage = () => {
     const isChatAccepted = useSelector((state) => state.socket.isChatAccepted);
     const { chatTimer } = useSelector(state => state.socket);
     const [seconds, setSeconds] = useState(0);
+    const confirmChat = useSelector((state) => state.socket.confirmChat);
     console.log("chatTimer____ChatsPage", chatTimer);
+    console.log("confirmChat____ChatsPage", confirmChat);
 
     useEffect(() => {
         const clientId = localStorage.getItem('client_u_Identity');
@@ -284,8 +286,8 @@ const ChatsPage = () => {
             shopId: data.shopId,
             consultantId: consultantId
         }
-
-        socket.emit("acceptUserChat", acceptDataIds);
+        socket.emit("conFirmChatEmit", acceptDataIds);
+        // socket.emit("acceptUserChat", acceptDataIds);
         setChatAccepted(prev => !prev);
     }
 
@@ -363,7 +365,7 @@ const ChatsPage = () => {
         if (chatTimer.isRunning) {
             localStorage.setItem("chatTimer", JSON.stringify(chatTimer));
             console.log("chatTimer____ChatsPage_localstorage", chatTimer);
-        } 
+        }
     }, [chatTimer.isRunning]);
 
     return (

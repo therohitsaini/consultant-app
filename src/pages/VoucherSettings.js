@@ -36,6 +36,8 @@ function VoucherSettings() {
     // Get adminId from URL params
     const params = new URLSearchParams(window.location.search);
     const adminId = params.get('adminId') 
+    console.log("adminId____VoucherSettings", adminId)
+    
 
     const handleFieldChange = useCallback((fieldName) => {
         return (value) => {
@@ -74,6 +76,8 @@ function VoucherSettings() {
     }, [formData]);
 
     const handleSubmit = useCallback(async () => {
+        const userId = localStorage.getItem("domain_V_id");
+        console.log("userId____VoucherSettings", userId)
         if (!validateForm()) {
             return;
         }
@@ -89,7 +93,7 @@ function VoucherSettings() {
             };
 
             const response = await axios.post(
-                `${process.env.REACT_APP_BACKEND_HOST}/api/admin/admin/voucher/${adminId}`,
+                `${process.env.REACT_APP_BACKEND_HOST}/api/admin/admin/voucher/${userId}`,
                 payload,
                 {
                     headers: {

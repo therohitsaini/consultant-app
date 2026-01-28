@@ -136,6 +136,7 @@ import {
     setCallAccepted,
     setCallEnded,
     setCallRejected,
+    setConfirmChat,
 } from "../Redux/slices/sokectSlice";
 
 export default function SocketProvider({ children }) {
@@ -143,7 +144,7 @@ export default function SocketProvider({ children }) {
 
     useEffect(() => {
         const socket = getSocket();
-        const clientId = localStorage.getItem("client_u_Identity") 
+        const clientId = localStorage.getItem("client_u_Identity")
 
         const onConnect = () => {
             console.log("✅ ____Socket connected");
@@ -206,6 +207,9 @@ export default function SocketProvider({ children }) {
         socket.on("call-ended-rejected", (data) =>
             dispatch(setCallRejected(data))
         );
+        socket.on("acceptUser", (data) =>
+            dispatch(setConfirmChat(data)),
+        );
 
         return () => {
             console.log("🧹 Cleaning socket listeners");
@@ -224,6 +228,7 @@ export default function SocketProvider({ children }) {
             socket.off("call-accepted-started");
             socket.off("call-missed");
             socket.off("call-ended-rejected");
+            socket.off("acceptUser");
         };
 
     }, [dispatch]);

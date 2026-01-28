@@ -10,14 +10,13 @@ const DashboardPage = () => {
     const dispatch = useDispatch();
     const { consultantOverview } = useSelector((state) => state.consultants);
     console.log("consultantOverview________________", consultantOverview)
-
+    console.log("userData________________", userId)
     useEffect(() => {
         const storedUserId = localStorage.getItem('client_u_Identity');
         setUserId(storedUserId);
         setShopId(localStorage.getItem('shop_o_Identity'));
     }, []);
-    console.log("USER DATA IN DASHBOARD:", userData);
-    console.log("USER ID IN DASHBOARD:", userId);
+
     useEffect(() => {
         if (shopId && userId) {
             dispatch(fetchConsultantById({ shop_id: shopId, consultant_id: userId }));
@@ -48,12 +47,15 @@ const DashboardPage = () => {
 
     // Simple line chart SVG data
     const getLatestUser = async () => {
+        // if (!userId) return;
+        console.log("userId________________", userId)
         try {
-            const url = `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/get/consultant/${"691dbba35e388352e3203b0b"}`;
+            const url = `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/get/consultant/${"6973b0d5cf6678cae20c2854"}`;
             const response = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
             const data = await response.json();
             console.log("Latest User Data:", data);
             // if (response.ok) {
+            console.log("data?.payload", data?.payload)
             setUserData(data?.payload);
             // }
         } catch (error) {
@@ -67,7 +69,7 @@ const DashboardPage = () => {
         <div className={styles.pageContainer}>
             {/* Header Section */}
             <div className={styles.headerSection}>
-                <h1 className={styles.pageTitle}>
+                <h1 onClick={() => getLatestUser()} className={styles.pageTitle}>
                     Dashboard Overview
                 </h1>
                 <p className={styles.pageDescription}>
@@ -85,7 +87,7 @@ const DashboardPage = () => {
                                     Total Clients
                                 </p>
                                 <h3 className={styles.statValue}>
-                                    {userData?.length}
+                                    {userData?.length || 0}
                                 </h3>
                             </div>
                             <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
@@ -117,7 +119,7 @@ const DashboardPage = () => {
                                     Active Consultations
                                 </p>
                                 <h3 className={styles.statValue}>
-                                    {userData?.filter(consultation => consultation.isActive).length}
+                                    {userData?.filter(consultation => consultation.isActive).length || 0}
                                 </h3>
                             </div>
                             <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
@@ -146,7 +148,7 @@ const DashboardPage = () => {
                                     Monthly Revenue
                                 </p>
                                 <h3 className={styles.statValue}>
-                                    ${consultantOverview?.consultant?.walletBalance + ".0"}k
+                                    ${consultantOverview?.consultant?.walletBalance ? consultantOverview?.consultant?.walletBalance.toFixed(2) + ".0" : ""}k
                                 </h3>
                             </div>
                             <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
