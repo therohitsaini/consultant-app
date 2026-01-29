@@ -29,7 +29,7 @@ import NotFound from "./pages/NotFound";
 import ProtectStoreFront from "./components/ProtectRoute/ProtectStoreFront";
 import VoucherTable from "./pages/VoucherTable";
 import { BillingProtectedRoute } from "./components/ProtectRoute/BillingProtectedRoute";
-import { AppStatusBillingProvider } from "./components/ProtectRoute/AppStatusBillingProvider";
+import { AppStatusProvider } from "./components/ProtectRoute/AppStatusProvider";
 
 
 
@@ -112,9 +112,9 @@ export default function App() {
           <Route path="/pricing" element={<Pricing />} />
           <Route element={
             <ProtectAdminRoute installed={installed}>
-                  {/* <AppStatusBillingProvider> */}
+              <BillingProtectedRoute>
                 <LayoutFrame />
-                {/* </AppStatusBillingProvider> */}
+              </BillingProtectedRoute>
             </ProtectAdminRoute>
           }>
             <Route path="/not-found" element={<NotFound />} />

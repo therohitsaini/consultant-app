@@ -11,6 +11,7 @@ import SocketProvider from './components/Sokect-io/sokectProvider';
 import ErrorBoundary from './components/ErrorBoundary';
 import { AdminMenu } from './pages/AdminMenu';
 import { AppStatusProvider } from './components/ProtectRoute/AppStatusProvider';
+import { AppStatusBillingProvider } from './components/ProtectRoute/AppStatusBillingProvider';
 import ToastProvider from './components/AlertModel/ToastProvider';
 
 if ("serviceWorker" in navigator) {
@@ -30,7 +31,9 @@ root.render(
           <Provider store={store}>
             <SocketProvider>
               <AppStatusProvider>
-                <App />
+                <AppStatusBillingProvider>
+                  <App />
+                </AppStatusBillingProvider>
               </AppStatusProvider>
             </SocketProvider>
           </Provider>

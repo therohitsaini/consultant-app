@@ -1,28 +1,36 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 
-const AppStatusBillingContext = createContext();
+const AppStatusBillingContext = createContext(null);
 
-export const AppStatusProvider = ({ children }) => {
+export const AppStatusBillingProvider = ({ children }) => {
     const [isPaid, setIsPaid] = useState(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const adminId = localStorage.getItem("domain_V_id");
-        console.log("adminId", adminId);
+
         if (!adminId) {
             setLoading(false);
             return;
         }
-        const fetchBillingStatus = async () => {
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/shop/billing-status/${adminId}`);
-            console.log("response_________________BILLING  __________________", response);
-            // setIsPaid(response.data.data.planStatus === "ACTIVE");
-            // setLoading(false);
-        }
-        fetchBillingStatus();
 
-       
+        const fetchBillingStatus = async () => {
+            try {
+                const response = await axios.get(
+                    `${process.env.REACT_APP_BACKEND_HOST}/api/admin/shop/billing-status/${adminId}`
+                );
+                const planStatus = response?.data?.data?.planStatus;
+                setIsPaid(planStatus === "ACTIVE");
+            } catch (err) {
+                console.error("Billing check failed", err);
+                setIsPaid(false);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchBillingStatus();
     }, []);
 
     return (
