@@ -25,7 +25,6 @@ root.render(
 
   <ErrorBoundary>
     <AppBridgeProvider >
-      <AdminMenu />
       <PolarisAppProvider i18n={en}>
         <ToastProvider>
           <Provider store={store}>

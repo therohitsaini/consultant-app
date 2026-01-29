@@ -130,7 +130,7 @@ function ManualDebetCreditBlance() {
                 </IndexTable.Cell>
                 <IndexTable.Cell>
                     <Text as="span" alignment="end" numeric>
-                        ${amount.toFixed(2)}
+                        ${amount || "0.0"}
                     </Text>
                 </IndexTable.Cell>
                 <div style={{ color: direction === "credit" ? "green" : "grey" }}>
@@ -185,7 +185,7 @@ function ManualDebetCreditBlance() {
             <UpdateUserDetailsModal open={active} onClose={() => setActive(false)} userDetails={userDetails} updateFormData={updateFormData} setUpdateFormData={setUpdateFormData} updateWallet={updateWallet} />
             <Page
                 title="Wallet History"
-          
+
             >
                 <Layout>
                     <Layout.Section>

@@ -28,6 +28,8 @@ import ManualDebetCreditBlance from "./pages/ManualDebetCreditBlance";
 import NotFound from "./pages/NotFound";
 import ProtectStoreFront from "./components/ProtectRoute/ProtectStoreFront";
 import VoucherTable from "./pages/VoucherTable";
+import { BillingProtectedRoute } from "./components/ProtectRoute/BillingProtectedRoute";
+import { AppStatusBillingProvider } from "./components/ProtectRoute/AppStatusBillingProvider";
 
 
 
@@ -107,9 +109,12 @@ export default function App() {
         <GlobalMessageNotification />
         <IncomingCallAlert />
         <Routes>
+          <Route path="/pricing" element={<Pricing />} />
           <Route element={
             <ProtectAdminRoute installed={installed}>
-              <LayoutFrame />
+                  {/* <AppStatusBillingProvider> */}
+                <LayoutFrame />
+                {/* </AppStatusBillingProvider> */}
             </ProtectAdminRoute>
           }>
             <Route path="/not-found" element={<NotFound />} />
@@ -119,7 +124,7 @@ export default function App() {
             <Route path="add-consultant" element={<AddConsultant />} />
             <Route path="/setting/history" element={<UserTransHistory />} />
             <Route path="/setting/wallet-management" element={<ManualDebetCreditBlance />} />
-            <Route path="pricing" element={<Pricing />} />
+
             <Route path="/admin-settings/voucher" element={<VoucherSettings />} />
             <Route path="/admin-settings/voucher-management" element={<VoucherTable />} />
             <Route path="faq" element={<Faq />} />
@@ -137,19 +142,19 @@ export default function App() {
           } />
           <Route path="/consultant-dashboard/*" element={
             // <ProtectStoreFront>
-              <TabNavigation />
+            <TabNavigation />
           } />
           <Route path="/users-page/*" element={
             // <ProtectStoreFront>
-              <TabNavigation />
+            <TabNavigation />
           } />
           <Route path="/consulant-chats/*" element={
             // <ProtectStoreFront>
-              <TabNavigation />
+            <TabNavigation />
           } />
           <Route path="/video/calling/page" element={
             // <ProtectStoreFront>
-              <VideoCallingPage />
+            <VideoCallingPage />
             // </ProtectStoreFront>
           } />
           <Route path="/chats" element={
@@ -164,8 +169,8 @@ export default function App() {
           } />
           <Route path="/fcm-token" element={
             // <ProtectStoreFront>
-              <FcmTokenWindow />
-        
+            <FcmTokenWindow />
+
           } />
           <Route path="/profile" element={
             <ProtectStoreFront>

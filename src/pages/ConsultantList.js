@@ -7,7 +7,7 @@ import { IndexTable } from '@shopify/polaris';
 import { deleteConsultantById, fetchConsultants } from '../components/Redux/slices/ConsultantSlices';
 import { useDispatch, useSelector } from 'react-redux';
 import { UserAlert } from '../components/AlertModel/UserAlert';
-import { headings, itemStrings,  } from '../components/FallbackData/FallbackData';
+import { headings, itemStrings, } from '../components/FallbackData/FallbackData';
 import axios from 'axios';
 import { useAppBridge } from '../components/createContext/AppBridgeContext';
 import { Redirect } from '@shopify/app-bridge/actions';
@@ -46,10 +46,10 @@ function ConsultantList() {
     const [adminIdLocal, setAdminIdLocal] = useState(null);
     const { consultants, loading: consultantLoading } = useSelector((state) => state.consultants);
     useEffect(() => {
-        const id = localStorage.getItem('domain_V_id') || '690c374f605cb8b946503ccb';
+        const id = localStorage.getItem('domain_V_id');
         setAdminIdLocal(id);
     }, []);
-    console.log("adminIdLocal", consultants);
+    console.log("adminIdLocal", consultants.findConsultant);
 
     useEffect(() => {
         if (!adminIdLocal) return;
@@ -185,7 +185,6 @@ function ConsultantList() {
                 <IndexTable.Cell>
 
                     <Thumbnail
-
                         source={
                             consultant?.profileImage
                                 ? `${consultant.profileImage.replace(/\\/g, "/")}`
@@ -307,63 +306,63 @@ function ConsultantList() {
 
     return (
         <Fragment>
-           
-                <Fragment>
-                    <UserAlert
-                        isUserAlertVisible={isUserAlertVisible}
-                        setIsUserAlertVisible={setIsUserAlertVisible}
-                        handleDelete={handleDelete}
-                        consultantId={consultantId}
 
-                    />
-                    {/* <ToastModel active={active} setActive={setActive} toastContent={toastContent} /> */}
-                    <Page
-                        title="Consultant List"
-                        primaryAction={{
-                            icon: PlusIcon,
-                            content: 'Add Consultant',
-                            onAction: goToAddConsultant,
-                        }}
-                       
-                    >
-                        <Layout>
+            <Fragment>
+                <UserAlert
+                    isUserAlertVisible={isUserAlertVisible}
+                    setIsUserAlertVisible={setIsUserAlertVisible}
+                    handleDelete={handleDelete}
+                    consultantId={consultantId}
 
-                            { /* Banner */}
-                            {isBannerVisible && (
-                                <Layout.Section>
-                                    <Banner
-                                        title="Hi om suman. Welcome To: Your Shopify Store"
-                                        tone="info"
-                                        onDismiss={() => setIsBannerVisible(false)}
-                                        icon={ConfettiIcon}
-                                    >
-                                        <BlockStack gap="200">
-                                            <p>Make sure you know how these changes affect your store.</p>
-                                            <p>Make sure you know how these changes affect your store.</p>
-                                        </BlockStack>
-                                    </Banner>
-                                </Layout.Section>
-                            )}
+                />
+                {/* <ToastModel active={active} setActive={setActive} toastContent={toastContent} /> */}
+                <Page
+                    title="Consultant List"
+                    primaryAction={{
+                        icon: PlusIcon,
+                        content: 'Add Consultant',
+                        onAction: goToAddConsultant,
+                    }}
 
+                >
+                    <Layout>
+
+                        { /* Banner */}
+                        {isBannerVisible && (
                             <Layout.Section>
-                                <IndexTableList
-                                    loading={consultantLoading}
-                                    itemStrings={itemStrings}
-                                    sortOptions={[]}
-                                    data={sortedConsultants}
-                                    headings={headings}
-                                    renderRow={renderConsultantRow}
-                                    resourceName={{ singular: 'consultant', plural: 'consultants' }}
-                                    queryPlaceholder="Search consultants"
-                                    onTabChange={setSelectedTab}
-                                    onQueryChange={setQueryValue}
-                                    onSortChange={setSortValue}
-                                />
+                                <Banner
+                                    title="Hi om suman. Welcome To: Your Shopify Store"
+                                    tone="info"
+                                    onDismiss={() => setIsBannerVisible(false)}
+                                    icon={ConfettiIcon}
+                                >
+                                    <BlockStack gap="200">
+                                        <p>Make sure you know how these changes affect your store.</p>
+                                        <p>Make sure you know how these changes affect your store.</p>
+                                    </BlockStack>
+                                </Banner>
                             </Layout.Section>
-                        </Layout>
-                    </Page>
-                </Fragment>
-          
+                        )}
+
+                        <Layout.Section>
+                            <IndexTableList
+                                loading={consultantLoading}
+                                itemStrings={itemStrings}
+                                sortOptions={[]}
+                                data={sortedConsultants}
+                                headings={headings}
+                                renderRow={renderConsultantRow}
+                                resourceName={{ singular: 'consultant', plural: 'consultants' }}
+                                queryPlaceholder="Search consultants"
+                                onTabChange={setSelectedTab}
+                                onQueryChange={setQueryValue}
+                                onSortChange={setSortValue}
+                            />
+                        </Layout.Section>
+                    </Layout>
+                </Page>
+            </Fragment>
+
         </Fragment>
     );
 }

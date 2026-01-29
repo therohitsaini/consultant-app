@@ -9,6 +9,7 @@ import {
 import { useState, useCallback, useEffect, Fragment } from "react";
 import { Outlet } from "react-router-dom";
 import Footer from "./Footer";
+import { AdminMenu } from "./AdminMenu";
 
 export default function LayoutFrame() {
     const [mobileNavActive, setMobileNavActive] = useState(false);
@@ -42,10 +43,12 @@ export default function LayoutFrame() {
 
     return (
         <Fragment>
-        {/* // <Frame topBar={topBarMarkup}> */}
+            {/* // <Frame topBar={topBarMarkup}> */}
             {/* 🔥 Page Content */}
+            <AdminMenu />
+
             <Outlet context={{ adminIdLocal }} />
-            <Footer />
+            {/* <Footer /> */}
 
             {toastActive && (
                 <Toast

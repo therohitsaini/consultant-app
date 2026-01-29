@@ -28,7 +28,6 @@ import { useAppStatus } from '../ProtectRoute/AppStatusProvider';
 
 
 export const SetupGuideNew = ({ appStatus, enabled, consultantCount }) => {
-  console.log("consultantCount", consultantCount);
   const [showGuide, setShowGuide] = useState(true);
   const [items, setItems] = useState([]);
 
@@ -41,20 +40,10 @@ export const SetupGuideNew = ({ appStatus, enabled, consultantCount }) => {
     setItems(ITEMS({ validation }));
   }, [validation.appStatus, validation.consultantCount]);
 
-  console.log("items", appStatus || enabled);
-  const onStepComplete = async (id) => {
-    try {
-      await new Promise((res) =>
-        setTimeout(() => {
-          res();
-        }, 1000)
-      );
-
-      setItems((prev) => prev.map((item) => (item.id === id ? { ...item, complete: !item.complete } : item)));
-    } catch (e) {
-      console.error(e);
-    }
+  const onStepComplete = async () => {
+    return;
   };
+  
 
   if (!showGuide) return <Button onClick={() => setShowGuide(true)}>Show Setup Guide</Button>;
 
@@ -183,7 +172,7 @@ export const SetupGuide = ({ onDismiss, onStepComplete, items }) => {
                   key={item.id}
                   expanded={expanded === item.id}
                   setExpanded={() => setExpanded(item.id)}
-                  onComplete={onStepComplete}
+                  // onComplete={onStepComplete}
                   {...item}
                 />
               );
@@ -232,7 +221,8 @@ const SetupItem = ({
       <div className={`${styles.setupItem} ${expanded ? styles.setupItemExpanded : ""}`}>
         <InlineStack gap='200' align='start' blockAlign='start' wrap={false}>
           <Tooltip content={complete ? 'Mark as not done' : 'Mark as done'} activatorWrapper='div'>
-            <div className={styles.completeButton} onClick={completeItem} style={{ cursor: 'pointer' }}>
+          <div className={styles.completeButton}>
+
               {loading ? (
                 <Spinner size='small' />
               ) : complete ? (

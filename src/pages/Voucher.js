@@ -45,7 +45,7 @@ function Voucher() {
 
             <div className={styles.balanceSection}>
                 {/* <span className={styles.balanceLabel}>Available balance:</span> */}
-                <span className={styles.balanceValue}>Coins : {walletBalance}</span>
+                <span className={styles.balanceValue}>Coins : {walletBalance?.toFixed(2) || "0.0"}</span>
             </div>
 
             <div className={styles.sectionHeader}>
