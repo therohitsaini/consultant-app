@@ -17,18 +17,15 @@ export const sortOptions = [
 
 
 export const headings = [
-    { title: 'Sr. No.' },
-    { title: 'Image' },
-    { title: 'Name' },
-    { title: 'Email _id' },
-    { title: 'Contact' },
-    { title: 'Profession' },
-    { title: 'Experience', alignment: 'end' },
-    { title: 'Chats', alignment: 'end' },
-    { title: 'Voice Calls', alignment: 'end' },
-    { title: 'Video Calls', alignment: 'end' },
-    { title: 'Status' },
-    { title: 'Action' },
+    { title: 'Sr. No.', alignment: 'center' },
+    { title: 'Image', alignment: 'center' },
+    { title: 'Name', alignment: 'center' },
+    { title: 'Profession', alignment: 'center' },
+    { title: 'Chats', alignment: 'center' },
+    { title: 'Voice Calls', alignment: 'center' },
+    { title: 'Video Calls', alignment: 'center' },
+    { title: 'Status', alignment: 'center' },
+    { title: 'Action', alignment: 'center' },
 ];
 
 export const itemStrings = [

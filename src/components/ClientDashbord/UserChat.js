@@ -36,19 +36,25 @@ const UserChat = () => {
     const [chatMessagesData, setChatMessagesData] = useState([]);
     const lastProcessedMessageId = useRef(null);
     const messagesAreaRef = useRef(null);
-    const [showNotification, setShowNotification] = useState(false);
-    const [notificationMessage, setNotificationMessage] = useState(null);
     const lastNotificationMessageId = useRef(null);
     const shouldAutoScrollRef = useRef(true);
     const { insufficientBalance } = useSelector((state) => state.socket);
     const [showChatEndToast, setShowChatEndToast] = useState(false);
-    const [showChatEndPop, setShowChatEndPop] = useState(true);
+    const [showChatLock, setShowChatLock] = useState(false);
+    const [waitingForAccept, setWaitingForAccept] = useState(false);
     const prevIsRunningRef = useRef(null);
     const { userDetails } = useSelector((state) => state.users);
     const { confirmChat } = useSelector((state) => state.socket);
 
     console.log("confirmChat____UserChat", confirmChat)
     console.log("userDetails____UserChat", userDetails)
+
+    useEffect(() => {
+        if (userDetails?.data?.chatLock === "true") {
+            setShowChatLock(true);
+        }
+    }, [userDetails, showChatLock]);
+
     useEffect(() => {
         if (insufficientBalance) {
             setShow(true);
@@ -57,6 +63,7 @@ const UserChat = () => {
     useEffect(() => {
         dispatch(fetchUserDetailsByIds(clientId));
     }, [clientId, refreshed])
+
     useEffect(() => {
         dispatch(fetchConsultantById({ shop_id: shopId, consultant_id: consultantId }))
     }, [shopId, consultantId]);
@@ -105,7 +112,6 @@ const UserChat = () => {
                 console.log("UserChat - Skipping invalid message:", message);
                 return;
             }
-
             if (message._id === lastProcessedMessageId.current) {
                 return;
             }
@@ -123,14 +129,12 @@ const UserChat = () => {
                     (messageSenderId === currentConsultantId && messageReceiverId === currentClientId));
 
             if (isCurrentChatMessage) {
-                console.log("UserChat - ✅ Processing new message for current chat:", message);
 
                 lastProcessedMessageId.current = message._id;
 
                 setChatMessagesData(prev => {
                     const messageExists = prev.some(msg => msg._id === message._id);
                     if (messageExists) {
-                        console.log("UserChat - Message already exists, skipping");
                         return prev;
                     }
 
@@ -182,29 +186,27 @@ const UserChat = () => {
                 : null,
         };
 
-        setNotificationMessage(payload);
-        setShowNotification(true);
 
         if (latestMessage._id) {
             lastNotificationMessageId.current = latestMessage._id;
         }
     }, [socketMessages, clientId, consultantId, shopId, consultantOverview]);
 
-    const sendChat = (text = "") => {
-        setText(text);
-        console.log("text____UserChat", text)
-        if (text.trim() === "" || !clientId || !consultantId || !shopId) return;
+    const sendChat = (input = "") => {
+        const finalMessage =
+            typeof input === "string"
+                ? input
+                : text;
+
+        if (!finalMessage?.trim() || !clientId || !consultantId || !shopId) return;
 
         if (!socket.connected) {
-            console.warn("Socket not connected, attempting to reconnect...");
             socket.connect();
-            // Wait a bit for connection, then send
             setTimeout(() => {
                 if (socket.connected) {
                     sendMessage();
                 } else {
                     console.error("Failed to connect socket");
-                    alert("Connection lost. Please refresh the page.");
                 }
             }, 1000);
             return;
@@ -213,12 +215,11 @@ const UserChat = () => {
         sendMessage();
 
         function sendMessage() {
-        
             const messageData = {
                 senderId: clientId,
                 receiverId: consultantId,
                 shop_id: shopId,
-                text: text,
+                text: text || "Hello",
                 timestamp: new Date().toISOString()
 
             };
@@ -281,8 +282,6 @@ const UserChat = () => {
         if (!clientId || !consultantId || !shopId) return;
 
         const handleDirectMessage = (message) => {
-            console.log("UserChat - Direct socket message received:", message);
-
             const messageShopId = String(message.shop_id || message.shopId || '');
             const currentShopId = String(shopId || '');
             const messageSenderId = String(message.senderId || '');
@@ -297,7 +296,6 @@ const UserChat = () => {
 
             if (isCurrentChatMessage && message._id) {
                 console.log("UserChat - ✅ Direct: Processing message for current chat");
-
                 if (message._id === lastProcessedMessageId.current) return;
                 lastProcessedMessageId.current = message._id;
 
@@ -337,7 +335,6 @@ const UserChat = () => {
     useEffect(() => {
         if (!clientId || !consultantId) return
         if (chatMessagesData.length === 0) return
-        console.log("Marking messages as seen", clientId, consultantId);
         socket.emit("markSeen", {
             senderId: consultantId,
             receiverId: clientId
@@ -383,7 +380,7 @@ const UserChat = () => {
         setSeconds(0);
         setRefreshed((prev) => !prev);
         setShowChatEndToast(true);
-        setShowChatEndPop(true);
+        setShowChatLock((prev) => !prev);
         localStorage.removeItem("chatTimer");
     }
 
@@ -400,14 +397,13 @@ const UserChat = () => {
             setSeconds(0);
             setRefreshed((prev) => !prev);
             setShowChatEndToast(true);
-            setShowChatEndPop(true);
+            setShowChatLock((prev) => !prev);
         }
     }, [autoChatEnded]);
 
     useEffect(() => {
         if (prevIsRunningRef.current === true && chatTimer.isRunning === false) {
             setShowChatEndToast(true);
-            setShowChatEndPop(true);
         }
         prevIsRunningRef.current = chatTimer.isRunning;
     }, [chatTimer.isRunning]);
@@ -419,6 +415,7 @@ const UserChat = () => {
             consultantId: confirmChat.consultantId
         });
         setRefreshed((prev) => !prev);
+        setShowChatLock(false);
     }
 
     return (
@@ -509,54 +506,71 @@ const UserChat = () => {
 
                             {/* Messages Area */}
                             <div className={styles.messagesArea} ref={messagesAreaRef}>
-                                {/* UNLOCK : Messages Area */}
-                                {/* {showChatEndPop && (
-                                    <div className={styles.chatEndOverlay}>
-                                        <div className={styles.chatEndBox}>
-                                            <div className={styles.chatEndIcon}>🔒</div>
-                                            <div className={styles.chatEndContent}>
-                                                <h4>Chat Ended</h4>
-                                                <p>Your chat session has ended.</p>
-                                            </div>
-                                            <button
-                                                className={styles.chatEndButton}
-                                                onClick={() => setShowChatEndPop(false)}
-                                            >
-                                                OK
-                                            </button>
-                                        </div>
-                                    </div>
-                                )} */}
-                                {userDetails?.data?.chatLock === "true" && (
-                                    <div className={styles.chatEndOverlay}>
-                                        <div className={styles.chatEndBox}>
-                                            <div className={styles.chatEndIcon}>🔒</div>
-                                            <div className={styles.chatEndContent}>
-                                                <h4>chat unlock </h4>
-                                                <p>Your chat session has unlocked.</p>
-                                            </div>
-                                            {
-                                                confirmChat ? <button
-                                                    className={styles.chatEndButton}
-                                                    onClick={() => {
-                                                        startCHatHandler();
-                                                    }}
-                                                >
-                                                    Accept chat
-                                                </button>
-                                                    :
-                                                    <button
-                                                        className={styles.chatEndButton}
+
+                                {
+                                    showChatLock && (
+                                        <div className={styles.chatEndOverlay}>
+                                            <div className={styles.chatEndBox}>
+                                                <div style={{
+                                                    position: "relative",
+                                                    width: "44px",
+                                                    height: "44px",
+                                                }}>
+                                                    <div className={styles.lockIcon}>🔒</div>
+                                                    {waitingForAccept && <div className={styles.reverseRing}></div>}
+                                                </div>
+                                                <div className={styles.chatEndContent}>
+                                                    <h4>chat unlock </h4>
+                                                    <p>Your chat session has unlocked.</p>
+                                                </div>
+                                                {
+                                                    confirmChat ? <button
+                                                        style={{
+                                                            marginLeft: "auto",
+                                                            background: "green",
+                                                            color: "#fff",
+                                                            border: "none",
+                                                            padding: "8px 16px",
+                                                            borderRadius: "6px",
+                                                            cursor: "pointer",
+                                                            fontSize: "12px",
+                                                            width: "100px",
+                                                            fontFamily: "sans-serif",
+                                                        }}
                                                         onClick={() => {
-                                                            sendChat("Hello");   // auto send
+                                                            startCHatHandler();
                                                         }}
                                                     >
-                                                        start chat
+                                                        Accept chat
                                                     </button>
-                                            }
+                                                        :
+                                                        <button
+                                                            style={{
+                                                                marginLeft: "auto",
+                                                                background: waitingForAccept ? "gray" : "yellow",
+                                                                color: waitingForAccept ? "#fff" : "#000",
+                                                                border: "none",
+                                                                padding: "8px 16px",
+                                                                borderRadius: "6px",
+                                                                cursor: "pointer",
+                                                                fontSize: "12px",
+                                                                width: "100px",
+                                                                fontFamily: "sans-serif",
+                                                            }}
+                                                            onClick={() => {
+                                                                sendChat("Hello");
+                                                                setWaitingForAccept(true);
+                                                                setTimeout(() => {
+                                                                    setWaitingForAccept(false);
+                                                                }, 60000);
+                                                            }}
+                                                        >
+                                                            {waitingForAccept ? "Wait" : "start chat"}
+                                                        </button>
+                                                }
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
 
                                 {
@@ -637,7 +651,7 @@ const UserChat = () => {
                 message="Chat ended"
                 onClose={() => setShowChatEndToast(false)}
             />
-        </Fragment>
+        </Fragment >
     );
 };
 

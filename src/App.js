@@ -119,15 +119,15 @@ export default function App() {
           }>
             <Route path="/not-found" element={<NotFound />} />
             <Route index element={<Dashboard />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="consultant-list" element={<ConsultantList />} />
-            <Route path="add-consultant" element={<AddConsultant />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/consultant-list" element={<ConsultantList />} />
+            <Route path="/add-consultant" element={<AddConsultant />} />
             <Route path="/setting/history" element={<UserTransHistory />} />
             <Route path="/setting/wallet-management" element={<ManualDebetCreditBlance />} />
 
             <Route path="/admin-settings/voucher" element={<VoucherSettings />} />
             <Route path="/admin-settings/voucher-management" element={<VoucherTable />} />
-            <Route path="faq" element={<Faq />} />
+            <Route path="/faq" element={<Faq />} />
           </Route>
 
           <Route path="/consultant-cards" element={

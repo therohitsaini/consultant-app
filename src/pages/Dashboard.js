@@ -6,13 +6,7 @@ import { TitleBar } from '@shopify/app-bridge-react';
 import { useAppBridge } from '../components/createContext/AppBridgeContext';
 import { SetupGuideNew } from '../components/dashboard/SetupGuide';
 import { AppStatus } from '../components/dashboard/AppStatus';
-import LanguageSelector from '../components/dashboard/LanguageSelecter';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUsers } from '../components/Redux/slices/UserSlices';
-import { fetchConsultants } from '../components/Redux/slices/ConsultantSlices';
-import { apps } from '../components/FallbackData/FallbackData';
-import axios from 'axios';
-import ShowToast from './ShowToast';
 import { fetchAdminDetails, fetchShopAllConsultants, fetchShopAllUsers, manageAppStatus } from '../components/Redux/slices/adminSlice';
 import { Redirect } from '@shopify/app-bridge/actions';
 import { useMemo } from 'react';
@@ -26,8 +20,6 @@ function AnimatedCount({ value }) {
     const [isAnimating, setIsAnimating] = useState(false);
     const prevValueRef = useRef(targetValue);
 
-
-
     useEffect(() => {
         if (value === undefined || value === null) {
             setDisplayValue(0);
@@ -37,7 +29,6 @@ function AnimatedCount({ value }) {
         const startValue = prevValueRef.current;
         prevValueRef.current = value;
 
-        // Only animate if value changed
         if (startValue !== value) {
             setIsAnimating(true);
             const controls = animate(startValue, value, {
@@ -140,7 +131,7 @@ function Dashboard() {
             )}
             <Page
                 title="vc-consultant app"
-                primaryAction={<LanguageSelector />}
+                // primaryAction={<LanguageSelector />}
                 secondaryActions={[
                     {
                         content: 'Publish App',
@@ -151,8 +142,6 @@ function Dashboard() {
             >
 
                 <Layout>
-
-                    { /* Banner */}
                     {isBannerVisible && (
                         <Layout.Section>
                             <Banner
@@ -164,13 +153,11 @@ function Dashboard() {
                                 <BlockStack gap="200">
                                     <p>Manage your consultants efficiently and track their performance.</p>
                                     <p>Add new consultants, update their status, and monitor consultations.</p>
-                                    {/* <ShowToast /> */}
                                 </BlockStack>
                             </Banner>
                         </Layout.Section>
                     )}
 
-                    { /* Stats Cards */}
                     <Layout.Section>
                         <Grid>
                             <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 3, xl: 3 }}>
@@ -295,7 +282,6 @@ function Dashboard() {
                         </Grid>
                     </Layout.Section>
 
-                    { /* App Status */}
                     <Layout.Section>
                         <AppStatus
                             enabled={enabled}

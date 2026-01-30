@@ -20,6 +20,8 @@ if ("serviceWorker" in navigator) {
     .catch((err) => console.error("SW registration failed:", err));
 }
 
+
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   // <React.StrictMode>
@@ -45,20 +47,17 @@ root.render(
 );
 if (process.env.NODE_ENV === 'development') {
   const hideErrorOverlay = () => {
-    // Hide React error overlay
     const overlay = document.getElementById('react-error-overlay');
     if (overlay) {
       overlay.style.display = 'none';
       overlay.remove();
     }
 
-    // Hide webpack dev server iframe
     const iframe = document.querySelector('iframe[id*="webpack-dev-server"]');
     if (iframe) {
       iframe.style.display = 'none';
     }
 
-    // Hide any error divs with "Uncaught runtime errors"
     const errorDivs = document.querySelectorAll('div');
     errorDivs.forEach(div => {
       if (div.textContent && div.textContent.includes('Uncaught runtime errors')) {
@@ -68,14 +67,12 @@ if (process.env.NODE_ENV === 'development') {
     });
   };
 
-  // Check periodically and on DOM ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', hideErrorOverlay);
   } else {
     hideErrorOverlay();
   }
 
-  // Use MutationObserver to continuously hide error overlay
   const observer = new MutationObserver(() => {
     hideErrorOverlay();
   });

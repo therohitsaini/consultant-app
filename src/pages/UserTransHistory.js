@@ -44,7 +44,7 @@ function UserTransHistory() {
     const [page, setPage] = useState(1);
     const [type, setType] = useState(0);
     const limit = 10;
-
+    console.log("activityHistory", activityHistory);
     useEffect(() => {
         const id = localStorage.getItem('domain_V_id');
         setAdminIdLocal(id);

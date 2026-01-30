@@ -1,4 +1,4 @@
-import { Banner, Layout, Page, BlockStack, Grid, LegacyCard, Text, ButtonGroup, Button, Thumbnail, Spinner } from '@shopify/polaris';
+import { Banner, Layout, Page, BlockStack, Grid, LegacyCard, Text, ButtonGroup, Button, Thumbnail, Spinner, Box } from '@shopify/polaris';
 import { ConfettiIcon, ExternalIcon, PlusIcon, EditIcon, DuplicateIcon, DeleteIcon } from '@shopify/polaris-icons';
 import { useEffect, useState, useCallback, useMemo, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -28,28 +28,20 @@ function ConsultantList() {
         if (!redirect) return;
         redirect.dispatch(Redirect.Action.APP, '/add-consultant');
     };
-
-    const goToEditConsultant = (id) => {
-        if (!redirect) return;
-        redirect.dispatch(Redirect.Action.APP, `/add-consultant?id=${id}`);
-    };
-
     const navigate = useNavigate();
-    const [isBannerVisible, setIsBannerVisible] = useState(true);
     const [selectedTab, setSelectedTab] = useState(0);
     const [queryValue, setQueryValue] = useState('');
     const [sortValue, setSortValue] = useState(['name asc']);
     const [isUserAlertVisible, setIsUserAlertVisible] = useState(false);
     const [consultantId, setConsultantId] = useState(null);
-    const [active, setActive] = useState(false);
     const [isRefreshed, setIsRefreshed] = useState(false);
     const [adminIdLocal, setAdminIdLocal] = useState(null);
     const { consultants, loading: consultantLoading } = useSelector((state) => state.consultants);
+    console.log("queryValue", queryValue);
     useEffect(() => {
         const id = localStorage.getItem('domain_V_id');
         setAdminIdLocal(id);
     }, []);
-    console.log("adminIdLocal", consultants.findConsultant);
 
     useEffect(() => {
         if (!adminIdLocal) return;
@@ -57,7 +49,6 @@ function ConsultantList() {
     }, [dispatch, isRefreshed, adminIdLocal, app]);
 
     const consultantsData = consultants?.findConsultant || []
-    console.log("consultantsData", consultantsData)
     const filteredConsultants = useMemo(() => {
         if (!consultantsData) return [];
 
@@ -154,7 +145,6 @@ function ConsultantList() {
                 },
             });
             if (response.ok) {
-                setActive(true);
                 console.log("Consultant deleted successfully");
                 setIsUserAlertVisible(false);
                 setIsRefreshed((prev) => !prev);
@@ -168,21 +158,20 @@ function ConsultantList() {
     }
 
     const renderConsultantRow = useCallback((consultant, index) => {
-        const { _id, fullname, email, phone, contact, profession, experience, chatPerMinute
+        const { _id, fullname, profession, experience, chatPerMinute
             , consultantStatus, voicePerMinute, videoPerMinute
         } = consultant;
-        const displayPhone = phone || contact;
 
         return (
 
 
             <IndexTable.Row _id={_id} key={_id} position={index}>
                 <IndexTable.Cell>
-                    <Text as="span" alignment="start" variant="bodyMd" fontWeight="bold" numeric>
+                    <Text as="span" alignment="center" variant="bodyMd" fontWeight="bold" numeric>
                         {index + 1}
                     </Text>
                 </IndexTable.Cell>
-                <IndexTable.Cell>
+                <IndexTable.Cell alignment="center">
 
                     <Thumbnail
                         source={
@@ -194,30 +183,25 @@ function ConsultantList() {
                     />
 
                 </IndexTable.Cell>
-                <IndexTable.Cell>
-                    <Text variant="bodyMd" as="span">
+                <IndexTable.Cell alignment="center">
+                    <Text variant="bodyMd" as="span" alignment="center">
                         {fullname}
                     </Text>
                 </IndexTable.Cell>
-
-
-                <IndexTable.Cell>{email}</IndexTable.Cell>
-                <IndexTable.Cell>{displayPhone}</IndexTable.Cell>
-                <IndexTable.Cell>{profession}</IndexTable.Cell>
-                <IndexTable.Cell>{experience + " years"}</IndexTable.Cell>
+                <IndexTable.Cell><Text variant="bodyMd" as="span" alignment="center">{profession}</Text></IndexTable.Cell>
                 <IndexTable.Cell>
                     <Text as="span" alignment="center" numeric>
-                        ${chatPerMinute || "-"}
+                        <Text variant="bodyMd" as="span" alignment="center">${chatPerMinute || "-"}</Text>
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
                     <Text as="span" alignment="center" numeric>
-                        ${voicePerMinute || "-"}
+                        <Text variant="bodyMd" as="span" alignment="center">${voicePerMinute || "-"}</Text>
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
                     <Text as="span" alignment="center" numeric>
-                        ${videoPerMinute || "-"}
+                        <Text variant="bodyMd" as="span" alignment="center">${videoPerMinute || "-"}</Text>
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
@@ -305,17 +289,16 @@ function ConsultantList() {
 
 
     return (
+
         <Fragment>
+            <UserAlert
+                isUserAlertVisible={isUserAlertVisible}
+                setIsUserAlertVisible={setIsUserAlertVisible}
+                handleDelete={handleDelete}
+                consultantId={consultantId}
 
-            <Fragment>
-                <UserAlert
-                    isUserAlertVisible={isUserAlertVisible}
-                    setIsUserAlertVisible={setIsUserAlertVisible}
-                    handleDelete={handleDelete}
-                    consultantId={consultantId}
-
-                />
-                {/* <ToastModel active={active} setActive={setActive} toastContent={toastContent} /> */}
+            />
+            <Box paddingBlockStart="400">
                 <Page
                     title="Consultant List"
                     primaryAction={{
@@ -326,23 +309,6 @@ function ConsultantList() {
 
                 >
                     <Layout>
-
-                        { /* Banner */}
-                        {isBannerVisible && (
-                            <Layout.Section>
-                                <Banner
-                                    title="Hi om suman. Welcome To: Your Shopify Store"
-                                    tone="info"
-                                    onDismiss={() => setIsBannerVisible(false)}
-                                    icon={ConfettiIcon}
-                                >
-                                    <BlockStack gap="200">
-                                        <p>Make sure you know how these changes affect your store.</p>
-                                        <p>Make sure you know how these changes affect your store.</p>
-                                    </BlockStack>
-                                </Banner>
-                            </Layout.Section>
-                        )}
 
                         <Layout.Section>
                             <IndexTableList
@@ -361,9 +327,9 @@ function ConsultantList() {
                         </Layout.Section>
                     </Layout>
                 </Page>
-            </Fragment>
-
+            </Box>
         </Fragment>
+
     );
 }
 

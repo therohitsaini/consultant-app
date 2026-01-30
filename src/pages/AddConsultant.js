@@ -9,6 +9,7 @@ import { Redirect } from '@shopify/app-bridge/actions';
 import { getAppBridgeToken } from '../utils/getAppBridgeToken';
 import { usePolarisToast } from '../components/AlertModel/PolariesTostContext';
 import { ContextualSaveBar } from "@shopify/polaris";
+import { Box } from '@shopify/polaris';
 
 
 
@@ -161,6 +162,8 @@ function AddConsultant() {
         </BlockStack>
     );
 
+    //-------------------------- dropdown markup -------------------
+
     const dropdownMarkup = showDropdown && filteredTags.length > 0 && (
         <div
             style={{
@@ -201,11 +204,13 @@ function AddConsultant() {
         </div>
     );
 
+    //-------------------------- handle file button click -------------------
 
     const handleFileButtonClick = useCallback(() => {
         fileInputRef.current?.click();
     }, []);
 
+    //-------------------------- submit consultant data -------------------
 
     const submitConsultantData = useCallback(async () => {
         const token = await getAppBridgeToken(app);
@@ -242,24 +247,37 @@ function AddConsultant() {
             });
 
             const responseData = await response.json();
-            console.log('Response data:', responseData);
             if (response.ok) {
                 showToast(responseData?.message);
                 setTextFieldValue('');
                 setProfileFile(null);
                 setProfileImageUrl(null);
+                goToAddConsultant();
             } else {
-                setSubmitError(responseData?.message || 'Failed to submit consultant data. Please try again.');
+                if (responseData?.missingFields) {
+                    const fields = responseData?.missingFields || [];
+                    showToast(
+                        fields.length > 3
+                            ? `${fields.slice(0, 3).join(", ")} +${fields.length - 3} more`
+                            : fields.join(", "),
+                        true
+                    );
+                } else {
+                    showToast(responseData?.message, true);
+                }
             }
         } catch (error) {
-            console.error('Error submitting consultant data:', error);
-            setSubmitError(
-                error.message || 'Failed to submit consultant data. Please try again.'
-            );
+            console.log("error", error);
+            showToast(error.message === "Invalid shop ID" ? "All fields are required" : "Failed to submit consultant data. Please try again.", true);
         } finally {
             setIsSubmitting(false);
         }
     }, [formData, profileFile]);
+
+    //-------------------------- submit consultant data -------------------
+
+
+    //-------------------------- update consultant data / edit consultant data-------------------
 
     const updateConsultantData = async () => {
         const token = await getAppBridgeToken(app);
@@ -289,10 +307,9 @@ function AddConsultant() {
                 }
             });
             const responseData = await response.json();
-            console.log('Response data:', responseData);
             if (response.ok) {
                 showToast(responseData?.message);
-                // showToast('Consultant updated successfully 🎉');
+                goToAddConsultant();
             } else {
                 showToast(responseData?.missingFields, true);
             }
@@ -305,7 +322,9 @@ function AddConsultant() {
             setIsSubmitting(false);
         }
     }
+    //-------------------------- update consultant data / edit consultant data-------------------
 
+    //-------------------------- get consultant by id -------------------
 
     const getConsultantById = async () => {
         if (!consultantId) return;
@@ -326,13 +345,15 @@ function AddConsultant() {
             console.error('Error fetching consultant:', error);
         }
     }
+    //-------------------------- get consultant by id -------------------
 
+    //-------------------------- use effect to get consultant by id -------------------
     useEffect(() => {
         if (consultantId) {
             getConsultantById();
         }
     }, [consultantId]);
-
+    //-------------------------- use effect to get consultant by id -------------------
 
     useEffect(() => {
         if (consultantDetails && consultantDetails.email) {
@@ -393,386 +414,396 @@ function AddConsultant() {
         }
     }, [consultantDetails])
 
+    //-------------------------- handle discard -------------------
+
+    const handleDiscard = () => {
+        setDirty(false);
+    }
+
 
     return (
-        <Page
-            backAction={{ content: 'Consultant List', onAction: goToAddConsultant }}
-            title={updateIsTrue ? 'Update Consultant settings' : 'Add Consultant settings'}
+        <Box paddingBlockStart="400">
+            <Page
+                marginBlockStart="400"
+                backAction={{ content: 'Consultant List', onAction: goToAddConsultant }}
+                title={updateIsTrue ? 'Update Consultant settings' : 'Add Consultant settings'}
 
-        >
-            {dirty && (
-                <ContextualSaveBar
-                    message="Unsaved changes"
-                    saveAction={{
-                        onAction: updateIsTrue ? updateConsultantData : submitConsultantData,
-                        loading: isSubmitting,
-                    }}
-                    discardAction={{
-                        onAction: "handleDiscard",
-                    }}
-                />
-            )}
+            >
+                {dirty && (
+                    <ContextualSaveBar
+                        message="Unsaved changes"
+                        saveAction={{
+                            content: updateIsTrue ? 'Update' : 'Submit',
+                            onAction: updateIsTrue ? updateConsultantData : submitConsultantData,
+                            loading: isSubmitting,
+                        }}
+                        discardAction={{
+                            onAction: handleDiscard,
+                        }}
+                    />
+                )}
 
 
 
-            <Layout>
+                <Layout>
 
-                <Layout.Section>
-                    <LegacyCard title="Add Consultant settings" sectioned>
-                        <FormLayout>
+                    <Layout.Section>
+                        <LegacyCard title="Add Consultant settings" sectioned>
+                            <FormLayout>
 
-                            <FormLayout.Group>
-                                <Grid>
-                                    <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
-                                        <FormLayout>
-                                            <FormLayout.Group>
-                                                {/* Full Name */}
-                                                <TextField
-                                                    label="Full Name"
-                                                    value={formData.fullName}
-                                                    onChange={handleFieldChange('fullName')}
-                                                    autoComplete="off"
-                                                    onBlur={() => setDirty(true)}
-                                                />
-                                            </FormLayout.Group>
-                                            <FormLayout.Group>
-                                                {/* Email */}
-                                                <TextField
-                                                    label="Email"
-                                                    type="email"
-                                                    value={formData.email}
-                                                    onChange={handleFieldChange('email')}
-                                                    autoComplete="email"
-                                                    onBlur={() => setDirty(true)}
-                                                />
-                                            </FormLayout.Group>
-                                            {!updateIsTrue && (
+                                <FormLayout.Group>
+                                    <Grid>
+                                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                                            <FormLayout>
                                                 <FormLayout.Group>
+                                                    {/* Full Name */}
                                                     <TextField
-                                                        label="Password"
-                                                        type="password"
-                                                        value={formData.password}
-                                                        onChange={handleFieldChange('password')}
+                                                        label="Full Name"
+                                                        value={formData.fullName}
+                                                        onChange={handleFieldChange('fullName')}
                                                         autoComplete="off"
                                                         onBlur={() => setDirty(true)}
                                                     />
                                                 </FormLayout.Group>
-                                            )}
+                                                <FormLayout.Group>
+                                                    {/* Email */}
+                                                    <TextField
+                                                        label="Email"
+                                                        type="email"
+                                                        value={formData.email}
+                                                        onChange={handleFieldChange('email')}
+                                                        autoComplete="email"
+                                                        onBlur={() => setDirty(true)}
+                                                    />
+                                                </FormLayout.Group>
+                                                {!updateIsTrue && (
+                                                    <FormLayout.Group>
+                                                        <TextField
+                                                            label="Password"
+                                                            type="password"
+                                                            value={formData.password}
+                                                            onChange={handleFieldChange('password')}
+                                                            autoComplete="off"
+                                                            onBlur={() => setDirty(true)}
+                                                        />
+                                                    </FormLayout.Group>
+                                                )}
 
-                                        </FormLayout>
-                                    </Grid.Cell>
-                                    {/* Profile Image */}
-                                    <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                                            </FormLayout>
+                                        </Grid.Cell>
+                                        {/* Profile Image */}
+                                        <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
 
-                                        <div style={{ width: 200, height: 'auto', margin: 'auto', }}>
-                                            <input
-                                                ref={fileInputRef}
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={handleFileInputChange}
-                                                style={{ display: 'none', }}
-                                                onBlur={() => setDirty(true)}
-                                            />
-                                            <DropZone
-                                                onDrop={handleDropZoneDrop}
-                                                accept="image/*"
-                                                type="image"
-                                                allowMultiple={false}
-                                                onBlur={() => setDirty(true)}
-                                            >
-                                                {
-                                                    profileImageUrl ? (
-                                                        <div style={{ width: '100%', height: '100%', textAlign: 'center', padding: '10px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                                            <img
-                                                                src={profileImageUrl || './images/teamdefault.png'}
-                                                                alt="Profile Preview"
-                                                                style={{
-                                                                    width: 90,
-                                                                    height: 90,
-                                                                    borderRadius: '8px',
-                                                                    objectFit: 'cover'
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    ) : (
-                                                        <div style={{ width: '100%', height: '100%', textAlign: 'center', padding: '10px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                                            <img
-                                                                src="./images\flag\teamdefault.png"
-                                                                alt="Default Profile"
-                                                                style={{
-                                                                    width: 90,
-                                                                    height: 90,
-                                                                    borderRadius: '8px',
-                                                                    objectFit: 'cover'
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    )}
-                                            </DropZone>
-                                            <div style={{ marginTop: '8px', textAlign: 'center' }}>
-                                                <Button size="slim" onClick={handleFileButtonClick}>
-                                                    Upload Image
-                                                </Button>
+                                            <div style={{ width: 200, height: 'auto', margin: 'auto', }}>
+                                                <input
+                                                    ref={fileInputRef}
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleFileInputChange}
+                                                    style={{ display: 'none', }}
+                                                    onBlur={() => setDirty(true)}
+                                                />
+                                                <DropZone
+                                                    onDrop={handleDropZoneDrop}
+                                                    accept="image/*"
+                                                    type="image"
+                                                    allowMultiple={false}
+                                                    onBlur={() => setDirty(true)}
+                                                >
+                                                    {
+                                                        profileImageUrl ? (
+                                                            <div style={{ width: '100%', height: '100%', textAlign: 'center', padding: '10px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                                                <img
+                                                                    src={profileImageUrl || './images/teamdefault.png'}
+                                                                    alt="Profile Preview"
+                                                                    style={{
+                                                                        width: 90,
+                                                                        height: 90,
+                                                                        borderRadius: '8px',
+                                                                        objectFit: 'cover'
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        ) : (
+                                                            <div style={{ width: '100%', height: '100%', textAlign: 'center', padding: '10px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                                                <img
+                                                                    src="./images\flag\teamdefault.png"
+                                                                    alt="Default Profile"
+                                                                    style={{
+                                                                        width: 90,
+                                                                        height: 90,
+                                                                        borderRadius: '8px',
+                                                                        objectFit: 'cover'
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        )}
+                                                </DropZone>
+                                                <div style={{ marginTop: '8px', textAlign: 'center' }}>
+                                                    <Button size="slim" onClick={handleFileButtonClick}>
+                                                        Upload Image
+                                                    </Button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </Grid.Cell>
-                                </Grid>
-                            </FormLayout.Group>
-                            <div style={{ marginTop: updateIsTrue ? '20px' : '0px' }}>
-                                <FormLayout.Group >
+                                        </Grid.Cell>
+                                    </Grid>
+                                </FormLayout.Group>
+                                <div style={{ marginTop: updateIsTrue ? '20px' : '0px' }}>
+                                    <FormLayout.Group >
 
-                                    {/* Phone Number */}
+                                        {/* Phone Number */}
+                                        <TextField
+                                            label="Phone Number"
+                                            type="tel"
+                                            value={formData.phoneNumber}
+                                            onChange={handleFieldChange('phoneNumber')}
+                                            autoComplete="off"
+                                            onBlur={() => setDirty(true)}
+                                        />
+
+                                        {/* Profession */}
+                                        <TextField
+                                            label="Profession"
+                                            value={formData.profession}
+                                            onChange={handleFieldChange('profession')}
+                                            autoComplete="off"
+                                            onBlur={() => setDirty(true)}
+                                        />
+
+                                        {/* Specialization */}
+                                        <TextField
+                                            label="Specialization"
+                                            value={formData.specialization}
+                                            onChange={handleFieldChange('specialization')}
+                                            autoComplete="off"
+                                            onBlur={() => setDirty(true)}
+                                        />
+
+                                    </FormLayout.Group>
+                                </div>
+                                <FormLayout.Group>
+
+                                    {/* License / ID Number */}
                                     <TextField
-                                        label="Phone Number"
-                                        type="tel"
-                                        value={formData.phoneNumber}
-                                        onChange={handleFieldChange('phoneNumber')}
+                                        label="License / ID Number"
+                                        value={formData.licenseIdNumber}
+                                        onChange={handleFieldChange('licenseIdNumber')}
                                         autoComplete="off"
                                         onBlur={() => setDirty(true)}
                                     />
 
-                                    {/* Profession */}
+                                    {/* Year of Experience */}
                                     <TextField
-                                        label="Profession"
-                                        value={formData.profession}
-                                        onChange={handleFieldChange('profession')}
+                                        label="Year of Experience"
+                                        value={formData.yearOfExperience}
+                                        onChange={handleFieldChange('yearOfExperience')}
                                         autoComplete="off"
                                         onBlur={() => setDirty(true)}
                                     />
 
-                                    {/* Specialization */}
-                                    <TextField
-                                        label="Specialization"
-                                        value={formData.specialization}
-                                        onChange={handleFieldChange('specialization')}
-                                        autoComplete="off"
-                                        onBlur={() => setDirty(true)}
-                                    />
+
 
                                 </FormLayout.Group>
-                            </div>
-                            <FormLayout.Group>
 
-                                {/* License / ID Number */}
-                                <TextField
-                                    label="License / ID Number"
-                                    value={formData.licenseIdNumber}
-                                    onChange={handleFieldChange('licenseIdNumber')}
-                                    autoComplete="off"
-                                    onBlur={() => setDirty(true)}
-                                />
+                            </FormLayout>
+                        </LegacyCard>
+                    </Layout.Section>
 
-                                {/* Year of Experience */}
-                                <TextField
-                                    label="Year of Experience"
-                                    value={formData.yearOfExperience}
-                                    onChange={handleFieldChange('yearOfExperience')}
-                                    autoComplete="off"
-                                    onBlur={() => setDirty(true)}
-                                />
-
-
-
-                            </FormLayout.Group>
-
-                        </FormLayout>
-                    </LegacyCard>
-                </Layout.Section>
-
-                <Layout.Section>
-                    <LegacyCard title="Add your consultant charges" sectioned>
-                        <FormLayout>
-                            <FormLayout.Group>
-                                {/* Display Name */}
-                                <TextField
-                                    type="number"
-                                    label="Chat per minute"
-                                    value={formData.chatPerMinute}
-                                    onChange={handleFieldChange('chatPerMinute')}
-                                    autoComplete="off"
-                                    onBlur={() => setDirty(true)}
-                                />
-                                {/* Video per minute */}
-
-                                <TextField
-                                    type="number"
-                                    label="Video per minute"
-                                    value={formData.videoPerMinute}
-                                    onChange={handleFieldChange('videoPerMinute')}
-                                    autoComplete="off"
-                                    onBlur={() => setDirty(true)}
-                                />
-                                {/* Voice per minute */}
-                                <TextField
-                                    type="number"
-                                    label="Voice per minute"
-                                    value={formData.voicePerMinute}
-                                    onChange={handleFieldChange('voicePerMinute')}
-                                    autoComplete="off"
-                                    onBlur={() => setDirty(true)}
-                                />
-                                {/* Audio per minute */}
-
-                            </FormLayout.Group>
-                        </FormLayout>
-                    </LegacyCard>
-                </Layout.Section>
-
-                {/* add your consultant Language */}
-                <Layout.Section>
-                    <div className="language-card-wrapper">
-                        <LegacyCard title="Add your consultant Language" sectioned>
+                    <Layout.Section>
+                        <LegacyCard title="Add your consultant charges" sectioned>
                             <FormLayout>
                                 <FormLayout.Group>
-                                    <div style={{ position: 'relative', width: '100%' }}>
-                                        <TextField
-                                            label="Tags"
-                                            value={textFieldValue}
-                                            onChange={handleTextFieldChange}
-                                            onFocus={handleTextFieldFocus}
-                                            onBlur={() => {
-                                                // Delay to allow click event on dropdown items
-                                                setTimeout(() => setShowDropdown(false), 200);
-                                            }}
-                                            placeholder="Search tags"
-                                            autoComplete="off"
-                                            verticalContent={verticalContentMarkup}
+                                    {/* Display Name */}
+                                    <TextField
+                                        type="number"
+                                        label="Chat per minute"
+                                        value={formData.chatPerMinute}
+                                        onChange={handleFieldChange('chatPerMinute')}
+                                        autoComplete="off"
+                                        onBlur={() => setDirty(true)}
+                                    />
+                                    {/* Video per minute */}
 
-                                        />
-                                        {dropdownMarkup}
-                                    </div>
+                                    <TextField
+                                        type="number"
+                                        label="Video per minute"
+                                        value={formData.videoPerMinute}
+                                        onChange={handleFieldChange('videoPerMinute')}
+                                        autoComplete="off"
+                                        onBlur={() => setDirty(true)}
+                                    />
+                                    {/* Voice per minute */}
+                                    <TextField
+                                        type="number"
+                                        label="Voice per minute"
+                                        value={formData.voicePerMinute}
+                                        onChange={handleFieldChange('voicePerMinute')}
+                                        autoComplete="off"
+                                        onBlur={() => setDirty(true)}
+                                    />
+                                    {/* Audio per minute */}
+
                                 </FormLayout.Group>
                             </FormLayout>
                         </LegacyCard>
-                    </div>
-                </Layout.Section>
+                    </Layout.Section>
 
-                {/* Add your consultant details */}
-                <Layout.Section>
-                    <LegacyCard title="Add your consultant details" sectioned>
-                        <FormLayout>
-                            <FormLayout.Group>
-                                {/* Display Name */}
-                                <TextField
-                                    label="Display Name"
-                                    value={formData.displayName}
-                                    onChange={handleFieldChange('displayName')}
-                                    autoComplete="off"
-                                    onBlur={() => setDirty(true)}
-                                />
-                                {/* Gender */}
-                                <Select
-                                    label="Gender"
-                                    options={genderOptions}
-                                    onChange={handleFieldChange('gender')}
-                                    value={formData.gender}
-                                    onBlur={() => setDirty(true)}
-                                />
+                    {/* add your consultant Language */}
+                    <Layout.Section>
+                        <div className="language-card-wrapper">
+                            <LegacyCard title="Add your consultant Language" sectioned>
+                                <FormLayout>
+                                    <FormLayout.Group>
+                                        <div style={{ position: 'relative', width: '100%' }}>
+                                            <TextField
+                                                label="Tags"
+                                                paddingBlockEnd="0"
+                                                value={textFieldValue}
+                                                onChange={handleTextFieldChange}
+                                                onFocus={handleTextFieldFocus}
+                                                onBlur={() => {
+                                                    setTimeout(() => setShowDropdown(false), 200);
+                                                }}
+                                                placeholder="Search tags"
+                                                autoComplete="off"
+                                                verticalContent={verticalContentMarkup}
 
-                                {/* House Number */}
-                                <TextField
-                                    label="House Number"
-                                    value={formData.houseNumber}
-                                    onChange={handleFieldChange('houseNumber')}
-                                    autoComplete="off"
-                                    onBlur={() => setDirty(true)}
-                                />
-                            </FormLayout.Group>
-                            <FormLayout.Group>
-
-                                {/* Street Area */}
-                                <TextField
-                                    label="Street Area"
-                                    value={formData.streetArea}
-                                    onChange={handleFieldChange('streetArea')}
-                                    autoComplete="off"
-                                    onBlur={() => setDirty(true)}
-                                />
-
-                                {/* Landmark */}
-                                <TextField
-                                    label="Landmark"
-                                    value={formData.landmark}
-                                    onChange={handleFieldChange('landmark')}
-                                    autoComplete="off"
-                                    onBlur={() => setDirty(true)}
-                                />
-
-                                {/* Address */}
-                                <TextField
-                                    label="Address"
-                                    value={formData.address}
-                                    onChange={handleFieldChange('address')}
-                                    autoComplete="off"
-                                    onBlur={() => setDirty(true)}
-                                />
-
-                            </FormLayout.Group>
-                            <FormLayout.Group>
-
-                                {/* Pincode */}
-                                <TextField
-                                    label="Pincode"
-                                    value={formData.pincode}
-                                    type="number"
-                                    onChange={handleFieldChange('pincode')}
-                                    autoComplete="off"
-                                    onBlur={() => setDirty(true)}
-                                />
-
-                                {/* Date of Birth */}
-                                <TextField
-                                    label="Date of Birth"
-                                    type="date"
-                                    value={formData.dateOfBirth}
-                                    onChange={handleFieldChange('dateOfBirth')}
-                                    autoComplete="off"
-                                    onBlur={() => setDirty(true)}
-                                />
-
-                                {/* Pancard Number */}
-                                <TextField
-                                    label="Pancard Number"
-                                    value={formData.pancardNumber}
-                                    onChange={handleFieldChange('pancardNumber')}
-                                    autoComplete="off"
-                                    onBlur={() => setDirty(true)}
-                                />
-
-                            </FormLayout.Group>
-                        </FormLayout>
-                        <div style={{ marginTop: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-
-                            {
-                                updateIsTrue ?
-                                    <Button
-                                        primary
-                                        onClick={updateConsultantData}
-                                        loading={isSubmitting}
-                                        disabled={isSubmitting}
-                                    >
-                                        {isSubmitting ? 'Updating...' : 'Update'}
-                                    </Button>
-                                    :
-                                    <Button
-                                        primary
-                                        onClick={submitConsultantData}
-                                        loading={isSubmitting}
-                                        disabled={isSubmitting}
-                                    >
-                                        {isSubmitting ? 'Submitting...' : 'Submit'}
-                                    </Button>
-
-                            }
-
+                                            />
+                                            {dropdownMarkup}
+                                        </div>
+                                    </FormLayout.Group>
+                                </FormLayout>
+                            </LegacyCard>
                         </div>
-                       
+                    </Layout.Section>
 
-                    </LegacyCard>
-                </Layout.Section>
+                    {/* Add your consultant details */}
+                    <Layout.Section>
+                        <LegacyCard title="Add your consultant details" sectioned>
+                            <FormLayout>
+                                <FormLayout.Group>
+                                    {/* Display Name */}
+                                    <TextField
+                                        label="Display Name"
+                                        value={formData.displayName}
+                                        onChange={handleFieldChange('displayName')}
+                                        autoComplete="off"
+                                        onBlur={() => setDirty(true)}
+                                    />
+                                    {/* Gender */}
+                                    <Select
+                                        label="Gender"
+                                        options={genderOptions}
+                                        onChange={handleFieldChange('gender')}
+                                        value={formData.gender}
+                                        onBlur={() => setDirty(true)}
+                                    />
 
-            </Layout>
-        </Page >
+                                    {/* House Number */}
+                                    <TextField
+                                        label="House Number"
+                                        value={formData.houseNumber}
+                                        onChange={handleFieldChange('houseNumber')}
+                                        autoComplete="off"
+                                        onBlur={() => setDirty(true)}
+                                    />
+                                </FormLayout.Group>
+                                <FormLayout.Group>
+
+                                    {/* Street Area */}
+                                    <TextField
+                                        label="Street Area"
+                                        value={formData.streetArea}
+                                        onChange={handleFieldChange('streetArea')}
+                                        autoComplete="off"
+                                        onBlur={() => setDirty(true)}
+                                    />
+
+                                    {/* Landmark */}
+                                    <TextField
+                                        label="Landmark"
+                                        value={formData.landmark}
+                                        onChange={handleFieldChange('landmark')}
+                                        autoComplete="off"
+                                        onBlur={() => setDirty(true)}
+                                    />
+
+                                    {/* Address */}
+                                    <TextField
+                                        label="Address"
+                                        value={formData.address}
+                                        onChange={handleFieldChange('address')}
+                                        autoComplete="off"
+                                        onBlur={() => setDirty(true)}
+                                    />
+
+                                </FormLayout.Group>
+                                <FormLayout.Group>
+
+                                    {/* Pincode */}
+                                    <TextField
+                                        label="Pincode"
+                                        value={formData.pincode}
+                                        type="number"
+                                        onChange={handleFieldChange('pincode')}
+                                        autoComplete="off"
+                                        onBlur={() => setDirty(true)}
+                                    />
+
+                                    {/* Date of Birth */}
+                                    <TextField
+                                        label="Date of Birth"
+                                        type="date"
+                                        value={formData.dateOfBirth}
+                                        onChange={handleFieldChange('dateOfBirth')}
+                                        autoComplete="off"
+                                        onBlur={() => setDirty(true)}
+                                    />
+
+                                    {/* Pancard Number */}
+                                    <TextField
+                                        label="Pancard Number"
+                                        value={formData.pancardNumber}
+                                        onChange={handleFieldChange('pancardNumber')}
+                                        autoComplete="off"
+                                        onBlur={() => setDirty(true)}
+                                    />
+
+                                </FormLayout.Group>
+                            </FormLayout>
+                            <div style={{ marginTop: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-end', }}>
+
+                                {
+                                    updateIsTrue ?
+                                        <Button
+                                            variant="primary"
+                                            onClick={updateConsultantData}
+                                            loading={isSubmitting}
+                                            disabled={isSubmitting}
+                                        >
+                                            {isSubmitting ? 'Updating...' : 'Update'}
+                                        </Button>
+                                        :
+                                        <Button
+                                            variant="primary"
+                                            onClick={submitConsultantData}
+                                            loading={isSubmitting}
+                                            disabled={isSubmitting}
+                                        >
+                                            {isSubmitting ? 'Submitting...' : 'Submit'}
+                                        </Button>
+
+                                }
+
+                            </div>
+
+
+                        </LegacyCard>
+                    </Layout.Section>
+
+                </Layout>
+            </Page >
+        </Box>
     );
 }
 

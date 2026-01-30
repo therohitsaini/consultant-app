@@ -1,6 +1,6 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react'
 import IndexTableList from '../components/consultant-list/IndexTableList'
-import { Page, Layout, Spinner, ButtonGroup, Button, Toast } from '@shopify/polaris'
+import { Page, Layout, Spinner, ButtonGroup, Button, Toast, Badge } from '@shopify/polaris'
 import { DuplicateIcon, EditIcon, PlusIcon } from '@shopify/polaris-icons'
 import { IndexTable, Text } from '@shopify/polaris'
 import { fetchWalletHistory } from '../components/Redux/slices/adminSlice'
@@ -128,50 +128,45 @@ function ManualDebetCreditBlance() {
                         {userType}
                     </Text>
                 </IndexTable.Cell>
-                <IndexTable.Cell>
-                    <Text as="span" alignment="end" numeric>
-                        ${amount || "0.0"}
+                <IndexTable.Cell alignment="center">
+                    <Text variant="bodyMd" as="span" alignment="center" numeric>
+                        ${amount ? parseFloat(amount).toFixed(2) : "0.0"}
                     </Text>
                 </IndexTable.Cell>
-                <div style={{ color: direction === "credit" ? "green" : "grey" }}>
-                    <IndexTable.Cell>
-                        <Text variant="bodyMd" as="span">
-                            {direction === "credit" ? "Credit" : "Debit"}
-                        </Text>
-                    </IndexTable.Cell>
-                </div>
+                <IndexTable.Cell alignment="center">
+                    <Badge tone={direction === "credit" ? "success" : "critical"}>
+                        {direction === "credit" ? "credit" : "debit"}
+                    </Badge>
+                </IndexTable.Cell>
 
-                <IndexTable.Cell>
-                    <Text variant="bodyMd" as="span">
+                <IndexTable.Cell alignment="center">
+                    <Text variant="bodyMd" as="span" alignment="center">
                         {referenceType}
                     </Text>
                 </IndexTable.Cell>
-                <div style={{ color: status === "success" ? "green" : "grey" }}>
-                    <IndexTable.Cell>
-                        <Text variant="bodyMd" as="span">
-                            {status}
-                        </Text>
-                    </IndexTable.Cell>
-                </div>
+                <IndexTable.Cell alignment="center">
+                    <Badge tone={status === "success" ? "success" : "critical"}>
+                        {status}
+                    </Badge>
+                </IndexTable.Cell>
 
-                <IndexTable.Cell>
+                <IndexTable.Cell alignment="center">
                     <Text variant="bodyMd" as="span">
                         {description}
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
-                    <ButtonGroup>
+                    <ButtonGroup alignment="center">
                         <Button
                             variant="tertiary"
                             icon={EditIcon}
-                            accessibilityLabel="Edit consultant"
+                            accessibilityLabel="Edit wallet"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 openUpdateWalletModal(userId, fullname, shop_Id);
                                 // handleEdit(_id);
                             }}
                         />
-                        <Button variant="tertiary" icon={DuplicateIcon} accessibilityLabel="Duplicate consultant" />
 
                     </ButtonGroup>
                 </IndexTable.Cell>

@@ -2,6 +2,7 @@ import React, { use, useEffect, useState } from 'react';
 import styles from '../../components/ConsultantDashboard/DashboardPage.module.css';
 import { fetchConsultantById } from '../Redux/slices/ConsultantSlices';
 import { useDispatch, useSelector } from 'react-redux';
+import axios from 'axios';
 
 const DashboardPage = () => {
     const [userId, setUserId] = useState(null);
@@ -16,6 +17,7 @@ const DashboardPage = () => {
         setUserId(storedUserId);
         setShopId(localStorage.getItem('shop_o_Identity'));
     }, []);
+    console.log("userId", userId)
 
     useEffect(() => {
         if (shopId && userId) {
@@ -29,13 +31,7 @@ const DashboardPage = () => {
         averageRating: 4.8
     };
 
-    const recentConsultations = [
-        { id: 1, client: 'Sarah Johnson', type: 'Business Strategy', date: '2024-01-15', status: 'Active', amount: 1200 },
-        { id: 2, client: 'Michael Chen', type: 'Financial Planning', date: '2024-01-14', status: 'Completed', amount: 850 },
-        { id: 3, client: 'Emily Rodriguez', type: 'Marketing Consultation', date: '2024-01-13', status: 'Active', amount: 950 },
-        { id: 4, client: 'David Kim', type: 'Technology Advisory', date: '2024-01-12', status: 'Scheduled', amount: 1500 },
-        { id: 5, client: 'Lisa Anderson', type: 'HR Consulting', date: '2024-01-11', status: 'Completed', amount: 1100 }
-    ];
+
 
     const getStatusBadge = (status) => {
         const badges = {
@@ -47,15 +43,16 @@ const DashboardPage = () => {
 
     // Simple line chart SVG data
     const getLatestUser = async () => {
-        // if (!userId) return;
+        // if (!userId) return console.log("userId not found")
         console.log("userId________________", userId)
         try {
-            const url = `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/get/consultant/${"6973b0d5cf6678cae20c2854"}`;
-            const response = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } });
-            const data = await response.json();
+            const url = `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/get/consultant/${userId}`;
+            console.log("url________________", url)
+            const response = await axios.get(url);
+            const data = await response.data;
             console.log("Latest User Data:", data);
             // if (response.ok) {
-            console.log("data?.payload", data?.payload)
+            console.log("   ", data?.payload)
             setUserData(data?.payload);
             // }
         } catch (error) {
@@ -64,7 +61,8 @@ const DashboardPage = () => {
     }
     useEffect(() => {
         getLatestUser();
-    }, []);
+    }, [userId]);
+
     return (
         <div className={styles.pageContainer}>
             {/* Header Section */}
@@ -217,9 +215,7 @@ const DashboardPage = () => {
                                 Latest client interactions and consultations
                             </p>
                         </div>
-                        <button className={styles.tableButton} style={{ fontSize: '13px' }}>
-                            View All
-                        </button>
+                      
                     </div>
                     <div className={styles.tableWrapper}>
                         <table className={styles.table}>

@@ -4,9 +4,10 @@ import styles from './LoginForm.module.css';
 import axios from 'axios';
 import { requestFcmTokenInNewWindow } from '../../firebase/FcmToken';
 import openTokenWindow from '../../firebase/utils/openTokenWindow';
-
+import { usePolarisToast } from '../AlertModel/PolariesTostContext';
 const LoginForm = () => {
     const navigate = useNavigate();
+    const { showToast } = usePolarisToast();
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -15,6 +16,7 @@ const LoginForm = () => {
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [tokenStatus, setTokenStatus] = useState('');
+    const [consultantBlockedError, setConsultantBlockedError] = useState('');
     const params = new URLSearchParams(window.location.search);
     const shop = params.get("shop");
     const host = params.get("host");
@@ -82,21 +84,23 @@ const LoginForm = () => {
             window.removeEventListener("message", handleMessage);
         };
     }, []);
+    //-------------------------- handle submit -------------------
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
 
         if (!validateForm()) return;
 
         try {
             const response = await axios.post(
                 `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/login-consultant`,
-                // `http://localhost:5001/api-consultant/login-consultant`,
-                formData
+                formData,
             );
 
             const { userData, token } = response?.data;
-            console.log("userData", response);
+            console.log("userData", userData);
             console.log("token", response?.data);
+            console.log("response", response);
 
             // Ensure userData exists and has an _id
             if (response.status === 200 && response.data?.userData?._id) {
@@ -133,24 +137,27 @@ const LoginForm = () => {
 
                 // Store cleanup function for component unmount (optional)
                 // cleanup will be called automatically when callbacks are executed
+                setIsLoading(false);
+                // proceedToDashboard(shop, host);
             } else {
                 setErrors({ email: "Invalid email or password" });
             }
         } catch (err) {
+            setConsultantBlockedError(err.response.data.message);
             console.error("login error", err);
             setErrors({ email: "Something went wrong. Please try again." });
+        } finally {
+            setIsLoading(false);
         }
     };
+
+    //-------------------------- return -------------------
 
     return (
         <div className={styles.loginPageContainer}>
             <div className={styles.loginContainer}>
-                {/* Title */}
                 <h1 className={styles.loginTitle}>Login</h1>
-
-                {/* Login Form */}
                 <form className={styles.loginForm} onSubmit={handleSubmit}>
-                    {/* Email Field */}
                     <div className={styles.formGroup}>
                         <label htmlFor="email" className={styles.formLabel}>
                             Email
@@ -164,7 +171,6 @@ const LoginForm = () => {
                             onChange={handleChange}
                             autoComplete="email"
                         />
-                        {errors.email && <span className={styles.errorMessage}>{errors.email}</span>}
                     </div>
 
                     {/* Password Field */}
@@ -251,12 +257,12 @@ const LoginForm = () => {
                         )}
                     </button>
 
-                    {/* Create Account Link */}
-                    <div className={styles.createAccountLink}>
-                        <a href="#" onClick={(e) => { e.preventDefault(); navigate('/signup'); }}>
-                            Create account
-                        </a>
-                    </div>
+                    {consultantBlockedError && (
+                        <div className={styles.errorMessage}>
+                            {consultantBlockedError}
+                        </div>
+                    )}
+                   
                 </form>
             </div>
         </div>

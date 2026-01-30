@@ -115,12 +115,7 @@ function TabNavigation({ children }) {
             path: '/consultant-chats-section',
             active: location.pathname === '/consultant-chats-section'
         },
-        {
-            label: 'Test Hash',
-            icon: <ChatIcon />,
-            path: '/consultant-chats-section',
-            active: location.pathname === '/consultant-chats-section'
-        },
+      
     ];
 
     const handleNavigation = (path) => {
@@ -133,7 +128,6 @@ function TabNavigation({ children }) {
 
     };
     const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${consultantOverview?.consultant?.profileImage?.replace("\\", "/")}`;
-
     const isVideoCallPage = location.pathname === '/video-call' || location.pathname.startsWith('/video-call');
 
     return (
@@ -172,7 +166,7 @@ function TabNavigation({ children }) {
                         {/* Profile Section */}
                         <div className={styles.profileSection}>
                             <div className={styles.profileImage}>
-                                <img src={'https://imgs.search.brave.com/9rELSNB2JEASiZPQlCef36aaHliToZj5fynVvObLBKg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4t/aWNvbnMtcG5nLmZs/YXRpY29uLmNvbS8x/MjgvNTk4Ny81OTg3/ODExLnBuZw'} alt={consultantOverview?.consultant?.fullname} />
+                                <img src={imageUrl || 'https://imgs.search.brave.com/9rELSNB2JEASiZPQlCef36aaHliToZj5fynVvObLBKg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4t/aWNvbnMtcG5nLmZs/YXRpY29uLmNvbS8x/MjgvNTk4Ny81OTg3/ODExLnBuZw'} alt={consultantOverview?.consultant?.fullname} />
                             </div>
                             <div className={styles.profileDetails}>
                                 <div className={styles.profileName}>{consultantOverview?.consultant?.fullname}</div>

@@ -4,7 +4,14 @@ import { useAppStatus } from '../ProtectRoute/AppStatusProvider';
 const ProtectStoreFront = ({ children }) => {
     const { loading, appEnabled } = useAppStatus();
 
-    // if (loading) return null; // or spinner
+    if (loading) return <div style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        textAlign: "center",
+    }}>Loading...</div>; // or spinner
 
     if (!appEnabled) {
         return (
@@ -30,7 +37,7 @@ const ProtectStoreFront = ({ children }) => {
                     }}
                 />
 
-             
+
             </div>
         )
 
