@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from '../../components/ConsultantDashboard/TabNavigation.module.css';
@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { connectSocket } from '../Redux/slices/sokectSlice';
 import { fetchConsultantById } from '../Redux/slices/ConsultantSlices';
 import IncomingCallAlert from '../AlertModel/IncommingCallAlert';
+import ConsultantProfileModal from './ConsultantProfileModal';
 
 // Icon Components - Enhanced with better designs
 
@@ -115,7 +116,7 @@ function TabNavigation({ children }) {
             path: '/consultant-chats-section',
             active: location.pathname === '/consultant-chats-section'
         },
-      
+
     ];
 
     const handleNavigation = (path) => {
@@ -129,96 +130,109 @@ function TabNavigation({ children }) {
     };
     const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${consultantOverview?.consultant?.profileImage?.replace("\\", "/")}`;
     const isVideoCallPage = location.pathname === '/video-call' || location.pathname.startsWith('/video-call');
+    const [showModal, setShowModal] = useState(false);
 
+    const handleLogout = () => {
+        console.log("User logged out");
+    };
     return (
-        <div className={`${styles.dashboardWrapper} ${isVideoCallPage ? styles.videoCallMode : ''}`}>
-            <button
-                className={styles.mobileToggleButton}
-                onClick={toggleSidebar}
-                aria-label="Toggle navigation"
-            >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    {sidebarOpen ? (
-                        <path d="M18 6L6 18M6 6l12 12" />
-                    ) : (
-                        <>
-                            <line x1="3" y1="12" x2="21" y2="12" />
-                            <line x1="3" y1="6" x2="21" y2="6" />
-                            <line x1="3" y1="18" x2="21" y2="18" />
-                        </>
-                    )}
-                </svg>
-            </button>
+        <Fragment>
+            <  ConsultantProfileModal
+                show={showModal}
+                handleClose={() => setShowModal(false)}
+                onLogout={handleLogout}
+                consultantOverview={consultantOverview}
 
-            {/* Mobile Overlay */}
-            {sidebarOpen && (
-                <div
-                    className={styles.mobileOverlay}
+            />
+            <div className={`${styles.dashboardWrapper} ${isVideoCallPage ? styles.videoCallMode : ''}`}>
+                <button
+                    className={styles.mobileToggleButton}
                     onClick={toggleSidebar}
-                ></div>
-            )}
+                    aria-label="Toggle navigation"
+                >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        {sidebarOpen ? (
+                            <path d="M18 6L6 18M6 6l12 12" />
+                        ) : (
+                            <>
+                                <line x1="3" y1="12" x2="21" y2="12" />
+                                <line x1="3" y1="6" x2="21" y2="6" />
+                                <line x1="3" y1="18" x2="21" y2="18" />
+                            </>
+                        )}
+                    </svg>
+                </button>
 
-            {/* Main Container with Navigation Tabs */}
-            <div className={styles.mainContainer}>
-                {/* Side Navigation Tabs - Hide on video call page */}
-                {!isVideoCallPage && (
-                    <aside className={`${styles.sideNav} ${sidebarOpen ? styles.sideNavOpen : ''}`}>
-                        {/* Profile Section */}
-                        <div className={styles.profileSection}>
-                            <div className={styles.profileImage}>
-                                <img src={imageUrl || 'https://imgs.search.brave.com/9rELSNB2JEASiZPQlCef36aaHliToZj5fynVvObLBKg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4t/aWNvbnMtcG5nLmZs/YXRpY29uLmNvbS8x/MjgvNTk4Ny81OTg3/ODExLnBuZw'} alt={consultantOverview?.consultant?.fullname} />
-                            </div>
-                            <div className={styles.profileDetails}>
-                                <div className={styles.profileName}>{consultantOverview?.consultant?.fullname}</div>
-                                <div className={styles.profileEmail}>{consultantOverview?.consultant?.email}</div>
-                            </div>
-                            <button className={styles.profileButton}>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                                    <circle cx="12" cy="7" r="4" />
-                                </svg>
-                                My Profile
-                            </button>
-                        </div>
-
-                        <nav className={styles.navTabs}>
-                            <ul className={styles.navTabList}>
-                                {menuItems.map((item, index) => (
-                                    <li key={index}>
-                                        <button
-                                            className={`${styles.navTab} ${item.active ? styles.navTabActive : ''}`}
-                                            onClick={() => handleNavigation(item.path)}
-                                            title={item.label}
-                                        >
-                                            <span className={styles.navTabIcon}>{item.icon}</span>
-                                            <span className={styles.navTabLabel}>{item.label}</span>
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
-                        </nav>
-                    </aside>
+                {/* Mobile Overlay */}
+                {sidebarOpen && (
+                    <div
+                        className={styles.mobileOverlay}
+                        onClick={toggleSidebar}
+                    ></div>
                 )}
 
-                {/* Main Content Area */}
-                <div className={styles.contentArea}>
-                    <main className={styles.content}>
-                        {(() => {
-                            const path = location.pathname;
-                            if (path === '/users-page' || path.startsWith('/users-page')) {
-                                return <UsersPage />;
-                            } else if (path === '/consulant-chats' || path.startsWith('/consulant-chats')) {
-                                return <ChatsPage />;
-                            } else if (path === '/video-call' || path.startsWith('/video-call')) {
-                                return <VideoCallingPage />;
-                            } else {
-                                return <DashboardPage />;
-                            }
-                        })()}
-                    </main>
+                {/* Main Container with Navigation Tabs */}
+                <div className={styles.mainContainer}>
+                    {/* Side Navigation Tabs - Hide on video call page */}
+                    {!isVideoCallPage && (
+                        <aside className={`${styles.sideNav} ${sidebarOpen ? styles.sideNavOpen : ''}`}>
+                            {/* Profile Section */}
+                            <div className={styles.profileSection}>
+                                <div className={styles.profileImage}>
+                                    <img src={imageUrl || 'https://imgs.search.brave.com/9rELSNB2JEASiZPQlCef36aaHliToZj5fynVvObLBKg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4t/aWNvbnMtcG5nLmZs/YXRpY29uLmNvbS8x/MjgvNTk4Ny81OTg3/ODExLnBuZw'} alt={consultantOverview?.consultant?.fullname} />
+                                </div>
+                                <div className={styles.profileDetails}>
+                                    <div className={styles.profileName}>{consultantOverview?.consultant?.fullname}</div>
+                                    <div className={styles.profileEmail}>{consultantOverview?.consultant?.email}</div>
+                                </div>
+                                <button onClick={() => setShowModal(true)} className={styles.profileButton}>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                        <circle cx="12" cy="7" r="4" />
+                                    </svg>
+                                    My Profile
+                                </button>
+                            </div>
+
+                            <nav className={styles.navTabs}>
+                                <ul className={styles.navTabList}>
+                                    {menuItems.map((item, index) => (
+                                        <li key={index}>
+                                            <button
+                                                className={`${styles.navTab} ${item.active ? styles.navTabActive : ''}`}
+                                                onClick={() => handleNavigation(item.path)}
+                                                title={item.label}
+                                            >
+                                                <span className={styles.navTabIcon}>{item.icon}</span>
+                                                <span className={styles.navTabLabel}>{item.label}</span>
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </nav>
+                        </aside>
+                    )}
+
+                    {/* Main Content Area */}
+                    <div className={styles.contentArea}>
+                        <main className={styles.content}>
+                            {(() => {
+                                const path = location.pathname;
+                                if (path === '/users-page' || path.startsWith('/users-page')) {
+                                    return <UsersPage />;
+                                } else if (path === '/consulant-chats' || path.startsWith('/consulant-chats')) {
+                                    return <ChatsPage />;
+                                } else if (path === '/video-call' || path.startsWith('/video-call')) {
+                                    return <VideoCallingPage />;
+                                } else {
+                                    return <DashboardPage />;
+                                }
+                            })()}
+                        </main>
+                    </div>
                 </div>
             </div>
-        </div>
+        </Fragment>
     );
 }
 

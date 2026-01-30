@@ -2,6 +2,8 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import '@shopify/polaris/build/esm/styles.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 import { AppProvider as PolarisAppProvider } from '@shopify/polaris';
 import en from "@shopify/polaris/locales/en.json";
 import { Provider } from 'react-redux';
