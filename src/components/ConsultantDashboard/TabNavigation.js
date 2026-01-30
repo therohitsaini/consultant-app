@@ -12,6 +12,8 @@ import { connectSocket } from '../Redux/slices/sokectSlice';
 import { fetchConsultantById } from '../Redux/slices/ConsultantSlices';
 import IncomingCallAlert from '../AlertModel/IncommingCallAlert';
 import ConsultantProfileModal from './ConsultantProfileModal';
+import axios from 'axios';
+import { app } from '@shopify/app-bridge/actions/Print';
 
 // Icon Components - Enhanced with better designs
 
@@ -26,7 +28,15 @@ function TabNavigation({ children }) {
     const [consultantId, setConsultantId] = useState(null);
     const [userId, setUserId] = useState(null);
     const [shopId, setShopId] = useState(null);
+    const [showModal, setShowModal] = useState(false);
     const dispatch = useDispatch();
+    const [profile, setProfile] = useState({
+        name: "",
+        email: "",
+        phone: "",
+        gender: "",
+        profileImage: null,
+    });
     const { consultantOverview } = useSelector((state) => state.consultants);
     console.log("consultantOverview________________", consultantOverview)
     useEffect(() => {
@@ -48,12 +58,45 @@ function TabNavigation({ children }) {
         dispatch(fetchConsultantById({ shop_id: shopId, consultant_id: userId }));
     }, [shopId, userId]);
 
-    // Add listeners for load / resize and initial timeout
+    const updateProfileDeatailsHandler = async () => {
+        try {
+            const formData = new FormData();
+
+            formData.append("consultantId", userId);
+            formData.append("shopId", shopId);
+            formData.append("name", profile.name);
+            formData.append("email", profile.email);
+            formData.append("phone", profile.phone);
+            formData.append("gender", profile.gender);
+
+            if (profile.profileImage instanceof File) {
+                formData.append("profileImage", profile.profileImage);
+            }
+
+            const response = await axios.put(
+                `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/update-profile`,
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+            if (response.data.success) {
+                dispatch(fetchConsultantById({ shop_id: shopId, consultant_id: userId }));
+            }
+
+            console.log("Profile updated:", response.data);
+        } catch (error) {
+            console.error("Error updating profile details:", error);
+        }
+    };
+
+
     useEffect(() => {
         window.addEventListener("load", sendHeight);
         window.addEventListener("resize", sendHeight);
         const timeoutId = setTimeout(sendHeight, 500);
-
         return () => {
             window.removeEventListener("load", sendHeight);
             window.removeEventListener("resize", sendHeight);
@@ -130,7 +173,6 @@ function TabNavigation({ children }) {
     };
     const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${consultantOverview?.consultant?.profileImage?.replace("\\", "/")}`;
     const isVideoCallPage = location.pathname === '/video-call' || location.pathname.startsWith('/video-call');
-    const [showModal, setShowModal] = useState(false);
 
     const handleLogout = () => {
         console.log("User logged out");
@@ -142,6 +184,9 @@ function TabNavigation({ children }) {
                 handleClose={() => setShowModal(false)}
                 onLogout={handleLogout}
                 consultantOverview={consultantOverview}
+                profile={profile}
+                setProfile={setProfile}
+                updateProfileDeatailsHandler={updateProfileDeatailsHandler}
 
             />
             <div className={`${styles.dashboardWrapper} ${isVideoCallPage ? styles.videoCallMode : ''}`}>
