@@ -6,8 +6,12 @@ import { useMemo } from 'react'
 import { DeleteIcon, EditIcon, PlusIcon } from '@shopify/polaris-icons'
 import { Redirect } from '@shopify/app-bridge/actions'
 import { useDispatch, useSelector } from 'react-redux'
-import { deleteVoucher, fetchAdminDetails } from '../components/Redux/slices/adminSlice'
-import { UserAlert, UserAlertVoucher } from '../components/AlertModel/UserAlert'
+import { fetchAdminDetails } from '../components/Redux/slices/adminSlice'
+import { VoucherDeleteAlert } from '../components/AlertModel/VoucherDeleteAlert'
+import axios from 'axios'
+import { ToastContext, usePolarisToast } from '../components/AlertModel/PolariesTostContext'
+import { getAppBridgeToken } from '../utils/getAppBridgeToken'
+
 
 function VoucherTable() {
     const app = useAppBridge();
@@ -21,10 +25,11 @@ function VoucherTable() {
         if (!redirect) return;
         redirect.dispatch(Redirect.Action.APP, '/admin-settings/voucher');
     }
-
+    const updateVoucherPlan = (id, totalCoin, extraCoin) => {
+        if (!redirect) return;
+        redirect.dispatch(Redirect.Action.APP, `/admin-settings/voucher?id=${id}&totalCoin=${totalCoin}&extraCoin=${extraCoin}`);
+    }
     const [data, setData] = useState([])
-    const [sortOptions, setSortOptions] = useState([])
-    const [itemStrings, setItemStrings] = useState([])
     const [headings, setHeadings] = useState([
         { title: 'Sr. No.' },
         { title: 'Voucher Code' },
@@ -38,20 +43,21 @@ function VoucherTable() {
     const [adminIdLocal, setAdminIdLocal] = useState(null)
     const [isUserAlertVisible, setIsUserAlertVisible] = useState(false)
     const [voucherId, setVoucherId] = useState(null)
+    const [loading, setLoading] = useState(false)
+    const [reLoadApi, setReLoadApi] = useState(false)
     const { adminDetails_, loading: adminDetailsLoading } = useSelector((state) => state.admin);
-    console.log("adminDetails_VOUCHER", adminDetails_)
+    const { showToast } = usePolarisToast();
     useEffect(() => {
         const id = localStorage.getItem('domain_V_id');
         setAdminIdLocal(id);
     }, [])
 
 
-
     useEffect(() => {
         if (adminIdLocal) {
             dispatch(fetchAdminDetails({ adminIdLocal, app }))
         }
-    }, [dispatch, adminIdLocal, app])
+    }, [dispatch, adminIdLocal, app, reLoadApi])
 
     useEffect(() => {
         if (adminDetails_ && adminDetails_.vouchers && Array.isArray(adminDetails_.vouchers)) {
@@ -69,9 +75,35 @@ function VoucherTable() {
     const handleEdit = (id) => {
         console.log("id", id);
     }
-    const handleDeleteClick = (adminIdLocal, id) => {
-        setIsUserAlertVisible(true)
-        setVoucherId(id)
+    const handleOpenDeleteModal = (id) => {
+        setVoucherId(id);
+        setIsUserAlertVisible(true);
+    };
+
+    const handleConfirmDelete = async (id) => {
+        const token = await getAppBridgeToken(app);
+        setLoading(true);
+        try {
+            const response = await axios.delete(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/delete/voucher/${adminIdLocal}/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            if (response.status === 200) {
+                showToast(response.data?.message);
+                setReLoadApi(prev => !prev);
+                setIsUserAlertVisible(false);
+                setVoucherId(null);
+                setLoading(false);
+            } else {
+                showToast(response.data?.message || 'Failed to delete voucher', true);
+            }
+        } catch (error) {
+            console.error("Error deleting voucher:", error);
+            showToast(error.response?.data?.message || 'Failed to delete voucher', true);
+        } finally {
+            setLoading(false);
+        }
     }
 
     const renderVoucherRow = useCallback((voucher, index) => {
@@ -108,7 +140,7 @@ function VoucherTable() {
                             accessibilityLabel="Edit voucher"
                             onClick={(e) => {
                                 e.stopPropagation();
-                                handleEdit(id);
+                                updateVoucherPlan(id, totalCoin, extraCoin);
                             }}
                         />
                         <Button
@@ -118,7 +150,7 @@ function VoucherTable() {
                             accessibilityLabel="Delete voucher"
                             onClick={(e) => {
                                 e.stopPropagation();
-                                handleDeleteClick(adminIdLocal, id);
+                                handleOpenDeleteModal(id);
                             }}
                         />
                     </ButtonGroup>
@@ -129,7 +161,14 @@ function VoucherTable() {
 
     return (
         <Fragment>
-            <UserAlertVoucher isUserAlertVisible={isUserAlertVisible} setIsUserAlertVisible={setIsUserAlertVisible} handleDelete={handleDeleteClick} voucherId={voucherId} />
+            <VoucherDeleteAlert
+                isUserAlertVisible={isUserAlertVisible}
+                setIsUserAlertVisible={setIsUserAlertVisible}
+                handleDelete={handleConfirmDelete}
+                voucherId={voucherId}
+                adminIdLocal={adminIdLocal}
+                loading={loading}
+            />
             <Page
                 title="Voucher Table"
                 primaryAction={{
@@ -143,13 +182,10 @@ function VoucherTable() {
                 <Layout>
                     <Layout.Section>
                         <IndexTableList
-                            itemStrings={itemStrings}
-                            sortOptions={sortOptions}
                             data={data}
                             headings={headings}
                             renderRow={renderVoucherRow}
                             page={page}
-
                             setPage={setPage}
                             limit={limit}
                             totalItems={totalItems}

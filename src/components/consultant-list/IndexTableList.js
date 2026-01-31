@@ -27,6 +27,7 @@ import { useState, useCallback } from 'react';
  * @param {Number} totalItems - Total number of items across all pages
  */
 function IndexTableList({
+  hideFilters = false,
   itemStrings = [],
   sortOptions = [],
   data = [],
@@ -43,6 +44,7 @@ function IndexTableList({
   totalItems,
   setType,
   loading,
+  onHandleCancel
 }) {
   const tabs = itemStrings.map((item, index) => ({
     content: item,
@@ -95,15 +97,8 @@ function IndexTableList({
     [onSortChange]
   );
 
-  const onHandleCancel = () => {
-    return true;
-  };
 
-  const rowMarkup = data?.map((item, index) =>
-    renderRow ? renderRow(item, index) : null
-  ).filter(Boolean);
 
-  // Calculate pagination values
   const hasPagination = page !== undefined && setPage !== undefined && limit !== undefined;
   const totalPages = hasPagination && totalItems !== undefined ? Math.ceil(totalItems / limit) : 1;
   const currentPage = page || 1;

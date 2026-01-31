@@ -5,7 +5,6 @@ import LayoutFrame from "./pages/LayoutFrame";
 import Dashboard from "./pages/Dashboard";
 import ConsultantList from "./pages/ConsultantList";
 import AddConsultant from "./pages/AddConsultant";
-import Pricing from "./pages/Pricing";
 import Faq from "./pages/Faq";
 import ConsultantCards from "./components/ConsultantCards/ConsultantCards";
 import ViewProfile from "./components/ConsultantCards/ViewProfile";
@@ -30,6 +29,7 @@ import ProtectStoreFront from "./components/ProtectRoute/ProtectStoreFront";
 import VoucherTable from "./pages/VoucherTable";
 import { BillingProtectedRoute } from "./components/ProtectRoute/BillingProtectedRoute";
 import { AppStatusProvider } from "./components/ProtectRoute/AppStatusProvider";
+import AccountInformation from "./pages/AccountInformation";
 
 
 
@@ -109,7 +109,6 @@ export default function App() {
         <GlobalMessageNotification />
         <IncomingCallAlert />
         <Routes>
-          <Route path="/pricing" element={<Pricing />} />
           <Route element={
             <ProtectAdminRoute installed={installed}>
               <BillingProtectedRoute>
@@ -124,7 +123,7 @@ export default function App() {
             <Route path="/add-consultant" element={<AddConsultant />} />
             <Route path="/setting/history" element={<UserTransHistory />} />
             <Route path="/setting/wallet-management" element={<ManualDebetCreditBlance />} />
-
+            <Route path="/account-information" element={<AccountInformation />} />
             <Route path="/admin-settings/voucher" element={<VoucherSettings />} />
             <Route path="/admin-settings/voucher-management" element={<VoucherTable />} />
             <Route path="/faq" element={<Faq />} />

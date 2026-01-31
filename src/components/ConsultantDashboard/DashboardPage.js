@@ -17,7 +17,6 @@ const DashboardPage = () => {
         setUserId(storedUserId);
         setShopId(localStorage.getItem('shop_o_Identity'));
     }, []);
-    console.log("userId", userId)
 
     useEffect(() => {
         if (shopId && userId) {
@@ -43,8 +42,7 @@ const DashboardPage = () => {
 
     // Simple line chart SVG data
     const getLatestUser = async () => {
-        // if (!userId) return console.log("userId not found")
-        console.log("userId________________", userId)
+        if (!userId) return console.log("userId not found")
         try {
             const url = `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/get/consultant/${userId}`;
             console.log("url________________", url)

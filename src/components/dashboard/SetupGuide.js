@@ -43,7 +43,7 @@ export const SetupGuideNew = ({ appStatus, enabled, consultantCount }) => {
   const onStepComplete = async () => {
     return;
   };
-  
+
 
   if (!showGuide) return <Button onClick={() => setShowGuide(true)}>Show Setup Guide</Button>;
 
@@ -149,16 +149,17 @@ export const SetupGuide = ({ onDismiss, onStepComplete, items }) => {
                   </Text>
                 )} */}
 
-              {completedItemsLength !== items.length ? (
-                <div style={{ width: '100px' }}>
-                  <ProgressBar
-                    progress={(items.filter((item) => item.complete).length / items.length) * 100}
-                    size='small'
-                    tone='primary'
-                    animated
-                  />
-                </div>
-              ) : null}
+              {
+                completedItemsLength !== items.length ? (
+                  <div style={{ width: '100px' }}>
+                    <ProgressBar
+                      progress={(items.filter((item) => item.complete).length / items.length) * 100}
+                      size='small'
+                      tone='primary'
+                      animated
+                    />
+                  </div>
+                ) : null}
             </InlineStack>
           </div>
         </BlockStack>
@@ -166,17 +167,19 @@ export const SetupGuide = ({ onDismiss, onStepComplete, items }) => {
       <Collapsible open={isGuideOpen} id={accessId}>
         <Box padding='200'>
           <BlockStack gap='100'>
-            {items.map((item) => {
-              return (
-                <SetupItem
-                  key={item.id}
-                  expanded={expanded === item.id}
-                  setExpanded={() => setExpanded(item.id)}
-                  // onComplete={onStepComplete}
-                  {...item}
-                />
-              );
-            })}
+            {
+              items.map((item) => {
+                console.log("item", item);
+                return (
+                  <SetupItem
+                    key={item.id}
+                    expanded={expanded === item.id}
+                    setExpanded={() => setExpanded(item.id)}
+                    // onComplete={onStepComplete}
+                    {...item}
+                  />
+                );
+              })}
           </BlockStack>
         </Box>
       </Collapsible>
@@ -221,7 +224,7 @@ const SetupItem = ({
       <div className={`${styles.setupItem} ${expanded ? styles.setupItemExpanded : ""}`}>
         <InlineStack gap='200' align='start' blockAlign='start' wrap={false}>
           <Tooltip content={complete ? 'Mark as not done' : 'Mark as done'} activatorWrapper='div'>
-          <div className={styles.completeButton}>
+            <div className={styles.completeButton}>
 
               {loading ? (
                 <Spinner size='small' />

@@ -19,23 +19,23 @@ export const startCall = createAsyncThunk(
         try {
             const numericUid = typeof uid === 'string' ? parseInt(uid) : uid;
             const agoraAppId = appId || process.env.REACT_APP_AGORA_APP_ID;
-            
-            console.log(`Starting ${callType} call:`, { 
-                channel, 
-                uid: numericUid, 
+
+            console.log(`Starting ${callType} call:`, {
+                channel,
+                uid: numericUid,
                 appId: agoraAppId,
                 tokenLength: token?.length,
-                callType 
+                callType
             });
-            
+
             if (!agoraAppId) {
                 throw new Error("Agora App ID is required");
             }
-            
+
             if (!token) {
                 throw new Error("Token is required");
             }
-            
+
             if (!channel) {
                 throw new Error("Channel name is required");
             }
@@ -51,13 +51,13 @@ export const startCall = createAsyncThunk(
             }
 
             // Join channel
-            console.log("Joining channel...", { 
-                appId: agoraAppId, 
-                channel, 
+            console.log("Joining channel...", {
+                appId: agoraAppId,
+                channel,
                 uid: numericUid,
                 tokenPreview: token?.substring(0, 20) + "..."
             });
-            
+
             try {
                 await client.join(agoraAppId, channel, token, numericUid);
                 console.log("Joined channel successfully. Connection state:", client.connectionState);
@@ -73,11 +73,11 @@ export const startCall = createAsyncThunk(
                 try {
                     [localAudioTrack, localVideoTrack] = await AgoraRTC.createMicrophoneAndCameraTracks();
                     console.log("Video tracks created successfully");
-                    
+
                     // Ensure tracks are enabled before publishing
                     if (localAudioTrack) localAudioTrack.setEnabled(true);
                     if (localVideoTrack) localVideoTrack.setEnabled(true);
-                    
+
                     console.log("Publishing video tracks...");
                     await client.publish([localAudioTrack, localVideoTrack]);
                     console.log("Published local audio and video tracks successfully");
@@ -85,7 +85,7 @@ export const startCall = createAsyncThunk(
                         audio: localAudioTrack?.isPlaying || false,
                         video: localVideoTrack?.isPlaying || false
                     });
-                    
+
                     // Try to play local video immediately if element exists - Multiple attempts
                     const playLocalVideo = () => {
                         const localVideoElement = document.querySelector('[data-local-video]');
@@ -97,12 +97,12 @@ export const startCall = createAsyncThunk(
                             });
                         }
                     };
-                    
+
                     // Try multiple times with delays
                     setTimeout(playLocalVideo, 100);
                     setTimeout(playLocalVideo, 500);
                     setTimeout(playLocalVideo, 1000);
-                    
+
                     // Dispatch event for component to handle
                     window.dispatchEvent(new Event('local-video-ready'));
                 } catch (trackError) {
@@ -114,10 +114,10 @@ export const startCall = createAsyncThunk(
                 try {
                     localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
                     console.log("Audio track created successfully");
-                    
+
                     // Ensure track is enabled before publishing
                     if (localAudioTrack) localAudioTrack.setEnabled(true);
-                    
+
                     console.log("Publishing audio track...");
                     await client.publish([localAudioTrack]);
                     console.log("Published local audio track successfully");
@@ -127,11 +127,11 @@ export const startCall = createAsyncThunk(
                     throw new Error(`Failed to create audio track: ${trackError.message}`);
                 }
             }
-            
+
             // Verify tracks are published and enabled
             const publishedTracks = client.localTracks;
             console.log("Local tracks published:", publishedTracks.length);
-            
+
             // Ensure tracks are enabled
             if (localAudioTrack) {
                 localAudioTrack.setEnabled(true);
@@ -141,7 +141,7 @@ export const startCall = createAsyncThunk(
                 localVideoTrack.setEnabled(true);
                 console.log("Local video track enabled:", localVideoTrack.isPlaying);
             }
-            
+
             // Verify connection state
             console.log("Final connection state:", client.connectionState);
             console.log("Channel name:", channel);
@@ -158,7 +158,7 @@ export const startCall = createAsyncThunk(
                     } else if (mediaType === "video") {
                         remoteVideoTrack = await client.subscribe(user, mediaType);
                         console.log("Remote video track subscribed successfully");
-                        
+
                         // Try to play immediately and also dispatch event
                         const playRemoteVideo = () => {
                             const remoteVideoElement = document.querySelector('[data-remote-video]');
@@ -170,14 +170,14 @@ export const startCall = createAsyncThunk(
                                 });
                             }
                         };
-                        
+
                         // Try immediately
                         setTimeout(playRemoteVideo, 100);
-                        
+
                         // Also try after a delay
                         setTimeout(playRemoteVideo, 500);
                         setTimeout(playRemoteVideo, 1000);
-                        
+
                         // Dispatch custom event to notify component
                         window.dispatchEvent(new Event('remote-video-ready'));
                     }
@@ -185,12 +185,26 @@ export const startCall = createAsyncThunk(
                     console.error(`Error handling remote ${mediaType}:`, error);
                 }
             };
-            
-            // Listen for user-joined event
+
+
             client.on("user-joined", (user) => {
                 console.log("User joined channel. UID:", user.uid);
             });
-            
+            // Fired on the OTHER peer when someone leaves. Agora SDK logs "user offline <uid> reason: Quit" (from endCall -> client.leave()).
+            client.on("user-left", (user, reason) => {
+                console.log("Agora user-left (onUserOffline): UID:", user.uid, "reason:", reason);
+
+                // Stop and clear remote tracks
+                remoteAudioTrack?.stop();
+                remoteAudioTrack = null;
+
+                remoteVideoTrack?.stop();
+                remoteVideoTrack = null;
+
+                // Dispatch event for React component (e.g. to close call UI / inform user B)
+                window.dispatchEvent(new Event("remote-user-left"));
+            });
+
             // Listen for connection state changes
             client.on("connection-state-change", (curState, revState) => {
                 console.log("Connection state changed:", { from: revState, to: curState });
@@ -256,7 +270,7 @@ export const endCall = createAsyncThunk(
         localVideoTrack?.close();
         localVideoTrack = null;
 
-        // Leave channel
+        // Leave channel – remote peer will get Agora "user offline" / "user-left" (reason: Quit)
         await client.leave();
         console.log("Call ended and cleaned up");
     }

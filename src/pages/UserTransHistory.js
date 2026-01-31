@@ -44,7 +44,7 @@ function UserTransHistory() {
     const [page, setPage] = useState(1);
     const [type, setType] = useState(0);
     const limit = 10;
-    console.log("activityHistory", activityHistory);
+
     useEffect(() => {
         const id = localStorage.getItem('domain_V_id');
         setAdminIdLocal(id);
@@ -68,6 +68,13 @@ function UserTransHistory() {
         const s = String(diff % 60).padStart(2, '0');
         return `${m}:${s}`;
     };
+    const onHandleCancel = () => {
+        setPage(1);
+        setSearchQuery("");
+        setType(0);
+        return true;
+    };
+
 
     const tableData = activityHistory?.data?.map((item) => ({
         id: item._id,
@@ -165,7 +172,7 @@ function UserTransHistory() {
                             resourceName={{ singular: 'transaction', plural: 'transactions' }}
                             queryPlaceholder="Search transactions"
                             onTabChange={() => { }}
-
+                            onHandleCancel={onHandleCancel}
                             onQueryChange={(value) => {
                                 setSearchQuery(value);
                                 setPage(1);

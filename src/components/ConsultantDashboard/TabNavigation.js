@@ -37,6 +37,7 @@ function TabNavigation({ children }) {
         gender: "",
         profileImage: null,
     });
+    console.log("profile________________", profile)
     const { consultantOverview } = useSelector((state) => state.consultants);
     console.log("consultantOverview________________", consultantOverview)
     useEffect(() => {
@@ -59,6 +60,7 @@ function TabNavigation({ children }) {
     }, [shopId, userId]);
 
     const updateProfileDeatailsHandler = async () => {
+        console.log("profile________________TTTTTTT", profile.profileImage)
         try {
             const formData = new FormData();
 
@@ -69,19 +71,30 @@ function TabNavigation({ children }) {
             formData.append("phone", profile.phone);
             formData.append("gender", profile.gender);
 
-            if (profile.profileImage instanceof File) {
-                formData.append("profileImage", profile.profileImage);
-            }
+            // if (profile.profileImage) {
+            //     if (profile.profileImage instanceof File) {
+            //         formData.append("profileImage", profile.profileImage);
+
+            //     } else if (typeof profile.profileImage === "string" && profile.profileImage.startsWith("blob:")) {
+
+            //         const res = await fetch(profile.profileImage);
+            //         const blob = await res.blob();
+
+            //         const file = new File([blob], "profile.png", {
+            //             type: blob.type
+            //         });  
+
+            //         formData.append("profileImage", file);
+            //     }
+            // }
 
             const response = await axios.put(
                 `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/update-profile`,
                 formData,
-                {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                }
+              
             );
+            console.log("Profile updated:", response.data);
+
             if (response.data.success) {
                 dispatch(fetchConsultantById({ shop_id: shopId, consultant_id: userId }));
             }

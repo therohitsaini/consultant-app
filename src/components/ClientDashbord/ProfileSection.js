@@ -5,40 +5,50 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserDetailsByIds } from '../Redux/slices/UserSlices';
 import { FormLayout, TextField } from '@shopify/polaris';
 import axios from 'axios';
+import { getAppBridgeToken } from '../../utils/getAppBridgeToken';
+import { useAppBridge } from '../createContext/AppBridgeContext';
 
 const ProfileSection = () => {
   const [userId, setUserId] = useState(null);
+  const [shopId, setShopId] = useState(null);
   const [voucherData, setVoucherData] = useState(null);
   const params = new URLSearchParams(window.location.search);
   const shop = params.get("shop");
   const loggedInCustomerId = params.get('logged_in_customer_Id');
   console.log("loggedInCustomerId", loggedInCustomerId);
-  console.log("shop", shop);
-console.log("userId", userId)
   const dispatch = useDispatch();
   const { userDetails } = useSelector((state) => state.users);
   const walletBalance = userDetails?.data?.walletBalance;
-  useEffect(() => {
-    const storedShop = localStorage.getItem('client_u_Identity');
-    setUserId(storedShop);
-  }, [shop])
 
+  useEffect(() => {
+    const adminId = localStorage.getItem("client_u_Identity");
+    const shopId = localStorage.getItem("shop_o_Identity");
+    if (adminId && shopId) {
+      setUserId(adminId);
+      setShopId(shopId);
+    }
+  }, []);
   useEffect(() => {
     dispatch(fetchUserDetailsByIds(userId));
   }, [userId])
   const getVoucher = async (adminId) => {
-    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/get/vouchers/${adminId}`);
+    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/get/vouchers/${adminId}`, {
+
+    });
     if (response.status === 200) {
       setVoucherData(response.data.data);
     }
   }
   useEffect(() => {
-    getVoucher("690c374f605cb8b946503ccb");
-  }, []);
+
+    if (shopId) {
+      getVoucher(shopId);
+    }
+  }, [shopId]);
 
   console.log("vo", voucherData)
 
- 
+
   return (
     <div className={styles.profileSection}>
       {/* Left side: user image / basic info */}

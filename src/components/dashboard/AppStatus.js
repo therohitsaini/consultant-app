@@ -13,7 +13,7 @@ import { InfoIcon } from '@shopify/polaris-icons';
 
 export function AppStatus({ enabled, handleToggle, adminDetailsLoading, appStatus }) {
 
-    const contentStatus = enabled ? 'Disable App' : 'Enable App';
+    const contentStatus = enabled ? 'Deactivate App' : 'Activate App';
     const toggleId = 'app-status-toggle-uuid';
     const descriptionId = 'app-status-description-uuid';
 

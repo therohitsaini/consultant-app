@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useAppStatus } from '../ProtectRoute/AppStatusProvider';
+import { Spinner } from 'react-bootstrap';
 
 const ProtectStoreFront = ({ children }) => {
     const { loading, appEnabled } = useAppStatus();
@@ -11,7 +12,7 @@ const ProtectStoreFront = ({ children }) => {
         alignItems: "center",
         justifyContent: "center",
         textAlign: "center",
-    }}>Loading...</div>; // or spinner
+    }}>  Loading... </div>; // or spinner
 
     if (!appEnabled) {
         return (
@@ -43,7 +44,6 @@ const ProtectStoreFront = ({ children }) => {
 
     }
 
-    console.log("appEnabled", appEnabled);
 
     return children;
 };

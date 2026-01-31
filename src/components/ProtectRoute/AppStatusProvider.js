@@ -9,20 +9,21 @@ export const AppStatusProvider = ({ children }) => {
     const params = new URLSearchParams(window.location.search);
     const shop = params.get('shop');
     console.log("shop", shop);
-    const adminIdLocal = localStorage.getItem('domain_V_id');
+    const adminIdLocal = localStorage.getItem('shop_o_Identity');
 
     useEffect(() => {
         const checkAppStatus = async () => {
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/app-status`,
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/users/app-status`,
                 {
                     params: {
                         shop: shop,
                         adminIdLocal: adminIdLocal
-                    }
+                    },
+                 
                 }
             );
             console.log("response", response);
-            
+
             setAppEnabled(response.data.data);
             setLoading(false);
         }

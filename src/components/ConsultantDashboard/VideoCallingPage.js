@@ -334,6 +334,16 @@ function VideoCallingPage() {
     console.log("callerDetails", callerDetails);
 
 
+    useEffect(() => {
+        const handler = () => {
+            console.log("🔥 Remote user left (event received in React)");
+        };
+
+        window.addEventListener("remote-user-left", handler);
+        return () => window.removeEventListener("remote-user-left", handler);
+    }, []);
+
+
     return (
         <div className={styles.videoCallContainer}>
             {/* Header */}

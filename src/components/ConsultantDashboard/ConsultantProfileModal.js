@@ -3,7 +3,7 @@ import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import PortalModal from "../middle-ware/PortalModal";
 
 const ConsultantProfileModal = ({ show, handleClose, onLogout, consultantOverview, profile, setProfile, updateProfileDeatailsHandler }) => {
-
+    console.log("profile________________", profile.profileImage)
 
     useEffect(() => {
         if (consultantOverview) {
@@ -18,6 +18,7 @@ const ConsultantProfileModal = ({ show, handleClose, onLogout, consultantOvervie
     }, [consultantOverview]);
 
     const handleChange = (e) => {
+        console.log("e________________", e)
         setProfile({
             ...profile,
             [e.target.name]: e.target.value,
@@ -26,6 +27,7 @@ const ConsultantProfileModal = ({ show, handleClose, onLogout, consultantOvervie
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
+        console.log("file________________", file)
         if (file) {
             setProfile({
                 ...profile,

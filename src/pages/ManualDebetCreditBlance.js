@@ -9,6 +9,7 @@ import { useAppBridge } from '../components/createContext/AppBridgeContext'
 import UpdateUserDetailsModal from './UpdateUserDetailsModal'
 import axios from 'axios'
 import { ToastModel } from '../components/AlertModel/Tost'
+import { getAppBridgeToken } from '../utils/getAppBridgeToken'
 
 
 const walletManagementHeadings = [
@@ -75,9 +76,15 @@ function ManualDebetCreditBlance() {
      * 
      */
     const updateWallet = async () => {
+        const token = await getAppBridgeToken(app);
+        console.log("token", token);
         try {
             const response = await axios.post(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/update-wallet/${adminIdLocal}`, {
                 ...updateFormData, userId: userDetails.userId,
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             });
             if (response.data.success === true) {
                 setRefresh((prev) => !prev);
@@ -106,6 +113,12 @@ function ManualDebetCreditBlance() {
         description: item?.description || '-',
         updatedAt: formatDate(item?.updatedAt),
     })) || [];
+    const onHandleCancel = () => {
+        setPage(1);
+        setSearchQuery("");
+        setType(0);
+        return true;
+    };
 
     const renderWalletRow = useCallback((wallet, index) => {
         const { id, userId, shop_Id, fullname, userType, amount, referenceType, direction, status, description } = wallet
@@ -201,6 +214,7 @@ function ManualDebetCreditBlance() {
                             limit={limit}
                             totalItems={walletHistory?.totalItems || walletHistory?.data?.length || 0}
                             loading={walletLoading}
+                            onHandleCancel={onHandleCancel}
                         />
                     </Layout.Section>
                 </Layout>
