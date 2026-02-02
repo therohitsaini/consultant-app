@@ -335,11 +335,11 @@ function VideoCallingPage() {
             console.log("No transaction ID, skipping emit");
             stopTimer();
             const returnUrl = params.get("returnUrl");
-            if (returnUrl) {
-                window.top.location.href = decodeURIComponent(returnUrl);
-            } else {
-                navigate(-1);
-            }
+            // if (returnUrl) {
+            //     window.top.location.href = decodeURIComponent(returnUrl);
+            // } else {
+            //     navigate(-1);
+            // }
         }
         // socket.emit("call-ended", { callerId: callerId, receiverId: receiverId, channel: channelNameParam, callType: callType, transactionId: callAccepted?.transactionId, shopId: "690c374f605cb8b946503ccb" });
         // const returnUrl = params.get("returnUrl");
