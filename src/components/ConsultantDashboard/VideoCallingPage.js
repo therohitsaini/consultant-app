@@ -316,15 +316,15 @@ function VideoCallingPage() {
     };
 
     const handleEndCall = () => {
+        const callAcceptedFromStorage = JSON.parse(localStorage.getItem("callAccepted") || null);
 
         console.log("callAccepted___handleEndCall_____TransactionId", callAccepted?.transactionId);
         console.log("callAccepted___handleEndCall_____TransactionId", callAccepted);
         dispatch(endCall());
-        if (callAccepted?.transactionId) {
+        if (callAcceptedFromStorage?.transactionId) {
             stopTimer();
-            console.log("callAccepted___handleEndCall_____TransactionId", callAccepted?.transactionId);
-            console.log("callAccepted___handleEndCall_____TransactionId", callAccepted);
-            socket.emit("call-ended", { callerId: callerId, receiverId: receiverId, channel: channelNameParam, callType: callType, transactionId: callAccepted?.transactionId, shopId: "690c374f605cb8b946503ccb" });
+            console.log("callAcceptedFromStorage___handleEndCall_____TransactionId", callAcceptedFromStorage?.transactionId);
+            socket.emit("call-ended", { callerId: callerId, receiverId: receiverId, channel: channelNameParam, callType: callType, transactionId: callAcceptedFromStorage?.transactionId, shopId: "690c374f605cb8b946503ccb" });
             const returnUrl = params.get("returnUrl");
             if (returnUrl) {
                 window.top.location.href = decodeURIComponent(returnUrl);
