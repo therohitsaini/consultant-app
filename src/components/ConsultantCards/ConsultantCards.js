@@ -36,12 +36,12 @@ function ConsultantCards() {
     const shop = params.get('shop');
     console.log("shop", shop);
     const user_id = params.get('customerId');
-    const shop_id = params.get('shopid');
+    const shop_id = params.get('shopid') || localStorage.getItem('domain_V_id');
     const [initialLoading, setInitialLoading] = useState(true);
     const [isRing, setIsRing] = useState(true);
     const { insufficientBalance } = useSelector((state) => state.socket);
 
-
+    console.log("consultants_____", consultants);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -177,7 +177,7 @@ function ConsultantCards() {
         console.log("startCall____ConsultantCards____receiverId", receiverId, type);
         await openCallPage({ receiverId, type, userId, shop });
 
-        // const hasMicPermission = await checkMicPermission();
+
         // if (!hasMicPermission) {
         //     alert("Please grant microphone permission to start the call");
         //     return;
@@ -273,7 +273,7 @@ function ConsultantCards() {
 
         const hostQuery = "";
         window.top.location.href = `https://${shop}/apps/consultant-theme/chats-c?consultantId=${consultantView}${hostQuery}`;
-      
+
     }
 
 

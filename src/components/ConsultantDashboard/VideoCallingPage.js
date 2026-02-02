@@ -29,7 +29,6 @@ function VideoCallingPage() {
     console.log("inCall", inCall);
     const isVideoCall = type === "video" || callType === "video";
     const { callRejected } = useSelector((state) => state.socket);
-    console.log("callRejected", callRejected);
 
 
 

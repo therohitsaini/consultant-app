@@ -11,8 +11,8 @@ let remoteVideoTrack = null;
 // Export functions to get tracks for video rendering
 export const getLocalVideoTrack = () => localVideoTrack;
 export const getRemoteVideoTrack = () => remoteVideoTrack;
+let userLeftListenerAdded = false;
 
-// Unified call function that handles both voice and video
 export const startCall = createAsyncThunk(
     "call/startCall",
     async ({ token, channel, uid, appId, callType = "voice" }, { rejectWithValue }) => {
@@ -66,6 +66,29 @@ export const startCall = createAsyncThunk(
                 console.error("Failed to join channel:", joinError);
                 throw new Error(`Failed to join channel: ${joinError.message}`);
             }
+            // ✅ JOIN hone ke baad hi listener lagana zaroori hai
+            if (!userLeftListenerAdded) {
+                client.on("user-left", (user, reason) => {
+                    console.log("🚨 Remote user left:", user.uid, reason);
+
+                    // Remote tracks cleanup
+                    remoteAudioTrack?.stop();
+                    remoteAudioTrack = null;
+
+                    remoteVideoTrack?.stop();
+                    remoteVideoTrack = null;
+
+                    // 🔥 React ko inform karo
+                    window.dispatchEvent(
+                        new CustomEvent("remote-user-left", {
+                            detail: { uid: user.uid, reason }
+                        })
+                    );
+                });
+
+                userLeftListenerAdded = true;
+            }
+
 
             // Create and publish tracks based on call type
             if (callType === "video") {
@@ -190,20 +213,20 @@ export const startCall = createAsyncThunk(
             client.on("user-joined", (user) => {
                 console.log("User joined channel. UID:", user.uid);
             });
-            // Fired on the OTHER peer when someone leaves. Agora SDK logs "user offline <uid> reason: Quit" (from endCall -> client.leave()).
-            client.on("user-left", (user, reason) => {
-                console.log("Agora user-left (onUserOffline): UID:", user.uid, "reason:", reason);
+            // // Fired on the OTHER peer when someone leaves. Agora SDK logs "user offline <uid> reason: Quit" (from endCall -> client.leave()).
+            // client.on("user-left", (user, reason) => {
+            //     console.log("Agora user-left (onUserOffline): UID:", user.uid, "reason:", reason);
 
-                // Stop and clear remote tracks
-                remoteAudioTrack?.stop();
-                remoteAudioTrack = null;
+            //     // Stop and clear remote tracks
+            //     remoteAudioTrack?.stop();
+            //     remoteAudioTrack = null;
 
-                remoteVideoTrack?.stop();
-                remoteVideoTrack = null;
+            //     remoteVideoTrack?.stop();
+            //     remoteVideoTrack = null;
 
-                // Dispatch event for React component (e.g. to close call UI / inform user B)
-                window.dispatchEvent(new Event("remote-user-left"));
-            });
+            //     // Dispatch event for React component (e.g. to close call UI / inform user B)
+            //     window.dispatchEvent(new Event("remote-user-left"));
+            // });
 
             // Listen for connection state changes
             client.on("connection-state-change", (curState, revState) => {

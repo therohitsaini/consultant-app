@@ -24,7 +24,7 @@ export const checkUserBalance = async ({ userId, consultantId, type }) => {
 }
 
 
-export const openCallPage = async ({ receiverId, type, userId, shop }) => {
+export const openCallPage = async ({ receiverId, type, userId = "6978766389b46d040a86b494", shop }) => {
     try {
         console.log("receiverId", receiverId);
         console.log("type", type);
@@ -34,10 +34,10 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
         const balance = await checkUserBalance({ userId, consultantId: receiverId, type });
         console.log("balance", balance);
 
-        if (!balance) {
-            alert("You have insufficient balance");
-            return;
-        }
+        // if (!balance) {
+        //     alert("You have insufficient balance");
+        //     return;
+        // }
 
         const hasMicPermission = await checkMicPermission();
 
@@ -82,7 +82,7 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
         const returnUrl = `https://${shop}/apps/consultant-theme`;
 
         const callUrl =
-            `https://aerospace-motherboard-helpful-circus.trycloudflare.com/video/calling/page` +
+            `http://localhost:3000/video/calling/page` +
             `?callerId=${userId}` +
             `&receiverId=${receiverId}` +
             `&callType=${type || "voice"}` +

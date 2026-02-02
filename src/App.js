@@ -130,14 +130,13 @@ export default function App() {
           </Route>
 
           <Route path="/consultant-cards" element={
-            <ProtectStoreFront>
+            // <ProtectStoreFront>
               <ConsultantCards />
-            </ProtectStoreFront>
+            // </ProtectStoreFront>
           } />
           <Route path="/view-profile" element={
-            <ProtectStoreFront>
+            // <ProtectStoreFront>
               <ViewProfile />
-            </ProtectStoreFront>
           } />
           <Route path="/consultant-dashboard/*" element={
             // <ProtectStoreFront>
