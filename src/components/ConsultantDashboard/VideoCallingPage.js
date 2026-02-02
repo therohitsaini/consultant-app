@@ -332,6 +332,7 @@ function VideoCallingPage() {
                 navigate(-1);
             }
         } else {
+            console.log("No transaction ID, skipping emit");
             stopTimer();
             const returnUrl = params.get("returnUrl");
             if (returnUrl) {
