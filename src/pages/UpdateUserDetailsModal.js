@@ -37,7 +37,7 @@ export default function UpdateUserDetailsModal({ open, onClose, userDetails, upd
         <Modal
             open={open}
             onClose={onClose}
-            title="Customer Details"
+            title="Update Wallet"
             primaryAction={{
                 content: 'Save',
                 onAction: () => {
@@ -52,6 +52,7 @@ export default function UpdateUserDetailsModal({ open, onClose, userDetails, upd
                 },
             ]}
         >
+            
             <Modal.Section>
                 <Form>
                     <FormLayout>

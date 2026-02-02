@@ -8,17 +8,19 @@ export const BillingProtectedRoute = ({ children }) => {
     const app = useAppBridge();
     const params = new URLSearchParams(window.location.search);
     const shop = params.get("shop");
-    console.log("shop", shop);
 
+    console.log("shop", shop);
+    const match = shop?.match(/^([a-z0-9-]+)\.myshopify\.com$/);
+    const store = match ? match[1] : null;
+    console.log("store", store);
     useEffect(() => {
         if (!billing || billing.loading) return;
-
         if (!billing.isPaid) {
             const redirect = Redirect.create(app);
 
             redirect.dispatch(
                 Redirect.Action.REMOTE,
-                `https://admin.shopify.com/store/${shop}/charges/label-node/pricing_plans`
+                `https://admin.shopify.com/store/${store}/charges/label-node/pricing_plans`
             );
         }
     }, [billing, app]);
