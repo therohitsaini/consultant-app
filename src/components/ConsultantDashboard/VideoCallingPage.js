@@ -412,6 +412,20 @@ function VideoCallingPage() {
         return () => clearInterval(intervalRef.current);
     }, []);
 
+    useEffect(() => {
+        const handleCallConnected = (e) => {
+            console.log("✅ Call connected event received", e.detail);
+            startTimer(); // ⏱️ REAL TIMER START HERE
+        };
+
+        window.addEventListener("call-connected", handleCallConnected);
+
+        return () => {
+            window.removeEventListener("call-connected", handleCallConnected);
+        };
+    }, []);
+
+
 
     return (
         <div className={styles.videoCallContainer}>

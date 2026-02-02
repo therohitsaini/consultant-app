@@ -12,6 +12,7 @@ let remoteVideoTrack = null;
 export const getLocalVideoTrack = () => localVideoTrack;
 export const getRemoteVideoTrack = () => remoteVideoTrack;
 let userLeftListenerAdded = false;
+let callConnectedEmitted = false;
 
 export const startCall = createAsyncThunk(
     "call/startCall",
@@ -243,6 +244,20 @@ export const startCall = createAsyncThunk(
                     console.log("Remote user unpublished video");
                     remoteVideoTrack?.stop();
                     remoteVideoTrack = null;
+                }
+                if (!callConnectedEmitted) {
+                    callConnectedEmitted = true;
+
+                    window.dispatchEvent(
+                        new CustomEvent("call-connected", {
+                            detail: {
+                                uid: user.uid,
+                                at: Date.now()
+                            }
+                        })
+                    );
+
+                    console.log("🔥 CALL CONNECTED → TIMER SHOULD START");
                 }
             };
 
