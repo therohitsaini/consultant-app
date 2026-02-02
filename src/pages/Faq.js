@@ -79,6 +79,17 @@ function Faq() {
             content: (
                 <BlockStack gap="300">
                     <Text variant='bodyMd' as='p'>
+                        
+                    </Text>
+                </BlockStack>
+            )
+        },
+        {
+            id: 7,
+            title: 'How to set up store front ',
+            content: (
+                <BlockStack gap="300">
+                    <Text variant='bodyMd' as='p'>
                         The Dashboard displays key metrics including: <span className="Polaris-Text--bold">Total Clients</span>, <span className="Polaris-Text--bold">Conversion Rate</span>, <span className="Polaris-Text--bold">Total Consultations</span>, and <span className="Polaris-Text--bold">Total Revenue</span>. These statistics help you track your consultant management performance and make informed decisions.
                     </Text>
                 </BlockStack>
@@ -90,66 +101,52 @@ function Faq() {
     return (
         <Page
             title="Faq"
-            
+
         >
             <Layout>
 
-                { /* Banner */}
-                {isBannerVisible && (
-                    <Layout.Section>
-                        <Banner
-                            title="Welcome to Consultant Management System"
-                            tone="info"
-                            onDismiss={() => setIsBannerVisible(false)}
-                            icon={ConfettiIcon}
-                        >
-                            <BlockStack gap="200">
-                                <p>Find answers to common questions about managing your consultants.</p>
-                                <p>Learn how to add, edit, and manage consultants effectively.</p>
-                            </BlockStack>
-                        </Banner>
-                    </Layout.Section>
-                )}
+
 
 
                 <Layout.Section>
                     <Card padding='0'>
-                        {ACCORDION_ITEMS.map(({ title, id, content }) => {
-                            const isExpanded = expanded === id;
-                            return (
-                                <Box
-                                    borderBlockEndWidth='025'
-                                    borderColor='border'
-                                    background='bg-surface-secondary'
-                                    key={id}
-                                >
-                                    <Box paddingBlock='300' paddingInline='400'>
-                                        <div
-                                            style={{ cursor: 'pointer' }}
-                                            onClick={() => {
-                                                return setExpanded((prev) => (id === prev ? null : id));
-                                            }}
-                                        >
-                                            <InlineStack align='space-between' blockAlign='center'>
-                                                <Text variant='headingMd' as='p'>
-                                                    {title}
-                                                </Text>
-                                                {isExpanded ? (
-                                                    <ChevronUpIcon width='1.5rem' height='1.5rem' />
-                                                ) : (
-                                                    <ChevronDownIcon width='1.5rem' height='1.5rem' />
-                                                )}
-                                            </InlineStack>
-                                        </div>
-                                    </Box>
-                                    <Collapsible open={isExpanded} id={id.toString()}>
-                                        <Box padding='400' background='bg-surface'>
-                                            {content}
+                        {
+                            ACCORDION_ITEMS.map(({ title, id, content }) => {
+                                const isExpanded = expanded === id;
+                                return (
+                                    <Box
+                                        borderBlockEndWidth='025'
+                                        borderColor='border'
+                                        background='bg-surface-secondary'
+                                        key={id}
+                                    >
+                                        <Box paddingBlock='300' paddingInline='400'>
+                                            <div
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={() => {
+                                                    return setExpanded((prev) => (id === prev ? null : id));
+                                                }}
+                                            >
+                                                <InlineStack align='space-between' blockAlign='center'>
+                                                    <Text variant='headingMd' as='p'>
+                                                        {title}
+                                                    </Text>
+                                                    {isExpanded ? (
+                                                        <ChevronUpIcon width='1.5rem' height='1.5rem' />
+                                                    ) : (
+                                                        <ChevronDownIcon width='1.5rem' height='1.5rem' />
+                                                    )}
+                                                </InlineStack>
+                                            </div>
                                         </Box>
-                                    </Collapsible>
-                                </Box>
-                            );
-                        })}
+                                        <Collapsible open={isExpanded} id={id.toString()}>
+                                            <Box padding='400' background='bg-surface'>
+                                                {content}
+                                            </Box>
+                                        </Collapsible>
+                                    </Box>
+                                );
+                            })}
                     </Card>
                 </Layout.Section>
 
