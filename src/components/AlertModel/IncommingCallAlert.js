@@ -13,13 +13,17 @@ export default function IncomingCallAlert() {
     const dispatch = useDispatch();
     const userId = localStorage.getItem('client_u_Identity') || localStorage.getItem('consultant_u_Identity');
     const { incomingCall, callEnded } = useSelector((state) => state.socket);
+    const { callAccepted } = useSelector((state) => state.socket);
+
     console.log("incomingCall", incomingCall);
 
     if (!incomingCall) return console.log("No incoming call");
 
     const { callerId, callType, channelName, callerName } = incomingCall;
+    console.log("callAccepted___IncomingCallAlert", callAccepted);
 
     const handleAccept = async () => {
+        localStorage.setItem("callAccepted____", JSON.stringify(callAccepted));
         const hasMicPermission = await checkMicPermission();
         if (!hasMicPermission) {
             alert("Please grant microphone permission to start the call");
@@ -46,7 +50,7 @@ export default function IncomingCallAlert() {
             const callType = incomingCall.callType || "voice";
             const returnUrl = "https://rohit-12345839.myshopify.com/apps/consultant-theme/consultant-dashboard";
             const callUrl =
-                `https://aerospace-motherboard-helpful-circus.trycloudflare.com/video/calling/page` +
+                `${process.env.REACT_APP_FRONTEND_URL}/video/calling/page` +
                 `?callerId=${callerId}` +
                 `&receiverId=${userId}` +
                 `&callType=${callType}` +
@@ -65,7 +69,6 @@ export default function IncomingCallAlert() {
     // }, [callEnded]);
     const handleReject = () => {
         console.log("Call rejected", incomingCall);
-
         socket.emit("reject-call", { callerId, receiverId: userId, channelName, callType: incomingCall.callType });
         dispatch(setIncomingCall(null));
 

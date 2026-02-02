@@ -212,6 +212,7 @@ export const startCall = createAsyncThunk(
 
             client.on("user-joined", (user) => {
                 console.log("User joined channel. UID:", user.uid);
+                // window.dispatchEvent(new Event("call-connected"));
             });
             // // Fired on the OTHER peer when someone leaves. Agora SDK logs "user offline <uid> reason: Quit" (from endCall -> client.leave()).
             // client.on("user-left", (user, reason) => {

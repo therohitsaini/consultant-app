@@ -197,43 +197,43 @@ export default function SocketProvider({ children }) {
         );
 
         socket.on("call-accepted-started", (data) =>
-            dispatch(setCallAccepted(data))
+            dispatch(setCallAccepted(data)),
         );
 
-        socket.on("call-missed", (data) =>
-            dispatch(setCallEnded(data))
-        );
+    socket.on("call-missed", (data) =>
+        dispatch(setCallEnded(data))
+    );
 
-        socket.on("call-ended-rejected", (data) =>
-            dispatch(setCallRejected(data))
-        );
-        socket.on("acceptUser", (data) =>
-            dispatch(setConfirmChat(data)),
-        );
+    socket.on("call-ended-rejected", (data) =>
+        dispatch(setCallRejected(data))
+    );
+    socket.on("acceptUser", (data) =>
+        dispatch(setConfirmChat(data)),
+    );
 
-        return () => {
-            console.log("🧹 Cleaning socket listeners");
+    return () => {
+        console.log("🧹 Cleaning socket listeners");
 
-            socket.off("connect", onConnect);
-            socket.off("disconnect", onDisconnect);
-            socket.off("activeUsers");
-            socket.off("receiveMessage");
-            socket.off("seenUpdate");
-            socket.off("balanceError");
-            socket.off("userChatAccepted");
-            socket.off("chatTimerStarted");
-            socket.off("chatEnded");
-            socket.off("autoChatEnded");
-            socket.off("incoming-call");
-            socket.off("call-accepted-started");
-            socket.off("call-missed");
-            socket.off("call-ended-rejected");
-            socket.off("acceptUser");
-        };
+        socket.off("connect", onConnect);
+        socket.off("disconnect", onDisconnect);
+        socket.off("activeUsers");
+        socket.off("receiveMessage");
+        socket.off("seenUpdate");
+        socket.off("balanceError");
+        socket.off("userChatAccepted");
+        socket.off("chatTimerStarted");
+        socket.off("chatEnded");
+        socket.off("autoChatEnded");
+        socket.off("incoming-call");
+        socket.off("call-accepted-started");
+        socket.off("call-missed");
+        socket.off("call-ended-rejected");
+        socket.off("acceptUser");
+    };
 
-    }, [dispatch]);
+}, [dispatch]);
 
-    return children;
+return children;
 }
 
 

@@ -13,13 +13,13 @@ export const AppStatusProvider = ({ children }) => {
 
     useEffect(() => {
         const checkAppStatus = async () => {
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/users/app-status`,
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/users/app-status-verify-app-status`,
                 {
                     params: {
                         shop: shop,
                         adminIdLocal: adminIdLocal
                     },
-                 
+
                 }
             );
             console.log("response", response);

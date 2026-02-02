@@ -34,10 +34,10 @@ export const openCallPage = async ({ receiverId, type, userId = "6978766389b46d0
         const balance = await checkUserBalance({ userId, consultantId: receiverId, type });
         console.log("balance", balance);
 
-        // if (!balance) {
-        //     alert("You have insufficient balance");
-        //     return;
-        // }
+        if (!balance) {
+            alert("You have insufficient balance");
+            return;
+        }
 
         const hasMicPermission = await checkMicPermission();
 
@@ -80,9 +80,9 @@ export const openCallPage = async ({ receiverId, type, userId = "6978766389b46d0
 
         const tokenEncoded = encodeURIComponent(data.token);
         const returnUrl = `https://${shop}/apps/consultant-theme`;
-
+        console.log("returnUrl", process.env.REACT_APP_FRONTEND_URL);
         const callUrl =
-            `http://localhost:3000/video/calling/page` +
+            `${process.env.REACT_APP_FRONTEND_URL}/video/calling/page` +
             `?callerId=${userId}` +
             `&receiverId=${receiverId}` +
             `&callType=${type || "voice"}` +

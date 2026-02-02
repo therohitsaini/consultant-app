@@ -17,13 +17,15 @@ function VideoCallingPage() {
     const { callEnded } = useSelector((state) => state.socket);
     const params = new URLSearchParams(window.location.search);
     const receiverId = params.get("receiverId");
-    const callType = params.get("callType") || "voice";
+    const callType = params.get("callType")
+    console.log("callType___Current", callType);
     const token = params.get("token") ? decodeURIComponent(params.get("token")) : null;
     const channelNameParam = params.get("channelName");
     const callerIdParam = params.get("callerId");
     const uidParam = params.get("uid");
     const appIdParam = params.get("appId");
     const userId = params.get("userId");
+    const [callAccepted, setCallAccepted] = useState(null);
     const callStartedRef = useRef(false);
     const { inCall, channel, type, muted, videoEnabled } = useSelector((state) => state.call);
     console.log("inCall", inCall);
@@ -34,7 +36,10 @@ function VideoCallingPage() {
 
     useEffect(() => {
         localStorage.setItem("userId", userId);
+        const callAcceptedFromStorage = JSON.parse(localStorage.getItem("callAccepted") || null);
+        setCallAccepted(callAcceptedFromStorage);
     }, [userId]);
+    console.log("callAccepted___Current", callAccepted);
     useEffect(() => {
         if (!userId) return;
 
@@ -303,9 +308,19 @@ function VideoCallingPage() {
         ? `${process.env.REACT_APP_BACKEND_HOST}/${callerDetails.receiver.profileImage.replace("\\", "/")}`
         : null;
 
+    const stopTimer = () => {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+        localStorage.removeItem("callStartTime");
+        setTime({ minutes: 0, seconds: 0 });
+    };
+
     const handleEndCall = () => {
+        stopTimer();
+        console.log("callAccepted___handleEndCall_____TransactionId", callAccepted?.transactionId);
+        console.log("callAccepted___handleEndCall_____TransactionId", callAccepted);
         dispatch(endCall());
-        socket.emit("call-ended", { callerId: callerId, receiverId: receiverId, channel: channelNameParam, callType: type });
+        socket.emit("call-ended", { callerId: callerId, receiverId: receiverId, channel: channelNameParam, callType: callType, transactionId: callAccepted?.transactionId, shopId: "690c374f605cb8b946503ccb" });
         const returnUrl = params.get("returnUrl");
         if (returnUrl) {
             window.top.location.href = decodeURIComponent(returnUrl);
@@ -336,12 +351,46 @@ function VideoCallingPage() {
     useEffect(() => {
         const handler = () => {
             console.log("🔥 Remote user left (event received in React)");
+            handleEndCall();
         };
 
         window.addEventListener("remote-user-left", handler);
         return () => window.removeEventListener("remote-user-left", handler);
     }, []);
 
+
+    const [time, setTime] = useState({ minutes: 0, seconds: 0 });
+    const intervalRef = useRef(null);
+
+
+    const startTimer = () => {
+        let startTime = localStorage.getItem("callStartTime");
+
+        if (!startTime) {
+            startTime = Date.now();
+            localStorage.setItem("callStartTime", startTime);
+        }
+
+        if (intervalRef.current) return;
+
+        intervalRef.current = setInterval(() => {
+            const now = Date.now();
+            const diff = Math.floor((now - startTime) / 1000);
+
+            setTime({
+                minutes: Math.floor(diff / 60),
+                seconds: diff % 60,
+            });
+        }, 1000);
+    };
+    useEffect(() => {
+        if (localStorage.getItem("callStartTime")) {
+            startTimer();
+        }
+
+        return () => clearInterval(intervalRef.current);
+    }, []);
+  
 
     return (
         <div className={styles.videoCallContainer}>
@@ -358,7 +407,7 @@ function VideoCallingPage() {
                 </button>
                 <div className={styles.callInfo}>
 
-                    <div className={styles.callAvatar}>
+                    <div onClick={startTimer} className={styles.callAvatar}>
                         <img className={styles.callAvatar} src={profileImage} alt="profile" />
                     </div>
                     <div>
@@ -405,6 +454,7 @@ function VideoCallingPage() {
                             <p className={styles.videoPlaceholderText}>
                                 {callerDetails?.receiver?.fullname || "Calling..."}
                             </p>
+
                             {
                                 callRejected ?
                                     <p className={styles.videoPlaceholderText} style={{ color: 'red' }}>
@@ -413,10 +463,18 @@ function VideoCallingPage() {
                                     :
                                     <>
                                         <p className={styles.videoPlaceholderText}>
-                                            {inCall ? "In Call" : "Connecting..."}
+                                            {
+                                                time ? <p style={{ color: 'white', fontSize: '12px', }}>
+                                                    {time.minutes}: {time.seconds < 10 ? `0${time.seconds}` : time.seconds}
+                                                </p>
+
+                                                    : null}
+                                            {/* {inCall ? "In Call" : "Connecting..."} */}
+
+
                                         </p>
-                                        <p className={styles.videoPlaceholderText}>
-                                            {type === "voice" ? "Voice Call" : "Video Call"}
+                                        <p style={{ fontSize: '12px', color: 'white' }}>
+                                            {callType === "voice" ? "Voice Call" : "Video Call"}
                                         </p>
                                     </>
                             }
@@ -452,7 +510,6 @@ function VideoCallingPage() {
                 )}
             </div>
 
-            {/* Call Controls */}
             <div className={styles.callControls}>
                 <button
                     className={`${styles.controlButton} ${muted ? styles.controlButtonActive : ''}`}
