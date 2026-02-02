@@ -82,7 +82,7 @@ export const openCallPage = async ({ receiverId, type, userId = "6978766389b46d0
         const returnUrl = `https://${shop}/apps/consultant-theme`;
         console.log("returnUrl", process.env.REACT_APP_FRONTEND_URL);
         const callUrl =
-            `${process.env.REACT_APP_FRONTEND_URL}/video/calling/page` +
+            `https://test-consultation-app.zend-apps.com/video/calling/page` +
             `?callerId=${userId}` +
             `&receiverId=${receiverId}` +
             `&callType=${type || "voice"}` +
