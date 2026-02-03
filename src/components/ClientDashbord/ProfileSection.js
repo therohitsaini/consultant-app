@@ -19,7 +19,7 @@ const ProfileSection = () => {
   const dispatch = useDispatch();
   const { userDetails } = useSelector((state) => state.users);
   const walletBalance = userDetails?.data?.walletBalance;
-
+  console.log("userDetails_____ProfileSection", userDetails);
   useEffect(() => {
     const adminId = localStorage.getItem("client_u_Identity");
     const shopId = localStorage.getItem("shop_o_Identity");
@@ -32,9 +32,10 @@ const ProfileSection = () => {
     dispatch(fetchUserDetailsByIds(userId));
   }, [userId])
   const getVoucher = async (adminId) => {
-    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/get/vouchers/${adminId}`, {
+    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/users/get/vouchers/${adminId}`, {
 
     });
+    console.log("response_____getVoucher", response);
     if (response.status === 200) {
       setVoucherData(response.data.data);
     }
@@ -56,7 +57,7 @@ const ProfileSection = () => {
         <h1 className={styles.profileTitle}>Profile Settings</h1>
         <div className={styles.profileImageContainer}>
           <div className={styles.profileImage}>
-            <img className='h-100 w-100 object-fit-cover' src={"https://imgs.search.brave.com/LgLnG0YyKC78VZULy9IVIpVyQVnacpc2pmuro63xxSo/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/cHJlbWl1bS1waG90/by91c2VyLXByb2Zp/bGUtcG5nLXByb2Zl/c3Npb25hbC1idXNp/bmVzc3dvbWFuLXN0/aWNrZXItdHJhbnNw/YXJlbnQtYmFja2dy/b3VuZF81Mzg3Ni0x/MDQ5MDE3LmpwZz9z/ZW10PWFpc19oeWJy/aWQmdz03NDAmcT04/MA"} alt="profile" />
+            <img className='h-100 w-100 object-fit-cover' src={"https://cdn.vectorstock.com/i/250p/12/86/simple-user-icon-profile-avatar-vector-56321286.avif"} alt="profile" />
           </div>
 
         </div>

@@ -24,6 +24,7 @@ export default function IncomingCallAlert() {
 
     const handleAccept = async () => {
         localStorage.setItem("callAccepted____", JSON.stringify(callAccepted));
+        console.log("callAccepted______IncomingCallAlert", callAccepted);
         const hasMicPermission = await checkMicPermission();
         if (!hasMicPermission) {
             alert("Please grant microphone permission to start the call");
@@ -50,7 +51,7 @@ export default function IncomingCallAlert() {
             const callType = incomingCall.callType || "voice";
             const returnUrl = "https://rohit-12345839.myshopify.com/apps/consultant-theme/consultant-dashboard";
             const callUrl =
-                `https://test-consultation-app.zend-apps.com/video/calling/page` +
+                `${process.env.REACT_APP_FRONTEND_URL}/video/calling/page` +
                 `?callerId=${callerId}` +
                 `&receiverId=${userId}` +
                 `&callType=${callType}` +

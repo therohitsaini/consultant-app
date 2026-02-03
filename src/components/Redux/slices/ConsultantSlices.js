@@ -8,12 +8,9 @@ import { getAppBridgeToken } from "../../../utils/getAppBridgeToken";
 export const fetchConsultants = createAsyncThunk(
     "consultants/fetch",
     async ({ adminIdLocal, app }) => {
-        // const token = await getAppBridgeToken(app);
-        console.log("token__________REDUX", app);
         const response = await axios.get(
             `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/api-find-consultant/${adminIdLocal}`,
         );
-        console.log("response__________REDUX", response);
         return response.data;
     }
 );

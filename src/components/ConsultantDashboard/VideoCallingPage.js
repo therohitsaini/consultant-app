@@ -317,14 +317,18 @@ function VideoCallingPage() {
 
     const handleEndCall = () => {
         const callAcceptedFromStorage = JSON.parse(localStorage.getItem("callAccepted") || null);
+        console.log("callAccepted________TransactionId", callAccepted?.transactionId);
+        console.log("callAccepted_______TransactionId", callAccepted);
+        // if ( !callerId || !receiverId || !channelNameParam || !callType) {
+        //     alert("Call not accepted");
+        //     return;
 
-        console.log("callAccepted___handleEndCall_____TransactionId", callAccepted?.transactionId);
-        console.log("callAccepted___handleEndCall_____TransactionId", callAccepted);
-        dispatch(endCall());
+        // }
         if (callAcceptedFromStorage?.transactionId) {
             stopTimer();
-            console.log("callAcceptedFromStorage___handleEndCall_____TransactionId", callAcceptedFromStorage?.transactionId);
-            socket.emit("call-ended", { callerId: callerId, receiverId: receiverId, channel: channelNameParam, callType: callType, transactionId: callAcceptedFromStorage?.transactionId, shopId: "690c374f605cb8b946503ccb" });
+            dispatch(endCall());
+            console.log("callAcceptedFromStorage_______TransactionId", callAcceptedFromStorage?.transactionId);
+            socket.emit("call-ended", { callerId: callAcceptedFromStorage?.callerId || "69809ec1fbb366783a04b28c", receiverId: receiverId, channel: channelNameParam, callType: callType, transactionId: callAcceptedFromStorage?.transactionId, shopId: "690c374f605cb8b946503ccb" });
             const returnUrl = params.get("returnUrl");
             if (returnUrl) {
                 window.top.location.href = decodeURIComponent(returnUrl);
@@ -333,6 +337,7 @@ function VideoCallingPage() {
             }
         } else {
             console.log("No transaction ID, skipping emit");
+            dispatch(endCall());
             stopTimer();
             const returnUrl = params.get("returnUrl");
             if (returnUrl) {
@@ -359,24 +364,48 @@ function VideoCallingPage() {
             dispatch(toggleVideo());
         }
     };
-    useEffect(() => {
-        if (callEnded) {
-            handleEndCall();
-        }
-    }, [callEnded]);
+    // useEffect(() => {
+    //     if (callEnded) {
+    //         handleEndCall();
+    //     }
+    // }, [callEnded]);
 
     console.log("callEnded", callEnded);
     console.log("callerDetails", callerDetails);
 
 
+    // Reconnection window: refresh/network glitch par turant call end na karein
+    const RECONNECT_WINDOW_MS = 15000; // 15 seconds
+    const remoteLeftTimeoutRef = useRef(null);
+
     useEffect(() => {
-        const handler = () => {
-            console.log("🔥 Remote user left (event received in React)");
-            handleEndCall();
+        const onRemoteLeft = (e) => {
+            console.log("🔥 Remote user left (event received in React)", e?.detail);
+
+            if (remoteLeftTimeoutRef.current) clearTimeout(remoteLeftTimeoutRef.current);
+
+            remoteLeftTimeoutRef.current = setTimeout(() => {
+                console.log("Remote user did not rejoin within window, ending call");
+                handleEndCall();
+                remoteLeftTimeoutRef.current = null;
+            }, RECONNECT_WINDOW_MS);
         };
 
-        window.addEventListener("remote-user-left", handler);
-        return () => window.removeEventListener("remote-user-left", handler);
+        const onRemoteRejoined = () => {
+            console.log("✅ Remote user rejoined (e.g. after refresh), cancelling end-call timer");
+            if (remoteLeftTimeoutRef.current) {
+                clearTimeout(remoteLeftTimeoutRef.current);
+                remoteLeftTimeoutRef.current = null;
+            }
+        };
+
+        window.addEventListener("remote-user-left", onRemoteLeft);
+        window.addEventListener("remote-user-rejoined", onRemoteRejoined);
+        return () => {
+            window.removeEventListener("remote-user-left", onRemoteLeft);
+            window.removeEventListener("remote-user-rejoined", onRemoteRejoined);
+            if (remoteLeftTimeoutRef.current) clearTimeout(remoteLeftTimeoutRef.current);
+        };
     }, []);
 
 
@@ -413,16 +442,20 @@ function VideoCallingPage() {
     }, []);
 
     useEffect(() => {
-        const handleCallConnected = (e) => {
-            console.log("✅ Call connected event received", e.detail);
-            startTimer(); // ⏱️ REAL TIMER START HERE
+        const handler = (event) => {
+            console.log("✅ Call connected event received on page:", event.detail);
+            startTimer();
         };
 
-        window.addEventListener("call-connected", handleCallConnected);
+        window.addEventListener("call-connected", handler);
 
-        return () => {
-            window.removeEventListener("call-connected", handleCallConnected);
-        };
+        // 🔥 LATE LISTENER FIX
+        if (window.callAlreadyConnected) {
+            console.log("⚡ Call already connected (late load)");
+            startTimer();
+        }
+
+        return () => window.removeEventListener("call-connected", handler);
     }, []);
 
 

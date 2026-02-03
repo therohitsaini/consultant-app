@@ -60,6 +60,15 @@ const DashboardPage = () => {
     useEffect(() => {
         getLatestUser();
     }, [userId]);
+    const formatAmount = (num) => {
+        if (!num) return "0";
+
+        if (num >= 1_000_000_000) return (num / 1_000_000_000).toFixed(1) + "B";
+        if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + "M";
+        if (num >= 1_000) return (num / 1_000).toFixed(1) + "K";
+
+        return num;
+    };
 
     return (
         <div className={styles.pageContainer}>
@@ -144,7 +153,7 @@ const DashboardPage = () => {
                                     Monthly Revenue
                                 </p>
                                 <h3 className={styles.statValue}>
-                                    ${consultantOverview?.consultant?.walletBalance ? consultantOverview?.consultant?.walletBalance.toFixed(2) + ".0" : ""}k
+                                    ${consultantOverview?.consultant?.walletBalance ? formatAmount(consultantOverview?.consultant?.walletBalance) : ""}
                                 </h3>
                             </div>
                             <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
@@ -213,7 +222,7 @@ const DashboardPage = () => {
                                 Latest client interactions and consultations
                             </p>
                         </div>
-                      
+
                     </div>
                     <div className={styles.tableWrapper}>
                         <table className={styles.table}>

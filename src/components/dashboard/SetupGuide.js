@@ -213,11 +213,7 @@ const SetupItem = ({
 }) => {
   const [loading, setLoading] = useState(false);
 
-  const completeItem = async () => {
-    setLoading(true);
-    await onComplete(id);
-    setLoading(false);
-  };
+ 
 
   return (
     <Box borderRadius='200' background={expanded ? 'bg-surface-active' : undefined}>

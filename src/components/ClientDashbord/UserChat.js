@@ -46,14 +46,14 @@ const UserChat = () => {
     const { userDetails } = useSelector((state) => state.users);
     const { confirmChat } = useSelector((state) => state.socket);
 
-    console.log("confirmChat____UserChat", confirmChat)
-    console.log("userDetails____UserChat", userDetails)
 
     useEffect(() => {
         if (userDetails?.data?.chatLock === "true") {
             setShowChatLock(true);
         }
     }, [userDetails, showChatLock]);
+
+
 
     useEffect(() => {
         if (insufficientBalance) {
@@ -62,11 +62,13 @@ const UserChat = () => {
     }, [insufficientBalance]);
     useEffect(() => {
         dispatch(fetchUserDetailsByIds(clientId));
-    }, [clientId, refreshed])
-
+    }, [clientId, refreshed, showChatEndToast])
+    console.log("clientId____UserChat", refreshed)
     useEffect(() => {
         dispatch(fetchConsultantById({ shop_id: shopId, consultant_id: consultantId }))
     }, [shopId, consultantId]);
+
+
 
     const isNearBottom = () => {
         if (!messagesAreaRef.current) return true;
@@ -382,7 +384,10 @@ const UserChat = () => {
         setShowChatEndToast(true);
         setShowChatLock((prev) => !prev);
         localStorage.removeItem("chatTimer");
+        navigate(-1);
     }
+
+
 
     useEffect(() => {
         if (autoChatEnded) {

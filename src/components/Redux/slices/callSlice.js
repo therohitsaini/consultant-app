@@ -174,6 +174,22 @@ export const startCall = createAsyncThunk(
             // Setup event listeners for remote users
             const handleUserPublished = async (user, mediaType) => {
                 console.log(`Remote user published ${mediaType}. User UID:`, user.uid);
+                if (!callConnectedEmitted) {
+                    callConnectedEmitted = true;
+                    window.callAlreadyConnected = true; // <- track for late listeners
+
+                    window.dispatchEvent(
+                        new CustomEvent("call-connected", {
+                            detail: {
+                                uid: user.uid,
+                                at: Date.now()
+                            }
+                        })
+                    );
+
+                    console.log("🔥 CALL CONNECTED → TIMER SHOULD START_____________________");
+                }
+
                 try {
                     if (mediaType === "audio") {
                         remoteAudioTrack = await client.subscribe(user, mediaType);
@@ -213,29 +229,18 @@ export const startCall = createAsyncThunk(
 
             client.on("user-joined", (user) => {
                 console.log("User joined channel. UID:", user.uid);
-                // window.dispatchEvent(new Event("call-connected"));
+                // Receiver refresh ke baad re-join par caller ko pata chale, call end na kare
+                window.dispatchEvent(new CustomEvent("remote-user-rejoined", { detail: { uid: user.uid } }));
             });
-            // // Fired on the OTHER peer when someone leaves. Agora SDK logs "user offline <uid> reason: Quit" (from endCall -> client.leave()).
-            // client.on("user-left", (user, reason) => {
-            //     console.log("Agora user-left (onUserOffline): UID:", user.uid, "reason:", reason);
-
-            //     // Stop and clear remote tracks
-            //     remoteAudioTrack?.stop();
-            //     remoteAudioTrack = null;
-
-            //     remoteVideoTrack?.stop();
-            //     remoteVideoTrack = null;
-
-            //     // Dispatch event for React component (e.g. to close call UI / inform user B)
-            //     window.dispatchEvent(new Event("remote-user-left"));
-            // });
-
+          
             // Listen for connection state changes
             client.on("connection-state-change", (curState, revState) => {
                 console.log("Connection state changed:", { from: revState, to: curState });
             });
 
             const handleUserUnpublished = async (user, mediaType) => {
+
+
                 if (mediaType === "audio") {
                     console.log("Remote user unpublished audio");
                     remoteAudioTrack?.stop();
@@ -245,20 +250,7 @@ export const startCall = createAsyncThunk(
                     remoteVideoTrack?.stop();
                     remoteVideoTrack = null;
                 }
-                if (!callConnectedEmitted) {
-                    callConnectedEmitted = true;
 
-                    window.dispatchEvent(
-                        new CustomEvent("call-connected", {
-                            detail: {
-                                uid: user.uid,
-                                at: Date.now()
-                            }
-                        })
-                    );
-
-                    console.log("🔥 CALL CONNECTED → TIMER SHOULD START");
-                }
             };
 
             // Remove old listeners and add new ones

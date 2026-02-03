@@ -102,19 +102,19 @@ export const ChatIcon = () => (
 );
 
  export const ITEMS = ({validation}) => [
-    {
-        id: 0,
-        title: "App Status Configuration",
-        description:
-            "Go to the top of the dashboard page and click the Enable/Disable button to activate or deactivate the consultant management system.",
-        complete: validation?.appStatus === true,
-        primaryButton: {
-            content: "Go to Dashboard",
-            props: {
-                external: true,
-            },
-        },
-    },
+    // {
+    //     id: 0,
+    //     title: "App Status Configuration",
+    //     description:
+    //         "Go to the top of the dashboard page and click the Enable/Disable button to activate or deactivate the consultant management system.",
+    //     complete: validation?.appStatus === true,
+    //     primaryButton: {
+    //         content: "Go to Dashboard",
+    //         props: {
+    //             external: true,
+    //         },
+    //     },
+    // },
     {
         id: 1,
         title: "Add Your First Consultant",
@@ -124,7 +124,7 @@ export const ChatIcon = () => (
         primaryButton: {
             content: "Add Consultant",
             props: {
-                external: false,
+                external: true,
             },
         },
     },

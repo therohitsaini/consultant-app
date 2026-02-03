@@ -79,22 +79,147 @@ function Faq() {
             content: (
                 <BlockStack gap="300">
                     <Text variant='bodyMd' as='p'>
-                        
+                        The Dashboard displays key metrics including: <span className="Polaris-Text--bold">Total Clients</span>, <span className="Polaris-Text--bold">Conversion Rate</span>, <span className="Polaris-Text--bold">Total Consultations</span>, and <span className="Polaris-Text--bold">Total Revenue</span>. These statistics help you track your consultant management performance and make informed decisions.
                     </Text>
                 </BlockStack>
             )
         },
         {
             id: 7,
-            title: 'How to set up store front ',
+            title: 'How to set up store front',
             content: (
                 <BlockStack gap="300">
                     <Text variant='bodyMd' as='p'>
-                        The Dashboard displays key metrics including: <span className="Polaris-Text--bold">Total Clients</span>, <span className="Polaris-Text--bold">Conversion Rate</span>, <span className="Polaris-Text--bold">Total Consultations</span>, and <span className="Polaris-Text--bold">Total Revenue</span>. These statistics help you track your consultant management performance and make informed decisions.
+                        To set up the storefront, please follow these steps:
                     </Text>
+
+                    <ol>
+                        <li>Log in to your Shopify Admin panel.</li>
+
+                        <li>From the left menu, go to <b>Online Store → Navigation</b>.</li>
+
+                        <li>Click on <b>Main menu</b> (or Footer menu if you prefer).</li>
+
+                        <li>Click <b>Add menu item</b>.</li>
+
+                        <li>
+                            Enter a name for the menu (for example: <b>Consult Now</b>, <b>Consultant Login</b>, or <b>Profile</b>).
+                        </li>
+
+                        <li>
+                            In the Link field, paste your store URL using one of the formats below:
+                            <br /><br />
+
+                            <b>Storefront Home Page:</b><br />
+                            <b>https://YOUR-SHOP-NAME.myshopify.com/apps/consultant-theme</b>
+                            <br /><br />
+
+                            <b>Consultant Login Page:</b><br />
+                            <b>https://YOUR-SHOP-NAME.myshopify.com/apps/consultant-theme/login</b>
+                            <br /><br />
+
+                            <b>User Profile Page:</b><br />
+                            <b>https://YOUR-SHOP-NAME.myshopify.com/apps/consultant-theme/profile</b>
+                        </li>
+
+                        <li>
+                            Replace <b>YOUR-SHOP-NAME</b> with your actual Shopify store name.
+                            <br />
+                            Example:
+                            <br />
+                            <b>https://rohit-12345839.myshopify.com/apps/consultant-theme</b>
+                        </li>
+
+                        <li>Click <b>Save</b>.</li>
+
+                        <li>
+                            Repeat the same steps to add multiple menu items (Home, Login, Profile) if required.
+                        </li>
+
+                        <li>Go to <b>Online Store → Themes → Customize</b>.</li>
+
+                        <li>Make sure the menu is visible in your header or footer.</li>
+
+                        <li>Visit your storefront and test all menu links.</li>
+                    </ol>
                 </BlockStack>
             )
-        }
+        },
+        {
+            id: 8,
+            title: 'How Consultant Can Login',
+            content: (
+              <BlockStack gap="300">
+                <Text variant='bodyMd' as='p'>
+                  Consultants can log in to the system by following these steps:
+                </Text>
+          
+                <ol>
+                  <li>
+                    Open your Shopify store URL in this format:
+                    <br />
+                    <b>https://YOUR-SHOP-NAME.myshopify.com/apps/consultant-theme/login</b>
+                  </li>
+          
+                  <li>
+                    Replace <b>YOUR-SHOP-NAME</b> with your actual Shopify store name.
+                    <br />
+                    Example:
+                    <br />
+                    <b>https://rohit-12345839.myshopify.com/apps/consultant-theme/login</b>
+                  </li>
+          
+                  <li>
+                    Enter your registered email and password.
+                  </li>
+          
+                  <li>
+                    Click on <b>Login</b>.
+                  </li>
+          
+                  <li>
+                    After successful login, you will be redirected to your consultant dashboard.
+                  </li>
+          
+                  <li>
+                    From the dashboard, you can view your profile, availability status, and incoming calls.
+                  </li>
+                </ol>
+          
+                <Text variant='bodyMd' as='p'>
+                  <b>Important: Enable Notification Permission</b>
+                </Text>
+          
+                <ol>
+                  <li>
+                    After login, your browser will ask for notification permission.
+                  </li>
+          
+                  <li>
+                    Click <b>Allow</b> to enable notifications.
+                  </li>
+          
+                  <li>
+                    Notifications are required to receive incoming call alerts.
+                  </li>
+          
+                  <li>
+                    If you accidentally clicked <b>Block</b>, follow these steps:
+                    <ul>
+                      <li>Click the lock icon near the browser address bar.</li>
+                      <li>Find <b>Notifications</b>.</li>
+                      <li>Select <b>Allow</b>.</li>
+                      <li>Refresh the page.</li>
+                    </ul>
+                  </li>
+          
+                  <li>
+                    Without notification permission, you may miss incoming calls.
+                  </li>
+                </ol>
+              </BlockStack>
+            )
+          }
     ];
 
 
