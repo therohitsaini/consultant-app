@@ -30,6 +30,7 @@ import VoucherTable from "./pages/VoucherTable";
 import { BillingProtectedRoute } from "./components/ProtectRoute/BillingProtectedRoute";
 import { AppStatusProvider } from "./components/ProtectRoute/AppStatusProvider";
 import AccountInformation from "./pages/AccountInformation";
+import CallChatLogs from "./pages/CallChatLogs";
 
 
 
@@ -171,9 +172,9 @@ export default function App() {
 
           } />
           <Route path="/profile" element={
-            <ProtectStoreFront>
+            // <ProtectStoreFront>
               <ProfileSection />
-            </ProtectStoreFront>
+            // </ProtectStoreFront>
           }>
             <Route index element={
               <ProtectStoreFront>
@@ -186,11 +187,17 @@ export default function App() {
               </ProtectStoreFront>
             } />
             <Route path="history" element={
-              <ProtectStoreFront>
+              // <ProtectStoreFront>
                 <History />
-              </ProtectStoreFront>
+              // </ProtectStoreFront>
+            } />
+            <Route path="call-chat-logs" element={
+              // <ProtectStoreFront>
+                <CallChatLogs />
+              // </ProtectStoreFront>
             } />
           </Route>
+          
         </Routes>
       </BrowserRouter>
     </Fragment >

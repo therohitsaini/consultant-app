@@ -103,6 +103,16 @@ const ProfileSection = () => {
           >
             History
           </NavLink>
+          <NavLink
+            to="call-chat-logs"
+            className={({ isActive }) =>
+              isActive
+                ? `${styles.profileNavButton} ${styles.profileNavButtonActive}`
+                : styles.profileNavButton
+            }
+          >
+            Call & Chat Logs
+          </NavLink>
         </div>
 
         <div className={styles.profileContent}>
