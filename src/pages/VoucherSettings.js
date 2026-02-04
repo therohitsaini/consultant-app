@@ -115,6 +115,7 @@ function VoucherSettings() {
             );
             if (response.status === 200) {
                 showToast(response.data?.message || 'Voucher settings have been saved successfully.');
+                backToVoucherManagement();
             } else {
                 setSubmitError(response.data?.message || 'Failed to save voucher settings. Please try again.');
             }

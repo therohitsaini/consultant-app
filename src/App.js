@@ -136,20 +136,24 @@ export default function App() {
             </ProtectStoreFront>
           } />
           <Route path="/view-profile" element={
-            // <ProtectStoreFront>
+            <ProtectStoreFront>
               <ViewProfile />
+            </ProtectStoreFront>
           } />
           <Route path="/consultant-dashboard/*" element={
-            // <ProtectStoreFront>
-            <TabNavigation />
+            <ProtectStoreFront>
+              <TabNavigation />
+            </ProtectStoreFront>
           } />
           <Route path="/users-page/*" element={
-            // <ProtectStoreFront>
-            <TabNavigation />
+            <ProtectStoreFront>
+              <TabNavigation />
+            </ProtectStoreFront>
           } />
           <Route path="/consulant-chats/*" element={
-            // <ProtectStoreFront>
-            <TabNavigation />
+            <ProtectStoreFront>
+              <TabNavigation />
+            </ProtectStoreFront>
           } />
           <Route path="/video/calling/page" element={
             // <ProtectStoreFront>
@@ -172,9 +176,9 @@ export default function App() {
 
           } />
           <Route path="/profile" element={
-            // <ProtectStoreFront>
+            <ProtectStoreFront>
               <ProfileSection />
-            // </ProtectStoreFront>
+            </ProtectStoreFront>
           }>
             <Route index element={
               <ProtectStoreFront>
@@ -187,17 +191,17 @@ export default function App() {
               </ProtectStoreFront>
             } />
             <Route path="history" element={
-              // <ProtectStoreFront>
+              <ProtectStoreFront>
                 <History />
-              // </ProtectStoreFront>
+              </ProtectStoreFront>
             } />
             <Route path="call-chat-logs" element={
-              // <ProtectStoreFront>
-                <CallChatLogs />
-              // </ProtectStoreFront>
+              <ProtectStoreFront>
+              <CallChatLogs />
+              </ProtectStoreFront>
             } />
           </Route>
-          
+
         </Routes>
       </BrowserRouter>
     </Fragment >

@@ -60,6 +60,7 @@ export default function IncomingCallAlert() {
                 `&token=${tokenEncoded}` +
                 appIdParam +
                 `&userId=${userId}` +
+                `&userType=${"consultant"}` +
                 `&returnUrl=${encodeURIComponent(returnUrl)}`;
             window.top.location.href = callUrl;
         }

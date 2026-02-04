@@ -90,6 +90,7 @@ export const openCallPage = async ({ receiverId, type, userId = "6978766389b46d0
             `&channelName=${channelName}` +
             `&token=${tokenEncoded}` +
             `&userId=${userId}` +
+            `&userType=${"client"}` +
             `&returnUrl=${encodeURIComponent(returnUrl)}`;
 
         console.log("callUrl", callUrl);

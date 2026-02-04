@@ -19,7 +19,7 @@ function ViewProfile() {
 
     }, []);
 
-    
+
     const { consultantOverview, loading } = useSelector((state) => state.consultants);
     useEffect(() => {
         dispatch(fetchConsultantById({ shop_id, consultant_id }));
@@ -32,7 +32,7 @@ function ViewProfile() {
 
     const consultantView = consultantOverview?.consultant;
     const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${consultantView?.profileImage?.replace("\\", "/")}`;
-    // Default static consultant data
+    console.log("consultantView____ViewProfile", consultantView)
     const consultant = {
         id: "691dbba35e388352e3203b0b",
         name: 'Arlene McCoy',
@@ -81,22 +81,18 @@ function ViewProfile() {
         );
     };
 
-    // Function to handle calling option selection
-    const handleCallingOption = (optionType, consultantId, price) => {
-        console.log(`Selected ${optionType} option for consultant ${consultantId} at price INR ${price}`);
-        // Here you can add logic to navigate to booking page or open a modal
-        alert(`You selected ${optionType.toUpperCase()} call option.\nConsultant ID: ${consultantId}\nPrice: INR ${price.toLocaleString()}`);
-    };
 
-    const viewProfile = async (consultantView) => {
+
+    const startChat = async (consultantView) => {
         const balance = await checkUserBalance({ userId, consultantId: consultantView, type: 'chat' });
-
-        if (!balance) {
-            alert("You have insufficient balance");
-            return;
-        }
         const targetShop = shop;
         const hostQuery = "";
+        if (!balance) {
+            alert("You have insufficient balance");
+            window.top.location.href = `https://${targetShop}/apps/consultant-theme/profile${hostQuery}`;
+            return;
+        }
+
         window.top.location.href = `https://${targetShop}/apps/consultant-theme/chats-c?consultantId=${consultantView}${hostQuery}`;
     }
     const backToHome = () => {
@@ -150,7 +146,7 @@ function ViewProfile() {
                                     </span>
                                 </div>
                                 <p className="mb-3 consultant-profession consultant-profession-large">
-                                    {consultant.profession}
+                                    {consultantView?.profession} - {consultantView?.specialization}
                                 </p>
                                 <div className="flex align-items-center gap-2 flex-wrap mb-3">
                                     <div className="rating-stars rating-stars-large">
@@ -167,7 +163,7 @@ function ViewProfile() {
                         </div>
 
                         {/* Divider */}
-                        <hr className="card-divider" />
+                        <hr className="card-divider my-2" />
 
                         {/* Information Section */}
                         <div className="mb-0">
@@ -182,7 +178,7 @@ function ViewProfile() {
                                         className="calling-option-btn chat-btn border-0"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            viewProfile(consultantView?._id);
+                                            startChat(consultantView?._id);
                                             // navigate(`/user-chat/${consultantView?._id}`);
                                         }}
                                     >
@@ -241,7 +237,7 @@ function ViewProfile() {
                         </div>
 
                         {/* Education & Certifications */}
-                        <div className="card shadow-sm border-0 mb-4">
+                        {/* <div className="card shadow-sm border-0 mb-4">
                             <div className="card-body p-4">
                                 <h3 className="section-title mb-3">Education & Certifications</h3>
                                 <div className="mb-3">
@@ -257,7 +253,7 @@ function ViewProfile() {
                                     </ul>
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
 
                         {/* Reviews */}
                         <div className="card shadow-sm border-0 mb-4">
@@ -288,7 +284,7 @@ function ViewProfile() {
                     {/* Right Column */}
                     <div className="col-lg-4">
                         {/* Expertise Tags */}
-                        <div className="card shadow-sm border-0 mb-4">
+                        {/* <div className="card shadow-sm border-0 mb-4">
                             <div className="card-body p-4">
                                 <h3 className="section-title mb-3">Expertise</h3>
                                 <div className="expertise-tags">
@@ -299,7 +295,7 @@ function ViewProfile() {
                                     ))}
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
 
                         {/* Calling Options */}
                         <div className="card shadow-sm border-0">
@@ -308,7 +304,7 @@ function ViewProfile() {
                                 <div className="calling-options-profile-sidebar">
                                     <button
                                         className="calling-option-btn chat-btn"
-                                        onClick={() => handleCallingOption('chat', consultant.id, consultant.chatPrice)}
+                                        onClick={() => startChat(consultantView?._id)}
                                         title={`Chat - INR ${consultant.chatPrice.toLocaleString()}`}
                                     >
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -317,7 +313,7 @@ function ViewProfile() {
                                     </button>
                                     <button
                                         className="calling-option-btn audio-btn"
-                                        onClick={() => handleCallingOption('audio', consultant.id, consultant.audioPrice)}
+                                        onClick={() => startCall({ receiverId: consultantView?._id, type: 'voice' })}
                                         title={`Audio Call - INR ${consultant.audioPrice.toLocaleString()}`}
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-phone-icon lucide-phone">
@@ -326,7 +322,7 @@ function ViewProfile() {
                                     </button>
                                     <button
                                         className="calling-option-btn video-btn"
-                                        onClick={() => handleCallingOption('video', consultant.id, consultant.videoPrice)}
+                                        onClick={() => startCall({ receiverId: consultantView?._id, type: 'video' })}
                                         title={`Video Call - INR ${consultant.videoPrice.toLocaleString()}`}
                                     >
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

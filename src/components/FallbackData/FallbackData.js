@@ -101,7 +101,7 @@ export const ChatIcon = () => (
     </svg>
 );
 
- export const ITEMS = ({validation}) => [
+export const ITEMS = ({ validation }) => [
     // {
     //     id: 0,
     //     title: "App Status Configuration",
@@ -128,8 +128,9 @@ export const ChatIcon = () => (
             },
         },
     },
-   
+
 
 
 
 ];
+

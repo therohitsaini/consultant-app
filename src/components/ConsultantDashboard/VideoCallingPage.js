@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { endCall, startCall, toggleMute, toggleVideo } from '../Redux/slices/callSlice';
 import { initRingtone, playRingtone } from '../ringTone/ringingTune';
 import { getSocket, socket } from '../Sokect-io/SokectConfig';
+import axios from 'axios';
 
 function VideoCallingPage() {
     const navigate = useNavigate();
@@ -14,6 +15,8 @@ function VideoCallingPage() {
     const remoteVideoRef = useRef(null);
     const [callerDetails, setCallerDetails] = useState(null);
     const [callerId, setCallerId] = useState(null);
+    const [callSession, setCallSession] = useState(null);
+    const [callSessionEnded, setCallSessionEnded] = useState(false);
     const { callEnded } = useSelector((state) => state.socket);
     const params = new URLSearchParams(window.location.search);
     const receiverId = params.get("receiverId");
@@ -25,6 +28,8 @@ function VideoCallingPage() {
     const uidParam = params.get("uid");
     const appIdParam = params.get("appId");
     const userId = params.get("userId");
+    const userType = params.get("userType") || "consultant";
+    console.log("userType", userType);
     const [callAccepted, setCallAccepted] = useState(null);
     const callStartedRef = useRef(false);
     const { inCall, channel, type, muted, videoEnabled } = useSelector((state) => state.call);
@@ -39,7 +44,31 @@ function VideoCallingPage() {
         const callAcceptedFromStorage = JSON.parse(localStorage.getItem("callAccepted") || null);
         setCallAccepted(callAcceptedFromStorage);
     }, [userId]);
-    console.log("callAccepted___Current", callAccepted);
+
+    const getCallSession = async () => {
+        console.log("channelNameParam", channelNameParam);
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/users/find-call-session`,
+                {
+                    params: {
+                        userId,
+                        channelName: channelNameParam
+                    }
+                }
+            );
+            if (response.status === 200) {
+                setCallSession(response.data.data);
+            }
+        } catch (error) {
+            console.error("Error fetching call session:", error);
+        }
+    };
+    useEffect(() => {
+        getCallSession();
+    }, [callType]);
+
+    console.log("callSession", callSession);
+
     useEffect(() => {
         if (!userId) return;
 
@@ -327,18 +356,36 @@ function VideoCallingPage() {
         if (callAcceptedFromStorage?.transactionId) {
             stopTimer();
             dispatch(endCall());
+            setCallSessionEnded(true);
             console.log("callAcceptedFromStorage_______TransactionId", callAcceptedFromStorage?.transactionId);
-            socket.emit("call-ended", { callerId: callAcceptedFromStorage?.callerId || "69809ec1fbb366783a04b28c", receiverId: receiverId, channel: channelNameParam, callType: callType, transactionId: callAcceptedFromStorage?.transactionId, shopId: "690c374f605cb8b946503ccb" });
+            socket.emit("call-ended",
+                {
+                    callerId: callAcceptedFromStorage?.callerId || "69809ec1fbb366783a04b28c",
+                    receiverId: receiverId,
+                    channelName: channelNameParam,
+                    callType: callType,
+                    transactionId: callAcceptedFromStorage?.transactionId,
+                    shopId: "690c374f605cb8b946503ccb"
+                });
             const returnUrl = params.get("returnUrl");
             if (returnUrl) {
                 window.top.location.href = decodeURIComponent(returnUrl);
             } else {
                 navigate(-1);
             }
-        } else {
-            console.log("No transaction ID, skipping emit");
+        } else if (callSession) {
+            console.log("callSession", callSession);
             dispatch(endCall());
             stopTimer();
+            setCallSessionEnded(true);
+            socket.emit("call-ended", {
+                callerId: callSession?.callerId,
+                receiverId: callSession?.receiverId,
+                channelName: callSession?.channelName,
+                callType: callSession?.callType,
+                transactionId: callSession?.transtionId,
+                shopId: "690c374f605cb8b946503ccb"
+            });
             const returnUrl = params.get("returnUrl");
             if (returnUrl) {
                 window.top.location.href = decodeURIComponent(returnUrl);
@@ -378,36 +425,49 @@ function VideoCallingPage() {
     const RECONNECT_WINDOW_MS = 15000; // 15 seconds
     const remoteLeftTimeoutRef = useRef(null);
 
+    // useEffect(() => {
+    //     const onRemoteLeft = (e) => {
+    //         console.log("🔥 Remote user left (event received in React)", e?.detail);
+
+    //         if (remoteLeftTimeoutRef.current) clearTimeout(remoteLeftTimeoutRef.current);
+
+    //         remoteLeftTimeoutRef.current = setTimeout(() => {
+    //             console.log("Remote user did not rejoin within window, ending call");
+    //             handleEndCall();
+    //             remoteLeftTimeoutRef.current = null;
+    //         }, RECONNECT_WINDOW_MS);
+    //     };
+
+    //     const onRemoteRejoined = () => {
+    //         console.log("✅ Remote user rejoined (e.g. after refresh), cancelling end-call timer");
+    //         if (remoteLeftTimeoutRef.current) {
+    //             clearTimeout(remoteLeftTimeoutRef.current);
+    //             remoteLeftTimeoutRef.current = null;
+    //         }
+    //     };
+
+    //     window.addEventListener("remote-user-left", onRemoteLeft);
+    //     window.addEventListener("remote-user-rejoined", onRemoteRejoined);
+    //     return () => {
+    //         window.removeEventListener("remote-user-left", onRemoteLeft);
+    //         window.removeEventListener("remote-user-rejoined", onRemoteRejoined);
+    //         if (remoteLeftTimeoutRef.current) clearTimeout(remoteLeftTimeoutRef.current);
+    //     };
+    // }, []);
+
     useEffect(() => {
         const onRemoteLeft = (e) => {
-            console.log("🔥 Remote user left (event received in React)", e?.detail);
+            console.log("🔥 Remote user left — ending call immediately", e?.detail);
 
-            if (remoteLeftTimeoutRef.current) clearTimeout(remoteLeftTimeoutRef.current);
-
-            remoteLeftTimeoutRef.current = setTimeout(() => {
-                console.log("Remote user did not rejoin within window, ending call");
-                handleEndCall();
-                remoteLeftTimeoutRef.current = null;
-            }, RECONNECT_WINDOW_MS);
-        };
-
-        const onRemoteRejoined = () => {
-            console.log("✅ Remote user rejoined (e.g. after refresh), cancelling end-call timer");
-            if (remoteLeftTimeoutRef.current) {
-                clearTimeout(remoteLeftTimeoutRef.current);
-                remoteLeftTimeoutRef.current = null;
-            }
+            handleEndCall(); // 👈 DIRECT END
         };
 
         window.addEventListener("remote-user-left", onRemoteLeft);
-        window.addEventListener("remote-user-rejoined", onRemoteRejoined);
+
         return () => {
             window.removeEventListener("remote-user-left", onRemoteLeft);
-            window.removeEventListener("remote-user-rejoined", onRemoteRejoined);
-            if (remoteLeftTimeoutRef.current) clearTimeout(remoteLeftTimeoutRef.current);
         };
     }, []);
-
 
     const [time, setTime] = useState({ minutes: 0, seconds: 0 });
     const intervalRef = useRef(null);
@@ -415,7 +475,6 @@ function VideoCallingPage() {
 
     const startTimer = () => {
         let startTime = localStorage.getItem("callStartTime");
-
         if (!startTime) {
             startTime = Date.now();
             localStorage.setItem("callStartTime", startTime);
@@ -443,10 +502,9 @@ function VideoCallingPage() {
 
     useEffect(() => {
         const handler = (event) => {
-            console.log("✅ Call connected event received on page:", event.detail);
+            console.log(" Call connected event received on page:", event.detail);
             startTimer();
         };
-
         window.addEventListener("call-connected", handler);
 
         // 🔥 LATE LISTENER FIX
@@ -476,10 +534,10 @@ function VideoCallingPage() {
                 <div className={styles.callInfo}>
 
                     <div onClick={startTimer} className={styles.callAvatar}>
-                        <img className={styles.callAvatar} src={profileImage} alt="profile" />
+                        <img className={styles.callAvatar} src={ userType === "consultant" ? callerDetails?.caller?.profileImage || "" : callerDetails?.receiver?.profileImage || null} alt="profile" />
                     </div>
                     <div>
-                        <div className={styles.callName}>{callerDetails?.receiver?.fullname}</div>
+                        <div className={styles.callName}>{ userType === "consultant" ? callerDetails?.caller?.fullname : callerDetails?.receiver?.fullname}</div>
                         <div className={styles.callStatus}>
                             {/* {conversation.isOnline ? 'Online' : 'Offline'} */}
                         </div>
@@ -507,7 +565,7 @@ function VideoCallingPage() {
                                         </div>
                                     )}
                                     <p className={styles.videoPlaceholderText}>
-                                        {callerDetails?.receiver?.fullname || "Waiting for video..."}
+                                         { userType === "consultant" ? callerDetails?.caller?.fullname : callerDetails?.receiver?.fullname || "Waiting for video..."}
                                     </p>
                                 </div>
                             )}
@@ -520,13 +578,13 @@ function VideoCallingPage() {
                                 </div>
                             )}
                             <p className={styles.videoPlaceholderText}>
-                                {callerDetails?.receiver?.fullname || "Calling..."}
+                                { userType === "consultant" ? callerDetails?.caller?.fullname : callerDetails?.receiver?.fullname || "Calling..."}
                             </p>
 
                             {
-                                callRejected ?
+                                callRejected || callSessionEnded ?
                                     <p className={styles.videoPlaceholderText} style={{ color: 'red' }}>
-                                        Call Rejected
+                                        {callSessionEnded ? "Call Ended" : "Call Rejected"}
                                     </p>
                                     :
                                     <>

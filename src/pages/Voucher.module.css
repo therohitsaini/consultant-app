@@ -41,7 +41,7 @@
 
 .cardGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(5, minmax(160px, 1fr));
     gap: 16px;
 }
 
@@ -79,7 +79,7 @@
     right: -54px;
     width: 150px;
     padding: 6px 0;
-    background: #22c55e;
+    background: #551d97;
     color: #ffffff;
     font-size: 10px;
     font-weight: 600;
@@ -88,7 +88,7 @@
     letter-spacing: 0.04em;
     transform: rotate(45deg);
     pointer-events: none;
-    box-shadow: 0px 1px 6px 0px #a5a5a5;
+    box-shadow: 0px 0px 5px 1px #5e5e5e;
 }
 
 .amount {
@@ -105,7 +105,7 @@
     padding-top: 6px;
     border-top: 1px solid #e5e7eb;
     font-size: 13px;
-    color: #22c55e;
+    color: #000000;
 }
 
 @media (max-width: 768px) {

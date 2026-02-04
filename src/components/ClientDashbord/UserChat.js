@@ -45,7 +45,7 @@ const UserChat = () => {
     const prevIsRunningRef = useRef(null);
     const { userDetails } = useSelector((state) => state.users);
     const { confirmChat } = useSelector((state) => state.socket);
-
+    console.log("confirmChat____UserChat", confirmChat)
 
     useEffect(() => {
         if (userDetails?.data?.chatLock === "true") {

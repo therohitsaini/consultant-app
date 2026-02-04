@@ -257,9 +257,7 @@ function ConsultantCards() {
     }
 
     const viewProfile = (shop_id, consultant_id) => {
-        const targetShop = "rohit-12345839.myshopify.com";
         const hostQuery = "";
-        console.log("targetShop", targetShop, "hostQuery", hostQuery)
         window.top.location.href = `https://${shop}/apps/consultant-theme/view-profile?consultantId=${consultant_id}&shopId=${shop_id}${hostQuery}`;
     }
 
@@ -268,6 +266,8 @@ function ConsultantCards() {
         console.log("balance", balance);
         if (!balance.userBalance) {
             alert("You have insufficient balance to chat with this consultant");
+            const hostQuery = "";
+            window.top.location.href = `https://${shop}/apps/consultant-theme/profile${hostQuery}`;
             return;
         }
 
