@@ -177,13 +177,13 @@ function TabNavigation({ children }) {
     const menuItems = [
         {
             label: 'Dashboard',
-            path: '/consultant/dashboard',
-            active: location.pathname === '/consultant/dashboard',
+            path: '/consultant-dashboard/dashboard',
+            active: location.pathname === '/consultant-dashboard/dashboard',
         },
         {
             label: 'Chats',
-            path: '/consultant/chats',
-            active: location.pathname.startsWith('/consultant/chats'),
+            path: '/consultant-dashboard/chats',
+            active: location.pathname.startsWith('/consultant-dashboard/chats'),
         },
     ];
 

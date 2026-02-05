@@ -141,7 +141,7 @@ export default function App() {
               <ViewProfile />
             </ProtectStoreFront>
           } />
-          <Route path="/consultant/*" element={
+          <Route path="/consultant-dashboard/*" element={
             // <ProtectStoreFront>
               <TabNavigation />
             }>
