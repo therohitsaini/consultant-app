@@ -91,7 +91,7 @@ function TabNavigation({ children }) {
             const response = await axios.put(
                 `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/update-profile`,
                 formData,
-              
+
             );
             console.log("Profile updated:", response.data);
 
@@ -158,32 +158,49 @@ function TabNavigation({ children }) {
         setSidebarOpen(!sidebarOpen);
     };
 
+    // const menuItems = [
+    //     {
+    //         label: 'Dashboard',
+    //         icon: <DashboardIcon />,
+    //         path: '/consultant-dashboard',
+    //         active: location.pathname === '/consultant-dashboard'
+    //     },
+
+    //     {
+    //         label: 'Chats',
+    //         icon: <ChatIcon />,
+    //         path: '/consultant-chats-section',
+    //         active: location.pathname === '/consultant-chats-section'
+    //     },
+
+    // ];
     const menuItems = [
         {
             label: 'Dashboard',
-            icon: <DashboardIcon />,
-            path: '/consultant-dashboard',
-            active: location.pathname === '/consultant-dashboard'
+            path: '/consultant/dashboard',
+            active: location.pathname === '/consultant/dashboard',
         },
-
         {
             label: 'Chats',
-            icon: <ChatIcon />,
-            path: '/consultant-chats-section',
-            active: location.pathname === '/consultant-chats-section'
+            path: '/consultant/chats',
+            active: location.pathname.startsWith('/consultant/chats'),
         },
-
     ];
 
-    const handleNavigation = (path) => {
-        const params = new URLSearchParams(window.location.search);
-        const shop = params.get("shop");
-        const targetShop = shop;
-        const hostQuery = "";
-        console.log("targetShop", targetShop, "hostQuery", hostQuery)
-        window.top.location.href = `https://${targetShop}/apps/consultant-theme${path}${hostQuery}`;
 
+    // const handleNavigation = (path) => {
+    //     const params = new URLSearchParams(window.location.search);
+    //     const shop = params.get("shop");
+    //     const targetShop = shop;
+    //     const hostQuery = "";
+    //     console.log("targetShop", targetShop, "hostQuery", hostQuery)
+    //     window.top.location.href = `https://${targetShop}/apps/consultant-theme${path}${hostQuery}`;
+
+    // };
+    const handleNavigation = (path) => {
+        navigate(path);
     };
+
     const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${consultantOverview?.consultant?.profileImage?.replace("\\", "/")}`;
     const isVideoCallPage = location.pathname === '/video-call' || location.pathname.startsWith('/video-call');
 

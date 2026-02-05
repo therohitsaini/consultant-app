@@ -31,6 +31,7 @@ import { BillingProtectedRoute } from "./components/ProtectRoute/BillingProtecte
 import { AppStatusProvider } from "./components/ProtectRoute/AppStatusProvider";
 import AccountInformation from "./pages/AccountInformation";
 import CallChatLogs from "./pages/CallChatLogs";
+import ChatsPage from "./components/ConsultantDashboard/ChatsPage";
 
 
 
@@ -140,10 +141,21 @@ export default function App() {
               <ViewProfile />
             </ProtectStoreFront>
           } />
-          <Route path="/consultant-dashboard/*" element={
-            <ProtectStoreFront>
+          <Route path="/consultant/*" element={
+            // <ProtectStoreFront>
               <TabNavigation />
-            </ProtectStoreFront>
+            }>
+            <Route index element={<Dashboard />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="chats/:chatId?" element={<ChatsPage />} />
+            {/* <Route path="users" element={<UsersPage />} /> */}
+            {/* <Route path="video-call/:id" element={<VideoCallingPage />} /> */}
+          </Route>
+
+          {/* <Route path="/consultant-dashboard/*" element={
+            // <ProtectStoreFront>
+              <TabNavigation />
+            // </ProtectStoreFront>
           } />
           <Route path="/users-page/*" element={
             <ProtectStoreFront>
@@ -154,7 +166,7 @@ export default function App() {
             <ProtectStoreFront>
               <TabNavigation />
             </ProtectStoreFront>
-          } />
+          } /> */}
           <Route path="/video/calling/page" element={
             // <ProtectStoreFront>
             <VideoCallingPage />
@@ -197,7 +209,7 @@ export default function App() {
             } />
             <Route path="call-chat-logs" element={
               <ProtectStoreFront>
-              <CallChatLogs />
+                <CallChatLogs />
               </ProtectStoreFront>
             } />
           </Route>
