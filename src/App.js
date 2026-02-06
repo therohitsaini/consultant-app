@@ -141,16 +141,12 @@ export default function App() {
               <ViewProfile />
             </ProtectStoreFront>
           } />
-          <Route path="/consultant-dashboard/*" element={
-            // <ProtectStoreFront>
-              <TabNavigation />
-            }>
+          <Route path="/consultant-dashboard/*" element={<TabNavigation />}>
             <Route index element={<Dashboard />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="chats/:chatId?" element={<ChatsPage />} />
-            {/* <Route path="users" element={<UsersPage />} /> */}
-            {/* <Route path="video-call/:id" element={<VideoCallingPage />} /> */}
           </Route>
+
 
           {/* <Route path="/consultant-dashboard/*" element={
             // <ProtectStoreFront>
