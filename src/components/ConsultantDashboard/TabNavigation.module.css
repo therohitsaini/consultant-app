@@ -2,9 +2,9 @@
 .dashboardWrapper {
     height: 100vh;
     background-color: #f5f6fa;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
         'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-        sans-serif;
+        sans-serif; */
     padding: 0;
     position: relative;
     /* border: 1px solid blue; */
@@ -90,6 +90,7 @@
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -290,6 +291,7 @@
 .navTabLabel {
     white-space: nowrap;
     flex: 1;
+    font-size: 13px;
 }
 
 /* Content Area */
@@ -371,7 +373,8 @@
     }
 
     .contentArea {
-        margin-left: 260px; /* 240px sidebar + 20px gap */
+        margin-left: 260px;
+        /* 240px sidebar + 20px gap */
     }
 }
 
@@ -394,7 +397,8 @@
     }
 
     .contentArea {
-        margin-left: 256px; /* 240px sidebar + 16px gap */
+        margin-left: 256px;
+        /* 240px sidebar + 16px gap */
     }
 
     .content {
@@ -406,7 +410,8 @@
 @media (max-width: 768px) {
     .dashboardWrapper {
         padding: 12px;
-        padding-top: 64px; /* Space for toggle button */
+        padding-top: 64px;
+        /* Space for toggle button */
     }
 
     .mobileToggleButton {
@@ -532,7 +537,8 @@
 @media (max-width: 576px) {
     .dashboardWrapper {
         padding: 8px;
-        padding-top: 60px; /* Space for toggle button */
+        padding-top: 60px;
+        /* Space for toggle button */
     }
 
     .mobileToggleButton {
@@ -583,9 +589,22 @@
         font-size: 14px;
     }
 
-    .navTabIcon svg {
+    /* .navTabIcon svg {
         width: 18px;
         height: 18px;
+    } */
+    .navTabIcon {
+        background: #eaf3ff;
+        padding: 6px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .navTabActive .navTabIcon {
+        background: #0d6efd;
+        color: white;
     }
 
     .mainContainer {
@@ -698,4 +717,3 @@
 .content::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
 }
-

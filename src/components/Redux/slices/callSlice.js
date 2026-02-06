@@ -189,7 +189,6 @@ export const startCall = createAsyncThunk(
 
                     console.log("🔥 CALL CONNECTED → TIMER SHOULD START_____________________");
                 }
-
                 try {
                     if (mediaType === "audio") {
                         remoteAudioTrack = await client.subscribe(user, mediaType);

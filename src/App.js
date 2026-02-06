@@ -32,6 +32,10 @@ import { AppStatusProvider } from "./components/ProtectRoute/AppStatusProvider";
 import AccountInformation from "./pages/AccountInformation";
 import CallChatLogs from "./pages/CallChatLogs";
 import ChatsPage from "./components/ConsultantDashboard/ChatsPage";
+import DashboardPage from "./components/ConsultantDashboard/DashboardPage";
+import CallLogsConsultant from "./components/ConsultantDashboard/CallChatLogsConsultant";
+import ConsultantWalletLogs from "./components/ConsultantDashboard/ConsultantWalletLogs";
+import WithdrawalRequestForm from "./components/ConsultantDashboard/WithdrawalRequestForm";
 
 
 
@@ -141,11 +145,14 @@ export default function App() {
               <ViewProfile />
             </ProtectStoreFront>
           } />
-          <Route path="/consultant-dashboard/*" element={<TabNavigation />}>
-            <Route index element={<Dashboard />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="chats/:chatId?" element={<ChatsPage />} />
-          </Route>
+            <Route path="/consultant-dashboard/*" element={<TabNavigation />}>
+              <Route index element={<DashboardPage />} />
+              <Route path="dashboard" element={<DashboardPage />} />
+              <Route path="chats/:chatId?" element={<ChatsPage />} />
+              <Route path="call-chat-logs" element={<CallLogsConsultant />} />
+              <Route path="consultant-wallet-logs" element={<ConsultantWalletLogs />} />
+              <Route path="withdrawal-request" element={<WithdrawalRequestForm />} />
+            </Route>
 
 
           {/* <Route path="/consultant-dashboard/*" element={

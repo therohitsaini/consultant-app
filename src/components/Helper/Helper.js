@@ -7,3 +7,12 @@ export const getDuration = (start, end) => {
     const s = String(diff % 60).padStart(2, '0');
     return `${m}:${s}`;
 };
+
+
+export const formatAmountHelper = (num) => {
+    if (!num) return "0";
+    if (num >= 1_000_000_000) return (num / 1_000_000_000).toFixed(1) + "B";
+    if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + "M";
+    if (num >= 1_000) return (num / 1_000).toFixed(1) + "K";
+    return Number(num.toFixed(2)).toString();
+};

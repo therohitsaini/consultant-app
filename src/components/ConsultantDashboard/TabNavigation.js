@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from '../../components/ConsultantDashboard/TabNavigation.module.css';
 import DashboardPage from './DashboardPage';
@@ -14,8 +14,15 @@ import IncomingCallAlert from '../AlertModel/IncommingCallAlert';
 import ConsultantProfileModal from './ConsultantProfileModal';
 import axios from 'axios';
 import { app } from '@shopify/app-bridge/actions/Print';
+import {
+    HiOutlineSquares2X2,
+    HiOutlineChatBubbleLeftRight,
+    HiOutlineClipboardDocumentList,
+    HiOutlineBanknotes,
+    HiOutlineArrowDownTray,
+} from "react-icons/hi2";
 
-// Icon Components - Enhanced with better designs
+// Icon Components - Enhanced with better, professional designs
 
 
 
@@ -177,13 +184,33 @@ function TabNavigation({ children }) {
     const menuItems = [
         {
             label: 'Dashboard',
-            path: '/consultant-dashboard/dashboard',
-            active: location.pathname === '/consultant-dashboard/dashboard',
+            path: '/consultant-dashboard',
+            active: location.pathname === '/consultant-dashboard',
+            icon: <HiOutlineSquares2X2 />,
         },
         {
             label: 'Chats',
             path: '/consultant-dashboard/chats',
             active: location.pathname.startsWith('/consultant-dashboard/chats'),
+            icon: <HiOutlineChatBubbleLeftRight />,
+        },
+        {
+            label: 'Call Chat Logs',
+            path: '/consultant-dashboard/call-chat-logs',
+            active: location.pathname.startsWith('/consultant-dashboard/call-chat-logs'),
+            icon: <HiOutlineClipboardDocumentList />,
+        },
+        {
+            label: 'Wallet Management',
+            path: '/consultant-dashboard/consultant-wallet-logs',
+            active: location.pathname.startsWith('/consultant-dashboard/consultant-wallet-logs'),
+            icon: <HiOutlineBanknotes />,
+        },
+        {
+            label: 'Withdrawal Request',
+            path: '/consultant-dashboard/withdrawal-request',
+            active: location.pathname.startsWith('/consultant-dashboard/withdrawal-request'),
+            icon: <HiOutlineArrowDownTray />,
         },
     ];
 
@@ -197,9 +224,22 @@ function TabNavigation({ children }) {
     //     window.top.location.href = `https://${targetShop}/apps/consultant-theme${path}${hostQuery}`;
 
     // };
+    // const handleNavigation = (path) => {
+    //     navigate(path);
+    // };
     const handleNavigation = (path) => {
+        localStorage.setItem("lastRoute", path);   // save route
         navigate(path);
     };
+    useEffect(() => {
+        const lastRoute = localStorage.getItem("lastRoute");
+
+        if (lastRoute && location.pathname === "/consultant-dashboard") {
+            navigate(lastRoute, { replace: true });
+        }
+    }, []);
+
+
 
     const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${consultantOverview?.consultant?.profileImage?.replace("\\", "/")}`;
     const isVideoCallPage = location.pathname === '/video-call' || location.pathname.startsWith('/video-call');
@@ -246,51 +286,52 @@ function TabNavigation({ children }) {
                     ></div>
                 )}
 
-                {/* Main Container with Navigation Tabs */}
                 <div className={styles.mainContainer}>
-                    {/* Side Navigation Tabs - Hide on video call page */}
-                    {!isVideoCallPage && (
-                        <aside className={`${styles.sideNav} ${sidebarOpen ? styles.sideNavOpen : ''}`}>
-                            {/* Profile Section */}
-                            <div className={styles.profileSection}>
-                                <div className={styles.profileImage}>
-                                    <img src={imageUrl || 'https://imgs.search.brave.com/9rELSNB2JEASiZPQlCef36aaHliToZj5fynVvObLBKg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4t/aWNvbnMtcG5nLmZs/YXRpY29uLmNvbS8x/MjgvNTk4Ny81OTg3/ODExLnBuZw'} alt={consultantOverview?.consultant?.fullname} />
+                    {
+                        !isVideoCallPage && (
+                            <aside className={`${styles.sideNav} ${sidebarOpen ? styles.sideNavOpen : ''}`}>
+                                <div className={styles.profileSection}>
+                                    <div className={styles.profileImage}>
+                                        <img src={imageUrl || 'https://imgs.search.brave.com/9rELSNB2JEASiZPQlCef36aaHliToZj5fynVvObLBKg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4t/aWNvbnMtcG5nLmZs/YXRpY29uLmNvbS8x/MjgvNTk4Ny81OTg3/ODExLnBuZw'} alt={consultantOverview?.consultant?.fullname} />
+                                    </div>
+                                    <div className={styles.profileDetails}>
+                                        <div className={styles.profileName}>{consultantOverview?.consultant?.fullname}</div>
+                                        <div className={styles.profileEmail}>{consultantOverview?.consultant?.email}</div>
+                                    </div>
+                                    <button onClick={() => setShowModal(true)} className={styles.profileButton}>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                            <circle cx="12" cy="7" r="4" />
+                                        </svg>
+                                        My Profile
+                                    </button>
                                 </div>
-                                <div className={styles.profileDetails}>
-                                    <div className={styles.profileName}>{consultantOverview?.consultant?.fullname}</div>
-                                    <div className={styles.profileEmail}>{consultantOverview?.consultant?.email}</div>
-                                </div>
-                                <button onClick={() => setShowModal(true)} className={styles.profileButton}>
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                                        <circle cx="12" cy="7" r="4" />
-                                    </svg>
-                                    My Profile
-                                </button>
-                            </div>
 
-                            <nav className={styles.navTabs}>
-                                <ul className={styles.navTabList}>
-                                    {menuItems.map((item, index) => (
-                                        <li key={index}>
-                                            <button
-                                                className={`${styles.navTab} ${item.active ? styles.navTabActive : ''}`}
-                                                onClick={() => handleNavigation(item.path)}
-                                                title={item.label}
-                                            >
-                                                <span className={styles.navTabIcon}>{item.icon}</span>
-                                                <span className={styles.navTabLabel}>{item.label}</span>
-                                            </button>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </nav>
-                        </aside>
-                    )}
+                                <nav className={styles.navTabs}>
+                                    <ul className={styles.navTabList}>
+                                        {menuItems.map((item, index) => (
+                                            <li key={index}>
+                                                <button
+                                                    className={`${styles.navTab} ${item.active ? styles.navTabActive : ''}`}
+                                                    onClick={() => handleNavigation(item.path)}
+                                                    title={item.label}
+                                                >
+                                                    <span className={styles.navTabIcon}>{item.icon}</span>
+                                                    <span className={styles.navTabLabel}>{item.label}</span>
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </nav>
+                            </aside>
+                        )}
 
-                    {/* Main Content Area */}
                     <div className={styles.contentArea}>
                         <main className={styles.content}>
+                            <Outlet />
+                        </main>
+
+                        {/* <main className={styles.content}>
                             {(() => {
                                 const path = location.pathname;
                                 if (path === '/users-page' || path.startsWith('/users-page')) {
@@ -303,7 +344,7 @@ function TabNavigation({ children }) {
                                     return <DashboardPage />;
                                 }
                             })()}
-                        </main>
+                        </main> */}
                     </div>
                 </div>
             </div>

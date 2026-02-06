@@ -104,7 +104,7 @@ const LoginForm = () => {
 
             // Ensure userData exists and has an _id
             if (response.status === 200 && response.data?.userData?._id) {
-                const params = new URLSearchParams(window.location.search);
+                const params = new URLSearchParams(window.loc2ation.search);
                 const shop = params.get("shop");
                 const host = params.get("host");
                 const userId = userData?._id;

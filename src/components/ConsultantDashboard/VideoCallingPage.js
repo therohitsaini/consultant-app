@@ -6,7 +6,7 @@ import { endCall, startCall, toggleMute, toggleVideo } from '../Redux/slices/cal
 import { initRingtone, playRingtone } from '../ringTone/ringingTune';
 import { getSocket, socket } from '../Sokect-io/SokectConfig';
 import axios from 'axios';
-
+import profileImageDefault from '../../../src/assets/avatar-or-person-sign-profile-picture-portrait-icon-user-profile-symbol.webp';
 function VideoCallingPage() {
     const navigate = useNavigate();
     const location = useLocation();
@@ -37,7 +37,14 @@ function VideoCallingPage() {
     const isVideoCall = type === "video" || callType === "video";
     const { callRejected } = useSelector((state) => state.socket);
 
+    // useEffect(() => {
+    //     const navType = performance.getEntriesByType("navigation")[0]?.type;
 
+    //     if (navType === "reload") {
+    //         alert("Page refreshed — Call resumed!");
+    //     }
+    // }, []);
+    console.log("inCall", inCall);
 
     useEffect(() => {
         localStorage.setItem("userId", userId);
@@ -393,6 +400,10 @@ function VideoCallingPage() {
                 navigate(-1);
             }
         }
+        else {
+            navigate(-1);
+            return;
+        }
         // socket.emit("call-ended", { callerId: callerId, receiverId: receiverId, channel: channelNameParam, callType: callType, transactionId: callAccepted?.transactionId, shopId: "690c374f605cb8b946503ccb" });
         // const returnUrl = params.get("returnUrl");
         // if (returnUrl) {
@@ -459,7 +470,7 @@ function VideoCallingPage() {
         const onRemoteLeft = (e) => {
             console.log("🔥 Remote user left — ending call immediately", e?.detail);
 
-            handleEndCall(); // 👈 DIRECT END
+            handleEndCall();
         };
 
         window.addEventListener("remote-user-left", onRemoteLeft);
@@ -507,7 +518,6 @@ function VideoCallingPage() {
         };
         window.addEventListener("call-connected", handler);
 
-        // 🔥 LATE LISTENER FIX
         if (window.callAlreadyConnected) {
             console.log("⚡ Call already connected (late load)");
             startTimer();
@@ -534,10 +544,10 @@ function VideoCallingPage() {
                 <div className={styles.callInfo}>
 
                     <div onClick={startTimer} className={styles.callAvatar}>
-                        <img className={styles.callAvatar} src={ userType === "consultant" ? callerDetails?.caller?.profileImage || "" : callerDetails?.receiver?.profileImage || null} alt="profile" />
+                        <img className={styles.callAvatar} src={userType === "consultant" ? callerDetails?.caller?.profileImage || profileImageDefault : callerDetails?.receiver?.profileImage || profileImageDefault} alt="profile" />
                     </div>
                     <div>
-                        <div className={styles.callName}>{ userType === "consultant" ? callerDetails?.caller?.fullname : callerDetails?.receiver?.fullname}</div>
+                        <div className={styles.callName}>{userType === "consultant" ? callerDetails?.caller?.fullname : callerDetails?.receiver?.fullname}</div>
                         <div className={styles.callStatus}>
                             {/* {conversation.isOnline ? 'Online' : 'Offline'} */}
                         </div>
@@ -561,11 +571,11 @@ function VideoCallingPage() {
                                 <div className={styles.videoPlaceholder}>
                                     {profileImage && (
                                         <div className={styles.avatarLarge}>
-                                            <img className={styles.avatarLarge} src={profileImage} alt="profile" />
+                                            <img className={styles.avatarLarge} src={userType === "consultant" ? callerDetails?.caller?.profileImage || profileImageDefault : callerDetails?.receiver?.profileImage || profileImageDefault} alt="profile" />
                                         </div>
                                     )}
                                     <p className={styles.videoPlaceholderText}>
-                                         { userType === "consultant" ? callerDetails?.caller?.fullname : callerDetails?.receiver?.fullname || "Waiting for video..."}
+                                        {userType === "consultant" ? callerDetails?.caller?.fullname : callerDetails?.receiver?.fullname || "Waiting for video..."}
                                     </p>
                                 </div>
                             )}
@@ -574,11 +584,11 @@ function VideoCallingPage() {
                         <div className={styles.videoPlaceholder}>
                             {profileImage && (
                                 <div className={styles.avatarLarge}>
-                                    <img className={styles.avatarLarge} src={profileImage} alt="profile" />
+                                    <img className={styles.avatarLarge} src={userType === "consultant" ? callerDetails?.caller?.profileImage || profileImageDefault : callerDetails?.receiver?.profileImage || profileImageDefault} alt="profile" />
                                 </div>
                             )}
                             <p className={styles.videoPlaceholderText}>
-                                { userType === "consultant" ? callerDetails?.caller?.fullname : callerDetails?.receiver?.fullname || "Calling..."}
+                                {userType === "consultant" ? callerDetails?.caller?.fullname : callerDetails?.receiver?.fullname || "Calling..."}
                             </p>
 
                             {

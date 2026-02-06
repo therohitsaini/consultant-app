@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 const UserTable = ({ columns, data, title, loading }) => {
     const [currentPage, setCurrentPage] = useState(1);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
     const indexOfLast = currentPage * rowsPerPage;
     const indexOfFirst = indexOfLast - rowsPerPage;
@@ -12,10 +12,8 @@ const UserTable = ({ columns, data, title, loading }) => {
 
     return (
         <div className="container mt-4">
-
             <div className="d-flex justify-content-between align-items-center mb-3">
-                <h5>{title}</h5>
-
+                <h5 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '10px' }}>{title}</h5>
                 <select
                     className="form-select w-auto" style={{ padding: ".375rem 1.25rem .375rem .75rem", fontSize: "12px", backgroundPosition: "right .55rem center", backgroundSize: "10px 12px", boxShadow: "none" }}
                     value={rowsPerPage}
