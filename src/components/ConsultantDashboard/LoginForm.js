@@ -23,7 +23,7 @@ const LoginForm = () => {
     console.log("shop", shop);
     console.log("host", host);
 
-    console.log("tokenStatus", tokenStatus)
+    console.log("tokenStatus", consultantBlockedError)
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -103,8 +103,10 @@ const LoginForm = () => {
             console.log("response", response);
 
             // Ensure userData exists and has an _id
-            if (response.status === 200 && response.data?.userData?._id) {
-                const params = new URLSearchParams(window.loc2ation.search);
+            if (response.status === 200 && userData?._id) {
+
+                console.log("userData?._id", userData?._id);
+                const params = new URLSearchParams(window.location.search);
                 const shop = params.get("shop");
                 const host = params.get("host");
                 const userId = userData?._id;
@@ -113,30 +115,6 @@ const LoginForm = () => {
                 localStorage.setItem("shop_o_Identity", shopId);
                 localStorage.setItem("varify_tokem", token);
                 openTokenWindow({ userId, shopId });
-                // Call FcmToken utility function
-                // const cleanup = requestFcmTokenInNewWindow(
-                //     userId,
-                //     shopId,
-                //     {
-                //         onStatusChange: (status) => {
-                //             setTokenStatus(status);
-                //         },
-                //         onSuccess: (data) => {
-                //             console.log("✅ Token saved successfully:", data);
-                //             setIsLoading(false);
-                //             proceedToDashboard(shop, host);
-                //         },
-                //         onError: (error) => {
-                //             console.error("❌ Token generation error:", error);
-                //             setIsLoading(false);
-                //             // Still proceed to dashboard even if token failed
-                //             proceedToDashboard(shop, host);
-                //         }
-                //     }
-                // );
-
-                // Store cleanup function for component unmount (optional)
-                // cleanup will be called automatically when callbacks are executed
                 setIsLoading(false);
                 // proceedToDashboard(shop, host);
             } else {
@@ -262,7 +240,7 @@ const LoginForm = () => {
                             {consultantBlockedError}
                         </div>
                     )}
-                   
+
                 </form>
             </div>
         </div>

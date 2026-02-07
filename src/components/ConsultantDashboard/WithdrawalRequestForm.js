@@ -9,62 +9,51 @@ const WithdrawalRequestForm = () => {
 
     const [amount, setAmount] = useState("");
     const [note, setNote] = useState("");
-    const [balance, setBalance] = useState(0);
     const [loading, setLoading] = useState(false);
 
     const consultantId = localStorage.getItem("client_u_Identity");
     const shopId = localStorage.getItem("shop_o_Identity");
-
     const { consultantOverview } = useSelector((state) => state.consultants);
-    console.log("consultantOverview________________", consultantOverview)
     useEffect(() => {
         if (shopId && consultantId) {
             dispatch(fetchConsultantById({ shop_id: shopId, consultant_id: consultantId }));
         }
     }, [shopId, consultantId]);
-
-    // Fetch Wallet Balance
-    useEffect(() => {
-        const fetchBalance = async () => {
-            try {
-                const res = await axios.get(
-                    `${process.env.REACT_APP_BACKEND_HOST}/api/wallet/${consultantId}/${shopId}`
-                );
-
-                setBalance(res.data.balance || 0);
-            } catch (err) {
-                console.log(err);
-            }
-        };
-
-        fetchBalance();
-    }, []);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!amount) return alert("Enter amount");
+    
+        if (!amount || amount <= 0) {
+            return alert("Please enter valid amount");
+        }
+    
         try {
             setLoading(true);
-
-            await axios.post(
-                `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/submit/withdrawal/reques/${consultantId}/${shopId}`,
+    
+            const res = await axios.post(
+                `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/submit/withdrawal/request/${consultantId}/${shopId}`,
                 {
                     amount,
                     note,
                 }
             );
-
-            alert("Withdrawal request sent");
-
-            setAmount("");
-            setNote("");
-
+    
+            if (res.data.success) {
+                alert(res.data.message);
+                setAmount("");
+                setNote("");
+            } else {
+                alert("Something went wrong");
+            }
+    
         } catch (error) {
-            alert("Failed to submit");
+            console.error(error);
+            alert(error?.response?.data?.message || "Failed to submit");
+    
         } finally {
             setLoading(false);
         }
     };
+    
 
     return (
         <div className="coainernt rounded-md d-flex justify-content-center align-items-center" style={{ height: "90vh" }} >
