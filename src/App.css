@@ -40,3 +40,21 @@
 .Polaris-LegacyCard {
   overflow: visible !important;
 }
+.Polaris-Page {
+  padding-bottom: 30px !important;
+}
+
+.Polaris-IndexTable__IndexTableWrapper {
+  border-radius: 0 0 var(--p-border-radius-300) var(--p-border-radius-300) !important;
+}
+
+.Polaris-IndexFilters-Container {
+  border-top-left-radius: var(--p-border-radius-300) !important;
+  border-top-right-radius: var(--p-border-radius-300) !important;
+}
+
+@media (min-width: 30.625em) {
+  .Polaris-Page {
+      padding-bottom: 30px !important;
+  }
+}

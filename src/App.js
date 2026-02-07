@@ -36,6 +36,8 @@ import DashboardPage from "./components/ConsultantDashboard/DashboardPage";
 import CallLogsConsultant from "./components/ConsultantDashboard/CallChatLogsConsultant";
 import ConsultantWalletLogs from "./components/ConsultantDashboard/ConsultantWalletLogs";
 import WithdrawalRequestForm from "./components/ConsultantDashboard/WithdrawalRequestForm";
+import WithdrawalRequest from "./pages/WithdrawalRequest";
+import "./App.css";
 
 
 
@@ -129,6 +131,7 @@ export default function App() {
             <Route path="/add-consultant" element={<AddConsultant />} />
             <Route path="/setting/history" element={<UserTransHistory />} />
             <Route path="/setting/wallet-management" element={<ManualDebetCreditBlance />} />
+            <Route path="/withdrawal-request" element={<WithdrawalRequest />} />
             <Route path="/account-information" element={<AccountInformation />} />
             <Route path="/admin-settings/voucher" element={<VoucherSettings />} />
             <Route path="/admin-settings/voucher-management" element={<VoucherTable />} />

@@ -28,7 +28,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   // <React.StrictMode>
 
-  <ErrorBoundary>
+  // <ErrorBoundary>
     <AppBridgeProvider >
       <PolarisAppProvider i18n={en}>
         <ToastProvider>
@@ -44,7 +44,7 @@ root.render(
         </ToastProvider>
       </PolarisAppProvider>
     </AppBridgeProvider>
-  </ErrorBoundary>
+  // </ErrorBoundary>
   // </React.StrictMode>
 );
 if (process.env.NODE_ENV === 'development') {

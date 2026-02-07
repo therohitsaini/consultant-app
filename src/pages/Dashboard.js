@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchAdminDetails, fetchShopAllConsultants, fetchShopAllUsers, manageAppStatus } from '../components/Redux/slices/adminSlice';
 import { Redirect } from '@shopify/app-bridge/actions';
 import { useMemo } from 'react';
+import { formatAmountHelper } from '../components/Helper/Helper';
 
 
 // Component to display animated count with motion
@@ -132,13 +133,7 @@ function Dashboard() {
             <Page
                 title="vc-consultant app"
                 // primaryAction={<LanguageSelector />}
-                secondaryActions={[
-                    {
-                        content: 'Publish App',
-                        external: true,
-                        icon: ExternalIcon,
-                    },
-                ]}
+               
             >
 
                 <Layout>
@@ -267,9 +262,7 @@ function Dashboard() {
                                             </div>
                                             <div style={{ flex: 1, }}>
                                                 <Text variant="headingLg" as="h2" fontWeight="bold">
-                                                    ₹{parseFloat(
-                                                        adminDetails?.adminWalletBalance?.$numberDecimal || 0
-                                                    ).toFixed(2)}
+                                                    ₹{formatAmountHelper(adminDetails?.adminWalletBalance?.$numberDecimal || 0)}
                                                 </Text>
                                                 <Text variant="bodyMd" as="p" tone="subdued">
                                                     Total Revenue

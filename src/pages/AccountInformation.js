@@ -24,7 +24,7 @@ export default function AccountInformation() {
         >
             <Card>
                 
-                <Box paddingBlockStart="400">
+                <Box>
                     <BlockStack gap="300">
                         <InlineStack align="space-between">
                             <Text>Plan Name</Text>

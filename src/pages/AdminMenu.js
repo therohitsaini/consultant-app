@@ -17,6 +17,7 @@ export function AdminMenu() {
             <a href="/consultant-list">Consultant Directory</a>
             <a href="/setting/history"> Activity History</a>
             <a href="/setting/wallet-management">Wallet Management</a>
+            <a href="/withdrawal-request">Withdrawal Request</a>
             <a href="/admin-settings/voucher-management">Voucher</a>
             <a href="/account-information">Account Info</a>
             <a href="/faq">FAQ</a>

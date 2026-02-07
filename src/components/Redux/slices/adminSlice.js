@@ -91,6 +91,21 @@ export const deleteVoucher = createAsyncThunk("admin/deleteVoucher", async ({ ad
     return response.data
 })
 
+export const fetchWithdrawalRequests = createAsyncThunk("admin/fetchWithdrawalRequests", async ({ adminIdLocal, page = 1, limit = 10, app, searchQuery }) => {
+    const token = await getAppBridgeToken(app);
+    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/withdrawal-requests/${adminIdLocal}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        params: {
+            page,
+            limit,
+            search: searchQuery
+        }
+    })
+    return response.data
+})
+
 
 const adminSlice = createSlice({
     name: "admin",
@@ -104,6 +119,7 @@ const adminSlice = createSlice({
         adminDetails_: [],
         appStatus: null,
         deletedVoucher: null,
+        withdrawalRequests: [],
     },
     extraReducers: (builder) => {
         builder
@@ -181,6 +197,17 @@ const adminSlice = createSlice({
                 state.deletedVoucher = action.payload;
             })
             .addCase(deleteVoucher.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
+            .addCase(fetchWithdrawalRequests.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchWithdrawalRequests.fulfilled, (state, action) => {
+                state.loading = false;
+                state.withdrawalRequests = action.payload;
+            })
+            .addCase(fetchWithdrawalRequests.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
             })
