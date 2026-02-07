@@ -19,16 +19,14 @@ const WithdrawalRequestForm = () => {
             dispatch(fetchConsultantById({ shop_id: shopId, consultant_id: consultantId }));
         }
     }, [shopId, consultantId]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
         if (!amount || amount <= 0) {
             return alert("Please enter valid amount");
         }
-    
         try {
             setLoading(true);
-    
             const res = await axios.post(
                 `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/submit/withdrawal/request/${consultantId}/${shopId}`,
                 {
@@ -36,8 +34,7 @@ const WithdrawalRequestForm = () => {
                     note,
                 }
             );
-    
-            if (res.data.success) {
+            if (res.status === 200) {
                 alert(res.data.message);
                 setAmount("");
                 setNote("");
