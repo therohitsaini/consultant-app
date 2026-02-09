@@ -1,20 +1,25 @@
-import React, { Fragment, useCallback, useEffect, useState } from 'react'
+import React, { Fragment, useCallback, useContext, useEffect, useState } from 'react'
 import IndexTableList from '../components/consultant-list/IndexTableList'
-import { Page, Layout, Spinner, ButtonGroup, Button, Toast, Badge } from '@shopify/polaris'
-import { DuplicateIcon, EditIcon, PlusIcon } from '@shopify/polaris-icons'
+import { Page, Layout, ButtonGroup, Button, Badge } from '@shopify/polaris'
 import { IndexTable, Text } from '@shopify/polaris'
-import { fetchWalletHistory, fetchWithdrawalRequests } from '../components/Redux/slices/adminSlice'
+import { fetchWithdrawalRequests } from '../components/Redux/slices/adminSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { useAppBridge } from '../components/createContext/AppBridgeContext'
-import UpdateUserDetailsModal from './UpdateUserDetailsModal'
 import axios from 'axios'
-import { ToastModel } from '../components/AlertModel/Tost'
 import { getAppBridgeToken } from '../utils/getAppBridgeToken'
+import { MdOutlinePayments } from "react-icons/md";
+import WidthrwalRequestApprove from '../components/AlertModel/WidthrwalRequestApprove'
+import { RxCross2 } from "react-icons/rx";
+import { ToastContext } from '../components/AlertModel/PolariesTostContext';
+import { WidthrawalReqDeclineAlert } from '../components/AlertModel/WidthrawalReqDeclineAlert'
+
+
+
 
 
 const withdrawalRequestHeadings = [
     { title: 'Sr. No.', align: 'center' },
-    { title: 'Name', align: 'center'     },
+    { title: 'Name', align: 'center' },
     { title: 'Amount', align: 'center' },
     { title: "Status", align: 'center' },
     { title: "Description", align: 'center' },
@@ -25,28 +30,30 @@ const withdrawalRequestHeadings = [
 
 function WithdrawalRequest() {
     const app = useAppBridge();
-    const { walletHistory, loading: walletLoading } = useSelector((state) => state.admin);
+    const { showToast } = useContext(ToastContext);
     const dispatch = useDispatch();
     const [adminIdLocal, setAdminIdLocal] = useState(null);
     const [userDetails, setUserDetails] = useState({});
     const [page, setPage] = useState(1);
     const [type, setType] = useState(0);
     const [active, setActive] = useState(false);
-    const [toastActive, setToastActive] = useState(false);
     const [refresh, setRefresh] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [isWidthrawalReqDeclineAlertVisible, setIsWidthrawalReqDeclineAlertVisible] = useState(false);
+    const [selectedWithdrawalRequestId, setSelectedWithdrawalRequestId] = useState(null);
     const [updateFormData, setUpdateFormData] = useState({
         userId: '',
+        transactionId: '',
         mainType: '',
         amount: '',
         description: '',
+        transactionNumber: '',
     });
     const limit = 10;
-    console.log("searchQuery", searchQuery);
     const { withdrawalRequests, loading: withdrawalRequestsLoading } = useSelector((state) => state.admin);
-    const openUpdateWalletModal = (userId, fullname) => {
+    const openUpdateWalletModal = (userId, fullname, shop_Id, amount, status, description, id) => {
         setActive(true);
-        setUserDetails({ userId, fullname });
+        setUserDetails({ userId, fullname, shop_Id, amount, status, description, id });
     }
 
     useEffect(() => {
@@ -58,16 +65,20 @@ function WithdrawalRequest() {
         dispatch(fetchWithdrawalRequests({ adminIdLocal, page, limit, app, searchQuery }));
     }, [dispatch, adminIdLocal, page, limit, refresh, searchQuery]);
 
-    console.log("withdrawalRequests", withdrawalRequests);
+
+
     /** 
      * Update Wallet
      * 
      */
+
+
     const updateWallet = async () => {
         const token = await getAppBridgeToken(app);
         console.log("token", token);
+        console.log("updateFormData", updateFormData);
         try {
-            const response = await axios.post(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/update-wallet/${adminIdLocal}`, {
+            const response = await axios.put(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/update/widthrwal/req/${adminIdLocal}`, {
                 ...updateFormData, userId: userDetails.userId,
             }, {
                 headers: {
@@ -76,13 +87,47 @@ function WithdrawalRequest() {
             });
             if (response.data.success === true) {
                 setRefresh((prev) => !prev);
+                setActive(false);
+                showToast(response.data?.message);
             } else {
-                setToastActive(true);
+                setActive(false);
+                showToast(response.data?.message, true);
             }
         } catch (error) {
-            setToastActive(true);
+            onClose();
+            showToast(error.response.data.message, true);
         }
     }
+
+    const openDeclineModal = (withdrawalRequestId) => {
+        setSelectedWithdrawalRequestId(withdrawalRequestId);
+        setIsWidthrawalReqDeclineAlertVisible(true);
+    };
+
+    const handleDecline = async (withdrawalRequestId) => {
+        const token = await getAppBridgeToken(app);
+        try {
+            const response = await axios.put(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/declin/widthrwal/req/${withdrawalRequestId}`, {
+
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            console.log("response", response);
+            if (response.data.success === true) {
+                setIsWidthrawalReqDeclineAlertVisible(false);
+                showToast(response.data.message);
+                setRefresh((prev) => !prev);
+            } else {
+                setIsWidthrawalReqDeclineAlertVisible(false);
+                showToast(response.data.message, true);
+            }
+        } catch (error) {
+            setIsWidthrawalReqDeclineAlertVisible(false);
+            showToast(error.response.data.message, true);
+        }
+    };
 
     const formatDate = (iso) =>
         new Date(iso).toLocaleDateString();
@@ -106,7 +151,7 @@ function WithdrawalRequest() {
     };
 
     const renderWalletRow = useCallback((withdrawal, index) => {
-        const { id, userId, shop_Id, fullname, amount, referenceType, status, description } = withdrawal
+        const { id, userId, shop_Id, fullname, amount, status, description } = withdrawal
         const serialNumber = (page - 1) * limit + index + 1;
 
         return (
@@ -130,7 +175,7 @@ function WithdrawalRequest() {
 
 
                 <IndexTable.Cell alignment="start">
-                    <Badge tone={status === "success" ? "success" : "critical"}>
+                    <Badge variant="outline" tone={status === "paid" ? "success" : "critical"}>
                         {status}
                     </Badge>
                 </IndexTable.Cell>
@@ -141,15 +186,25 @@ function WithdrawalRequest() {
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
-                    <ButtonGroup alignment="start">
+                    <ButtonGroup alignment="start" gap="2" spacing="compact" style={{ border: '1px solidrgb(192, 30, 30)', borderRadius: '5px', padding: '5px' }}>
                         <Button
                             variant="tertiary"
-                            icon={EditIcon}
-                            accessibilityLabel="Edit wallet"
+                            icon={MdOutlinePayments}
+                            accessibilityLabel="Withdrawal Request"
                             onClick={(e) => {
                                 e.stopPropagation();
-                                openUpdateWalletModal(userId, fullname, shop_Id);
+                                openUpdateWalletModal(userId, fullname, shop_Id, amount, status, description, id);
                                 // handleEdit(_id);
+                            }}
+                        />
+                        <Button
+                            variant="tertiary"
+                            tone="critical"
+                            icon={RxCross2}
+                            accessibilityLabel="Decline Withdrawal Request"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                openDeclineModal(id);
                             }}
                         />
 
@@ -160,9 +215,16 @@ function WithdrawalRequest() {
         )
     }, [page, limit])
 
+
     return (
         <Fragment>
-            <UpdateUserDetailsModal open={active} onClose={() => setActive(false)} userDetails={userDetails} updateFormData={updateFormData} setUpdateFormData={setUpdateFormData} updateWallet={updateWallet} />
+            <WidthrawalReqDeclineAlert
+                isWidthrawalReqDeclineAlertVisible={isWidthrawalReqDeclineAlertVisible}
+                setIsWidthrawalReqDeclineAlertVisible={setIsWidthrawalReqDeclineAlertVisible}
+                handleDecline={handleDecline}
+                withdrawalRequestId={selectedWithdrawalRequestId}
+            />
+            <WidthrwalRequestApprove open={active} onClose={() => setActive(false)} userDetails={userDetails} updateFormData={updateFormData} setUpdateFormData={setUpdateFormData} updateWallet={updateWallet} />
             <Page
                 title="Withdrawal Request"
 
@@ -184,8 +246,8 @@ function WithdrawalRequest() {
                             setPage={setPage}
                             setType={setType}
                             limit={limit}
-                            totalItems={walletHistory?.totalItems || walletHistory?.data?.length || 0}
-                            loading={walletLoading}
+                            totalItems={withdrawalRequests?.totalItems || withdrawalRequests?.data?.length || 0}
+                            loading={withdrawalRequestsLoading}
                             onHandleCancel={onHandleCancel}
                         />
                     </Layout.Section>

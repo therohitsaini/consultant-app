@@ -81,12 +81,12 @@ function Dashboard() {
     const appStatus = useSelector((state) => state.admin.appStatus);
     const { adminDetails_, loading: adminDetailsLoading } = useSelector((state) => state.admin);
 
-   
+
     const params = new URLSearchParams(window.location.search);
     const id = params.get("adminId");
     const host = params.get("host");
 
-
+    console.log("adminDetails_T", adminDetails_, adminDetails);
     useEffect(() => {
         const id = localStorage.getItem('domain_V_id');
         setAdminIdLocal(id);
@@ -132,8 +132,8 @@ function Dashboard() {
             )}
             <Page
                 title="vc-consultant app"
-                // primaryAction={<LanguageSelector />}
-               
+            // primaryAction={<LanguageSelector />}
+
             >
 
                 <Layout>
@@ -204,7 +204,8 @@ function Dashboard() {
                                             </div>
                                             <div style={{ flex: 1, }}>
                                                 <Text variant="headingLg" as="h2" fontWeight="bold">
-                                                    {adminDetails?.adminPercentage?.$numberDecimal || 0}%
+                                                {Number(adminDetails_?.adminPersenTage?.$numberDecimal || 0)}%
+                                                    
                                                 </Text>
                                                 <Text variant="bodyMd" as="p" tone="subdued">
                                                     Conversion Rate

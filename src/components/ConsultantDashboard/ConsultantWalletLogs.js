@@ -23,7 +23,7 @@ const ConsultantWalletLogs = () => {
         {
             label: "Amount",
             key: "amount",
-            render: row => `₹${row.amount.toFixed(2)}`
+            render: row => `₹${row.amount?.toFixed(2) || "0.00"}`
         },
         {
             label: "Type",

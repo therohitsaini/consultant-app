@@ -38,6 +38,8 @@ import ConsultantWalletLogs from "./components/ConsultantDashboard/ConsultantWal
 import WithdrawalRequestForm from "./components/ConsultantDashboard/WithdrawalRequestForm";
 import WithdrawalRequest from "./pages/WithdrawalRequest";
 import "./App.css";
+import WithdrawalRequestTable from "./components/ConsultantDashboard/WithdrawalRequestTable";
+import AdminPercentage from "./pages/AdminPercentage";
 
 
 
@@ -135,6 +137,7 @@ export default function App() {
             <Route path="/account-information" element={<AccountInformation />} />
             <Route path="/admin-settings/voucher" element={<VoucherSettings />} />
             <Route path="/admin-settings/voucher-management" element={<VoucherTable />} />
+            <Route path="/admin-settings/admin-percentage" element={<AdminPercentage />} />
             <Route path="/faq" element={<Faq />} />
           </Route>
 
@@ -155,6 +158,7 @@ export default function App() {
               <Route path="call-chat-logs" element={<CallLogsConsultant />} />
               <Route path="consultant-wallet-logs" element={<ConsultantWalletLogs />} />
               <Route path="withdrawal-request" element={<WithdrawalRequestForm />} />
+              <Route path="withdrawal-request-table" element={<WithdrawalRequestTable />} />
             </Route>
 
 

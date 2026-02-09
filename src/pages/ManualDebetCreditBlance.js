@@ -24,18 +24,6 @@ const walletManagementHeadings = [
     { title: " Action" },
 ];
 
-const transactionSortOptions = [
-    { label: 'Date', value: 'date asc', directionLabel: 'Oldest First' },
-    { label: 'Date', value: 'date desc', directionLabel: 'Newest First' },
-    { label: 'Type', value: 'type asc', directionLabel: 'A-Z' },
-    { label: 'Type', value: 'type desc', directionLabel: 'Z-A' },
-    { label: 'Amount', value: 'amount asc', directionLabel: 'Low to High' },
-    { label: 'Amount', value: 'amount desc', directionLabel: 'High to Low' },
-    { label: 'Duration', value: 'duration asc', directionLabel: 'Shortest First' },
-    { label: 'Duration', value: 'duration desc', directionLabel: 'Longest First' }
-]
-
-
 function ManualDebetCreditBlance() {
     const app = useAppBridge();
     const { walletHistory, loading: walletLoading } = useSelector((state) => state.admin);
@@ -55,7 +43,6 @@ function ManualDebetCreditBlance() {
         description: '',
     });
     const limit = 10;
-    console.log("searchQuery", searchQuery);
     const openUpdateWalletModal = (userId, fullname) => {
         setActive(true);
         setUserDetails({ userId, fullname });

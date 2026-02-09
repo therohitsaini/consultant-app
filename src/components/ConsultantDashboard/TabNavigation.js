@@ -206,12 +206,14 @@ function TabNavigation({ children }) {
             active: location.pathname.startsWith('/consultant-dashboard/consultant-wallet-logs'),
             icon: <HiOutlineBanknotes />,
         },
+       
         {
             label: 'Withdrawal Request',
-            path: '/consultant-dashboard/withdrawal-request',
-            active: location.pathname.startsWith('/consultant-dashboard/withdrawal-request'),
+            path: '/consultant-dashboard/withdrawal-request-table',
+            active: location.pathname.startsWith('/consultant-dashboard/withdrawal-request-table'),
             icon: <HiOutlineArrowDownTray />,
         },
+     
     ];
 
 

@@ -15,11 +15,12 @@ const WithdrawalRequestForm = () => {
     const consultantId = localStorage.getItem("client_u_Identity");
     const shopId = localStorage.getItem("shop_o_Identity");
     const { consultantOverview } = useSelector((state) => state.consultants);
+    
     useEffect(() => {
         if (shopId && consultantId) {
             dispatch(fetchConsultantById({ shop_id: shopId, consultant_id: consultantId }));
         }
-    }, [shopId, consultantId]);
+    }, [shopId, consultantId, showToast]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

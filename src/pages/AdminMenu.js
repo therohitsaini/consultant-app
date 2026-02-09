@@ -15,6 +15,7 @@ export function AdminMenu() {
             {/* First link must have rel="home" and href="/" for home route */}
             <a href="/" rel="home">Dashboard  </a>
             <a href="/consultant-list">Consultant Directory</a>
+            <a href="/admin-settings/admin-percentage">Admin Charges</a>
             <a href="/setting/history"> Activity History</a>
             <a href="/setting/wallet-management">Wallet Management</a>
             <a href="/withdrawal-request">Withdrawal Request</a>
