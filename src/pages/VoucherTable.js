@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useCallback, useEffect } from 'react'
-import { Page, Layout, IndexTable, Text, Button, ButtonGroup } from '@shopify/polaris'
+import { Page, Layout, IndexTable, Text, Button, ButtonGroup, InlineStack } from '@shopify/polaris'
 import IndexTableList from '../components/consultant-list/IndexTableList'
 import { useAppBridge } from '../components/createContext/AppBridgeContext'
 import { useMemo } from 'react'
@@ -31,11 +31,11 @@ function VoucherTable() {
     }
     const [data, setData] = useState([])
     const [headings, setHeadings] = useState([
-        { title: 'Sr. No.' },
-        { title: 'Voucher Code' },
-        { title: 'Total Coin' },
-        { title: 'Extra Coin' },
-        { title: 'Action' }
+        { title: 'Sr. No.', alignment: 'start' },
+        { title: 'Voucher Code', alignment: 'center' },
+        { title: 'Total Coin', alignment: 'center' },
+        { title: 'Extra Coin', alignment: 'center' },
+        { title: 'Action', alignment: 'center' }
     ])
     const [page, setPage] = useState(1)
     const [limit, setLimit] = useState(10)
@@ -117,7 +117,7 @@ function VoucherTable() {
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
-                    <Text variant="bodyMd" as="span">
+                    <Text variant="bodyMd" as="span" alignment="center">
                         {voucherCode || 'N/A'}
                     </Text>
                 </IndexTable.Cell>
@@ -133,7 +133,7 @@ function VoucherTable() {
                 </IndexTable.Cell>
 
                 <IndexTable.Cell>
-                    <ButtonGroup>
+                <InlineStack align="center"  gap="100">
                         <Button
                             variant="tertiary"
                             icon={EditIcon}
@@ -153,7 +153,7 @@ function VoucherTable() {
                                 handleOpenDeleteModal(id);
                             }}
                         />
-                    </ButtonGroup>
+                    </InlineStack>
                 </IndexTable.Cell>
             </IndexTable.Row>
         );

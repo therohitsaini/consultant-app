@@ -1,6 +1,6 @@
 import React, { Fragment, useCallback, useContext, useEffect, useState } from 'react'
 import IndexTableList from '../components/consultant-list/IndexTableList'
-import { Page, Layout, ButtonGroup, Button, Badge } from '@shopify/polaris'
+import { Page, Layout, ButtonGroup, Button, Badge, InlineStack } from '@shopify/polaris'
 import { IndexTable, Text } from '@shopify/polaris'
 import { fetchWithdrawalRequests } from '../components/Redux/slices/adminSlice'
 import { useDispatch, useSelector } from 'react-redux'
@@ -12,18 +12,22 @@ import WidthrwalRequestApprove from '../components/AlertModel/WidthrwalRequestAp
 import { RxCross2 } from "react-icons/rx";
 import { ToastContext } from '../components/AlertModel/PolariesTostContext';
 import { WidthrawalReqDeclineAlert } from '../components/AlertModel/WidthrawalReqDeclineAlert'
-
-
+import {
+    XIcon
+} from '@shopify/polaris-icons';
+import {
+    PaymentIcon
+} from '@shopify/polaris-icons';
 
 
 
 const withdrawalRequestHeadings = [
-    { title: 'Sr. No.', align: 'center' },
-    { title: 'Name', align: 'center' },
-    { title: 'Amount', align: 'center' },
-    { title: "Status", align: 'center' },
-    { title: "Description", align: 'center' },
-    { title: " Action", align: 'center' },
+    { title: 'Sr. No.', alignment: 'start' },
+    { title: 'Name', alignment: 'center' },
+    { title: 'Amount', alignment: 'center' },
+    { title: "Status", alignment: 'center' },
+    { title: "Description", alignment: 'center' },
+    { title: " Action", alignment: 'center' },
 ];
 
 
@@ -94,7 +98,7 @@ function WithdrawalRequest() {
                 showToast(response.data?.message, true);
             }
         } catch (error) {
-            onClose();
+
             showToast(error.response.data.message, true);
         }
     }
@@ -162,34 +166,36 @@ function WithdrawalRequest() {
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
-                    <Text variant="bodyMd" as="span">
+                    <Text variant="bodyMd" as="span" alignment="center">
                         {fullname}
                     </Text>
                 </IndexTable.Cell>
 
                 <IndexTable.Cell alignment="start">
-                    <Text variant="bodyMd" as="span" alignment="start" numeric>
+                    <Text variant="bodyMd" as="span" alignment="center" numeric>
                         ${amount ? parseFloat(amount).toFixed(2) : "0.0"}
                     </Text>
                 </IndexTable.Cell>
 
 
-                <IndexTable.Cell alignment="start">
-                    <Badge variant="outline" tone={status === "paid" ? "success" : "critical"}>
-                        {status}
-                    </Badge>
+                <IndexTable.Cell>
+                    <InlineStack align="center">
+                        <Badge progress="complete" variant="outline" tone={status === "paid" ? "success" : ""}>
+                            {status}
+                        </Badge>
+                    </InlineStack>
                 </IndexTable.Cell>
 
                 <IndexTable.Cell alignment="start">
-                    <Text variant="bodyMd" as="span">
+                    <Text variant="bodyMd" as="span" alignment="center">
                         {description}
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
-                    <ButtonGroup alignment="start" gap="2" spacing="compact" style={{ border: '1px solidrgb(192, 30, 30)', borderRadius: '5px', padding: '5px' }}>
+                    <InlineStack align="center" gap="100">
                         <Button
                             variant="tertiary"
-                            icon={MdOutlinePayments}
+                            icon={PaymentIcon}
                             accessibilityLabel="Withdrawal Request"
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -200,7 +206,7 @@ function WithdrawalRequest() {
                         <Button
                             variant="tertiary"
                             tone="critical"
-                            icon={RxCross2}
+                            icon={XIcon}
                             accessibilityLabel="Decline Withdrawal Request"
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -208,7 +214,7 @@ function WithdrawalRequest() {
                             }}
                         />
 
-                    </ButtonGroup>
+                    </InlineStack>
                 </IndexTable.Cell>
 
             </IndexTable.Row>

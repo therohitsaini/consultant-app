@@ -13,17 +13,17 @@ const transactionHeadings = [
     { title: 'Sr. No.', alignment: 'start' },
     { title: 'User', alignment: 'center' },
     { title: 'Consultant', alignment: 'center' },
-    { title: 'Date', alignment: 'center' },
-    { title: 'Time', alignment: 'center' },
     { title: 'Type', alignment: 'center' },
     { title: 'Duration', alignment: 'center' },
     { title: 'Amount', alignment: 'center' },
-    { title: 'Status', alignment: 'center' }
+    { title: 'Consultant Share', alignment: 'center' },
+    { title: 'Admin Share', alignment: 'center' },
+    { title: 'Date', alignment: 'center' }
 ]
 
 const transactionItemStrings = ['All', 'Chat', 'Voice Call', 'Video Call',]
 
-function UserTransHistory() {
+function RevenuManagement() {
     const app = useAppBridge();
     console.log("app", app);
     const { activityHistory, loading } = useSelector((state) => state.admin);
@@ -33,7 +33,7 @@ function UserTransHistory() {
     const [page, setPage] = useState(1);
     const [type, setType] = useState(0);
     const limit = 10;
-
+console.log("searchQuery", searchQuery);
     useEffect(() => {
         const id = localStorage.getItem('domain_V_id');
         setAdminIdLocal(id);
@@ -52,9 +52,9 @@ function UserTransHistory() {
         new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     const getDuration = (start, end) => {
-        if (!start || !end) return "00:00";   
+        if (!start || !end) return "00:00";
         const diffMs = new Date(end) - new Date(start);
-        if (diffMs <= 0) return "00:00";   
+        if (diffMs <= 0) return "00:00";
         const diff = Math.floor(diffMs / 1000);
         const m = String(Math.floor(diff / 60)).padStart(2, '0');
         const s = String(diff % 60).padStart(2, '0');
@@ -77,11 +77,13 @@ function UserTransHistory() {
         user: item.senderId?.fullname,
         consultant: item.receiverId?.fullname,
         amount: `$${item.amount}`,
-        status: item.status
+        status: item.status,
+        consultantAmount: `$${item.consultantAmount}`,
+        adminAmount: `$${item.adminAmount}`
     })) || [];
-    console.log("tableData", tableData);
+
     const renderTransactionRow = useCallback((transaction, index) => {
-        const { id, user, type, date, time, duration, consultant, amount, status } = transaction
+        const { id, user, type, date, time, duration, consultantAmount, adminAmount, consultant, amount, } = transaction
         const serialNumber = (page - 1) * limit + index + 1;
 
         return (
@@ -103,44 +105,45 @@ function UserTransHistory() {
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
-                    <Text variant="bodyMd" as="span" alignment="center">
-                        {date}
-                    </Text>
-                </IndexTable.Cell>
-                <IndexTable.Cell>
-                    <Text variant="bodyMd" as="span" alignment="center">
-                        {time}
-                    </Text>
-                </IndexTable.Cell>
-                <IndexTable.Cell>
-
                     <div style={{ textTransform: 'lowercase' }}>
                         <Text variant="bodyMd" as="span" alignment="center">
                             {type.charAt(0).toUpperCase() + type.slice(1)}
                         </Text>
                     </div>
                 </IndexTable.Cell>
-
-
                 <IndexTable.Cell>
                     <Text variant="bodyMd" as="span" alignment="center">
                         {duration}
                     </Text>
                 </IndexTable.Cell>
-
-
                 <IndexTable.Cell>
                     <Text as="span" alignment="center" numeric>
                         {amount}
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
-                    <div style={{ color: status === "active" ? "green" : "black" }}>
-                        <Text variant="bodyMd" as="span" alignment="center">
-                            {status}
-                        </Text>
-                    </div>
+                    <Text variant="bodyMd" as="span" alignment="center">
+                        {
+                            consultantAmount ? `${consultantAmount}` : "-"
+                        }
+                    </Text>
                 </IndexTable.Cell>
+                <IndexTable.Cell>
+                    <Text variant="bodyMd" as="span" alignment="center">
+                        {adminAmount ? `${adminAmount}` : "-"}
+                    </Text>
+                </IndexTable.Cell>
+
+
+                <IndexTable.Cell>
+                    <Text variant="bodyMd" as="span" alignment="center">
+                        {date},{time}
+                    </Text>
+                </IndexTable.Cell>
+
+
+
+
             </IndexTable.Row >
         )
     }, [page, limit])
@@ -150,8 +153,7 @@ function UserTransHistory() {
 
 
             <Page
-                title="Activity History"
-
+                title="Revenue Management"
             >
                 <Layout>
                     <Layout.Section>
@@ -184,4 +186,4 @@ function UserTransHistory() {
     )
 }
 
-export default UserTransHistory
+export default RevenuManagement

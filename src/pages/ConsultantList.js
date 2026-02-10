@@ -1,4 +1,4 @@
-import { Banner, Layout, Page, BlockStack, Grid, LegacyCard, Text, ButtonGroup, Button, Thumbnail, Spinner, Box } from '@shopify/polaris';
+import { Banner, Layout, Page, BlockStack, Grid, LegacyCard, Text, ButtonGroup, Button, Thumbnail, Spinner, InlineStack, Box } from '@shopify/polaris';
 import { ConfettiIcon, ExternalIcon, PlusIcon, EditIcon, DuplicateIcon, DeleteIcon } from '@shopify/polaris-icons';
 import { useEffect, useState, useCallback, useMemo, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -37,7 +37,6 @@ function ConsultantList() {
     const [isRefreshed, setIsRefreshed] = useState(false);
     const [adminIdLocal, setAdminIdLocal] = useState(null);
     const { consultants, loading: consultantLoading } = useSelector((state) => state.consultants);
-    console.log("queryValue", queryValue);
     useEffect(() => {
         const id = localStorage.getItem('domain_V_id');
         setAdminIdLocal(id);
@@ -166,13 +165,13 @@ function ConsultantList() {
 
 
             <IndexTable.Row _id={_id} key={_id} position={index}>
-                <IndexTable.Cell>
-                    <Text as="span" alignment="center" variant="bodyMd" fontWeight="bold" numeric>
+                <IndexTable.Cell alignment="start">
+                    <Text as="span" alignment="start" variant="bodyMd" fontWeight="bold" numeric>
                         {index + 1}
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell alignment="center">
-
+                    <InlineStack align="center">
                     <Thumbnail
                         source={
                             consultant?.profileImage
@@ -180,7 +179,9 @@ function ConsultantList() {
                                 : "/images/flag/teamdefault.png"
                         }
                         size="small"
+                        
                     />
+                    </InlineStack>
 
                 </IndexTable.Cell>
                 <IndexTable.Cell alignment="center">
@@ -209,10 +210,12 @@ function ConsultantList() {
                         onClick={() => handleToggle(_id)}
                         style={{
                             position: 'relative',
-                            display: 'inline-block',
+                            display: 'flex',
+                            margin: 'auto',
                             width: '36px',
                             height: '20px',
                             cursor: 'pointer',
+
                         }}
                     >
                         <input
@@ -259,7 +262,7 @@ function ConsultantList() {
                     </label>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
-                    <ButtonGroup>
+                <InlineStack align="center" gap="100">
                         <Button
                             variant="tertiary"
                             icon={EditIcon}
@@ -279,7 +282,7 @@ function ConsultantList() {
                                 handleDeleteClick(_id);
                             }}
                         />
-                    </ButtonGroup>
+                    </InlineStack>
                 </IndexTable.Cell>
             </IndexTable.Row>
         );

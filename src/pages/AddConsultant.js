@@ -11,7 +11,29 @@ import { usePolarisToast } from '../components/AlertModel/PolariesTostContext';
 import { ContextualSaveBar } from "@shopify/polaris";
 import { Box } from '@shopify/polaris';
 
-
+const validationOrder = [
+    { key: "fullName", label: "Full Name" },
+    { key: "email", label: "Email" },
+    { key: "password", label: "Password" },
+    { key: "phoneNumber", label: "Phone Number" },
+    { key: "profession", label: "Profession" },
+    { key: "specialization", label: "Specialization" },
+    { key: "licenseIdNumber", label: "License / ID Number" },
+    { key: "yearOfExperience", label: "Year of Experience" },
+    { key: "chatPerMinute", label: "Chat per minute" },
+    { key: "videoPerMinute", label: "Video per minute" },
+    { key: "voicePerMinute", label: "Voice per minute" },
+    { key: "languages", label: "Languages" },
+    { key: "displayName", label: "Display Name" },
+    { key: "gender", label: "Gender" },
+    { key: "houseNumber", label: "House Number" },
+    { key: "streetArea", label: "Street Area" },
+    { key: "landmark", label: "Landmark" },
+    { key: "address", label: "Address" },
+    { key: "pincode", label: "Pincode" },
+    { key: "dateOfBirth", label: "Date of Birth" },
+    { key: "pancardNumber", label: "Pancard Number" },
+];
 
 function AddConsultant() {
     const app = useAppBridge();
@@ -39,6 +61,7 @@ function AddConsultant() {
     const fileInputRef = useRef(null);
     const { showToast } = usePolarisToast();
     const [dirty, setDirty] = useState(false);
+    const [errors, setErrors] = useState({});
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
@@ -83,6 +106,11 @@ function AddConsultant() {
 
     const handleFieldChange = useCallback((fieldName) => {
         return (value) => {
+            setDirty(true);
+            setErrors((prev) => ({
+                ...prev,
+                [fieldName]: '',
+            }));
             setFormData((prev) => ({
                 ...prev,
                 [fieldName]: value,
@@ -210,9 +238,30 @@ function AddConsultant() {
         fileInputRef.current?.click();
     }, []);
 
+
+
+    const validateForm = () => {
+        let newErrors = {};
+
+        for (let field of validationOrder) {
+            const value = formData[field.key];
+
+            if (!value || value.trim() === "") {
+                newErrors[field.key] = `${field.label} is required`;
+                setErrors(newErrors);
+                return false; // stop at first invalid field
+            }
+        }
+
+        setErrors({});
+        return true;
+    };
+
+
     //-------------------------- submit consultant data -------------------
 
     const submitConsultantData = useCallback(async () => {
+        if (!validateForm()) return;
         const token = await getAppBridgeToken(app);
         setIsSubmitting(true);
         setSubmitError('');
@@ -419,7 +468,7 @@ function AddConsultant() {
     const handleDiscard = () => {
         setDirty(false);
     }
-
+    console.log("submitError", submitError);
 
     return (
         <Box paddingBlockStart="400">
@@ -463,6 +512,7 @@ function AddConsultant() {
                                                         onChange={handleFieldChange('fullName')}
                                                         autoComplete="off"
                                                         onBlur={() => setDirty(true)}
+                                                        error={errors.fullName}
                                                     />
                                                 </FormLayout.Group>
                                                 <FormLayout.Group>
@@ -474,6 +524,7 @@ function AddConsultant() {
                                                         onChange={handleFieldChange('email')}
                                                         autoComplete="email"
                                                         onBlur={() => setDirty(true)}
+                                                        error={errors.email}
                                                     />
                                                 </FormLayout.Group>
                                                 {!updateIsTrue && (
@@ -485,6 +536,7 @@ function AddConsultant() {
                                                             onChange={handleFieldChange('password')}
                                                             autoComplete="off"
                                                             onBlur={() => setDirty(true)}
+                                                            error={errors.password}
                                                         />
                                                     </FormLayout.Group>
                                                 )}
@@ -559,6 +611,7 @@ function AddConsultant() {
                                             onChange={handleFieldChange('phoneNumber')}
                                             autoComplete="off"
                                             onBlur={() => setDirty(true)}
+                                            error={errors.phoneNumber}
                                         />
 
                                         {/* Profession */}
@@ -568,6 +621,7 @@ function AddConsultant() {
                                             onChange={handleFieldChange('profession')}
                                             autoComplete="off"
                                             onBlur={() => setDirty(true)}
+                                            error={errors.profession}
                                         />
 
                                         {/* Specialization */}
@@ -577,6 +631,7 @@ function AddConsultant() {
                                             onChange={handleFieldChange('specialization')}
                                             autoComplete="off"
                                             onBlur={() => setDirty(true)}
+                                            error={errors.specialization}
                                         />
 
                                     </FormLayout.Group>
@@ -590,6 +645,7 @@ function AddConsultant() {
                                         onChange={handleFieldChange('licenseIdNumber')}
                                         autoComplete="off"
                                         onBlur={() => setDirty(true)}
+                                        error={errors.licenseIdNumber}
                                     />
 
                                     {/* Year of Experience */}
@@ -599,6 +655,7 @@ function AddConsultant() {
                                         onChange={handleFieldChange('yearOfExperience')}
                                         autoComplete="off"
                                         onBlur={() => setDirty(true)}
+                                        error={errors.yearOfExperience}
                                     />
 
 
@@ -621,6 +678,7 @@ function AddConsultant() {
                                         onChange={handleFieldChange('chatPerMinute')}
                                         autoComplete="off"
                                         onBlur={() => setDirty(true)}
+                                        error={errors.chatPerMinute}
                                     />
                                     {/* Video per minute */}
 
@@ -631,6 +689,7 @@ function AddConsultant() {
                                         onChange={handleFieldChange('videoPerMinute')}
                                         autoComplete="off"
                                         onBlur={() => setDirty(true)}
+                                        error={errors.videoPerMinute}
                                     />
                                     {/* Voice per minute */}
                                     <TextField
@@ -640,6 +699,7 @@ function AddConsultant() {
                                         onChange={handleFieldChange('voicePerMinute')}
                                         autoComplete="off"
                                         onBlur={() => setDirty(true)}
+                                        error={errors.voicePerMinute}
                                     />
                                     {/* Audio per minute */}
 
@@ -667,7 +727,7 @@ function AddConsultant() {
                                                 placeholder="Search tags"
                                                 autoComplete="off"
                                                 verticalContent={verticalContentMarkup}
-
+                                                error={errors.languages}
                                             />
                                             {dropdownMarkup}
                                         </div>
@@ -689,16 +749,20 @@ function AddConsultant() {
                                         onChange={handleFieldChange('displayName')}
                                         autoComplete="off"
                                         onBlur={() => setDirty(true)}
+                                        error={errors.displayName}
                                     />
                                     {/* Gender */}
-                                    <Select
-                                        label="Gender"
-                                        options={genderOptions}
-                                        onChange={handleFieldChange('gender')}
-                                        value={formData.gender}
-                                        onBlur={() => setDirty(true)}
-                                    />
-
+                                    <div style={{ width: '100%' }}>
+                                        <Select
+                                            fullWidth
+                                            label="Gender"
+                                            options={genderOptions}
+                                            onChange={handleFieldChange('gender')}
+                                            value={formData.gender}
+                                            onBlur={() => setDirty(true)}
+                                            error={errors.gender}
+                                        />
+                                    </div>
                                     {/* House Number */}
                                     <TextField
                                         label="House Number"
@@ -706,6 +770,7 @@ function AddConsultant() {
                                         onChange={handleFieldChange('houseNumber')}
                                         autoComplete="off"
                                         onBlur={() => setDirty(true)}
+                                        error={errors.houseNumber}
                                     />
                                 </FormLayout.Group>
                                 <FormLayout.Group>
@@ -717,6 +782,7 @@ function AddConsultant() {
                                         onChange={handleFieldChange('streetArea')}
                                         autoComplete="off"
                                         onBlur={() => setDirty(true)}
+                                        error={errors.streetArea}
                                     />
 
                                     {/* Landmark */}
@@ -726,6 +792,7 @@ function AddConsultant() {
                                         onChange={handleFieldChange('landmark')}
                                         autoComplete="off"
                                         onBlur={() => setDirty(true)}
+                                        error={errors.landmark}
                                     />
 
                                     {/* Address */}
@@ -735,6 +802,7 @@ function AddConsultant() {
                                         onChange={handleFieldChange('address')}
                                         autoComplete="off"
                                         onBlur={() => setDirty(true)}
+                                        error={errors.address}
                                     />
 
                                 </FormLayout.Group>
@@ -748,6 +816,7 @@ function AddConsultant() {
                                         onChange={handleFieldChange('pincode')}
                                         autoComplete="off"
                                         onBlur={() => setDirty(true)}
+                                        error={errors.pincode}
                                     />
 
                                     {/* Date of Birth */}
@@ -758,6 +827,7 @@ function AddConsultant() {
                                         onChange={handleFieldChange('dateOfBirth')}
                                         autoComplete="off"
                                         onBlur={() => setDirty(true)}
+                                        error={errors.dateOfBirth}
                                     />
 
                                     {/* Pancard Number */}
@@ -767,6 +837,7 @@ function AddConsultant() {
                                         onChange={handleFieldChange('pancardNumber')}
                                         autoComplete="off"
                                         onBlur={() => setDirty(true)}
+                                        error={errors.pancardNumber}
                                     />
 
                                 </FormLayout.Group>

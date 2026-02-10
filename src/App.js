@@ -40,6 +40,7 @@ import WithdrawalRequest from "./pages/WithdrawalRequest";
 import "./App.css";
 import WithdrawalRequestTable from "./components/ConsultantDashboard/WithdrawalRequestTable";
 import AdminPercentage from "./pages/AdminPercentage";
+import RevenuManagement from "./pages/RevenuManagement";
 
 
 
@@ -138,6 +139,7 @@ export default function App() {
             <Route path="/admin-settings/voucher" element={<VoucherSettings />} />
             <Route path="/admin-settings/voucher-management" element={<VoucherTable />} />
             <Route path="/admin-settings/admin-percentage" element={<AdminPercentage />} />
+            <Route path="/admin/revenue-management" element={<RevenuManagement />} />
             <Route path="/faq" element={<Faq />} />
           </Route>
 

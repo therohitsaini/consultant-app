@@ -1,6 +1,6 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react'
 import IndexTableList from '../components/consultant-list/IndexTableList'
-import { Page, Layout, Spinner, ButtonGroup, Button, Toast, Badge } from '@shopify/polaris'
+import { Page, Layout, Spinner, ButtonGroup, Button, Toast, Badge, InlineStack } from '@shopify/polaris'
 import { DuplicateIcon, EditIcon, PlusIcon } from '@shopify/polaris-icons'
 import { IndexTable, Text } from '@shopify/polaris'
 import { fetchWalletHistory } from '../components/Redux/slices/adminSlice'
@@ -13,15 +13,15 @@ import { getAppBridgeToken } from '../utils/getAppBridgeToken'
 
 
 const walletManagementHeadings = [
-    { title: 'Sr. No.' },
-    { title: 'Name' },
-    { title: " Type" },
-    { title: 'Amount' },
-    { title: "Direction" },
-    { title: " Reference Type" },
-    { title: "Status" },
-    { title: "Description" },
-    { title: " Action" },
+    { title: 'Sr. No.', alignment: 'start' },
+    { title: 'Name', alignment: 'center' },
+    { title: " Type", alignment: 'center' },
+    { title: 'Amount', alignment: 'center' },
+    { title: "Direction", alignment: 'center' },
+    { title: " Reference Type", alignment: 'center' },
+    { title: "Status", alignment: 'center' },
+    { title: "Description", alignment: 'center' },
+    { title: " Action", alignment: 'center' },
 ];
 
 function ManualDebetCreditBlance() {
@@ -119,12 +119,12 @@ function ManualDebetCreditBlance() {
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
-                    <Text variant="bodyMd" as="span">
+                    <Text variant="bodyMd" as="span" alignment="center">
                         {fullname}
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
-                    <Text variant="bodyMd" as="span">
+                    <Text variant="bodyMd" as="span" alignment="center">
                         {userType}
                     </Text>
                 </IndexTable.Cell>
@@ -134,9 +134,11 @@ function ManualDebetCreditBlance() {
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell alignment="center">
-                    <Badge tone={direction === "credit" ? "success" : "critical"}>
-                        {direction === "credit" ? "credit" : "debit"}
-                    </Badge>
+                    <InlineStack align="center">
+                        <Badge tone={direction === "credit" ? "success" : "critical"}>
+                            {direction === "credit" ? "credit" : "debit"}
+                        </Badge>
+                    </InlineStack>
                 </IndexTable.Cell>
 
                 <IndexTable.Cell alignment="center">
@@ -145,18 +147,20 @@ function ManualDebetCreditBlance() {
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell alignment="center">
-                    <Badge tone={status === "success" ? "success" : "critical"}>
-                        {status}
-                    </Badge>
+                    <InlineStack align="center">
+                        <Badge tone={status === "success" ? "success" : "critical"}>
+                            {status}
+                        </Badge>
+                    </InlineStack>
                 </IndexTable.Cell>
 
                 <IndexTable.Cell alignment="center">
-                    <Text variant="bodyMd" as="span">
+                    <Text variant="bodyMd" as="span" alignment="center">
                         {description}
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
-                    <ButtonGroup alignment="center">
+                    <InlineStack align="center" gap="100">
                         <Button
                             variant="tertiary"
                             icon={EditIcon}
@@ -168,7 +172,7 @@ function ManualDebetCreditBlance() {
                             }}
                         />
 
-                    </ButtonGroup>
+                    </InlineStack>
                 </IndexTable.Cell>
 
             </IndexTable.Row>

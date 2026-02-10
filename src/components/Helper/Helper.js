@@ -10,9 +10,21 @@ export const getDuration = (start, end) => {
 
 
 export const formatAmountHelper = (num) => {
-    if (!num) return "0";
-    if (num >= 1_000_000_000) return (num / 1_000_000_000).toFixed(1) + "B";
-    if (num >= 1_000_000) return (num / 1_000_000).toFixed(1) + "M";
-    if (num >= 1_000) return (num / 1_000).toFixed(1) + "K";
-    return Number(num.toFixed(2)).toString();
+    if (num === null || num === undefined) return "0";
+
+    // Mongo Decimal128 / string / anything → number me convert
+    const value = Number(num);
+
+    if (isNaN(value)) return "0";
+
+    // single digit OR below 1000 → normal number (no K)
+    if (value < 1000) {
+        return value % 1 === 0 ? value.toString() : value.toFixed(2);
+    }
+
+    if (value >= 1_000_000_000) return (value / 1_000_000_000).toFixed(1) + "B";
+    if (value >= 1_000_000) return (value / 1_000_000).toFixed(1) + "M";
+    if (value >= 1_000) return (value / 1_000).toFixed(1) + "K";
+
+    return value.toString();
 };

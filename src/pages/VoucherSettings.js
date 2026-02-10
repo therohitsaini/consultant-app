@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useContext, useEffect } from 'react';
+import React, { useState, useCallback, useContext, useEffect, Fragment } from 'react';
 import {
     Page,
     Layout,
@@ -8,6 +8,7 @@ import {
     Button,
     Banner,
     BlockStack,
+    ContextualSaveBar,
 } from '@shopify/polaris';
 import axios from 'axios';
 import { useAppBridge } from '../components/createContext/AppBridgeContext';
@@ -35,6 +36,7 @@ function VoucherSettings() {
     const [submitError, setSubmitError] = useState('');
     const [submitSuccess, setSubmitSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [dirty, setDirty] = useState(false);
 
 
     const params = new URLSearchParams(window.location.search);
@@ -80,10 +82,7 @@ function VoucherSettings() {
             return false;
         }
 
-        if (isNaN(Number(formData.extraCoin)) || Number(formData.extraCoin) < 0) {
-            setSubmitError('Extra Coin must be a valid positive number');
-            return false;
-        }
+      
         return true;
     }, [formData])
 
@@ -163,6 +162,20 @@ function VoucherSettings() {
 
 
     return (
+        <Fragment>
+        {dirty && (
+                <ContextualSaveBar
+                    message="Unsaved changes"
+                    saveAction={{
+                        content: voucherId ? 'update' : 'save',
+                        onAction: handleSubmit,
+                        loading: loading,
+                    }}
+                    discardAction={{
+                        onAction: () => setDirty(false),
+                    }}
+                />
+            )}
         <Page
             backAction={{ content: 'Voucher Management', onAction: backToVoucherManagement }}
             title={voucherId ? 'Update Voucher Settings' : 'Voucher Management'}
@@ -175,6 +188,7 @@ function VoucherSettings() {
                         <LegacyCard sectioned title="Dynamic Card Coin Management">
                             <FormLayout>
                                 <TextField
+                                    error={submitError}
                                     label="Coin"
                                     type="number"
                                     value={formData.totalCoin}
@@ -184,6 +198,7 @@ function VoucherSettings() {
                                     autoComplete="off"
                                     min={0}
                                     step="1"
+                                    onBlur={() => setDirty(true)}
                                 />
 
                                 <TextField
@@ -196,6 +211,7 @@ function VoucherSettings() {
                                     autoComplete="off"
                                     min={0}
                                     step="1"
+                                    onBlur={() => setDirty(true)}
                                 />
 
                                 <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
@@ -206,7 +222,7 @@ function VoucherSettings() {
                                         loading={loading}
                                         disabled={loading}
                                     >
-                                        {voucherId ? 'Update Voucher' : 'Create Voucher'}
+                                        {voucherId ? 'update ' : 'save'}
                                     </Button>
                                 </div>
                             </FormLayout>
@@ -217,6 +233,7 @@ function VoucherSettings() {
                 </Layout.Section>
             </Layout>
         </Page>
+        </Fragment>
     );
 }
 

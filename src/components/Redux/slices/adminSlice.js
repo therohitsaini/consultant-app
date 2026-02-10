@@ -28,6 +28,7 @@ export const fetchActivityHistory = createAsyncThunk("admin/fetchActivityHistory
             searchQuery
         }
     })
+    console.log("fetchActivityHistory", response.data);
     return response.data
 })
 
@@ -106,6 +107,7 @@ export const fetchWithdrawalRequests = createAsyncThunk("admin/fetchWithdrawalRe
     })
     return response.data
 })
+
 
 
 const adminSlice = createSlice({

@@ -14,7 +14,7 @@ import { useState, useCallback, Fragment, useEffect } from "react";
 import axios from "axios";
 import { fetchAdminDetails } from "../components/Redux/slices/adminSlice";
 import { useAppBridge } from "../components/createContext/AppBridgeContext";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Router } from "react-router-dom";
 import { usePolarisToast } from "../components/AlertModel/PolariesTostContext";
 import { getAppBridgeToken } from '../utils/getAppBridgeToken'
@@ -25,13 +25,10 @@ function AdminPercentage({ currentPercentage }) {
     const dispatch = useDispatch();
     const { showToast } = usePolarisToast();
     const [adminIdLocal, setAdminIdLocal] = useState(null);
-    const [adminDetails, setAdminDetails] = useState(null);
-    const [percentage, setPercentage] = useState(
-        currentPercentage?.toString() || ""
-    );
+    const { adminDetails_, loading: adminDetailsLoading } = useSelector((state) => state.admin);
+    const [percentage, setPercentage] = useState("");
     const [loading, setLoading] = useState(false);
     const [percentageError, setPercentageError] = useState(null);
-    const [toastActive, setToastActive] = useState(false);
     const [dirty, setDirty] = useState(false);
 
 
@@ -41,17 +38,25 @@ function AdminPercentage({ currentPercentage }) {
     }, []);
 
     useEffect(() => {
-
-        dispatch(fetchAdminDetails({ adminIdLocal, app }));
-        setAdminDetails(adminDetails);
-    }, []);
+        if (adminIdLocal) {
+            dispatch(fetchAdminDetails({ adminIdLocal, app }));
+        }
+    }, [adminIdLocal]);
 
     const handleChange = useCallback((value) => {
         setPercentage(value);
     }, []);
 
+    useEffect(() => {
+
+    }, [adminDetails_]);
 
 
+    useEffect(() => {
+        if(adminDetails_.adminPersenTage){
+            setPercentage(adminDetails_.adminPersenTage.$numberDecimal || "");
+        }
+    }, [adminDetails_.adminPersenTage]);
     const handleSubmit = async () => {
         if (!percentage || percentage < 0 || percentage > 100) {
             setPercentageError("Please enter a valid percentage (0–100)");
@@ -60,7 +65,6 @@ function AdminPercentage({ currentPercentage }) {
         try {
             setLoading(true);
             const token = await getAppBridgeToken(app);
-            console.log("token", token);
             const response = await axios.put(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/admin/update-percentage/${adminIdLocal}`, {
                 adminPercentage: Number(percentage),
             }, {

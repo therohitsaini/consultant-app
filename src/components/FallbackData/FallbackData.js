@@ -17,7 +17,7 @@ export const sortOptions = [
 
 
 export const headings = [
-    { title: 'Sr. No.', alignment: 'center' },
+    { title: 'Sr. No.', alignment: 'start' },
     { title: 'Image', alignment: 'center' },
     { title: 'Name', alignment: 'center' },
     { title: 'Profession', alignment: 'center' },
