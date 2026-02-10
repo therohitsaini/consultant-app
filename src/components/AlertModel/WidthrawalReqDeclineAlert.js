@@ -17,7 +17,7 @@ export function WidthrawalReqDeclineAlert({ isWidthrawalReqDeclineAlertVisible =
             onClose={handleChange}
             title="Decline Withdrawal Request"
             primaryAction={{
-                icon: CrossIcon,
+                // icon: CrossIcon,
                 variant: "primary",
                 tone: "critical",
                 content: 'Decline',
