@@ -131,9 +131,6 @@ function VideoCallingPage() {
 
         console.log("calling user");
         console.log("effect triggered");
-
-
-
         sessionStorage.setItem(callKey, "true");
 
     }, [callerId, receiverId, channelNameParam, callType]);
@@ -367,7 +364,7 @@ function VideoCallingPage() {
             console.log("callAcceptedFromStorage_______TransactionId", callAcceptedFromStorage?.transactionId);
             socket.emit("call-ended",
                 {
-                    callerId: callAcceptedFromStorage?.callerId || "69809ec1fbb366783a04b28c",
+                    callerId: callAcceptedFromStorage?.callerId ,
                     receiverId: receiverId,
                     channelName: channelNameParam,
                     callType: callType,

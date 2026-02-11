@@ -34,6 +34,28 @@ const validationOrder = [
     { key: "dateOfBirth", label: "Date of Birth" },
     { key: "pancardNumber", label: "Pancard Number" },
 ];
+const validationOrderUpdate = [
+    { key: "fullName", label: "Full Name" },
+    { key: "email", label: "Email" },
+    { key: "phoneNumber", label: "Phone Number" },
+    { key: "profession", label: "Profession" },
+    { key: "specialization", label: "Specialization" },
+    { key: "licenseIdNumber", label: "License / ID Number" },
+    { key: "yearOfExperience", label: "Year of Experience" },
+    { key: "chatPerMinute", label: "Chat per minute" },
+    { key: "videoPerMinute", label: "Video per minute" },
+    { key: "voicePerMinute", label: "Voice per minute" },
+    { key: "languages", label: "Languages" },
+    { key: "displayName", label: "Display Name" },
+    { key: "gender", label: "Gender" },
+    { key: "houseNumber", label: "House Number" },
+    { key: "streetArea", label: "Street Area" },
+    { key: "landmark", label: "Landmark" },
+    { key: "address", label: "Address" },
+    { key: "pincode", label: "Pincode" },
+    { key: "dateOfBirth", label: "Date of Birth" },
+    { key: "pancardNumber", label: "Pancard Number" },
+];
 
 function AddConsultant() {
     const app = useAppBridge();
@@ -243,10 +265,16 @@ function AddConsultant() {
     const validateForm = () => {
         let newErrors = {};
 
-        for (let field of validationOrder) {
+        for (let field of updateIsTrue ? validationOrderUpdate : validationOrder) {
             const value = formData[field.key];
 
-            if (!value || value.trim() === "") {
+            const isEmpty =
+                value === undefined ||
+                value === null ||
+                (typeof value === "string" && value.trim() === "") ||
+                (Array.isArray(value) && value.length === 0);
+
+            if (isEmpty) {
                 newErrors[field.key] = `${field.label} is required`;
                 setErrors(newErrors);
                 return false; // stop at first invalid field
@@ -329,6 +357,8 @@ function AddConsultant() {
     //-------------------------- update consultant data / edit consultant data-------------------
 
     const updateConsultantData = async () => {
+        if (!validateForm()) return;
+
         const token = await getAppBridgeToken(app);
         setIsSubmitting(true);
         setSubmitError('');

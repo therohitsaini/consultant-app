@@ -1,8 +1,8 @@
 let ringtone;
 
 export const initRingtone = () => {
-    // Use a free online ringtone that always works
-    ringtone = new Audio("https://assets.mixkit.co/sfx/preview/mixkit-classic-alarm-995.mp3");
+    // ringtone = new Audio("https://assets.mixkit.co/sfx/preview/mixkit-classic-alarm-995.mp3");
+    ringtone = new Audio("/sounds/ringing_tone.mp3");
     ringtone.loop = true;
     console.log("Using online ringtone");
 };
@@ -16,8 +16,6 @@ export const playRingtone = async () => {
         console.log("🎵 Ringtone playing!");
     } catch (e) {
         console.error("Ringtone error:", e);
-        
-        // Emergency fallback - use browser beep
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
         const oscillator = ctx.createOscillator();
         oscillator.frequency.value = 800;

@@ -6,6 +6,7 @@ import { IndexTable, Text } from '@shopify/polaris'
 import { fetchActivityHistory } from '../components/Redux/slices/adminSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { useAppBridge } from '../components/createContext/AppBridgeContext'
+import { formatAmountHelper } from '../components/Helper/Helper'
 
 
 
@@ -33,7 +34,7 @@ function RevenuManagement() {
     const [page, setPage] = useState(1);
     const [type, setType] = useState(0);
     const limit = 10;
-console.log("searchQuery", searchQuery);
+    console.log("searchQuery", searchQuery);
     useEffect(() => {
         const id = localStorage.getItem('domain_V_id');
         setAdminIdLocal(id);
@@ -76,12 +77,12 @@ console.log("searchQuery", searchQuery);
         duration: getDuration(item.startTime, item.endTime),
         user: item.senderId?.fullname,
         consultant: item.receiverId?.fullname,
-        amount: `$${item.amount}`,
+        amount: `${item.amount}`,
         status: item.status,
         consultantAmount: `$${item.consultantAmount}`,
         adminAmount: `$${item.adminAmount}`
     })) || [];
-
+    console.log("tableData", tableData);
     const renderTransactionRow = useCallback((transaction, index) => {
         const { id, user, type, date, time, duration, consultantAmount, adminAmount, consultant, amount, } = transaction
         const serialNumber = (page - 1) * limit + index + 1;
@@ -118,7 +119,7 @@ console.log("searchQuery", searchQuery);
                 </IndexTable.Cell>
                 <IndexTable.Cell>
                     <Text as="span" alignment="center" numeric>
-                        {amount}
+                        {`$${formatAmountHelper(amount)}`}
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>

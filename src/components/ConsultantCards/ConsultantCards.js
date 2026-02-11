@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { connectSocket } from '../Redux/slices/sokectSlice';
 import { checkUserBalance, openCallPage } from '../middle-ware/OpenCallingPage';
 import TestRingtone from '../../pages/TestRingtone';
+import { playRingtone } from '../ringTone/ringingTune';
 
 
 
@@ -292,10 +293,10 @@ function ConsultantCards() {
                     <div className="hero-content">
                         <div className="hero-badge mb-3">
                             <span className="hero-badge-icon">⭐</span>
-                            <span>Trusted by Thousands</span>
+                            <span onClick={() => playRingtone()}>Trusted by Thousands</span>
 
                         </div>
-                        <h1 className="hero-title">
+                        <h1  className="hero-title">
                             Find Your Perfect <span className="hero-title-highlight">Consultant</span>
                         </h1>
                         <p className="hero-description">
