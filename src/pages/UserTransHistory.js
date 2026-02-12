@@ -6,6 +6,7 @@ import { IndexTable, Text } from '@shopify/polaris'
 import { fetchActivityHistory } from '../components/Redux/slices/adminSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { useAppBridge } from '../components/createContext/AppBridgeContext'
+import { formatNumber, formatNumberString } from '../components/Helper/Helper'
 
 
 
@@ -76,7 +77,7 @@ function UserTransHistory() {
         duration: getDuration(item.startTime, item.endTime),
         user: item.senderId?.fullname,
         consultant: item.receiverId?.fullname,
-        amount: `$${item.amount}`,
+        amount: `${item.amount}`,
         status: item.status
     })) || [];
     console.log("tableData", tableData);
@@ -131,7 +132,7 @@ function UserTransHistory() {
 
                 <IndexTable.Cell>
                     <Text as="span" alignment="center" numeric>
-                        {amount}
+                        {`$${formatNumber(amount, 2)}`}
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>

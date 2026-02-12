@@ -11,16 +11,23 @@ import axios from "axios";
 
 export default function IncomingCallAlert() {
     const dispatch = useDispatch();
+    const params = new URLSearchParams(window.location.search);
     const userId = localStorage.getItem('client_u_Identity') || localStorage.getItem('consultant_u_Identity');
     const { incomingCall, callEnded } = useSelector((state) => state.socket);
     const { callAccepted } = useSelector((state) => state.socket);
+    const shopId = params.get("shopId");
+    const shop = params.get("shop");
 
-    console.log("incomingCall", incomingCall);
+    console.log("incomingCall", shop, params);
+    useEffect(() => {
+        if (callEnded?.callId) {
+            handleReject();
+        }
+    }, [callEnded]);
 
     if (!incomingCall) return console.log("No incoming call");
 
     const { callerId, callType, channelName, callerName } = incomingCall;
-    console.log("callAccepted___IncomingCallAlert", callAccepted);
 
     const handleAccept = async () => {
         localStorage.setItem("callAccepted____", JSON.stringify(callAccepted));
@@ -41,15 +48,14 @@ export default function IncomingCallAlert() {
             }
         });
         const data = res.data;
-        console.log("data____Reciver_____", data)
         if (data.token) {
             socket.emit("call-accepted", { callerId, receiverId: userId, channelName, callType: incomingCall.callType, shopId: "690c374f605cb8b946503ccb" });
-            console.log("Call accepted", incomingCall);
             dispatch(setIncomingCall(null));
             const tokenEncoded = encodeURIComponent(data.token);
             const appIdParam = data.appId ? `&appId=${data.appId}` : '';
             const callType = incomingCall.callType || "voice";
-            const returnUrl = "https://rohit-12345839.myshopify.com/apps/consultant-theme/consultant-dashboard";
+         
+            const returnUrl = `https://rohit-12345839.myshopify.com/apps/consultant-theme/consultant-dashboard`;
             const callUrl =
                 `${process.env.REACT_APP_FRONTEND_URL}/video/calling/page` +
                 `?callerId=${callerId}` +
@@ -61,14 +67,12 @@ export default function IncomingCallAlert() {
                 appIdParam +
                 `&userId=${userId}` +
                 `&userType=${"consultant"}` +
+                `&shopId=${shopId}` +
                 `&returnUrl=${encodeURIComponent(returnUrl)}`;
             window.top.location.href = callUrl;
         }
     };
-    // useEffect(() => {
-    //     if (!callEnded) return;
-    //     handleReject();
-    // }, [callEnded]);
+
     const handleReject = () => {
         console.log("Call rejected", incomingCall);
         socket.emit("reject-call", { callerId, receiverId: userId, channelName, callType: incomingCall.callType });

@@ -8,7 +8,7 @@ const CallLogsConsultant = () => {
     const [loading, setLoading] = useState(false)
     const [userId, setUserId] = useState(null)
     const [shopId, setShopId] = useState(null)
-
+    console.log("callLogsConsultant", callLogsConsultant)
     const columns = [
         {
             label: "User Name",
@@ -18,7 +18,7 @@ const CallLogsConsultant = () => {
         {
             label: "Amount",
             key: "amount",
-            render: row => `₹${row.amount.toFixed(2)}`,
+            render: row => `₹${row.consultantAmount.toFixed(2)}`,
         },
         {
             label: "Date & Time",
@@ -75,7 +75,7 @@ const CallLogsConsultant = () => {
 
     return (
         <div style={{ padding: '20px' }}>
-            
+
             <UserTable
                 title="Call / Chat Logs"
                 columns={columns}

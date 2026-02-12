@@ -94,7 +94,8 @@ export const openCallPage = async ({ receiverId, type, userId = "6978766389b46d0
             `&returnUrl=${encodeURIComponent(returnUrl)}`;
 
         console.log("callUrl", callUrl);
-        window.open(callUrl, "_blank");
+        window.top.location.href = callUrl;
+        // window.open(callUrl, "_blank");
 
 
     } catch (error) {

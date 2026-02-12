@@ -28,3 +28,18 @@ export const formatAmountHelper = (num) => {
 
     return value.toString();
 };
+export const formatNumber = (value, decimals = 2) => {
+    if (value === null || value === undefined) return 0;
+
+    const num = Number(value);
+    if (isNaN(num)) return 0;
+
+    // integer value → return as is
+    if (Number.isInteger(num)) {
+        return num;
+    }
+
+    // decimal value → toFixed
+    return Number(num.toFixed(decimals));
+};
+

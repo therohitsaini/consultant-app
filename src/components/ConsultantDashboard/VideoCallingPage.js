@@ -28,12 +28,13 @@ function VideoCallingPage() {
     const uidParam = params.get("uid");
     const appIdParam = params.get("appId");
     const userId = params.get("userId");
+    const shopId = params.get("shopId");
     const userType = params.get("userType") || "consultant";
     console.log("userType", userType);
     const [callAccepted, setCallAccepted] = useState(null);
     const callStartedRef = useRef(false);
     const { inCall, channel, type, muted, videoEnabled } = useSelector((state) => state.call);
-    console.log("inCall", inCall);
+    console.log("mutedRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR", muted);
     const isVideoCall = type === "video" || callType === "video";
     const { callRejected } = useSelector((state) => state.socket);
 
@@ -44,7 +45,7 @@ function VideoCallingPage() {
     //         alert("Page refreshed — Call resumed!");
     //     }
     // }, []);
-    console.log("inCall", inCall);
+    console.log("callAccepted", callAccepted);
 
     useEffect(() => {
         localStorage.setItem("userId", userId);
@@ -364,50 +365,56 @@ function VideoCallingPage() {
             console.log("callAcceptedFromStorage_______TransactionId", callAcceptedFromStorage?.transactionId);
             socket.emit("call-ended",
                 {
-                    callerId: callAcceptedFromStorage?.callerId ,
+                    callerId: callAcceptedFromStorage?.callerId,
                     receiverId: receiverId,
                     channelName: channelNameParam,
                     callType: callType,
                     transactionId: callAcceptedFromStorage?.transactionId,
-                    shopId: "690c374f605cb8b946503ccb"
+                    shopId: shopId || "690c374f605cb8b946503ccb"
                 });
+            localStorage.removeItem("callAccepted");
             const returnUrl = params.get("returnUrl");
             if (returnUrl) {
                 window.top.location.href = decodeURIComponent(returnUrl);
-            } else {
-                navigate(-1);
             }
+            //  else {
+            //     navigate(-1);
+            // }
         } else if (callSession) {
-            console.log("callSession", callSession);
             dispatch(endCall());
             stopTimer();
             setCallSessionEnded(true);
-            socket.emit("call-ended", {
-                callerId: callSession?.callerId,
-                receiverId: callSession?.receiverId,
-                channelName: callSession?.channelName,
-                callType: callSession?.callType,
-                transactionId: callSession?.transtionId,
-                shopId: "690c374f605cb8b946503ccb"
-            });
+            setTimeout(() => {
+                socket.emit("call-ended", {
+                    callerId: callSession?.callerId,
+                    receiverId: callSession?.receiverId,
+                    channelName: callSession?.channelName,
+                    callType: callSession?.callType,
+                    transactionId: callSession?.transtionId,
+                    shopId: callSession?.shopId || "690c374f605cb8b946503ccb"
+                });
+            }, 900); // 2000 ms = 2 seconds
+            localStorage.removeItem("callStartTime");
+            localStorage.removeItem("callAccepted");
+            const returnUrl = params.get("returnUrl");
+            if (returnUrl) {
+                window.top.location.href = decodeURIComponent(returnUrl);
+            }
+            // else {
+            //     navigate(-1);
+            // }
+        }
+        else {
+            dispatch(endCall());
             const returnUrl = params.get("returnUrl");
             if (returnUrl) {
                 window.top.location.href = decodeURIComponent(returnUrl);
             } else {
                 navigate(-1);
             }
-        }
-        else {
-            navigate(-1);
             return;
         }
-        // socket.emit("call-ended", { callerId: callerId, receiverId: receiverId, channel: channelNameParam, callType: callType, transactionId: callAccepted?.transactionId, shopId: "690c374f605cb8b946503ccb" });
-        // const returnUrl = params.get("returnUrl");
-        // if (returnUrl) {
-        //     window.top.location.href = decodeURIComponent(returnUrl);
-        // } else {
-        //     navigate(-1);
-        // }
+
     };
 
     const handleMuteToggle = () => {
@@ -419,11 +426,11 @@ function VideoCallingPage() {
             dispatch(toggleVideo());
         }
     };
-    // useEffect(() => {
-    //     if (callEnded) {
-    //         handleEndCall();
-    //     }
-    // }, [callEnded]);
+    useEffect(() => {
+        if (callEnded?.callId) {
+            handleEndCall();
+        }
+    }, [callEnded]);
 
     console.log("callEnded", callEnded);
     console.log("callerDetails", callerDetails);
@@ -433,35 +440,7 @@ function VideoCallingPage() {
     const RECONNECT_WINDOW_MS = 15000; // 15 seconds
     const remoteLeftTimeoutRef = useRef(null);
 
-    // useEffect(() => {
-    //     const onRemoteLeft = (e) => {
-    //         console.log("🔥 Remote user left (event received in React)", e?.detail);
 
-    //         if (remoteLeftTimeoutRef.current) clearTimeout(remoteLeftTimeoutRef.current);
-
-    //         remoteLeftTimeoutRef.current = setTimeout(() => {
-    //             console.log("Remote user did not rejoin within window, ending call");
-    //             handleEndCall();
-    //             remoteLeftTimeoutRef.current = null;
-    //         }, RECONNECT_WINDOW_MS);
-    //     };
-
-    //     const onRemoteRejoined = () => {
-    //         console.log("✅ Remote user rejoined (e.g. after refresh), cancelling end-call timer");
-    //         if (remoteLeftTimeoutRef.current) {
-    //             clearTimeout(remoteLeftTimeoutRef.current);
-    //             remoteLeftTimeoutRef.current = null;
-    //         }
-    //     };
-
-    //     window.addEventListener("remote-user-left", onRemoteLeft);
-    //     window.addEventListener("remote-user-rejoined", onRemoteRejoined);
-    //     return () => {
-    //         window.removeEventListener("remote-user-left", onRemoteLeft);
-    //         window.removeEventListener("remote-user-rejoined", onRemoteRejoined);
-    //         if (remoteLeftTimeoutRef.current) clearTimeout(remoteLeftTimeoutRef.current);
-    //     };
-    // }, []);
 
     useEffect(() => {
         const onRemoteLeft = (e) => {
@@ -501,12 +480,13 @@ function VideoCallingPage() {
         }, 1000);
     };
     useEffect(() => {
-        if (localStorage.getItem("callStartTime")) {
+        if (userType === "consultant") {
+            startTimer();
+        } else if (callAccepted) {
+            console.log("timer is on ")
             startTimer();
         }
-
-        return () => clearInterval(intervalRef.current);
-    }, []);
+    }, [userType, callAccepted]);
 
     useEffect(() => {
         const handler = (event) => {
@@ -527,7 +507,7 @@ function VideoCallingPage() {
 
     return (
         <div className={styles.videoCallContainer}>
-            {/* Header */}
+
             <div className={styles.callHeader}>
                 <button
                     className={styles.backButton}
@@ -552,9 +532,7 @@ function VideoCallingPage() {
                 </div>
             </div>
 
-            {/* Video Area */}
             <div className={styles.videoArea}>
-                {/* Remote Video (Other Person) - Full Screen */}
                 <div className={styles.remoteVideo}>
                     {isVideoCall ? (
                         <>
@@ -563,19 +541,19 @@ function VideoCallingPage() {
                                 data-remote-video
                                 className={styles.videoElement}
                             />
-                            {/* Fallback placeholder if remote video not available yet */}
-                            {!inCall && (
-                                <div className={styles.videoPlaceholder}>
-                                    {profileImage && (
-                                        <div className={styles.avatarLarge}>
-                                            <img className={styles.avatarLarge} src={userType === "consultant" ? callerDetails?.caller?.profileImage || profileImageDefault : callerDetails?.receiver?.profileImage || profileImageDefault} alt="profile" />
-                                        </div>
-                                    )}
-                                    <p className={styles.videoPlaceholderText}>
-                                        {userType === "consultant" ? callerDetails?.caller?.fullname : callerDetails?.receiver?.fullname || "Waiting for video..."}
-                                    </p>
-                                </div>
-                            )}
+                            {
+                                !inCall && (
+                                    <div className={styles.videoPlaceholder}>
+                                        {profileImage && (
+                                            <div className={styles.avatarLarge}>
+                                                <img className={styles.avatarLarge} src={userType === "consultant" ? callerDetails?.caller?.profileImage || profileImageDefault : callerDetails?.receiver?.profileImage || profileImageDefault} alt="profile" />
+                                            </div>
+                                        )}
+                                        <p className={styles.videoPlaceholderText}>
+                                            {userType === "consultant" ? callerDetails?.caller?.fullname : callerDetails?.receiver?.fullname || "Waiting for video..."}
+                                        </p>
+                                    </div>
+                                )}
                         </>
                     ) : (
                         <div className={styles.videoPlaceholder}>
@@ -616,31 +594,31 @@ function VideoCallingPage() {
                     )}
                 </div>
 
-                {/* Local Video (You) - Small Corner Overlay - Always show for video calls */}
-                {isVideoCall && (
-                    <div className={styles.localVideo}>
-                        <div
-                            ref={localVideoRef}
-                            data-local-video
-                            className={styles.videoElement}
-                            style={{
-                                display: videoEnabled ? 'block' : 'none',
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover'
-                            }}
-                        />
-                        <div
-                            className={styles.videoPlaceholderSmall}
-                            style={{ display: !videoEnabled ? 'flex' : 'none' }}
-                        >
-                            <div className={styles.avatarSmall}>
-                                You
+                {
+                    isVideoCall && (
+                        <div className={styles.localVideo}>
+                            <div
+                                ref={localVideoRef}
+                                data-local-video
+                                className={styles.videoElement}
+                                style={{
+                                    display: videoEnabled ? 'block' : 'none',
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover'
+                                }}
+                            />
+                            <div
+                                className={styles.videoPlaceholderSmall}
+                                style={{ display: !videoEnabled ? 'flex' : 'none' }}
+                            >
+                                <div className={styles.avatarSmall}>
+                                    You
+                                </div>
+                                <p className={styles.videoPlaceholderTextSmall}>Camera Off</p>
                             </div>
-                            <p className={styles.videoPlaceholderTextSmall}>Camera Off</p>
                         </div>
-                    </div>
-                )}
+                    )}
             </div>
 
             <div className={styles.callControls}>

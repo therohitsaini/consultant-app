@@ -12,7 +12,30 @@ let remoteVideoTrack = null;
 export const getLocalVideoTrack = () => localVideoTrack;
 export const getRemoteVideoTrack = () => remoteVideoTrack;
 let userLeftListenerAdded = false;
-let callConnectedEmitted = false;
+
+
+const checkAndEmitCallConnected = () => {
+    console.log("Both user joined and connection state is connected timer should start");
+    if (
+        client.connectionState === "CONNECTED" &&
+        client.remoteUsers.length > 0 &&
+        !callConnectedEmitted
+    ) {
+        callConnectedEmitted = true;
+
+        window.dispatchEvent(
+            new CustomEvent("call-connected", {
+                detail: {
+                    at: Date.now(),
+                    remoteUid: client.remoteUsers[0]?.uid
+                }
+            })
+        );
+
+        console.log("🔥 CALL CONNECTED (SAFE)");
+    }
+};
+
 
 export const startCall = createAsyncThunk(
     "call/startCall",
@@ -99,7 +122,10 @@ export const startCall = createAsyncThunk(
                     console.log("Video tracks created successfully");
 
                     // Ensure tracks are enabled before publishing
-                    if (localAudioTrack) localAudioTrack.setEnabled(true);
+                    // if (localAudioTrack) localAudioTrack.setEnabled(true);
+                    if (localAudioTrack && !isMuted) {
+                        localAudioTrack.setEnabled(false);
+                    }
                     if (localVideoTrack) localVideoTrack.setEnabled(true);
 
                     console.log("Publishing video tracks...");
@@ -174,21 +200,7 @@ export const startCall = createAsyncThunk(
             // Setup event listeners for remote users
             const handleUserPublished = async (user, mediaType) => {
                 console.log(`Remote user published ${mediaType}. User UID:`, user.uid);
-                if (!callConnectedEmitted) {
-                    callConnectedEmitted = true;
-                    window.callAlreadyConnected = true; // <- track for late listeners
 
-                    window.dispatchEvent(
-                        new CustomEvent("call-connected", {
-                            detail: {
-                                uid: user.uid,
-                                at: Date.now()
-                            }
-                        })
-                    );
-
-                    console.log("🔥 CALL CONNECTED → TIMER SHOULD START_____________________");
-                }
                 try {
                     if (mediaType === "audio") {
                         remoteAudioTrack = await client.subscribe(user, mediaType);
@@ -228,13 +240,15 @@ export const startCall = createAsyncThunk(
 
             client.on("user-joined", (user) => {
                 console.log("User joined channel. UID:", user.uid);
+                checkAndEmitCallConnected();
                 // Receiver refresh ke baad re-join par caller ko pata chale, call end na kare
                 window.dispatchEvent(new CustomEvent("remote-user-rejoined", { detail: { uid: user.uid } }));
             });
-          
+
             // Listen for connection state changes
             client.on("connection-state-change", (curState, revState) => {
                 console.log("Connection state changed:", { from: revState, to: curState });
+                checkAndEmitCallConnected();
             });
 
             const handleUserUnpublished = async (user, mediaType) => {

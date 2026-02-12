@@ -6,7 +6,7 @@ import { IndexTable, Text } from '@shopify/polaris'
 import { fetchActivityHistory } from '../components/Redux/slices/adminSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { useAppBridge } from '../components/createContext/AppBridgeContext'
-import { formatAmountHelper } from '../components/Helper/Helper'
+import { formatAmountHelper, formatNumber } from '../components/Helper/Helper'
 
 
 
@@ -79,8 +79,8 @@ function RevenuManagement() {
         consultant: item.receiverId?.fullname,
         amount: `${item.amount}`,
         status: item.status,
-        consultantAmount: `$${item.consultantAmount}`,
-        adminAmount: `$${item.adminAmount}`
+        consultantAmount: `${item.consultantAmount}`,
+        adminAmount: `${item.adminAmount}`
     })) || [];
     console.log("tableData", tableData);
     const renderTransactionRow = useCallback((transaction, index) => {
@@ -125,13 +125,13 @@ function RevenuManagement() {
                 <IndexTable.Cell>
                     <Text variant="bodyMd" as="span" alignment="center">
                         {
-                            consultantAmount ? `${consultantAmount}` : "-"
+                            consultantAmount ? `$${formatNumber(consultantAmount)}` : "-"
                         }
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
                     <Text variant="bodyMd" as="span" alignment="center">
-                        {adminAmount ? `${adminAmount}` : "-"}
+                        {adminAmount ? `$${formatNumber(adminAmount)}` : "-"}
                     </Text>
                 </IndexTable.Cell>
 
