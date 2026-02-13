@@ -329,10 +329,24 @@ function VideoCallingPage() {
         getCallingUser();
     }, [callerIdParam, callerId, receiverId]);
 
+    // Helper function to get the correct profile image URL
+    const getProfileImageUrl = () => {
+        // If consultant: show receiver's (client's) image
+        // If user/client: show caller's (consultant's) image
+        const imagePath = userType === "client"
+            ? callerDetails?.receiver?.profileImage
+            : callerDetails?.caller?.profileImage;
+
+        if (imagePath) {
+            return `${process.env.REACT_APP_BACKEND_HOST}/${imagePath.replace("\\", "/")}`;
+        }
+        return profileImageDefault;
+    };
+
     const profileImage = callerDetails?.receiver?.profileImage
         ? `${process.env.REACT_APP_BACKEND_HOST}/${callerDetails.receiver.profileImage.replace("\\", "/")}`
         : null;
-console.log("profileImage", profileImage);
+    console.log("profileImage", profileImage);
     const stopTimer = () => {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -367,9 +381,9 @@ console.log("profileImage", profileImage);
             //     });
             localStorage.removeItem("callAccepted");
             const returnUrl = params.get("returnUrl");
-            // if (returnUrl) {
-            //     window.top.location.href = decodeURIComponent(returnUrl);
-            // }
+            if (returnUrl) {
+                window.top.location.href = decodeURIComponent(returnUrl);
+            }
         } else if (callSession) {
             dispatch(endCall());
             // alert("Call ended from consultant side");
@@ -379,20 +393,22 @@ console.log("profileImage", profileImage);
             socket.emit("call-ended", {
                 callerId: callSession?.callerId,
                 receiverId: callSession?.receiverId,
-                channelName: callSession?.channelName,
+                // channelName: callSession?.channelName,
                 callType: callSession?.callType,
                 transactionId: callSession?.transtionId,
                 shopId: callSession?.shopId || "690c374f605cb8b946503ccb",
-                dtn_: "CUT FROM CONSULTANT SIDE"
+                dtn_: "CUT FROM CONSULTANT SIDE",
+                channelName: channelNameParam,
+
             });
 
             localStorage.removeItem("callStartTime");
             localStorage.removeItem("callAccepted");
             localStorage.removeItem("callSession");
             const returnUrl = params.get("returnUrl");
-            // if (returnUrl) {
-            //     window.top.location.href = decodeURIComponent(returnUrl);
-            // }
+            if (returnUrl) {
+                window.top.location.href = decodeURIComponent(returnUrl);
+            }
             // else {
             //     navigate(-1);
             // }
@@ -401,12 +417,12 @@ console.log("profileImage", profileImage);
             dispatch(endCall());
             localStorage.removeItem("callStartTime");
             const returnUrl = params.get("returnUrl");
-            // if (returnUrl) {
-            //     window.top.location.href = decodeURIComponent(returnUrl);
-            // } else {
-            //     navigate(-1);
-            // }
-            // return;
+            if (returnUrl) {
+                window.top.location.href = decodeURIComponent(returnUrl);
+            } else {
+                navigate(-1);
+            }
+            return;
         }
 
     };
@@ -530,10 +546,10 @@ console.log("profileImage", profileImage);
                 <div className={styles.callInfo}>
 
                     <div onClick={startTimer} className={styles.callAvatar}>
-                        <img className={styles.callAvatar} src={userType === "consultant" ? callerDetails?.caller?.profileImage || profileImageDefault : callerDetails?.receiver?.profileImage || profileImageDefault} alt="p" />
+                        <img className={styles.callAvatar} src={getProfileImageUrl()} alt="profile" />
                     </div>
                     <div>
-                        <div className={styles.callName}>{userType === "consultant" ? callerDetails?.caller?.fullname : callerDetails?.receiver?.fullname}</div>
+                        <div className={styles.callName}>{userType === "client" ? callerDetails?.receiver?.fullname : callerDetails?.caller?.fullname}</div>
                         <div className={styles.callStatus}>
                             {/* {conversation.isOnline ? 'Online' : 'Offline'} */}
                         </div>
@@ -553,26 +569,22 @@ console.log("profileImage", profileImage);
                             {
                                 !inCall && (
                                     <div className={styles.videoPlaceholder}>
-                                        {profileImage && (
-                                            <div className={styles.avatarLarge}>
-                                                <img className={styles.avatarLarge} src={userType === "consultant" ? callerDetails?.caller?.profileImage || profileImageDefault : callerDetails?.receiver?.profileImage || profileImageDefault} alt="profile" />
-                                            </div>
-                                        )}
+                                        <div className={styles.avatarLarge}>
+                                            <img className={styles.avatarLarge} src={getProfileImageUrl()} alt="profile" />
+                                        </div>
                                         <p className={styles.videoPlaceholderText}>
-                                            {userType === "consultant" ? callerDetails?.caller?.fullname : callerDetails?.receiver?.fullname || "Waiting for video..."}
+                                            {userType === "client" ? callerDetails?.receiver?.fullname : callerDetails?.caller?.fullname || "Waiting for video..."}
                                         </p>
                                     </div>
                                 )}
                         </>
                     ) : (
                         <div className={styles.videoPlaceholder}>
-                            {profileImage && (
-                                <div className={styles.avatarLarge}>
-                                    <img className={styles.avatarLarge} src={userType === "consultant" ? callerDetails?.caller?.profileImage || profileImageDefault : callerDetails?.receiver?.profileImage || profileImageDefault} alt="profile" />
-                                </div>
-                            )}
+                            <div className={styles.avatarLarge}>
+                                <img className={styles.avatarLarge} src={getProfileImageUrl()} alt="profile" />
+                            </div>
                             <p className={styles.videoPlaceholderText}>
-                                {userType === "consultant" ? callerDetails?.caller?.fullname : callerDetails?.receiver?.fullname || "Calling..."}
+                                {userType === "client" ? callerDetails?.receiver?.fullname : callerDetails?.caller?.fullname || "Calling..."}
                             </p>
 
                             {
