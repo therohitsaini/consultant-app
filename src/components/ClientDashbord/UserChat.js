@@ -488,7 +488,7 @@ const UserChat = () => {
 
                                             </div>
                                         )}
-                                    <button
+                                    {/* <button
                                         className={styles.headerButton}
                                         title="Video Call"
                                         onClick={() => navigate('/video-call', { state: { conversation: consultantOverview?.consultant } })}
@@ -504,7 +504,7 @@ const UserChat = () => {
                                             <circle cx="19" cy="12" r="1" />
                                             <circle cx="5" cy="12" r="1" />
                                         </svg>
-                                    </button>
+                                    </button> */}
                                 </div>
 
                             </div>
@@ -562,6 +562,7 @@ const UserChat = () => {
                                                                 width: "100px",
                                                                 fontFamily: "sans-serif",
                                                             }}
+                                                            disabled={waitingForAccept ? true : false}
                                                             onClick={() => {
                                                                 sendChat("Hello");
                                                                 setWaitingForAccept(true);

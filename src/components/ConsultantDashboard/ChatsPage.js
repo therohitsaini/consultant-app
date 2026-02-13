@@ -43,7 +43,7 @@ const ChatsPage = () => {
     const [seconds, setSeconds] = useState(0);
     const confirmChat = useSelector((state) => state.socket.confirmChat);
     console.log("chatTimer____ChatsPage", chatTimer);
-    console.log("confirmChat____ChatsPage", confirmChat);
+    console.log("userControlMenu$$$$$$$$$$$$", userControlMenu);
 
     useEffect(() => {
         const clientId = localStorage.getItem('client_u_Identity');
@@ -336,7 +336,9 @@ const ChatsPage = () => {
         localStorage.removeItem("chatTimer");
     }
     const handlerUserControlMenu = (conversation) => {
-        setUserControlMenu(conversation?.chatListId);
+        setUserControlMenu((prev) =>
+            prev === conversation?.chatListId ? null : conversation?.chatListId
+        );
     }
 
     const HandleRemoveUser = async (conversation) => {
@@ -452,47 +454,59 @@ const ChatsPage = () => {
                                                                 </div>
 
                                                                 <div className={styles.moreMenuWrapper}>
-                                                                    <button
-                                                                        type="button"
-                                                                        className={styles.unreadBadgeIcon}
-                                                                        onClick={(e) => {
-                                                                            handlerUserControlMenu(conversation);
-                                                                            // setOpenMenuConversationId(
-                                                                            //     openMenuConversationId === conversation.id ? null : conversation.id
-                                                                            // );
-                                                                        }}
-                                                                    >
-                                                                        <BsThreeDotsVertical />
-                                                                    </button>
-
-                                                                    {
-                                                                        !userControlMenu || userControlMenu === conversation?.chatListId && (
-                                                                            <div
-                                                                                className={styles.moreMenu}
-                                                                                onClick={(e) => e.stopPropagation()}
+                                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                                                                        <button
+                                                                            type="button"
+                                                                            style={{
+                                                                                padding: "5px 12px",
+                                                                                backgroundColor: "green",
+                                                                                color: "#fff",
+                                                                                border: "none",
+                                                                                borderRadius: "4px",
+                                                                                cursor: "pointer",
+                                                                                fontSize: "12px"
+                                                                            }}
+                                                                         onClick={() => {
+                                                                            updateUser(conversation);
+                                                                        }}>add</button>
+                                                                        <button
+                                                                            type="button"
+                                                                            className={styles.unreadBadgeIcon}
+                                                                            onClick={(e) => {
+                                                                                handlerUserControlMenu(conversation);
+                                                                                // setOpenMenuConversationId(
+                                                                                //     openMenuConversationId === conversation.id ? null : conversation.id
+                                                                                // );
+                                                                            }}
+                                                                        >
+                                                                            <BsThreeDotsVertical />
+                                                                        </button>
+                                                                    </div>
+                                                                    {userControlMenu === conversation?.chatListId && (
+                                                                        <div
+                                                                            className={styles.moreMenu}
+                                                                            onClick={(e) => e.stopPropagation()}
+                                                                        >
+                                                                            <button
+                                                                                type="button"
+                                                                                className={styles.moreMenuItem}
+                                                                                onClick={() => {
+                                                                                    updateUser(conversation);
+                                                                                }}
                                                                             >
-                                                                                <button
-                                                                                    type="button"
-                                                                                    className={styles.moreMenuItem}
-                                                                                    onClick={() => {
-                                                                                        // TODO: add your add logic here
-                                                                                        // setOpenMenuConversationId(null);
-                                                                                        updateUser(conversation);
-                                                                                    }}
-                                                                                >
-                                                                                    Add
-                                                                                </button>
-                                                                                <button
-                                                                                    type="button"
-                                                                                    className={styles.moreMenuItem}
-                                                                                    onClick={() => {
-                                                                                        HandleRemoveUser(conversation);
-                                                                                    }}
-                                                                                >
-                                                                                    Remove
-                                                                                </button>
-                                                                            </div>
-                                                                        )}
+                                                                                Add
+                                                                            </button>
+                                                                            <button
+                                                                                type="button"
+                                                                                className={styles.moreMenuItem}
+                                                                                onClick={() => {
+                                                                                    HandleRemoveUser(conversation);
+                                                                                }}
+                                                                            >
+                                                                                Remove
+                                                                            </button>
+                                                                        </div>
+                                                                    )}
                                                                 </div>
                                                             </div>
 
@@ -571,38 +585,40 @@ const ChatsPage = () => {
                                                                                     }
                                                                                 </div>
                                                                                 {/* {conversation.unreadCount > 0 && ( */}
-                                                                                <span className={styles.unreadBadge}>
+                                                                                {/* <span className={styles.unreadBadge}>
                                                                                     {"5+"}
-                                                                                </span>
+                                                                                </span> */}
                                                                                 <div className={styles.moreMenuWrapper}>
                                                                                     <button
                                                                                         type="button"
                                                                                         className={styles.unreadBadgeIcon}
                                                                                         onClick={(e) => {
                                                                                             e.stopPropagation();
-                                                                                            setUserControlMenu(conversation?.chatListId);
+                                                                                            setUserControlMenu((prev) =>
+                                                                                                prev === conversation?.chatListId ? null : conversation?.chatListId
+                                                                                            );
                                                                                         }}
-                                                                                        onClose={() => setUserControlMenu(null)}
                                                                                     >
                                                                                         <BsThreeDotsVertical />
                                                                                     </button>
 
-                                                                                    {!userControlMenu || userControlMenu === conversation?.chatListId && (
-                                                                                        <div
-                                                                                            className={styles.moreMenu}
-                                                                                            onClick={(e) => e.stopPropagation()}
-                                                                                        >
-                                                                                            <button
-                                                                                                type="button"
-                                                                                                className={styles.moreMenuItem}
-                                                                                                onClick={() => {
-                                                                                                    HandleRemoveUser(conversation);
-                                                                                                }}
+                                                                                    {
+                                                                                        userControlMenu === conversation?.chatListId && (
+                                                                                            <div
+                                                                                                className={styles.moreMenu}
+                                                                                                onClick={(e) => e.stopPropagation()}
                                                                                             >
-                                                                                                Remove
-                                                                                            </button>
-                                                                                        </div>
-                                                                                    )}
+                                                                                                <button
+                                                                                                    type="button"
+                                                                                                    className={styles.moreMenuItem}
+                                                                                                    onClick={() => {
+                                                                                                        HandleRemoveUser(conversation);
+                                                                                                    }}
+                                                                                                >
+                                                                                                    Remove
+                                                                                                </button>
+                                                                                            </div>
+                                                                                        )}
                                                                                 </div>
                                                                                 {/* )} */}
                                                                             </div>
@@ -647,18 +663,19 @@ const ChatsPage = () => {
                                             </button>
                                             <div className={`${styles.chatHeaderInfo} ${styles.flex} ${styles.flexCenter}`}>
                                                 <div className={styles.avatarWrapper}>
-                                                    {selectedConversation?.sender?.profileImage ? (
-                                                        <img
-                                                            src={`${process.env.REACT_APP_BACKEND_HOST}/${selectedConversation.sender.profileImage.replace("\\", "/")}`}
-                                                            alt={selectedConversation.sender.fullname}
-                                                            className={styles.chatHeaderAvatar}
-                                                            style={{ borderRadius: '50%', width: '40px', height: '40px', objectFit: 'cover' }}
-                                                        />
-                                                    ) : (
-                                                        <div className={styles.chatHeaderAvatar}>
-                                                            {selectedConversation?.sender?.fullname?.charAt(0)?.toUpperCase() || 'U'}
-                                                        </div>
-                                                    )}
+                                                    {
+                                                        selectedConversation?.sender?.profileImage ? (
+                                                            <img
+                                                                src={`${process.env.REACT_APP_BACKEND_HOST}/${selectedConversation.sender.profileImage.replace("\\", "/")}`}
+                                                                alt={selectedConversation.sender.fullname}
+                                                                className={styles.chatHeaderAvatar}
+                                                                style={{ borderRadius: '50%', width: '40px', height: '40px', objectFit: 'cover' }}
+                                                            />
+                                                        ) : (
+                                                            <div className={styles.chatHeaderAvatar}>
+                                                                {selectedConversation?.sender?.fullname?.charAt(0)?.toUpperCase() || 'U'}
+                                                            </div>
+                                                        )}
                                                     {
                                                         selectedConversation?.isOnline && (
                                                             <div className={styles.onlineIndicator}></div>
@@ -719,78 +736,76 @@ const ChatsPage = () => {
 
                                         {/* Messages Area */}
                                         <div className={styles.messagesArea} ref={messagesAreaRef}>
-                                            {showChatEndPop ? (
-                                                <div className={styles.mainChatReqBox}>
-                                                    <div className={styles.chatRequestBox}>
-                                                        <div className={styles.chatIcon}>🔒</div>
+                                            {
+                                                showChatEndPop ? (
+                                                    <div className={styles.mainChatReqBox}>
+                                                        <div className={styles.chatRequestBox}>
+                                                            <div className={styles.chatIcon}>🔒</div>
 
-                                                        <div className={styles.chatRequestContent}>
-                                                            <h4>Chat Ended</h4>
-                                                            <p>The chat session has been ended successfully</p>
+                                                            <div className={styles.chatRequestContent}>
+                                                                <h4>Chat Ended</h4>
+                                                                <p>The chat session has been ended successfully</p>
+                                                            </div>
+
+                                                            <button onClick={() => setShowChatEndPop(false)} className={styles.acceptBtn}>
+                                                                OK
+                                                            </button>
                                                         </div>
-
-                                                        <button onClick={() => setShowChatEndPop(false)} className={styles.acceptBtn}>
-                                                            OK
-                                                        </button>
                                                     </div>
-                                                </div>
-                                            ) : chatAccepted?.isChatAccepted === "request" ? (
-                                                <div className={styles.mainChatReqBox}>
-                                                    <div className={styles.chatRequestBox}>
-                                                        <div className={styles.chatIcon}>💬</div>
+                                                ) : chatAccepted?.isChatAccepted === "request" ? (
+                                                    <div className={styles.mainChatReqBox}>
+                                                        <div className={styles.chatRequestBox}>
+                                                            <div className={styles.chatIcon}>💬</div>
 
-                                                        <div className={styles.chatRequestContent}>
-                                                            <h4>New Chat Request</h4>
-                                                            <p>A user wants to start a chat with you</p>
+                                                            <div className={styles.chatRequestContent}>
+                                                                <h4>New Chat Request</h4>
+                                                                <p>A user wants to start a chat with you</p>
+                                                            </div>
+
+                                                            <button onClick={() => acceptUserChat(chatAccepted)} className={styles.acceptBtn}>
+                                                                Accept Chat
+                                                            </button>
                                                         </div>
-
-                                                        <button onClick={() => acceptUserChat(chatAccepted)} className={styles.acceptBtn}>
-                                                            Accept Chat
-                                                        </button>
                                                     </div>
-                                                </div>
-                                            ) : chatMessagesData.length === 0 ? (
-                                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                                                    <p>No messages yet. Start the conversation!</p>
-                                                </div>
-                                            ) : (
-                                                <>
-                                                    {
-                                                        chatMessagesData.map((message) => {
-                                                            // const consultantId = consultantId;
-                                                            const isOwn = message.senderId === consultantId;
+                                                ) : chatMessagesData.length === 0 ? (
+                                                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                                                        <p>No messages yet. Start the conversation!</p>
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        {
+                                                            chatMessagesData.map((message) => {
+                                                                const isOwn = message.senderId === consultantId;
+                                                                const timestamp = new Date(message.timestamp).toLocaleTimeString([], {
+                                                                    hour: "2-digit",
+                                                                    minute: "2-digit",
+                                                                    hour12: true
+                                                                });
 
-                                                            // Format timestamp
-                                                            const timestamp = new Date(message.timestamp).toLocaleTimeString([], {
-                                                                hour: "2-digit",
-                                                                minute: "2-digit",
-                                                                hour12: true
-                                                            });
-
-                                                            return (
-                                                                <div
-                                                                    key={message._id}
-                                                                    className={`${styles.messageContainer} ${isOwn ? styles.messageContainerRight : styles.messageContainerLeft}`}
-                                                                >
-                                                                    <div className={`${styles.messageBubble} ${isOwn ? styles.messageBubbleOwn : styles.messageBubbleOther}`}>
-                                                                        {/* {!isOwn && (
+                                                                return (
+                                                                    <div
+                                                                        key={message._id}
+                                                                        className={`${styles.messageContainer} ${isOwn ? styles.messageContainerRight : styles.messageContainerLeft}`}
+                                                                    >
+                                                                        <div className={`${styles.messageBubble} ${isOwn ? styles.messageBubbleOwn : styles.messageBubbleOther}`}>
+                                                                            {/* {!isOwn && (
                                                                 <div className={styles.messageSender}>
                                                                     User
                                                                 </div>
                                                             )} */}
-                                                                        <div className={styles.messageText}>
-                                                                            {message.text}
-                                                                        </div>
-                                                                        <div className={styles.messageTimestamp}>
-                                                                            {timestamp}
+                                                                            <div className={styles.messageText}>
+                                                                                {message.text}
+                                                                            </div>
+                                                                            <div className={styles.messageTimestamp}>
+                                                                                {timestamp}
+                                                                            </div>
                                                                         </div>
                                                                     </div>
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    <div ref={messagesEndRef} />
-                                                </>
-                                            )}
+                                                                );
+                                                            })}
+                                                        <div ref={messagesEndRef} />
+                                                    </>
+                                                )}
                                         </div>
 
                                         {/* Message Input */}

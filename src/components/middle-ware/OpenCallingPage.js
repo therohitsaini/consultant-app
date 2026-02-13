@@ -3,9 +3,10 @@ import { checkMicPermission } from "../ConsultantCards/ConsultantCards";
 import { socket } from "../Sokect-io/SokectConfig";
 
 
-export const checkUserBalance = async ({ userId, consultantId, type }) => {
+export const checkUserBalance = async ({ userId, consultantId, type, shop }) => {
     if (!userId || !consultantId) {
-        alert("Login to start the call");
+        window.top.location.href = `https://${shop}/account/login`;
+
         return
     }
     try {
@@ -24,14 +25,14 @@ export const checkUserBalance = async ({ userId, consultantId, type }) => {
 }
 
 
-export const openCallPage = async ({ receiverId, type, userId = "6978766389b46d040a86b494", shop }) => {
+export const openCallPage = async ({ receiverId, type, userId, shop }) => {
     try {
         console.log("receiverId", receiverId);
         console.log("type", type);
         console.log("userId", userId);
         console.log("shop", shop);
 
-        const balance = await checkUserBalance({ userId, consultantId: receiverId, type });
+        const balance = await checkUserBalance({ userId, consultantId: receiverId, type, shop });
         console.log("balance", balance);
 
         if (!balance) {
