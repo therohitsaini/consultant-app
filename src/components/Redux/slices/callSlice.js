@@ -12,6 +12,8 @@ let remoteVideoTrack = null;
 export const getLocalVideoTrack = () => localVideoTrack;
 export const getRemoteVideoTrack = () => remoteVideoTrack;
 let userLeftListenerAdded = false;
+let callConnectedEmitted = false; // Track if call-connected event has been emitted
+let timerStarted = false; // Track if timer start event has been emitted
 
 
 const checkAndEmitCallConnected = () => {
@@ -33,6 +35,28 @@ const checkAndEmitCallConnected = () => {
         );
 
         console.log("🔥 CALL CONNECTED (SAFE)");
+    }
+};
+
+// Timer start function - fires when both users join
+const tryStartTimer = () => {
+    if (
+        !timerStarted &&
+        client.connectionState === "CONNECTED" &&
+        client.remoteUsers.length > 0
+    ) {
+        timerStarted = true;
+
+        console.log("🔥 BOTH USER JOINED → TIMER START");
+
+        window.dispatchEvent(
+            new CustomEvent("call-timer-start", {
+                detail: {
+                    startedAt: Date.now(),
+                    remoteUid: client.remoteUsers[0]?.uid
+                }
+            })
+        );
     }
 };
 
@@ -118,46 +142,70 @@ export const startCall = createAsyncThunk(
             if (callType === "video") {
                 console.log("Creating video tracks...");
                 try {
-                    [localAudioTrack, localVideoTrack] = await AgoraRTC.createMicrophoneAndCameraTracks();
-                    console.log("Video tracks created successfully");
-
-                    // Ensure tracks are enabled before publishing
-                    // if (localAudioTrack) localAudioTrack.setEnabled(true);
-                    if (localAudioTrack && !isMuted) {
-                        localAudioTrack.setEnabled(false);
+                    // Try to create both audio and video tracks
+                    try {
+                        [localAudioTrack, localVideoTrack] = await AgoraRTC.createMicrophoneAndCameraTracks();
+                        console.log("Video tracks created successfully");
+                    } catch (audioError) {
+                        // If audio device not found, try creating only video track
+                        if (audioError.code === 'DEVICE_NOT_FOUND' || audioError.message?.includes('device not found')) {
+                            console.warn("Audio device not found, continuing with video only:", audioError.message);
+                            try {
+                                localVideoTrack = await AgoraRTC.createCameraVideoTrack();
+                                console.log("Video track created successfully (audio unavailable)");
+                            } catch (videoError) {
+                                console.error("Failed to create video track:", videoError);
+                                throw videoError;
+                            }
+                        } else {
+                            throw audioError;
+                        }
                     }
+
+                    // Ensure tracks are enabled before publishing (audio on, video on by default)
+                    if (localAudioTrack) localAudioTrack.setEnabled(true);
                     if (localVideoTrack) localVideoTrack.setEnabled(true);
 
-                    console.log("Publishing video tracks...");
-                    await client.publish([localAudioTrack, localVideoTrack]);
-                    console.log("Published local audio and video tracks successfully");
-                    console.log("Published tracks status:", {
-                        audio: localAudioTrack?.isPlaying || false,
-                        video: localVideoTrack?.isPlaying || false
-                    });
+                    // Publish available tracks
+                    const tracksToPublish = [localAudioTrack, localVideoTrack].filter(Boolean);
+                    if (tracksToPublish.length > 0) {
+                        console.log("Publishing tracks...", { audio: !!localAudioTrack, video: !!localVideoTrack });
+                        await client.publish(tracksToPublish);
+                        console.log("Published local tracks successfully");
+                        console.log("Published tracks status:", {
+                            audio: localAudioTrack?.isPlaying || false,
+                            video: localVideoTrack?.isPlaying || false
+                        });
+                    } else {
+                        console.warn("No tracks available to publish");
+                    }
 
                     // Try to play local video immediately if element exists - Multiple attempts
-                    const playLocalVideo = () => {
-                        const localVideoElement = document.querySelector('[data-local-video]');
-                        if (localVideoElement && localVideoTrack) {
-                            localVideoTrack.play(localVideoElement).then(() => {
-                                console.log("Local video playing on element successfully");
-                            }).catch(err => {
-                                console.error("Error playing local video:", err);
-                            });
-                        }
-                    };
+                    if (localVideoTrack) {
+                        const playLocalVideo = () => {
+                            const localVideoElement = document.querySelector('[data-local-video]');
+                            if (localVideoElement && localVideoTrack) {
+                                localVideoTrack.play(localVideoElement).then(() => {
+                                    console.log("Local video playing on element successfully");
+                                }).catch(err => {
+                                    console.error("Error playing local video:", err);
+                                });
+                            }
+                        };
 
-                    // Try multiple times with delays
-                    setTimeout(playLocalVideo, 100);
-                    setTimeout(playLocalVideo, 500);
-                    setTimeout(playLocalVideo, 1000);
+                        // Try multiple times with delays
+                        setTimeout(playLocalVideo, 100);
+                        setTimeout(playLocalVideo, 500);
+                        setTimeout(playLocalVideo, 1000);
 
-                    // Dispatch event for component to handle
-                    window.dispatchEvent(new Event('local-video-ready'));
+                        // Dispatch event for component to handle
+                        window.dispatchEvent(new Event('local-video-ready'));
+                    }
                 } catch (trackError) {
                     console.error("Error creating/publishing video tracks:", trackError);
-                    throw new Error(`Failed to create video tracks: ${trackError.message}`);
+                    // Don't throw error - allow call to continue even without local tracks
+                    // Remote user can still join and timer should start
+                    console.warn("Continuing call without local tracks due to device error");
                 }
             } else {
                 console.log("Creating audio track...");
@@ -173,8 +221,16 @@ export const startCall = createAsyncThunk(
                     console.log("Published local audio track successfully");
                     console.log("Audio track status:", localAudioTrack?.isPlaying || false);
                 } catch (trackError) {
-                    console.error("Error creating/publishing audio track:", trackError);
-                    throw new Error(`Failed to create audio track: ${trackError.message}`);
+                    // Handle device not found error gracefully
+                    if (trackError.code === 'DEVICE_NOT_FOUND' || trackError.message?.includes('device not found')) {
+                        console.warn("Audio device not found, continuing call without local audio:", trackError.message);
+                        // Don't throw error - allow call to continue
+                        // User can still receive remote audio and timer should start
+                    } else {
+                        console.error("Error creating/publishing audio track:", trackError);
+                        // For other errors, still don't throw - allow call to continue
+                        console.warn("Continuing call despite audio track error");
+                    }
                 }
             }
 
@@ -241,6 +297,7 @@ export const startCall = createAsyncThunk(
             client.on("user-joined", (user) => {
                 console.log("User joined channel. UID:", user.uid);
                 checkAndEmitCallConnected();
+                tryStartTimer(); // Start timer when both users join
                 // Receiver refresh ke baad re-join par caller ko pata chale, call end na kare
                 window.dispatchEvent(new CustomEvent("remote-user-rejoined", { detail: { uid: user.uid } }));
             });
@@ -249,6 +306,7 @@ export const startCall = createAsyncThunk(
             client.on("connection-state-change", (curState, revState) => {
                 console.log("Connection state changed:", { from: revState, to: curState });
                 checkAndEmitCallConnected();
+                tryStartTimer(); // Start timer when connection state changes to CONNECTED
             });
 
             const handleUserUnpublished = async (user, mediaType) => {
@@ -313,6 +371,10 @@ export const endCall = createAsyncThunk(
         localVideoTrack?.stop();
         localVideoTrack?.close();
         localVideoTrack = null;
+
+        // Reset flags for next call
+        callConnectedEmitted = false;
+        timerStarted = false;
 
         // Leave channel – remote peer will get Agora "user offline" / "user-left" (reason: Quit)
         await client.leave();
