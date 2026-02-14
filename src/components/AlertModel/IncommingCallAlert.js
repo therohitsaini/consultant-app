@@ -57,7 +57,7 @@ export default function IncomingCallAlert() {
          
             const returnUrl = `https://${shop}/apps/consultant-theme/consultant-dashboard`;
             const callUrl =
-                `${process.env.REACT_APP_FRONTEND_URL}/video/calling/page` +
+                `${"https://test-consultation-app.zend-apps.com"}/video/calling/page` +
                 `?callerId=${callerId}` +
                 `&receiverId=${userId}` +
                 `&callType=${callType}` +
