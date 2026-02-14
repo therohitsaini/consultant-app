@@ -3,6 +3,30 @@ import AgoraRTC from "agora-rtc-sdk-ng";
 
 const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
 
+// 🔊 MIC CONTROL HELPERS
+
+export const enableMic = async () => {
+    if (!localAudioTrack) {
+        console.log("🎤 Creating & publishing mic track");
+        localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+        await client.publish([localAudioTrack]);
+    } else {
+        console.log("🎤 Enabling mic track");
+        localAudioTrack.setEnabled(true);
+    }
+};
+
+export const disableMic = async () => {
+    if (localAudioTrack) {
+        console.log("🔇 Disabling mic track");
+        await client.unpublish([localAudioTrack]);
+        localAudioTrack.stop();
+        localAudioTrack.close();
+        localAudioTrack = null;
+    }
+};
+
+
 let localAudioTrack = null;
 let localVideoTrack = null;
 let remoteAudioTrack = null;
@@ -392,10 +416,20 @@ const callSlice = createSlice({
         videoEnabled: true,
     },
     reducers: {
+        // toggleMute: state => {
+        //     state.muted = !state.muted;
+        //     localAudioTrack?.setEnabled(!state.muted);
+        // },
         toggleMute: state => {
             state.muted = !state.muted;
-            localAudioTrack?.setEnabled(!state.muted);
+        
+            if (!state.muted) {
+                enableMic();   // 🎤 mic ON
+            } else {
+                disableMic();  // 🔇 mic OFF
+            }
         },
+        
         toggleVideo: state => {
             state.videoEnabled = !state.videoEnabled;
             localVideoTrack?.setEnabled(state.videoEnabled);

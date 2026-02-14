@@ -77,6 +77,7 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
             receiverId,
             channelName,
             callType: type || "voice",
+            shop
         });
 
         const tokenEncoded = encodeURIComponent(data.token);

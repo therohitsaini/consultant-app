@@ -16,9 +16,8 @@ export default function IncomingCallAlert() {
     const { incomingCall, callEnded } = useSelector((state) => state.socket);
     const { callAccepted } = useSelector((state) => state.socket);
     const shopId = params.get("shopId");
-    const shop = params.get("shop");
 
-    console.log("incomingCall", shop, params);
+
     useEffect(() => {
         if (callEnded?.callId) {
             handleReject();
@@ -27,8 +26,9 @@ export default function IncomingCallAlert() {
 
     if (!incomingCall) return console.log("No incoming call");
 
-    const { callerId, callType, channelName, callerName } = incomingCall;
+    const { callerId, callType, channelName, callerName,shop } = incomingCall;
 
+    console.log("incomingCall", shop, );
     const handleAccept = async () => {
         localStorage.setItem("callAccepted____", JSON.stringify(callAccepted));
         console.log("callAccepted______IncomingCallAlert", callAccepted);
@@ -55,7 +55,7 @@ export default function IncomingCallAlert() {
             const appIdParam = data.appId ? `&appId=${data.appId}` : '';
             const callType = incomingCall.callType || "voice";
          
-            const returnUrl = `https://rohit-12345839.myshopify.com/apps/consultant-theme/consultant-dashboard`;
+            const returnUrl = `https://${shop}/apps/consultant-theme/consultant-dashboard`;
             const callUrl =
                 `${process.env.REACT_APP_FRONTEND_URL}/video/calling/page` +
                 `?callerId=${callerId}` +
@@ -74,12 +74,10 @@ export default function IncomingCallAlert() {
     };
 
     const handleReject = () => {
-        console.log("Call rejected", incomingCall);
         socket.emit("reject-call", { callerId, receiverId: userId, channelName, callType: incomingCall.callType });
         dispatch(setIncomingCall(null));
 
     };
-
 
     return (
         <>

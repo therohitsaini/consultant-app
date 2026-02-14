@@ -21,32 +21,40 @@ if ("serviceWorker" in navigator) {
     .then((reg) => console.log("Service worker registered:", reg.scope))
     .catch((err) => console.error("SW registration failed:", err));
 }
+const isShopifyAdmin = () => {
+  if (typeof window === "undefined") return false;
+  const params = new URLSearchParams(window.location.search);
+  return params.has("host");
+};
+
+const AppWrapper = ({ children }) => {
+  if (isShopifyAdmin()) {
+    return <AppBridgeProvider>{children}</AppBridgeProvider>;
+  }
+  return <>{children}</>; // store frontend → no AppBridge
+};
 
 
+const root = ReactDOM.createRoot(document.getElementById("root"));
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  // <React.StrictMode>
-
-  // <ErrorBoundary>
-    <AppBridgeProvider >
-      <PolarisAppProvider i18n={en}>
-        <ToastProvider>
-          <Provider store={store}>
-            <SocketProvider>
-              <AppStatusProvider>
-                <AppStatusBillingProvider>
-                  <App />
-                </AppStatusBillingProvider>
-              </AppStatusProvider>
-            </SocketProvider>
-          </Provider>
-        </ToastProvider>
-      </PolarisAppProvider>
-    </AppBridgeProvider>
-  // </ErrorBoundary>
-  // </React.StrictMode>
+  <AppWrapper>
+    <PolarisAppProvider i18n={en}>
+      <ToastProvider>
+        <Provider store={store}>
+          <SocketProvider>
+            <AppStatusProvider>
+              <AppStatusBillingProvider>
+                <App />
+              </AppStatusBillingProvider>
+            </AppStatusProvider>
+          </SocketProvider>
+        </Provider>
+      </ToastProvider>
+    </PolarisAppProvider>
+  </AppWrapper>
 );
+
 if (process.env.NODE_ENV === 'development') {
   const hideErrorOverlay = () => {
     const overlay = document.getElementById('react-error-overlay');

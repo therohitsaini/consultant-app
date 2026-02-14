@@ -90,19 +90,44 @@
     padding-top: 8px;
 }
 
+
+/* =============== MOBILE RESPONSIVE =============== */
 @media (max-width: 768px) {
+
     .profileSection {
-        flex-direction: column;
+      flex-direction: column;
+      padding: 12px;
     }
-
-    .profileLeft {
-        width: 100%;
-        flex-direction: row;
-        justify-content: flex-start;
-        gap: 16px;
+  
+    .profileSectionHeader {
+      width: 100%;
+      padding: 16px;
     }
-
-    .profileBasicInfo {
-        text-align: left;
+  
+    .profileImage {
+      width: 90px;
+      height: 90px;
     }
-}
+  
+    .profileRight {
+      width: 100%;
+      padding: 16px;
+      margin-top: 12px;
+    }
+  
+    .profileNav {
+      flex-direction: column;
+      gap: 8px;
+    }
+  
+    .profileNavButton {
+      width: 100%;
+      text-align: center;
+      padding: 12px;
+    }
+  
+    .profileContent {
+      margin-top: 12px;
+    }
+  }
+  

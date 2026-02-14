@@ -28,7 +28,10 @@ const UserTable = ({ columns, data, title, loading }) => {
                 </select>
             </div>
 
-            <table className="table table-bordered table-hover text-center">
+            <div className="table-responsive user-table-responsive">
+  <table className="table table-bordered table-hover text-center">
+
+                
                 <thead className="table-dark">
                     <tr>
                         <th>#</th>
@@ -73,7 +76,9 @@ const UserTable = ({ columns, data, title, loading }) => {
                             )}
                     </tbody>
                 )}
-            </table>
+          </table>
+</div>
+
 
             {/* Pagination */}
 
