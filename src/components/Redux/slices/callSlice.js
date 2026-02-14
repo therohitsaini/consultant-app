@@ -163,7 +163,7 @@ export const startCall = createAsyncThunk(
                     }
 
                     // Ensure tracks are enabled before publishing (audio on, video on by default)
-                    if (localAudioTrack) localAudioTrack.setEnabled(true);
+                    if (localAudioTrack) localAudioTrack.setEnabled(false);
                     if (localVideoTrack) localVideoTrack.setEnabled(true);
 
                     // Publish available tracks
@@ -388,7 +388,7 @@ const callSlice = createSlice({
         inCall: false,
         channel: null,
         type: null,
-        muted: false,
+        muted: true,
         videoEnabled: true,
     },
     reducers: {

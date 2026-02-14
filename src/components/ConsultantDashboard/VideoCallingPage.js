@@ -146,7 +146,6 @@ function VideoCallingPage() {
         if (callStartedRef.current) return;
         if (token && channelNameParam && uidParam) {
             const appId = appIdParam || "656422a01e774a4ba5b2dc0ac12e5fe5";
-            console.log(`Starting ${callType} call:`, { token, channel: channelNameParam, uid: uidParam, appId });
             callStartedRef.current = true;
             dispatch(startCall({
                 token: token,
@@ -550,7 +549,7 @@ function VideoCallingPage() {
                 </button>
                 <div className={styles.callInfo}>
 
-                    <div onClick={startTimer} className={styles.callAvatar}>
+                    <div onClick={stopRingtone()} className={styles.callAvatar}>
                         <img className={styles.callAvatar} src={getProfileImageUrl()} alt="profile" />
                     </div>
                     <div>
