@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './VideoCallingPage.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { endCall, startCall, toggleMute, toggleVideo } from '../Redux/slices/callSlice';
-import { initRingtone, playRingtone } from '../ringTone/ringingTune';
+import { initRingtone, playRingtone ,stopRingtone} from '../ringTone/ringingTune';
 import { getSocket, socket } from '../Sokect-io/SokectConfig';
 import axios from 'axios';
 import profileImageDefault from '../../../src/assets/avatar-or-person-sign-profile-picture-portrait-icon-user-profile-symbol.webp';
@@ -38,7 +38,19 @@ function VideoCallingPage() {
     const { callRejected } = useSelector((state) => state.socket);
 
 
-    console.log("callAccepted", callAccepted);
+    useEffect(() => {
+        const handleBeforeUnload = (e) => {
+          e.preventDefault();
+          e.returnValue = ""; // required
+        };
+      
+        window.addEventListener("beforeunload", handleBeforeUnload);
+      
+        return () => {
+          window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+      }, []);
+      
 
     useEffect(() => {
         localStorage.setItem("userId", userId);
@@ -234,7 +246,6 @@ function VideoCallingPage() {
                 });
             };
 
-            // Check immediately and then periodically
             checkAndPlayRemoteVideo();
             const interval = setInterval(() => {
                 checkAndPlayRemoteVideo();
@@ -248,7 +259,6 @@ function VideoCallingPage() {
         }
     }, [isVideoCall, inCall]);
 
-    // Listen for custom events when videos are ready
     useEffect(() => {
         const handleRemoteVideoReady = () => {
             if (remoteVideoRef.current) {
@@ -302,7 +312,6 @@ function VideoCallingPage() {
     }, []);
 
 
-    // Fetch caller details
     const getCallingUser = async () => {
         const finalCallerId = callerIdParam || callerId;
         if (!finalCallerId || !receiverId) return;
@@ -329,10 +338,7 @@ function VideoCallingPage() {
         getCallingUser();
     }, [callerIdParam, callerId, receiverId]);
 
-    // Helper function to get the correct profile image URL
     const getProfileImageUrl = () => {
-        // If consultant: show receiver's (client's) image
-        // If user/client: show caller's (consultant's) image
         const imagePath = userType === "client"
             ? callerDetails?.receiver?.profileImage
             : callerDetails?.caller?.profileImage;
@@ -346,7 +352,7 @@ function VideoCallingPage() {
     const profileImage = callerDetails?.receiver?.profileImage
         ? `${process.env.REACT_APP_BACKEND_HOST}/${callerDetails.receiver.profileImage.replace("\\", "/")}`
         : null;
-    console.log("profileImage", profileImage);
+
     const stopTimer = () => {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -356,8 +362,6 @@ function VideoCallingPage() {
 
     const handleEndCall = () => {
         const callAcceptedFromStorage = JSON.parse(localStorage.getItem("callAccepted") || null);
-        console.log("callAccepted________TransactionId", callAccepted?.transactionId);
-        console.log("callAccepted_______TransactionId", callAccepted);
         // if ( !callerId || !receiverId || !channelNameParam || !callType) {
         //     alert("Call not accepted");
         //     return;
@@ -449,6 +453,7 @@ function VideoCallingPage() {
         const onRemoteLeft = (e) => {
             console.log("🔥 Remote user left — ending call immediately", e?.detail);
             handleEndCall();
+            stopRingtone()
         };
 
         window.addEventListener("remote-user-left", onRemoteLeft);
