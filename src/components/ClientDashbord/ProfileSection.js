@@ -5,8 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserDetailsByIds } from '../Redux/slices/UserSlices';
 import { FormLayout, TextField } from '@shopify/polaris';
 import axios from 'axios';
-import { getAppBridgeToken } from '../../utils/getAppBridgeToken';
-import { useAppBridge } from '../createContext/AppBridgeContext';
+
 
 const ProfileSection = () => {
   const [userId, setUserId] = useState(null);

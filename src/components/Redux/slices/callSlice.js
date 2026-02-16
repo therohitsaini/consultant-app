@@ -176,7 +176,15 @@ export const startCall = createAsyncThunk(
                         if (audioError.code === 'DEVICE_NOT_FOUND' || audioError.message?.includes('device not found')) {
                             console.warn("Audio device not found, continuing with video only:", audioError.message);
                             try {
-                                localVideoTrack = await AgoraRTC.createCameraVideoTrack();
+                                localVideoTrack = await AgoraRTC.createCameraVideoTrack({
+                                    encoderConfig: {
+                                        width: 640,
+                                        height: 480,
+                                        frameRate: 15,
+                                        bitrateMin: 400,
+                                        bitrateMax: 800
+                                    }
+                                });
                                 console.log("Video track created successfully (audio unavailable)");
                             } catch (videoError) {
                                 console.error("Failed to create video track:", videoError);
@@ -187,9 +195,9 @@ export const startCall = createAsyncThunk(
                         }
                     }
 
-                    // Ensure tracks are enabled before publishing (audio on, video on by default)
+                    // Video call: default camera OFF and mic OFF; user turns on when ready
                     if (localAudioTrack) localAudioTrack.setEnabled(false);
-                    if (localVideoTrack) localVideoTrack.setEnabled(true);
+                    if (localVideoTrack) localVideoTrack.setEnabled(false);
 
                     // Publish available tracks
                     const tracksToPublish = [localAudioTrack, localVideoTrack].filter(Boolean);
@@ -238,8 +246,8 @@ export const startCall = createAsyncThunk(
                     localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
                     console.log("Audio track created successfully");
 
-                    // Ensure track is enabled before publishing
-                    if (localAudioTrack) localAudioTrack.setEnabled(true);
+                    // Start muted (matches initialState.muted: true); user unmutes to enable
+                    if (localAudioTrack) localAudioTrack.setEnabled(false);
 
                     console.log("Publishing audio track...");
                     await client.publish([localAudioTrack]);
@@ -259,19 +267,9 @@ export const startCall = createAsyncThunk(
                 }
             }
 
-            // Verify tracks are published and enabled
+            // Verify tracks are published (default: mic and camera off for video call)
             const publishedTracks = client.localTracks;
             console.log("Local tracks published:", publishedTracks.length);
-
-            // Ensure tracks are enabled
-            if (localAudioTrack) {
-                // localAudioTrack.setEnabled(true);
-                console.log("Local audio track enabled:", localAudioTrack.isPlaying);
-            }
-            if (localVideoTrack) {
-                localVideoTrack.setEnabled(true);
-                console.log("Local video track enabled:", localVideoTrack.isPlaying);
-            }
 
             // Verify connection state
             console.log("Final connection state:", client.connectionState);
@@ -295,8 +293,10 @@ export const startCall = createAsyncThunk(
                         const playRemoteVideo = () => {
                             const remoteVideoElement = document.querySelector('[data-remote-video]');
                             if (remoteVideoElement && remoteVideoTrack) {
-                                remoteVideoTrack.play(remoteVideoElement).then(() => {
-                                    console.log("Playing remote video on element successfully");
+                                remoteVideoTrack.play(remoteVideoElement, {
+                                    fit: "contain"   // 🔥 NO ZOOM
+                                }).then(() => {
+                                    console.log("Playing remote video (no zoom)");
                                 }).catch(err => {
                                     console.error("Error playing remote video:", err);
                                 });
@@ -345,6 +345,7 @@ export const startCall = createAsyncThunk(
                     console.log("Remote user unpublished video");
                     remoteVideoTrack?.stop();
                     remoteVideoTrack = null;
+                    window.dispatchEvent(new Event('remote-video-stopped'));
                 }
 
             };
@@ -417,20 +418,15 @@ const callSlice = createSlice({
         videoEnabled: true,
     },
     reducers: {
-        // toggleMute: state => {
-        //     state.muted = !state.muted;
-        //     localAudioTrack?.setEnabled(!state.muted);
-        // },
+        // Use setEnabled only (sync) so voice transfers immediately. Do not destroy track on mute.
         toggleMute: state => {
             state.muted = !state.muted;
-        
-            if (!state.muted) {
-                enableMic();   // 🎤 mic ON
-            } else {
-                disableMic();  // 🔇 mic OFF
+            if (localAudioTrack) {
+                localAudioTrack.setEnabled(!state.muted);
+                console.log("🎤 Mic", state.muted ? "muted" : "unmuted");
             }
         },
-        
+
         toggleVideo: state => {
             state.videoEnabled = !state.videoEnabled;
             localVideoTrack?.setEnabled(state.videoEnabled);
@@ -446,7 +442,8 @@ const callSlice = createSlice({
                 state.inCall = true;
                 state.channel = action.payload.channel;
                 state.type = action.payload.type;
-                state.videoEnabled = action.payload.type === "video";
+                // Video call: start with camera off; voice call doesn't use video
+                state.videoEnabled = action.payload.type === "video" ? false : true;
             })
             .addCase(startCall.rejected, (state, action) => {
                 console.error("Call rejected:", action.payload);
@@ -463,7 +460,7 @@ const callSlice = createSlice({
                 state.inCall = true;
                 state.channel = action.payload.channel;
                 state.type = "video";
-                state.videoEnabled = true;
+                state.videoEnabled = false; // Camera off by default
             })
             .addCase(endCall.fulfilled, state => {
                 state.inCall = false;

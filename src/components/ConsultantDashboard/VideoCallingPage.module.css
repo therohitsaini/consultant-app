@@ -24,8 +24,36 @@
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), transparent);
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 16px;
     z-index: 10;
+    border: 2px solid blue;
+}
+
+.callHeaderLeft {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+}
+
+.callHeaderRight {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.callTimer {
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 1px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .backButton {
@@ -305,7 +333,7 @@
         height: 80%;    
         bottom: 90px;
         right: 18px;
-        border: 1px solid blue;
+        /* border: 1px solid blue; */
     }
 
     .avatarSmall {
@@ -340,6 +368,7 @@
     .callHeader {
         padding: 12px 16px;
         gap: 12px;
+        border: 2px solid blue;
     }
 
     .backButton {
@@ -380,7 +409,7 @@
 
     .videoPlaceholderText {
         font-size: 18px;
-        border: 2px solid blue;
+        /* border: 2px solid blue; */
     }
 
     .localVideo {
@@ -432,7 +461,7 @@
 
     .videoArea {
         height: 80%;
-        border: 1px solid blue;
+        /* border: 1px solid blue; */
     }
 
     .remoteVideo {

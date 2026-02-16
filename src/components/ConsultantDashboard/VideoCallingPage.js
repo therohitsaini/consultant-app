@@ -20,7 +20,7 @@ function VideoCallingPage() {
     const { callEnded } = useSelector((state) => state.socket);
     const params = new URLSearchParams(window.location.search);
     const receiverId = params.get("receiverId");
-    const callType = params.get("callType")
+    const callType = params.get("callType") || "video";
     console.log("callType___Current", callType);
     const token = params.get("token") ? decodeURIComponent(params.get("token")) : null;
     const channelNameParam = params.get("channelName");
@@ -39,6 +39,7 @@ function VideoCallingPage() {
     const [bothUserJoined, setBothUserJoined] = useState(false);
     const [time, setTime] = useState({ minutes: 0, seconds: 0 });
     const intervalRef = useRef(null);
+    const [hasRemoteVideo, setHasRemoteVideo] = useState(false);
 
 
 
@@ -99,13 +100,11 @@ function VideoCallingPage() {
         };
     }, [userId]);
 
-
     useEffect(() => {
         if (callRejected) {
             handleEndCall();
         }
     }, [callRejected]);
-
 
 
     useEffect(() => {
@@ -129,11 +128,12 @@ function VideoCallingPage() {
     useEffect(() => {
         if (userType === "consultant") {
             const data = {
-                callerId: callerIdParam, receiverId: receiverId, channelNameParam, callType
+                callerId: callerIdParam, receiverId: receiverId, channelName: channelNameParam, callType
             }
             console.log("_____", data)
             socket.emit("user-is-on", data)
         }
+        startTimer(Date.now());
     }, [userType])
 
     useEffect(() => {
@@ -142,30 +142,8 @@ function VideoCallingPage() {
             console.log("✅ both-user-join received:", data);
             setBothUserJoined(true);
             setCallAccepted(true);
-            startTimer()
-            localStorage.setItem(
-                "callAccepted",
-                JSON.stringify({
-                    accepted: true,
-                    channelName: data.channelName,
-                    callType: data.callType,
-                    startedAt: Date.now()
-                })
-            );
-
-            window.dispatchEvent(
-                new CustomEvent("call-timer-start", {
-                    detail: { startedAt: Date.now() }
-                })
-            );
+            startTimer(Date.now());
         };
-        socket.emit("both-update-time", {
-            callerId: callerIdParam,
-            receiverId: receiverId,
-            channelName: channelNameParam,
-            callType: callType,
-            startedAt: Date.now()
-        });
         socket.on("both-user-join", handleBothUserJoin);
         return () => {
             socket.off("both-user-join", handleBothUserJoin);
@@ -210,13 +188,29 @@ function VideoCallingPage() {
         const socket = getSocket();
         const handleBothUpdateTime = (data) => {
             console.log("🔥 call-accepted-started received:", data);
-            startTimer();
+            const startedAt = data?.startedAt;
+            startTimer(startedAt != null ? startedAt : undefined);
         };
 
         socket.on("call-accepted-started", handleBothUpdateTime);
-     
+
         return () => {
-            socket.off("both-update-time");
+            socket.off("call-accepted-started", handleBothUpdateTime);
+        };
+    }, []);
+
+    useEffect(() => {
+        const socket = getSocket();
+        const handleBothUpdateTime = (data) => {
+            console.log("🔥 user-available received:", data);
+
+            startTimer(Date.now());
+        };
+
+        socket.on("user-available-start-timer", handleBothUpdateTime);
+
+        return () => {
+            socket.off("user-available-start-timer", handleBothUpdateTime);
         };
     }, []);
 
@@ -355,6 +349,7 @@ function VideoCallingPage() {
 
     useEffect(() => {
         const handleRemoteVideoReady = () => {
+            setHasRemoteVideo(true);
             if (remoteVideoRef.current) {
                 import('../Redux/slices/callSlice').then((module) => {
                     const track = module.getRemoteVideoTrack();
@@ -367,6 +362,10 @@ function VideoCallingPage() {
                     }
                 });
             }
+        };
+
+        const handleRemoteVideoStopped = () => {
+            setHasRemoteVideo(false);
         };
 
         const handleLocalVideoReady = () => {
@@ -396,13 +395,34 @@ function VideoCallingPage() {
         };
 
         window.addEventListener('remote-video-ready', handleRemoteVideoReady);
+        window.addEventListener('remote-video-stopped', handleRemoteVideoStopped);
         window.addEventListener('local-video-ready', handleLocalVideoReady);
 
         return () => {
             window.removeEventListener('remote-video-ready', handleRemoteVideoReady);
+            window.removeEventListener('remote-video-stopped', handleRemoteVideoStopped);
             window.removeEventListener('local-video-ready', handleLocalVideoReady);
         };
     }, []);
+
+    // When user turns camera ON, play local video on the element
+    useEffect(() => {
+        if (isVideoCall && videoEnabled && localVideoRef.current) {
+            import('../Redux/slices/callSlice').then((module) => {
+                const track = module.getLocalVideoTrack();
+                if (track) {
+                    track.play(localVideoRef.current).then(() => {
+                        console.log("Local video playing after camera turned on");
+                    }).catch(err => console.error("Error playing local video after enable:", err));
+                }
+            });
+        }
+    }, [isVideoCall, videoEnabled]);
+
+    // Reset remote video state when call ends
+    useEffect(() => {
+        if (!inCall) setHasRemoteVideo(false);
+    }, [inCall]);
 
 
     const getCallingUser = async () => {
@@ -552,57 +572,71 @@ function VideoCallingPage() {
 
 
 
-    const startTimer = () => {
-        let startTime = localStorage.getItem("callStartTime");
-        if (!startTime) {
+    const startTimer = (optionalStartTimestamp) => {
+        let startTime = optionalStartTimestamp != null
+            ? Number(optionalStartTimestamp)
+            : parseInt(localStorage.getItem("callStartTime"), 10);
+        if (!startTime || isNaN(startTime)) {
             startTime = Date.now();
-            localStorage.setItem("callStartTime", startTime);
+        }
+        localStorage.setItem("callStartTime", String(startTime));
+
+        if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
         }
 
-        if (intervalRef.current) return;
-
-        intervalRef.current = setInterval(() => {
+        const tick = () => {
             const now = Date.now();
             const diff = Math.floor((now - startTime) / 1000);
-
             setTime({
                 minutes: Math.floor(diff / 60),
                 seconds: diff % 60,
             });
-        }, 1000);
+        };
+        tick(); // update immediately
+        intervalRef.current = setInterval(tick, 1000);
     };
-    useEffect(() => {
-        if (userType === "consultant") {
-            startTimer();
-        } 
-        // else if (callAccepted) {
-        //     console.log("timer is on ")
-        //     startTimer();
-        // }
-    }, [userType, callAccepted]);
+    // Consultant/receiver timer starts only when we get synced startedAt via socket (call-accepted-started or both-user-join)
 
     useEffect(() => {
         const timerHandler = (event) => {
-            console.log("🔥 Call timer start event received - starting timer on both sides:", event.detail);
             const eventTimestamp = event.detail?.startedAt || Date.now();
+            console.log("🔥 Call timer start event received - starting timer:", eventTimestamp);
             startTimer(eventTimestamp);
+            if (userType === "client") {
+                getSocket().emit("both-update-time", {
+                    callerId: callerIdParam,
+                    receiverId: receiverId,
+                    channelName: channelNameParam,
+                    callType: callType,
+                    startedAt: eventTimestamp,
+                });
+            }
+        };
+
+        const connectedHandler = (event) => {
+            const eventTimestamp = event.detail?.at || Date.now();
+            console.log("🔥 Call connected event received - starting timer:", eventTimestamp);
+            startTimer(eventTimestamp);
+            if (userType === "client") {
+                getSocket().emit("both-update-time", {
+                    callerId: callerIdParam,
+                    receiverId: receiverId,
+                    channelName: channelNameParam,
+                    callType: callType,
+                    startedAt: eventTimestamp,
+                });
+            }
         };
 
         window.addEventListener("call-timer-start", timerHandler);
-
-        const connectedHandler = (event) => {
-            console.log("🔥 Call connected event received:", event.detail);
-            const eventTimestamp = event.detail?.at || Date.now();
-            startTimer(eventTimestamp);
-        };
-
         window.addEventListener("call-connected", connectedHandler);
 
         if (window.callAlreadyConnected) {
-            console.log("⚡ Call already connected (late load)");
             const storedStartTime = localStorage.getItem("callStartTime");
             if (storedStartTime) {
-                startTimer(parseInt(storedStartTime));
+                startTimer(parseInt(storedStartTime, 10));
             } else {
                 startTimer();
             }
@@ -612,7 +646,7 @@ function VideoCallingPage() {
             window.removeEventListener("call-timer-start", timerHandler);
             window.removeEventListener("call-connected", connectedHandler);
         };
-    }, []);
+    }, [userType, callerIdParam, receiverId, channelNameParam, callType]);
 
 
 
@@ -620,27 +654,38 @@ function VideoCallingPage() {
         <div className={styles.videoCallContainer}>
 
             <div className={styles.callHeader}>
-                <button
-                    className={styles.backButton}
-                    onClick={handleEndCall}
-                    aria-label="End call"
-                >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                        <path d="M19 12H5M12 19l-7-7 7-7" />
-                    </svg>
-                </button>
-                <div className={styles.callInfo}>
+                <div className={styles.callHeaderLeft}>
+                    <button
+                        className={styles.backButton}
+                        onClick={handleEndCall}
+                        aria-label="End call"
+                    >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            <path d="M19 12H5M12 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <div className={styles.callInfo}>
 
-                    <div onClick={stopRingtone()} className={styles.callAvatar}>
-                        <img className={styles.callAvatar} src={getProfileImageUrl()} alt="profile" />
-                    </div>
-                    <div>
-                        <div className={styles.callName}>{userType === "client" ? callerDetails?.receiver?.fullname : callerDetails?.caller?.fullname}</div>
-                        <div className={styles.callStatus}>
-                            {/* {conversation.isOnline ? 'Online' : 'Offline'} */}
+                        <div onClick={stopRingtone()} className={styles.callAvatar}>
+                            <img className={styles.callAvatar} src={getProfileImageUrl()} alt="profile" />
+                        </div>
+                        <div>
+                            <div className={styles.callName}>{userType === "client" ? callerDetails?.receiver?.fullname : callerDetails?.caller?.fullname}</div>
+                            <div className={styles.callStatus}>
+                                {/* {conversation.isOnline ? 'Online' : 'Offline'} */}
+                            </div>
+
                         </div>
                     </div>
+                    <div style={{ fontSize: '12px', color: 'white' }}> Voice Call</div>
                 </div>
+                {time && (
+                    <div className={styles.callHeaderRight}>
+                        <div className={styles.callTimer}>
+                            {String(time.minutes).padStart(2, '0')}:{String(time.seconds).padStart(2, '0')}
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className={styles.videoArea}>
@@ -651,15 +696,18 @@ function VideoCallingPage() {
                                 ref={remoteVideoRef}
                                 data-remote-video
                                 className={styles.videoElement}
+                                style={{ display: hasRemoteVideo ? 'block' : 'none' }}
                             />
                             {
-                                !inCall && (
+                                (!inCall || (inCall && !hasRemoteVideo)) && (
                                     <div className={styles.videoPlaceholder}>
                                         <div className={styles.avatarLarge}>
                                             <img className={styles.avatarLarge} src={getProfileImageUrl()} alt="profile" />
                                         </div>
                                         <p className={styles.videoPlaceholderText}>
-                                            {userType === "client" ? callerDetails?.receiver?.fullname : callerDetails?.caller?.fullname || "Waiting for video..."}
+                                            {!inCall
+                                                ? (userType === "client" ? callerDetails?.receiver?.fullname : callerDetails?.caller?.fullname || "Waiting for video...")
+                                                : (userType === "client" ? callerDetails?.receiver?.fullname : callerDetails?.caller?.fullname) + " (Camera off)"}
                                         </p>
                                     </div>
                                 )}
