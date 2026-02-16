@@ -571,14 +571,15 @@ function VideoCallingPage() {
             });
         }, 1000);
     };
-    // useEffect(() => {
-    //     if (userType === "consultant") {
-    //         startTimer();
-    //     } else if (callAccepted) {
-    //         console.log("timer is on ")
-    //         startTimer();
-    //     }
-    // }, [userType, callAccepted]);
+    useEffect(() => {
+        if (userType === "consultant") {
+            startTimer();
+        } 
+        // else if (callAccepted) {
+        //     console.log("timer is on ")
+        //     startTimer();
+        // }
+    }, [userType, callAccepted]);
 
     useEffect(() => {
         const timerHandler = (event) => {
