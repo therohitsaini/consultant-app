@@ -99,7 +99,6 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
         window.top.location.href = callUrl;
         // window.open(callUrl, "_blank");
 
-
     } catch (error) {
         console.error("🔥 API ERROR:", error.message);
         alert("Call failed. Please try again.");

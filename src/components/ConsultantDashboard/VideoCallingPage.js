@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './VideoCallingPage.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { endCall, startCall, toggleMute, toggleVideo } from '../Redux/slices/callSlice';
-import { initRingtone, playRingtone ,stopRingtone} from '../ringTone/ringingTune';
+import { initRingtone, playRingtone, stopRingtone } from '../ringTone/ringingTune';
 import { getSocket, socket } from '../Sokect-io/SokectConfig';
 import axios from 'axios';
 import profileImageDefault from '../../../src/assets/avatar-or-person-sign-profile-picture-portrait-icon-user-profile-symbol.webp';
@@ -34,25 +34,27 @@ function VideoCallingPage() {
     const [callAccepted, setCallAccepted] = useState(null);
     const callStartedRef = useRef(false);
     const { inCall, channel, type, muted, videoEnabled } = useSelector((state) => state.call);
-    const isVideoCall =  callType === "video";
+    const isVideoCall = callType === "video";
     const { callRejected } = useSelector((state) => state.socket);
     const [bothUserJoined, setBothUserJoined] = useState(false);
+    const [time, setTime] = useState({ minutes: 0, seconds: 0 });
+    const intervalRef = useRef(null);
 
 
 
     useEffect(() => {
         const handleBeforeUnload = (e) => {
-          e.preventDefault();
-          e.returnValue = ""; 
+            e.preventDefault();
+            e.returnValue = "";
         };
-      
+
         window.addEventListener("beforeunload", handleBeforeUnload);
-      
+
         return () => {
-          window.removeEventListener("beforeunload", handleBeforeUnload);
+            window.removeEventListener("beforeunload", handleBeforeUnload);
         };
-      }, []);
-      
+    }, []);
+
 
     useEffect(() => {
         localStorage.setItem("userId", userId);
@@ -105,7 +107,7 @@ function VideoCallingPage() {
     }, [callRejected]);
 
 
-  
+
     useEffect(() => {
         const callerIdFromStorage = localStorage.getItem("client_u_Identity");
         const finalCallerId = callerIdParam || callerIdFromStorage;
@@ -124,50 +126,100 @@ function VideoCallingPage() {
         }
     }, []);
 
-        useEffect(()=> {
-                if(userType==="consultant"){
-                    const data ={
-                        callerId: callerIdParam,receiverId:receiverId,channelNameParam,callType
-                    }
-                    console.log("_____",data)
-                    socket.emit("user-is-on",data)
-                }
-        },[userType])
+    useEffect(() => {
+        if (userType === "consultant") {
+            const data = {
+                callerId: callerIdParam, receiverId: receiverId, channelNameParam, callType
+            }
+            console.log("_____", data)
+            socket.emit("user-is-on", data)
+        }
+    }, [userType])
 
-        useEffect(() => {
-            const socket = getSocket();
-          
-            const handleBothUserJoin = (data) => {
-              console.log("✅ both-user-join received:", data);
-              setBothUserJoined(true);
-              setCallAccepted(true);
-              startTimer()
-
-              console.log("_______________________________________________")
-              localStorage.setItem(
+    useEffect(() => {
+        const socket = getSocket();
+        const handleBothUserJoin = (data) => {
+            console.log("✅ both-user-join received:", data);
+            setBothUserJoined(true);
+            setCallAccepted(true);
+            startTimer()
+            localStorage.setItem(
                 "callAccepted",
                 JSON.stringify({
-                  accepted: true,
-                  channelName: data.channelName,
-                  callType: data.callType,
-                  startedAt: Date.now()
+                    accepted: true,
+                    channelName: data.channelName,
+                    callType: data.callType,
+                    startedAt: Date.now()
                 })
-              );
-          
-              window.dispatchEvent(
+            );
+
+            window.dispatchEvent(
                 new CustomEvent("call-timer-start", {
-                  detail: { startedAt: Date.now() }
+                    detail: { startedAt: Date.now() }
                 })
-              );
-            };
-          
-            socket.on("both-user-join", handleBothUserJoin);
-          
-            return () => {
-              socket.off("both-user-join", handleBothUserJoin);
-            };
-          }, []);
-          
+            );
+        };
+        socket.emit("both-update-time", {
+            callerId: callerIdParam,
+            receiverId: receiverId,
+            channelName: channelNameParam,
+            callType: callType,
+            startedAt: Date.now()
+        });
+        socket.on("both-user-join", handleBothUserJoin);
+        return () => {
+            socket.off("both-user-join", handleBothUserJoin);
+        };
+    }, []);
+
+    useEffect(() => {
+        const socket = getSocket();
+
+        const handleAutoCallEnd = (data) => {
+            console.log("🔥 autoCallEnded-no-balance received:", data);
+            alert("❌ Balance khatam ho gaya, call end ho gayi");
+
+            // // stop ringtone / timer
+            // stopRingtone();
+            // stopTimer();
+
+            // // redux cleanup
+            // dispatch(endCall());
+            // // local cleanup
+            // localStorage.removeItem("callStartTime");
+            // localStorage.removeItem("callAccepted");
+            // localStorage.removeItem("callSession");
+
+            // // redirect / close tab
+            // const returnUrl = params.get("returnUrl");
+            // if (returnUrl) {
+            //     window.top.location.href = decodeURIComponent(returnUrl);
+            // } else {
+            //     window.close();
+            // }
+        };
+
+        socket.on("autoCallEnded-no-balance", handleAutoCallEnd);
+
+        return () => {
+            socket.off("autoCallEnded-no-balance", handleAutoCallEnd);
+        };
+    }, []);
+
+    useEffect(() => {
+        const socket = getSocket();
+        const handleBothUpdateTime = (data) => {
+            console.log("🔥 call-accepted-started received:", data);
+            startTimer();
+        };
+
+        socket.on("call-accepted-started", handleBothUpdateTime);
+     
+        return () => {
+            socket.off("both-update-time");
+        };
+    }, []);
+
 
     useEffect(() => {
         if (!callerId || !receiverId || !channelNameParam || !callType) return;
@@ -176,7 +228,6 @@ function VideoCallingPage() {
         console.log("callKey", callKey);
         console.log("effect triggered");
 
-        // reload / re-render protection
         if (sessionStorage.getItem(callKey)) return;
 
         console.log("calling user");
@@ -189,7 +240,7 @@ function VideoCallingPage() {
     useEffect(() => {
         if (callStartedRef.current) return;
         if (token && channelNameParam && uidParam) {
-            const appId = appIdParam 
+            const appId = appIdParam
             // || "656422a01e774a4ba5b2dc0ac12e5fe5";
             callStartedRef.current = true;
             dispatch(startCall({
@@ -281,7 +332,7 @@ function VideoCallingPage() {
                         try {
                             track.play(remoteVideoRef.current);
                             console.log("Remote video playing on element");
-                            attempts = maxAttempts; 
+                            attempts = maxAttempts;
                         } catch (error) {
                             console.error("Error playing remote video:", error);
                         }
@@ -451,7 +502,7 @@ function VideoCallingPage() {
             if (returnUrl) {
                 window.top.location.href = decodeURIComponent(returnUrl);
             }
-          
+
         }
         else {
             dispatch(endCall());
@@ -493,14 +544,12 @@ function VideoCallingPage() {
         };
 
         window.addEventListener("remote-user-left", onRemoteLeft);
-
         return () => {
             window.removeEventListener("remote-user-left", onRemoteLeft);
         };
     }, []);
 
-    const [time, setTime] = useState({ minutes: 0, seconds: 0 });
-    const intervalRef = useRef(null);
+
 
 
     const startTimer = () => {
@@ -531,19 +580,15 @@ function VideoCallingPage() {
     //     }
     // }, [userType, callAccepted]);
 
-    // Listen for call-timer-start event - this fires when BOTH users join
-    // This ensures timer starts on BOTH caller and receiver sides at the same time
     useEffect(() => {
         const timerHandler = (event) => {
             console.log("🔥 Call timer start event received - starting timer on both sides:", event.detail);
-            // Use the timestamp from the event to ensure both sides start from the same time
             const eventTimestamp = event.detail?.startedAt || Date.now();
             startTimer(eventTimestamp);
         };
 
         window.addEventListener("call-timer-start", timerHandler);
 
-        // Also listen for call-connected event as fallback
         const connectedHandler = (event) => {
             console.log("🔥 Call connected event received:", event.detail);
             const eventTimestamp = event.detail?.at || Date.now();
@@ -552,7 +597,6 @@ function VideoCallingPage() {
 
         window.addEventListener("call-connected", connectedHandler);
 
-        // Check if call was already connected before this component mounted
         if (window.callAlreadyConnected) {
             console.log("⚡ Call already connected (late load)");
             const storedStartTime = localStorage.getItem("callStartTime");
@@ -642,7 +686,6 @@ function VideoCallingPage() {
                                                 </p>
 
                                                     : null}
-                                            {/* {inCall ? "In Call" : "Connecting..."} */}
 
 
                                         </p>
@@ -684,7 +727,7 @@ function VideoCallingPage() {
             </div>
 
             <div className={styles.callControls}>
-                <button 
+                <button
                     className={`${styles.controlButton} ${muted ? styles.controlButtonActive : ''}`}
                     title={muted ? "Unmute" : "Mute"}
                     onClick={handleMuteToggle}

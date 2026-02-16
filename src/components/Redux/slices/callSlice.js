@@ -9,6 +9,7 @@ export const enableMic = async () => {
     if (!localAudioTrack) {
         console.log("🎤 Creating & publishing mic track");
         localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+        await localAudioTrack.setEnabled(false)
         await client.publish([localAudioTrack]);
     } else {
         console.log("🎤 Enabling mic track");
@@ -238,7 +239,7 @@ export const startCall = createAsyncThunk(
                     console.log("Audio track created successfully");
 
                     // Ensure track is enabled before publishing
-                    if (localAudioTrack) localAudioTrack.setEnabled(true);
+                    if (localAudioTrack) localAudioTrack.setEnabled(false);
 
                     console.log("Publishing audio track...");
                     await client.publish([localAudioTrack]);
@@ -264,7 +265,7 @@ export const startCall = createAsyncThunk(
 
             // Ensure tracks are enabled
             if (localAudioTrack) {
-                localAudioTrack.setEnabled(true);
+                // localAudioTrack.setEnabled(true);
                 console.log("Local audio track enabled:", localAudioTrack.isPlaying);
             }
             if (localVideoTrack) {

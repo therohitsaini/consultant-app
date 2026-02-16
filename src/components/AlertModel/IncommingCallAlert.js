@@ -26,9 +26,9 @@ export default function IncomingCallAlert() {
 
     if (!incomingCall) return console.log("No incoming call");
 
-    const { callerId, callType, channelName, callerName,shop } = incomingCall;
+    const { callerId, callType, channelName, callerName, shop } = incomingCall;
 
-    console.log("incomingCall", shop, );
+    console.log("incomingCall", shop,);
     const handleAccept = async () => {
         localStorage.setItem("callAccepted____", JSON.stringify(callAccepted));
         console.log("callAccepted______IncomingCallAlert", callAccepted);
@@ -54,7 +54,7 @@ export default function IncomingCallAlert() {
             const tokenEncoded = encodeURIComponent(data.token);
             const appIdParam = data.appId ? `&appId=${data.appId}` : '';
             const callType = incomingCall.callType || "voice";
-         
+
             const returnUrl = `https://${shop}/apps/consultant-theme/consultant-dashboard`;
             const callUrl =
                 `${"https://test-consultation-app.zend-apps.com"}/video/calling/page` +
@@ -69,7 +69,10 @@ export default function IncomingCallAlert() {
                 `&userType=${"consultant"}` +
                 `&shopId=${shopId}` +
                 `&returnUrl=${encodeURIComponent(returnUrl)}`;
-            window.top.location.href = callUrl;
+            setTimeout(() => {
+                window.top.location.href = callUrl;
+            }, 1000);
+
         }
     };
 
