@@ -239,7 +239,7 @@ export const startCall = createAsyncThunk(
                     console.log("Audio track created successfully");
 
                     // Ensure track is enabled before publishing
-                    if (localAudioTrack) localAudioTrack.setEnabled(false);
+                    if (localAudioTrack) localAudioTrack.setEnabled(true);
 
                     console.log("Publishing audio track...");
                     await client.publish([localAudioTrack]);
