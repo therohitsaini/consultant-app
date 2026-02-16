@@ -9,7 +9,7 @@ export const enableMic = async () => {
     if (!localAudioTrack) {
         console.log("🎤 Creating & publishing mic track");
         localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
-        await localAudioTrack.setEnabled(false)
+        // await localAudioTrack.setEnabled(false)
         await client.publish([localAudioTrack]);
     } else {
         console.log("🎤 Enabling mic track");
