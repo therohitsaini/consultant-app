@@ -114,7 +114,6 @@ function VideoCallingPage() {
     }, [callerIdParam]);
 
 
-
     useEffect(() => {
         const socket = getSocket();
         const userId = localStorage.getItem("client_u_Identity");
@@ -130,7 +129,7 @@ function VideoCallingPage() {
             const data = {
                 callerId: callerIdParam, receiverId: receiverId, channelName: channelNameParam, callType
             }
-            console.log("_____", data)
+
             socket.emit("user-is-on", data)
         }
         startTimer(Date.now());
@@ -157,24 +156,6 @@ function VideoCallingPage() {
             console.log("🔥 autoCallEnded-no-balance received:", data);
             alert("❌ Balance khatam ho gaya, call end ho gayi");
 
-            // // stop ringtone / timer
-            // stopRingtone();
-            // stopTimer();
-
-            // // redux cleanup
-            // dispatch(endCall());
-            // // local cleanup
-            // localStorage.removeItem("callStartTime");
-            // localStorage.removeItem("callAccepted");
-            // localStorage.removeItem("callSession");
-
-            // // redirect / close tab
-            // const returnUrl = params.get("returnUrl");
-            // if (returnUrl) {
-            //     window.top.location.href = decodeURIComponent(returnUrl);
-            // } else {
-            //     window.close();
-            // }
         };
 
         socket.on("autoCallEnded-no-balance", handleAutoCallEnd);
@@ -190,14 +171,24 @@ function VideoCallingPage() {
             console.log("🔥 call-accepted-started received:", data);
             const startedAt = data?.startedAt;
             startTimer(startedAt != null ? startedAt : undefined);
+            socket.emit("user-connected-time-updated", {
+                callerId: callerIdParam,
+                receiverId: receiverId,
+                channelName: channelNameParam,
+                callType: callType,
+                startedAt: Date.now(),
+                // callUniqueId: data.callUniqueId
+            });
+    
         };
-
         socket.on("call-accepted-started", handleBothUpdateTime);
-
+      
         return () => {
             socket.off("call-accepted-started", handleBothUpdateTime);
         };
     }, []);
+
+ 
 
     useEffect(() => {
         const socket = getSocket();
