@@ -177,18 +177,19 @@ function VideoCallingPage() {
                 channelName: channelNameParam,
                 callType: callType,
                 startedAt: Date.now(),
+                transactionId: data?.transactionId,
                 // callUniqueId: data.callUniqueId
             });
-    
+
         };
         socket.on("call-accepted-started", handleBothUpdateTime);
-      
+
         return () => {
             socket.off("call-accepted-started", handleBothUpdateTime);
         };
     }, []);
 
- 
+
 
     useEffect(() => {
         const socket = getSocket();
