@@ -534,7 +534,7 @@ function VideoCallingPage() {
                     channelName: channelNameParam,
                     callType: callType,
                     transactionId: endFromClient,
-                    shopId: shopId || "690c374f605cb8b946503ccb",
+                    shopId: shopId || "69959af26caa0dfd3a3f03f4",
                     endby: "user_cut_call"
                 });
             localStorage.removeItem("endFromClient");
@@ -555,7 +555,7 @@ function VideoCallingPage() {
                     channelName: channelNameParam,
                     callType: callSession?.callType,
                     // transactionId: callSession?.transtionId,
-                    shopId: callSession?.shopId || "690c374f605cb8b946503ccb",
+                    shopId: callSession?.shopId || "69959af26caa0dfd3a3f03f4",
                     dtn_: "CUT FROM CONSULTANT SIDE",
                     endby: "consultant_cut_call" // 👈 backend ke liye clear rakho
                 });

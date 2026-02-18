@@ -1850,6 +1850,11 @@
         padding: 6px 12px;
     }
 }
+.disabled-btn {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
 
 /* ============================================
    LOADER STYLES

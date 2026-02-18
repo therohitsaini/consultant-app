@@ -106,6 +106,7 @@ function ConsultantCards() {
             chatPrice: parseInt(consultant?.chatPerMinute) || 0,
             audioPrice: parseInt(consultant?.voicePerMinute) || 0,
             videoPrice: parseInt(consultant?.videoPerMinute) || 0,
+            isBusy: consultant?.isBusy,
         };
     });
 
@@ -179,71 +180,7 @@ function ConsultantCards() {
         await openCallPage({ receiverId, type, userId, shop });
 
 
-        // if (!hasMicPermission) {
-        //     alert("Please grant microphone permission to start the call");
-        //     return;
-        // }
-        // const channelName = `channel-${userId.slice(-6)}-${receiverId.slice(-6)}`;
-        // const uid = Math.floor(Math.random() * 1000000);
-        // const url = `${process.env.REACT_APP_BACKEND_HOST}/api/call/generate-token`;
-        // const res = await fetch(url, {
-        //     method: "POST",
-        //     headers: {
-        //         "Content-Type": "application/json",
-        //     },
-        //     body: JSON.stringify({ channelName, uid }),
-        // });
-        // const data = await res.json();
-        // console.log("data", data)
-        // if (data.token) {
-        //     socket.emit("call-user", {
-        //         callerId: userId,
-        //         receiverId: receiverId,
-        //         channelName,
-        //         callType: type || "voice",
-        //     });
-        //     const tokenEncoded = encodeURIComponent(data.token);
-        //     const appIdParam = data.appId ? `&appId=${data.appId}` : '';
-        //     const returnUrl = `https://${shop}/apps/consultant-theme`;
-        //     const returnUrlEncoded = process.env.REACT_FRONTEND_URL
-        //     console.log("returnUrlEncoded", returnUrlEncoded);
-        //     const callUrl =
-        //         `https://projectable-eely-minerva.ngrok-free.dev/video/calling/page` +
-        //         `?callerId=${userId}` +
-        //         `&receiverId=${receiverId}` +
-        //         `&callType=${type || "voice"}` +
-        //         `&uid=${uid}` +
-        //         `&channelName=${channelName}` +
-        //         `&token=${tokenEncoded}` +
-        //         appIdParam +
-        //         `&returnUrl=${encodeURIComponent(returnUrl)}`;
-        //     console.log("callUrl", callUrl);
-        //     window.top.location.href = callUrl;
-        // }
 
-        // if (type === "voice") {
-        //     await dispatch(
-        //         startVoiceCall({
-        //             token: data.token,
-        //             channel: "123",
-        //             uid: 1,
-        //             appId: "AGORA_APP_ID",
-        //         })
-        //     );
-        // }
-
-        // if (type === "video") {
-        //     await dispatch(
-        //         startVideoCall({
-        //             token: data.token,
-        //             channel: "123",
-        //             uid: 1,
-        //             appId: "AGORA_APP_ID",
-        //         })
-        //     );
-        // }
-
-        // navigate("/call");
     };
 
     if (initialLoading || loading) {
@@ -296,7 +233,7 @@ function ConsultantCards() {
                             <span onClick={() => playRingtone()}>Trusted by Thousands</span>
 
                         </div>
-                        <h1  className="hero-title">
+                        <h1 className="hero-title">
                             Find Your Perfect <span className="hero-title-highlight">Consultant</span>
                         </h1>
                         <p className="hero-description">
@@ -396,7 +333,7 @@ function ConsultantCards() {
                         mappedConsultants.map((consultant) => {
                             const shop_id = shopId;
                             const consultant_id = consultant.id;
-
+                            console.log("consultant", consultant);
                             return (
                                 <div key={consultant.id} className="col-lg-4 col-md-6 col-sm-12">
                                     <div
@@ -459,11 +396,16 @@ function ConsultantCards() {
                                                     <strong>Speaks:</strong> {consultant.languages.join(', ')}
                                                 </p>
                                                 <div className="mb-0">
-                                                    <strong className="consultant-info d-block mb-2">Calling Options:</strong>
+                                                    <div className="d-flex align-items-center gap-2 mb-2">
+                                                        <strong className="consultant-info d-block">Calling Options:</strong>
+                                                        {consultant.isBusy && (
+                                                            <span className="busy-status-dot text-danger">wait for 5 minutes</span>
+                                                        )}
+                                                    </div>
                                                     <div className="calling-options">
                                                         <button
-                                                            className="calling-option-btn chat-btn"
-
+                                                            className={`calling-option-btn chat-btn ${consultant.isBusy ? 'disabled-btn' : ''}`}
+                                                            disabled={consultant.isBusy}
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 viewChatsPage(consultant.id);
@@ -480,6 +422,7 @@ function ConsultantCards() {
                                                         </button>
                                                         <button
                                                             className="calling-option-btn audio-btn"
+                                                            disabled={consultant.isBusy}
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 startCall({ receiverId: consultant.id, type: 'voice' })
@@ -495,6 +438,7 @@ function ConsultantCards() {
                                                         </button>
                                                         <button
                                                             className="calling-option-btn video-btn"
+                                                            disabled={consultant.isBusy}
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 startCall({ receiverId: consultant.id, type: 'video' })
