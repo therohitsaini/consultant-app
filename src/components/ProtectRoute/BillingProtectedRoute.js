@@ -20,7 +20,7 @@ export const BillingProtectedRoute = ({ children }) => {
 
             redirect.dispatch(
                 Redirect.Action.REMOTE,
-                `https://admin.shopify.com/store/${store}/charges/label-node/pricing_plans`
+                `https://admin.shopify.com/store/${store}/charges/label-node01/pricing_plans`
             );
         }
     }, [billing, app]);
