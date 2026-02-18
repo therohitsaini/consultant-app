@@ -51,6 +51,7 @@ export default function App() {
   const adminId = params.get("AdminId");
   const app = useAppBridge();
   const { installed, accessDenied } = UseAppInstall(shop, app);
+  console.log("___________APP.JS FILE IS RENDERED");  
 
   useEffect(() => {
     const handleMessage = (event) => {
@@ -121,13 +122,13 @@ export default function App() {
         <IncomingCallAlert />
         <Routes>
           <Route element={
-            <ProtectAdminRoute installed={installed}>
-              <BillingProtectedRoute>
+            // <ProtectAdminRoute installed={installed}>
+              // <BillingProtectedRoute>
                 <LayoutFrame />
-              </BillingProtectedRoute>
-            </ProtectAdminRoute>
+              // </BillingProtectedRoute>
+            // </ProtectAdminRoute>
           }>
-            <Route path="/not-found" element={<NotFound />} />
+            {/* <Route path="/not-found" element={<NotFound />} /> */}
             <Route index element={<Dashboard />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/consultant-list" element={<ConsultantList />} />

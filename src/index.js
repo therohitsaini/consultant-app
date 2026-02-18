@@ -33,7 +33,7 @@ const AppWrapper = ({ children }) => {
   }
   return <>{children}</>; // store frontend → no AppBridge
 };
-
+console.log("___________INDEX MAIN FILE IS RENDERED");  
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
