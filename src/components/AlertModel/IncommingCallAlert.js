@@ -70,7 +70,8 @@ export default function IncomingCallAlert() {
                 `&shopId=${shopId}` +
                 `&returnUrl=${encodeURIComponent(returnUrl)}`;
             setTimeout(() => {
-                window.top.location.href = callUrl;
+                // window.top.location.href = callUrl;
+                window.open(callUrl, "_blank");
             }, 1000);
 
         }

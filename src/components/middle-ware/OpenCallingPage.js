@@ -96,8 +96,8 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
             `&returnUrl=${encodeURIComponent(returnUrl)}`;
 
         console.log("callUrl", callUrl);
-        window.top.location.href = callUrl;
-        // window.open(callUrl, "_blank");
+        // window.top.location.href = callUrl;
+        window.open(callUrl, "_blank");
 
     } catch (error) {
         console.error("🔥 API ERROR:", error.message);
