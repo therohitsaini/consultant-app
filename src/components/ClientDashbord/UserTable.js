@@ -10,6 +10,19 @@ const UserTable = ({ columns, data, title, loading }) => {
     const totalPages = Math.ceil(data.length / rowsPerPage);
     const load = true;
 
+    const getVisiblePages = () => {
+        const pages = [];
+        const start = Math.max(1, currentPage - 1);
+        const end = Math.min(totalPages, currentPage + 1);
+
+        for (let i = start; i <= end; i++) {
+            pages.push(i);
+        }
+
+        return pages;
+    };
+
+
     return (
         <div className="container mt-4">
             <div className="d-flex justify-content-between align-items-center mb-3">
@@ -29,55 +42,55 @@ const UserTable = ({ columns, data, title, loading }) => {
             </div>
 
             <div className="table-responsive user-table-responsive">
-  <table className="table table-bordered table-hover text-center">
+                <table className="table table-bordered table-hover text-center">
 
-                
-                <thead className="table-dark">
-                    <tr>
-                        <th>#</th>
-                        {
-                            columns.map(col => (
-                                <th key={col.key}>{col.label}</th>
-                            ))}
-                    </tr>
-                </thead>
 
-                {loading ? (
-                    <tbody>
+                    <thead className="table-dark">
                         <tr>
-                            <td colSpan={columns.length + 1} style={{ border: "red" }} >
-                                <div className="text-center py-5">
-                                    <div className="spinner-border" role="status">
-                                        <span className="visually-hidden">Loading...</span>
-                                    </div>
-                                </div>
-                            </td>
+                            <th>#</th>
+                            {
+                                columns.map(col => (
+                                    <th key={col.key}>{col.label}</th>
+                                ))}
                         </tr>
-                    </tbody>
-                ) : (
-                    <tbody>
-                        {
-                            currentRows.length === 0 ? (
-                                <tr>
-                                    <td colSpan={columns.length + 1}>No Records</td>
-                                </tr>
-                            ) : (
-                                currentRows.map((row, index) => (
-                                    <tr key={index}>
-                                        <td>{indexOfFirst + index + 1}</td>
+                    </thead>
 
-                                        {columns.map(col => (
-                                            <td key={col.key}>
-                                                {col.render ? col.render(row) : row[col.key]}
-                                            </td>
-                                        ))}
+                    {loading ? (
+                        <tbody>
+                            <tr>
+                                <td colSpan={columns.length + 1} style={{ border: "red" }} >
+                                    <div className="text-center py-5">
+                                        <div className="spinner-border" role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    ) : (
+                        <tbody>
+                            {
+                                currentRows.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={columns.length + 1}>No Records</td>
                                     </tr>
-                                ))
-                            )}
-                    </tbody>
-                )}
-          </table>
-</div>
+                                ) : (
+                                    currentRows.map((row, index) => (
+                                        <tr key={index}>
+                                            <td>{indexOfFirst + index + 1}</td>
+
+                                            {columns.map(col => (
+                                                <td key={col.key}>
+                                                    {col.render ? col.render(row) : row[col.key]}
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))
+                                )}
+                        </tbody>
+                    )}
+                </table>
+            </div>
 
 
             {/* Pagination */}
@@ -95,23 +108,24 @@ const UserTable = ({ columns, data, title, loading }) => {
                             Prev
                         </button>
                     </li>
-
-                    {[...Array(totalPages)].map((_, i) => (
-                        <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}
-                            style={{
-
-                            }}
+                    {getVisiblePages().map((page) => (
+                        <li
+                            key={page}
+                            className={`page-item ${currentPage === page ? "active" : ""}`}
                         >
-                            <button className="page-link fs-12" onClick={() => setCurrentPage(i + 1)} style={{
-                                padding: "4px 9px",
-                                fontSize: "13px",
-                                color: "#000000",
-                                boxShadow: "none",
-                                backgroundColor: currentPage === i + 1 ? "#212529" : "white",
-                                color: currentPage === i + 1 ? "white" : "#000000",
-                                borderColor: currentPage === i + 1 ? "#212529" : "#dee2e6",
-                            }}>
-                                {i + 1}
+                            <button
+                                className="page-link fs-12"
+                                onClick={() => setCurrentPage(page)}
+                                style={{
+                                    padding: "4px 9px",
+                                    fontSize: "13px",
+                                    boxShadow: "none",
+                                    backgroundColor: currentPage === page ? "#212529" : "white",
+                                    color: currentPage === page ? "white" : "#000000",
+                                    borderColor: currentPage === page ? "#212529" : "#dee2e6",
+                                }}
+                            >
+                                {page}
                             </button>
                         </li>
                     ))}

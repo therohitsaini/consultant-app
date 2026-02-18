@@ -40,13 +40,14 @@ function VideoCallingPage() {
     const [time, setTime] = useState({ minutes: 0, seconds: 0 });
     const intervalRef = useRef(null);
     const [hasRemoteVideo, setHasRemoteVideo] = useState(false);
-
-
+    const [transactionId, setTransactionId] = useState(null);
+    const [firstTime, setFirstTime] = useState(false);
+    console.log("transactionId", transactionId);
 
     useEffect(() => {
         const handleBeforeUnload = (e) => {
             e.preventDefault();
-            e.returnValue = "";
+            e.returnValue = "Call is running. Are you sure?";
         };
 
         window.addEventListener("beforeunload", handleBeforeUnload);
@@ -62,6 +63,13 @@ function VideoCallingPage() {
         const callAcceptedFromStorage = JSON.parse(localStorage.getItem("callAccepted") || null);
         setCallAccepted(callAcceptedFromStorage);
     }, [userId]);
+    useEffect(() => {
+        const callerIdFromStorage = localStorage.getItem("client_u_Identity");
+        const finalCallerId = callerIdParam || callerIdFromStorage;
+        setCallerId(finalCallerId);
+    }, [callerIdParam]);
+
+    // get call session from server
 
     const getCallSession = async () => {
         try {
@@ -86,6 +94,23 @@ function VideoCallingPage() {
     }, [callType]);
 
 
+    const menualTimeUpdate = () => {
+        if (userType === "client") {
+            const id = localStorage.getItem("endFromClient") || null;
+            socket.emit("user-connected-time-updated", {
+                callerId: callerIdParam,
+                receiverId: receiverId,
+                channelName: channelNameParam,
+                callType: callType,
+                startedAt: Date.now(),
+                transactionId: id,
+            });
+            console.log("menualTimeUpdate", transactionId);
+        }
+    }
+
+    // register user
+
     useEffect(() => {
         if (!userId) return;
         const socket = getSocket();
@@ -107,11 +132,7 @@ function VideoCallingPage() {
     }, [callRejected]);
 
 
-    useEffect(() => {
-        const callerIdFromStorage = localStorage.getItem("client_u_Identity");
-        const finalCallerId = callerIdParam || callerIdFromStorage;
-        setCallerId(finalCallerId);
-    }, [callerIdParam]);
+
 
 
     useEffect(() => {
@@ -124,12 +145,13 @@ function VideoCallingPage() {
         }
     }, []);
 
+
+
     useEffect(() => {
         if (userType === "consultant") {
             const data = {
                 callerId: callerIdParam, receiverId: receiverId, channelName: channelNameParam, callType
             }
-
             socket.emit("user-is-on", data)
         }
         startTimer(Date.now());
@@ -171,6 +193,8 @@ function VideoCallingPage() {
             console.log("🔥 call-accepted-started received:", data);
             const startedAt = data?.startedAt;
             startTimer(startedAt != null ? startedAt : undefined);
+            localStorage.setItem("endFromClient", JSON.stringify(data?.transactionId));
+            setTransactionId(data?.transactionId);
             socket.emit("user-connected-time-updated", {
                 callerId: callerIdParam,
                 receiverId: receiverId,
@@ -178,7 +202,6 @@ function VideoCallingPage() {
                 callType: callType,
                 startedAt: Date.now(),
                 transactionId: data?.transactionId,
-                // callUniqueId: data.callUniqueId
             });
 
         };
@@ -189,7 +212,39 @@ function VideoCallingPage() {
         };
     }, []);
 
+    useEffect(() => {
+        //     if (firstTime && userType === "client") {
+        const handleFirstTime = () => {
+            console.log("firstTime", firstTime);
 
+            const callSession = JSON.parse(localStorage.getItem("callSession"));
+            const transactionId_ = callSession?.transtionId;
+
+            const socket = getSocket();
+
+            socket.emit("user-connected-time-updated", {
+                callerId: callerIdParam,
+                receiverId: receiverId,
+                channelName: channelNameParam,
+                callType: callType,
+                startedAt: Date.now(),
+                transactionId:
+                    localStorage.getItem("endFromClient") ||
+                    transactionId ||
+                    transactionId_,
+            });
+
+            console.log(
+                "transactionId_____handleFirstTime",
+                localStorage.getItem("endFromClient") ||
+                transactionId ||
+                transactionId_
+            );
+        };
+        if (firstTime && userType === "client") {
+            handleFirstTime();
+        }
+    }, [firstTime]);
 
     useEffect(() => {
         const socket = getSocket();
@@ -464,27 +519,25 @@ function VideoCallingPage() {
     };
 
     const handleEndCall = () => {
-        const callAcceptedFromStorage = JSON.parse(localStorage.getItem("callAccepted") || null);
-        // if ( !callerId || !receiverId || !channelNameParam || !callType) {
-        //     alert("Call not accepted");
-        //     return;
-
-        // }
-        // callAcceptedFromStorage?.transactionId
-        if (!callSession) {
+        const endFromClient = localStorage.getItem("endFromClient") || null;
+        if (endFromClient) {
+            console.log("transactionId", transactionId);
             stopTimer();
             dispatch(endCall());
             setCallSessionEnded(true);
             localStorage.removeItem("callStartTime");
-            // socket.emit("call-ended",
-            //     {
-            //         callerId: callAcceptedFromStorage?.callerId,
-            //         receiverId: receiverId,
-            //         channelName: channelNameParam,
-            //         callType: callType,
-            //         transactionId: callAcceptedFromStorage?.transactionId,
-            //         shopId: shopId || "690c374f605cb8b946503ccb"
-            //     });
+
+            socket.emit("call-ended",
+                {
+                    callerId: callerIdParam,
+                    receiverId: receiverId,
+                    channelName: channelNameParam,
+                    callType: callType,
+                    transactionId: endFromClient,
+                    shopId: shopId || "690c374f605cb8b946503ccb",
+                    endby: "user_cut_call"
+                });
+            localStorage.removeItem("endFromClient");
             localStorage.removeItem("callAccepted");
             const returnUrl = params.get("returnUrl");
             if (returnUrl) {
@@ -494,22 +547,25 @@ function VideoCallingPage() {
             dispatch(endCall());
             stopTimer();
             setCallSessionEnded(true);
-            localStorage.removeItem("callStartTime");
-            socket.emit("call-ended", {
-                callerId: callSession?.callerId,
-                receiverId: callSession?.receiverId,
-                // channelName: callSession?.channelName,
-                callType: callSession?.callType,
-                transactionId: callSession?.transtionId,
-                shopId: callSession?.shopId || "690c374f605cb8b946503ccb",
-                dtn_: "CUT FROM CONSULTANT SIDE",
-                channelName: channelNameParam,
 
-            });
+            setTimeout(() => {
+                socket.emit("call-ended", {
+                    callerId: callSession?.callerId,
+                    receiverId: receiverId,
+                    channelName: channelNameParam,
+                    callType: callSession?.callType,
+                    // transactionId: callSession?.transtionId,
+                    shopId: callSession?.shopId || "690c374f605cb8b946503ccb",
+                    dtn_: "CUT FROM CONSULTANT SIDE",
+                    endby: "consultant_cut_call" // 👈 backend ke liye clear rakho
+                });
+
+                console.log("⏱️ call-ended emitted after 1 second (CONSULTANT)");
+            }, 1000);
 
             localStorage.removeItem("callStartTime");
-            localStorage.removeItem("callAccepted");
-            localStorage.removeItem("callSession");
+            localStorage.removeItem("endFromClient");
+
             const returnUrl = params.get("returnUrl");
             if (returnUrl) {
                 window.top.location.href = decodeURIComponent(returnUrl);
@@ -519,6 +575,7 @@ function VideoCallingPage() {
         else {
             dispatch(endCall());
             localStorage.removeItem("callStartTime");
+            localStorage.removeItem("endFromClient");
             const returnUrl = params.get("returnUrl");
             if (returnUrl) {
                 window.top.location.href = decodeURIComponent(returnUrl);
@@ -596,6 +653,7 @@ function VideoCallingPage() {
             const eventTimestamp = event.detail?.startedAt || Date.now();
             console.log("🔥 Call timer start event received - starting timer:", eventTimestamp);
             startTimer(eventTimestamp);
+
             if (userType === "client") {
                 getSocket().emit("both-update-time", {
                     callerId: callerIdParam,
@@ -605,6 +663,7 @@ function VideoCallingPage() {
                     startedAt: eventTimestamp,
                 });
             }
+            setFirstTime(true);
         };
 
         const connectedHandler = (event) => {
@@ -658,7 +717,7 @@ function VideoCallingPage() {
                     </button>
                     <div className={styles.callInfo}>
 
-                        <div onClick={stopRingtone()} className={styles.callAvatar}>
+                        <div className={styles.callAvatar}>
                             <img className={styles.callAvatar} src={getProfileImageUrl()} alt="profile" />
                         </div>
                         <div>
