@@ -28,9 +28,11 @@ export default function IncomingCallAlert() {
 
     const { callerId, callType, channelName, callerName, shop } = incomingCall;
 
-    console.log("incomingCall", shop,);
+   
     const handleAccept = async () => {
         localStorage.setItem("callAccepted____", JSON.stringify(callAccepted));
+        const shopId = localStorage.getItem("shop_o_Identity");
+      
         console.log("callAccepted______IncomingCallAlert", callAccepted);
         const hasMicPermission = await checkMicPermission();
         if (!hasMicPermission) {
@@ -49,7 +51,7 @@ export default function IncomingCallAlert() {
         });
         const data = res.data;
         if (data.token) {
-            socket.emit("call-accepted", { callerId, receiverId: userId, channelName, callType: incomingCall.callType, shopId: "690c374f605cb8b946503ccb" });
+            socket.emit("call-accepted", { callerId, receiverId: userId, channelName, callType: incomingCall.callType, shopId: shopId });
             dispatch(setIncomingCall(null));
             const tokenEncoded = encodeURIComponent(data.token);
             const appIdParam = data.appId ? `&appId=${data.appId}` : '';
