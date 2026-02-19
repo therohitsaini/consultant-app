@@ -27,33 +27,20 @@ export const checkUserBalance = async ({ userId, consultantId, type, shop }) => 
 
 export const openCallPage = async ({ receiverId, type, userId, shop }) => {
     try {
-        console.log("receiverId", receiverId);
-        console.log("type", type);
-        console.log("userId", userId);
-        console.log("shop", shop);
-
         const balance = await checkUserBalance({ userId, consultantId: receiverId, type, shop });
-        console.log("balance", balance);
-
         if (!balance) {
             alert("You have insufficient balance");
             return;
         }
-
         const hasMicPermission = await checkMicPermission();
-
         if (!hasMicPermission) {
             alert("Please grant microphone permission");
             return;
         }
-
         const channelName = `channel-${userId.slice(-6)}-${receiverId.slice(-6)}`;
         const uid = Math.floor(Math.random() * 1000000);
 
         const url = `${process.env.REACT_APP_BACKEND_HOST}/api/call/generate-token`;
-        console.log("url____generate-token", url);
-
-        console.log("BEFORE FETCH");
         const res = await axios.post(url, {
             channelName,
             uid
@@ -62,12 +49,8 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
                 "Content-Type": "application/json",
             }
         });
-        console.log("BEFORE FETCH");
-        console.log("STATUS:", res.data);
 
         const data = res.data;
-        console.log("data____generate-token", data);
-
         if (!data.token) {
             throw new Error("Token missing from API");
         }
@@ -84,7 +67,7 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
         const returnUrl = `https://${shop}/apps/consultant-theme`;
         console.log("returnUrl", process.env.REACT_APP_FRONTEND_URL);
         const callUrl =
-            `${"https://test-consultation-app.zend-apps.com"}/video/calling/page` +
+            `${"https://applied-polls-starring-paragraphs.trycloudflare.com"}/video/calling/page` +
             `?callerId=${userId}` +
             `&receiverId=${receiverId}` +
             `&callType=${type || "voice"}` +
@@ -95,7 +78,6 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
             `&userType=${"client"}` +
             `&returnUrl=${encodeURIComponent(returnUrl)}`;
 
-        console.log("callUrl", callUrl);
         // window.top.location.href = callUrl;
         window.open(callUrl, "_blank");
 

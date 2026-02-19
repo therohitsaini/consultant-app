@@ -42,8 +42,8 @@ function VideoCallingPage() {
     const [hasRemoteVideo, setHasRemoteVideo] = useState(false);
     const [transactionId, setTransactionId] = useState(null);
     const [firstTime, setFirstTime] = useState(false);
-    console.log("transactionId", transactionId);
-
+    const [isRinging, setIsRinging] = useState(false);
+    const [bothUserConnected, setBothUserConnected] = useState(false);
     useEffect(() => {
         const handleBeforeUnload = (e) => {
             e.preventDefault();
@@ -609,7 +609,7 @@ function VideoCallingPage() {
         const onRemoteLeft = (e) => {
             console.log("🔥 Remote user left — ending call immediately", e?.detail);
             handleEndCall();
-            stopRingtone()
+
         };
 
         window.addEventListener("remote-user-left", onRemoteLeft);
@@ -664,6 +664,7 @@ function VideoCallingPage() {
                 });
             }
             setFirstTime(true);
+            setBothUserConnected(true);
         };
 
         const connectedHandler = (event) => {
@@ -679,6 +680,7 @@ function VideoCallingPage() {
                     startedAt: eventTimestamp,
                 });
             }
+            setIsRinging(false);
         };
 
         window.addEventListener("call-timer-start", timerHandler);
@@ -698,6 +700,22 @@ function VideoCallingPage() {
             window.removeEventListener("call-connected", connectedHandler);
         };
     }, [userType, callerIdParam, receiverId, channelNameParam, callType]);
+
+    // play ringtone when call is accepted, rejected, or ended
+    useEffect(() => {
+        if (userType === "client" && !bothUserConnected) {
+            initRingtone();
+            playRingtone();
+            setIsRinging(true);
+        }
+    }, [userType, bothUserConnected]);
+
+    // stop ringtone when call is accepted, rejected, or ended
+    useEffect(() => {
+        if (userType === "client" && bothUserConnected) {
+            stopRingtone();
+        }
+    }, [userType, bothUserConnected]);
 
 
 
@@ -728,9 +746,9 @@ function VideoCallingPage() {
 
                         </div>
                     </div>
-                    <div style={{ fontSize: '12px', color: 'white' }}> Voice Call</div>
+                    <div onClick={() => stopRingtone()} style={{ fontSize: '12px', color: 'white' }}> Voice Call</div>
                 </div>
-                {time && (
+                {bothUserConnected && (
                     <div className={styles.callHeaderRight}>
                         <div className={styles.callTimer}>
                             {String(time.minutes).padStart(2, '0')}:{String(time.seconds).padStart(2, '0')}
@@ -780,12 +798,7 @@ function VideoCallingPage() {
                                     :
                                     <>
                                         <p className={styles.videoPlaceholderText}>
-                                            {
-                                                time ? <p style={{ color: 'white', fontSize: '12px', }}>
-                                                    {time.minutes}: {time.seconds < 10 ? `0${time.seconds}` : time.seconds}
-                                                </p>
-
-                                                    : null}
+                                            {isRinging ? "Ringing..." : "Calling..."}
 
 
                                         </p>

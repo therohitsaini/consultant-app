@@ -51,10 +51,7 @@ function ConsultantCards() {
 
         return () => clearTimeout(timer);
     }, []);
-    useEffect(() => {
-        const client_id = localStorage.setItem('client_u_Identity', user_id);
-        const shop = localStorage.setItem('shop_o_Identity', shop_id);
-    }, [user_id, shop_id]);
+  
     useEffect(() => {
         setUserId(localStorage.getItem('client_u_Identity'));
         setShopId(localStorage.getItem('shop_o_Identity'));
@@ -144,36 +141,9 @@ function ConsultantCards() {
         );
     };
 
-
-
-    // useEffect(() => {
-    //     if (!user_id) return console.log("User ID is required");
-    //     socket.on("connect", () => {
-    //         console.log("Connected to socket", socket.id);
-    //         socket.emit("register", user_id);
-    //         console.log("User ID registered", user_id);
-    //     });
-
-
-    //     socket.on("disconnect", () => {
-    //         console.log("Disconnected from socket", user_id);
-    //     });
-
-    //     socket.on("error", (error) => {
-    //         console.log("Socket error", error);
-    //     });
-
-    //     socket.on("message", (message) => {
-    //         console.log("Socket message", message);
-    //     });
-
-    // }, [user_id]);
-
     /**
      * Start Voice Call and Video Call
      */
-
-
 
     const startCall = async ({ receiverId, type }) => {
         console.log("startCall____ConsultantCards____receiverId", receiverId, type);
@@ -214,16 +184,8 @@ function ConsultantCards() {
 
     }
 
-
-
-
-
-
-
     return (
         <>
-
-
             <div className="container py-4">
                 {/* Hero Section */}
                 <div className="hero-section mb-5">
@@ -404,8 +366,8 @@ function ConsultantCards() {
                                                     </div>
                                                     <div className="calling-options">
                                                         <button
-                                                            className={`calling-option-btn chat-btn ${consultant.isBusy ? 'disabled-btn' : ''}`}
-                                                            disabled={consultant.isBusy}
+                                                            className={`calling-option-btn chat-btn}`}
+                                                            // disabled={consultant.isBusy}
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 viewChatsPage(consultant.id);
@@ -422,7 +384,7 @@ function ConsultantCards() {
                                                         </button>
                                                         <button
                                                             className="calling-option-btn audio-btn"
-                                                            disabled={consultant.isBusy}
+                                                            // disabled={consultant.isBusy}
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 startCall({ receiverId: consultant.id, type: 'voice' })
@@ -438,7 +400,7 @@ function ConsultantCards() {
                                                         </button>
                                                         <button
                                                             className="calling-option-btn video-btn"
-                                                            disabled={consultant.isBusy}
+                                                            // disabled={consultant.isBusy}
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 startCall({ receiverId: consultant.id, type: 'video' })
