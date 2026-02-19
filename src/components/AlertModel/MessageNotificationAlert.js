@@ -1,10 +1,14 @@
 import React, { useEffect } from "react";
 export default function PopupNotification({ message, onClose }) {
-    if (!message) return null;
+  console.log("message____MessageNotificationAlert", message)
+  if (localStorage.getItem("___U-B") === message.senderId || message.receiverId === localStorage.getItem("___U-B")) {
+    return null;
+  }
+  if (!message) return null;
 
-    return (
-        <>
-            <style>{`
+  return (
+    <>
+      <style>{`
           .bs-popup {
             position: fixed;
             top: 20px;
@@ -42,22 +46,22 @@ export default function PopupNotification({ message, onClose }) {
           }
         `}</style>
 
-            <div className="bs-popup d-flex align-items-center gap-3">
-                <button className="bs-close-btn" onClick={onClose}>×</button>
+      <div className="bs-popup d-flex align-items-center gap-3">
+        <button className="bs-close-btn" onClick={onClose}>×</button>
 
-                <img
-                    src={"https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg"}
-                    alt={message.senderName || "User"}
-                />
+        <img
+          src={"https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg"}
+          alt={message.senderName || "User"}
+        />
 
-                <div>
-                    <h5 className="fw-bold mb-1">
-                        {message.senderName|| "User"}
-                    </h5>
-                    <p>{message.text || "New message received"}</p>
-                </div>
-            </div>
-        </>
-    );
+        <div>
+          <h5 className="fw-bold mb-1">
+            {message.senderName || "User"}
+          </h5>
+          <p>{message.text || "New message received"}</p>
+        </div>
+      </div>
+    </>
+  );
 }
 

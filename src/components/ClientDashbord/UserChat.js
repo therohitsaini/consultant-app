@@ -20,7 +20,6 @@ const UserChat = () => {
     const parms = new URLSearchParams(window.location.search);
     const consultantId = parms.get('consultantId');
     const shop = parms.get('shop');
-    console.log("text____UserChat", text)
 
     useEffect(() => {
         const storedClientId = localStorage.getItem('client_u_Identity');
@@ -45,7 +44,6 @@ const UserChat = () => {
     const prevIsRunningRef = useRef(null);
     const { userDetails } = useSelector((state) => state.users);
     const { confirmChat } = useSelector((state) => state.socket);
-    console.log("confirmChat____UserChat", confirmChat)
 
     useEffect(() => {
         if (userDetails?.data?.chatLock === "true") {
@@ -54,6 +52,13 @@ const UserChat = () => {
     }, [userDetails, showChatLock]);
 
 
+    useEffect(() => {
+        if (consultantId) {
+            localStorage.setItem("___U-B", consultantId);
+        } else {
+            localStorage.removeItem("___U-B");
+        }
+    }, [consultantId])
 
     useEffect(() => {
         if (insufficientBalance) {
@@ -63,7 +68,7 @@ const UserChat = () => {
     useEffect(() => {
         dispatch(fetchUserDetailsByIds(clientId));
     }, [clientId, refreshed, showChatEndToast])
-    console.log("clientId____UserChat", refreshed)
+
     useEffect(() => {
         dispatch(fetchConsultantById({ shop_id: shopId, consultant_id: consultantId }))
     }, [shopId, consultantId]);

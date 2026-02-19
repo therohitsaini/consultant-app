@@ -94,20 +94,7 @@ function VideoCallingPage() {
     }, [callType]);
 
 
-    const menualTimeUpdate = () => {
-        if (userType === "client") {
-            const id = localStorage.getItem("endFromClient") || null;
-            socket.emit("user-connected-time-updated", {
-                callerId: callerIdParam,
-                receiverId: receiverId,
-                channelName: channelNameParam,
-                callType: callType,
-                startedAt: Date.now(),
-                transactionId: id,
-            });
-            console.log("menualTimeUpdate", transactionId);
-        }
-    }
+
 
     // register user
 
@@ -295,8 +282,10 @@ function VideoCallingPage() {
             }).catch((error) => {
                 console.error(`${callType} call failed:`, error);
             });
-            initRingtone();
-            playRingtone();
+            if (userType === "client") {
+                initRingtone();
+                playRingtone();
+            }
         }
     }, [dispatch, token, channelNameParam, uidParam, appIdParam, callType]);
 
@@ -507,9 +496,7 @@ function VideoCallingPage() {
         return profileImageDefault;
     };
 
-    const profileImage = callerDetails?.receiver?.profileImage
-        ? `${process.env.REACT_APP_BACKEND_HOST}/${callerDetails.receiver.profileImage.replace("\\", "/")}`
-        : null;
+
 
     const stopTimer = () => {
         clearInterval(intervalRef.current);
@@ -521,22 +508,25 @@ function VideoCallingPage() {
     const handleEndCall = () => {
         const endFromClient = localStorage.getItem("endFromClient") || null;
         if (endFromClient) {
+
             console.log("transactionId", transactionId);
             stopTimer();
             dispatch(endCall());
             setCallSessionEnded(true);
             localStorage.removeItem("callStartTime");
+            setTimeout(() => {
+                socket.emit("call-ended",
+                    {
+                        callerId: callerIdParam,
+                        receiverId: receiverId,
+                        channelName: channelNameParam,
+                        callType: callType,
+                        transactionId: endFromClient,
+                        shopId: shopId || "69959af26caa0dfd3a3f03f4",
+                        endby: "user_cut_call"
+                    });
+            }, 1000);
 
-            socket.emit("call-ended",
-                {
-                    callerId: callerIdParam,
-                    receiverId: receiverId,
-                    channelName: channelNameParam,
-                    callType: callType,
-                    transactionId: endFromClient,
-                    shopId: shopId || "69959af26caa0dfd3a3f03f4",
-                    endby: "user_cut_call"
-                });
             localStorage.removeItem("endFromClient");
             localStorage.removeItem("callAccepted");
             const returnUrl = params.get("returnUrl");
@@ -555,13 +545,13 @@ function VideoCallingPage() {
                     channelName: channelNameParam,
                     callType: callSession?.callType,
                     // transactionId: callSession?.transtionId,
-                    shopId: callSession?.shopId || "69959af26caa0dfd3a3f03f4",
+                    shopId: "69959af26caa0dfd3a3f03f4",
                     dtn_: "CUT FROM CONSULTANT SIDE",
-                    endby: "consultant_cut_call" // 👈 backend ke liye clear rakho
+                    endby: "consultant_cut_call"
                 });
 
                 console.log("⏱️ call-ended emitted after 1 second (CONSULTANT)");
-            }, 1000);
+            }, 500);
 
             localStorage.removeItem("callStartTime");
             localStorage.removeItem("endFromClient");
@@ -746,15 +736,17 @@ function VideoCallingPage() {
 
                         </div>
                     </div>
-                    <div onClick={() => stopRingtone()} style={{ fontSize: '12px', color: 'white' }}> Voice Call</div>
+                    <div style={{ fontSize: '12px', color: 'white' }}> Voice Call</div>
                 </div>
-                {bothUserConnected && (
-                    <div className={styles.callHeaderRight}>
-                        <div className={styles.callTimer}>
-                            {String(time.minutes).padStart(2, '0')}:{String(time.seconds).padStart(2, '0')}
+
+                {
+                    bothUserConnected && (
+                        <div className={styles.callHeaderRight}>
+                            <div className={styles.callTimer}>
+                                {String(time.minutes).padStart(2, '0')}:{String(time.seconds).padStart(2, '0')}
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
             </div>
 
             <div className={styles.videoArea}>
@@ -797,8 +789,8 @@ function VideoCallingPage() {
                                     </p>
                                     :
                                     <>
-                                        <p className={styles.videoPlaceholderText}>
-                                            {isRinging ? "Ringing..." : "Calling..."}
+                                        <p style={{ color: isRinging ? 'white' : 'green' }} className={styles.videoPlaceholderText}>
+                                            {isRinging ? "Ringing..." : "Connected..."}
 
 
                                         </p>
@@ -845,39 +837,41 @@ function VideoCallingPage() {
                     title={muted ? "Unmute" : "Mute"}
                     onClick={handleMuteToggle}
                 >
-                    {muted ? (
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-                            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                            <line x1="1" y1="1" x2="23" y2="23" />
-                        </svg>
-                    ) : (
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-                            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                        </svg>
-                    )}
-                </button>
-                {isVideoCall && (
-                    <button
-                        className={`${styles.controlButton} ${!videoEnabled ? styles.controlButtonActive : ''}`}
-                        title={videoEnabled ? "Turn Off Camera" : "Turn On Camera"}
-                        onClick={handleVideoToggle}
-                    >
-                        {!videoEnabled ? (
+                    {
+                        muted ? (
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M23 7l-7 5 7 5V7z" />
-                                <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
                                 <line x1="1" y1="1" x2="23" y2="23" />
                             </svg>
                         ) : (
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M23 7l-7 5 7 5V7z" />
-                                <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
                             </svg>
                         )}
-                    </button>
-                )}
+                </button>
+                {
+                    isVideoCall && (
+                        <button
+                            className={`${styles.controlButton} ${!videoEnabled ? styles.controlButtonActive : ''}`}
+                            title={videoEnabled ? "Turn Off Camera" : "Turn On Camera"}
+                            onClick={handleVideoToggle}
+                        >
+                            {!videoEnabled ? (
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M23 7l-7 5 7 5V7z" />
+                                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                                    <line x1="1" y1="1" x2="23" y2="23" />
+                                </svg>
+                            ) : (
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M23 7l-7 5 7 5V7z" />
+                                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                                </svg>
+                            )}
+                        </button>
+                    )}
                 <button className={`${styles.controlButton} ${styles.endCallButton}`} onClick={handleEndCall} title="End Call">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />

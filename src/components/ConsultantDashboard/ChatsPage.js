@@ -38,10 +38,8 @@ const ChatsPage = () => {
     const [showChatEndPop, setShowChatEndPop] = useState(false);
     const prevIsRunningRef = useRef(null);
     const { userInRequest } = useSelector((state) => state.consultants);
-    const isChatAccepted = useSelector((state) => state.socket.isChatAccepted);
     const { chatTimer } = useSelector(state => state.socket);
     const [seconds, setSeconds] = useState(0);
-    const confirmChat = useSelector((state) => state.socket.confirmChat);
     console.log("chatTimer____ChatsPage", chatTimer);
     console.log("userControlMenu$$$$$$$$$$$$", userControlMenu);
 
@@ -410,114 +408,116 @@ const ChatsPage = () => {
                                 <p onClick={() => setShowRequestModal(!showRequestModal)} style={{ fontSize: "14px", fontWeight: "600", padding: "10px", cursor: "pointer", }}> <span style={{ color: "#63ba77" }}>Request</span> ({isRequestModalOpen.length})</p>
                             </div>
                             {
-                                showRequestModal ? (
+                                showRequestModal
+                                    ?
+                                    (
 
-                                    isRequestModalOpen?.map((conversation) => {
-                                        const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${conversation?.sender?.profileImage?.replace("\\", "/")}`;
-                                        const isImage = conversation?.sender?.profileImage ? true : false;
-                                        const updatedAt = new Date(conversation?.updatedAt).toLocaleTimeString([], {
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                            hour12: true
-                                        });
-
-                                        return (
-                                            <Fragment>
-                                                <div
-                                                    key={conversation.id}
-                                                    // onClick={() => handleChatSelect({ shopId: conversation.shop.id, userId: conversation.sender.id })}
-                                                    className={`${styles.conversationItem} ${selectedChat === conversation.id ? styles.conversationItemActive : ''}`}
-                                                >
-                                                    <div className={styles.conversationContent}>
-                                                        <div className={styles.avatarWrapper}>
-                                                            <img
-                                                                src={isImage ? imageUrl : "../images/team/team1.avif"}
-                                                                alt="profile"
-                                                                className={styles.conversationAvatar}
-                                                            />
-                                                            {conversation.isOnline && (
-                                                                <div className={styles.onlineIndicator}></div>
-                                                            )}
-                                                        </div>
-                                                        <div className={styles.conversationDetails}>
-                                                            <div className={`${styles.conversationHeader} ${styles.flexBetween} ${styles.flexStart}`}>
-                                                                <div className={styles.conversationName}>
-                                                                    {conversation.sender?.fullname}
-                                                                </div>
-                                                                <div className={styles.conversationTimestamp}>
-                                                                    {updatedAt}
-                                                                </div>
+                                        isRequestModalOpen?.map((conversation) => {
+                                            const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${conversation?.sender?.profileImage?.replace("\\", "/")}`;
+                                            const isImage = conversation?.sender?.profileImage ? true : false;
+                                            const updatedAt = new Date(conversation?.updatedAt).toLocaleTimeString([], {
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                                hour12: true
+                                            });
+                                            return (
+                                                <Fragment>
+                                                    <div
+                                                        key={conversation.id}
+                                                        // onClick={() => handleChatSelect({ shopId: conversation.shop.id, userId: conversation.sender.id })}
+                                                        className={`${styles.conversationItem} ${selectedChat === conversation.id ? styles.conversationItemActive : ''}`}
+                                                    >
+                                                        <div className={styles.conversationContent}>
+                                                            <div className={styles.avatarWrapper}>
+                                                                <img
+                                                                    src={isImage ? imageUrl : "../images/team/team1.avif"}
+                                                                    alt="profile"
+                                                                    className={styles.conversationAvatar}
+                                                                />
+                                                                {conversation.isOnline && (
+                                                                    <div className={styles.onlineIndicator}></div>
+                                                                )}
                                                             </div>
-                                                            <div className={`${styles.conversationMessage} ${styles.flexBetween} ${styles.flexCenter}`}>
-                                                                <div className={styles.messageText}>
-                                                                    {conversation?.lastMessage}
-                                                                </div>
-
-                                                                <div className={styles.moreMenuWrapper}>
-                                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                                                                        <button
-                                                                            type="button"
-                                                                            style={{
-                                                                                padding: "5px 12px",
-                                                                                backgroundColor: "green",
-                                                                                color: "#fff",
-                                                                                border: "none",
-                                                                                borderRadius: "4px",
-                                                                                cursor: "pointer",
-                                                                                fontSize: "12px"
-                                                                            }}
-                                                                         onClick={() => {
-                                                                            updateUser(conversation);
-                                                                        }}>add</button>
-                                                                        <button
-                                                                            type="button"
-                                                                            className={styles.unreadBadgeIcon}
-                                                                            onClick={(e) => {
-                                                                                handlerUserControlMenu(conversation);
-                                                                                // setOpenMenuConversationId(
-                                                                                //     openMenuConversationId === conversation.id ? null : conversation.id
-                                                                                // );
-                                                                            }}
-                                                                        >
-                                                                            <BsThreeDotsVertical />
-                                                                        </button>
+                                                            <div className={styles.conversationDetails}>
+                                                                <div className={`${styles.conversationHeader} ${styles.flexBetween} ${styles.flexStart}`}>
+                                                                    <div className={styles.conversationName}>
+                                                                        {conversation.sender?.fullname}
                                                                     </div>
-                                                                    {userControlMenu === conversation?.chatListId && (
-                                                                        <div
-                                                                            className={styles.moreMenu}
-                                                                            onClick={(e) => e.stopPropagation()}
-                                                                        >
+                                                                    <div className={styles.conversationTimestamp}>
+                                                                        {updatedAt}
+                                                                    </div>
+                                                                </div>
+                                                                <div className={`${styles.conversationMessage} ${styles.flexBetween} ${styles.flexCenter}`}>
+                                                                    <div className={styles.messageText}>
+                                                                        {conversation?.lastMessage}
+                                                                    </div>
+
+                                                                    <div className={styles.moreMenuWrapper}>
+                                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
                                                                             <button
                                                                                 type="button"
-                                                                                className={styles.moreMenuItem}
+                                                                                style={{
+                                                                                    padding: "5px 12px",
+                                                                                    backgroundColor: "green",
+                                                                                    color: "#fff",
+                                                                                    border: "none",
+                                                                                    borderRadius: "4px",
+                                                                                    cursor: "pointer",
+                                                                                    fontSize: "12px"
+                                                                                }}
                                                                                 onClick={() => {
                                                                                     updateUser(conversation);
-                                                                                }}
-                                                                            >
-                                                                                Add
-                                                                            </button>
+                                                                                }}>add</button>
                                                                             <button
                                                                                 type="button"
-                                                                                className={styles.moreMenuItem}
-                                                                                onClick={() => {
-                                                                                    HandleRemoveUser(conversation);
+                                                                                className={styles.unreadBadgeIcon}
+                                                                                onClick={(e) => {
+                                                                                    handlerUserControlMenu(conversation);
+                                                                                    // setOpenMenuConversationId(
+                                                                                    //     openMenuConversationId === conversation.id ? null : conversation.id
+                                                                                    // );
                                                                                 }}
                                                                             >
-                                                                                Remove
+                                                                                <BsThreeDotsVertical />
                                                                             </button>
                                                                         </div>
-                                                                    )}
+                                                                        {userControlMenu === conversation?.chatListId && (
+                                                                            <div
+                                                                                className={styles.moreMenu}
+                                                                                onClick={(e) => e.stopPropagation()}
+                                                                            >
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className={styles.moreMenuItem}
+                                                                                    onClick={() => {
+                                                                                        updateUser(conversation);
+                                                                                        setShowRequestModal(false);
+                                                                                    }}
+                                                                                >
+                                                                                    Add
+                                                                                </button>
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className={styles.moreMenuItem}
+                                                                                    onClick={() => {
+                                                                                        HandleRemoveUser(conversation);
+                                                                                    }}
+                                                                                >
+                                                                                    Remove
+                                                                                </button>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
                                                                 </div>
-                                                            </div>
 
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </Fragment>
-                                        )
-                                    })
+                                                </Fragment>
+                                            )
+                                        })
 
-                                )
+                                    )
                                     : (
                                         <div className={styles.conversationsList}>
                                             {
@@ -550,6 +550,11 @@ const ChatsPage = () => {
                                                             hour12: true
                                                         });
                                                         const isChatAccepted = conversation?.isChatAccepted;
+                                                        if (conversation.sender.id) {
+                                                            localStorage.setItem("___U-B", conversation.sender.id);
+                                                        } else {
+                                                            localStorage.removeItem("___U-B");
+                                                        }
 
                                                         return (
                                                             <Fragment>

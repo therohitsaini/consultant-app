@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from "react";
 export default function TestRingtone({ incomingCall }) {
     const ringtoneRef = useRef(null);
 
-    const playRingtone = () => {
+    const playRingtoneIncoming = () => {
         if (!ringtoneRef.current) return;
 
         ringtoneRef.current
@@ -17,7 +17,7 @@ export default function TestRingtone({ incomingCall }) {
     };
     useEffect(() => {
         if (incomingCall) {
-            playRingtone();
+            playRingtoneIncoming();
         } else {
             stopRingtone();
         }
@@ -41,7 +41,7 @@ export default function TestRingtone({ incomingCall }) {
             />
 
             {/* Buttons */}
-            {/* <button onClick={playRingtone}>Play Ring</button>
+            {/* <button onClick={playRingtoneIncoming}>Play Ring</button>
             <button onClick={stopRingtone}>Stop Ring</button> */}
         </>
     );
