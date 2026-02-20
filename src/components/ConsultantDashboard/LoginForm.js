@@ -104,7 +104,6 @@ const LoginForm = () => {
 
             // Ensure userData exists and has an _id
             if (response.status === 200 && userData?._id) {
-
                 console.log("userData?._id", userData?._id);
                 const params = new URLSearchParams(window.location.search);
                 const shop = params.get("shop");
@@ -115,8 +114,11 @@ const LoginForm = () => {
                 localStorage.setItem("shop_o_Identity", shopId);
                 localStorage.setItem("varify_tokem", token);
                 openTokenWindow({ userId, shopId });
+                console.log("userId______", userId);
+                console.log("shopId_________", shopId);
+                localStorage.setItem("client_u_Identity", userId);
+                localStorage.setItem("shop_o_Identity", shopId);
                 setIsLoading(false);
-                // proceedToDashboard(shop, host);
             } else {
                 setErrors({ email: "Invalid email or password" });
             }

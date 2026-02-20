@@ -31,7 +31,6 @@ function ConsultantCards() {
     const dispatch = useDispatch();
     const [userId, setUserId] = useState(null);
     const [shopId, setShopId] = useState(null);
-    const [alertMsg, setAlertMsg] = useState(true);
     const { consultants, loading } = useSelector((state) => state.consultants);
     const params = new URLSearchParams(window.location.search);
     const shop = params.get('shop');
@@ -39,10 +38,16 @@ function ConsultantCards() {
     const user_id = params.get('customerId');
     const shop_id = params.get('shopid') || localStorage.getItem('domain_V_id');
     const [initialLoading, setInitialLoading] = useState(true);
-    const [isRing, setIsRing] = useState(true);
-    const { insufficientBalance } = useSelector((state) => state.socket);
 
-    console.log("consultants_____", consultants);
+
+    // useEffect(() => {
+    //     if (user_id) {
+    //        const user_id = localStorage.setItem('client_u_Identity', user_id);
+    //        setUserId(user_id);
+    //        setShopId(localStorage.getItem('shop_o_Identity', shop_id));
+          
+    //     }
+    // }, [user_id, shop_id])
 
     useEffect(() => {
         const timer = setTimeout(() => {

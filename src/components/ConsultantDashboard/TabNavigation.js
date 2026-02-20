@@ -48,7 +48,7 @@ function TabNavigation({ children }) {
     const { consultantOverview } = useSelector((state) => state.consultants);
     console.log("consultantOverview________________", consultantOverview)
     useEffect(() => {
-        setUserId(localStorage.getItem('client_u_Identity'));
+        setUserId(localStorage.getItem('client_u_Identity') || "69959e1e6caa0dfd3a3f045d");
         setShopId(localStorage.getItem('shop_o_Identity'));
     }, []);
 
@@ -67,7 +67,6 @@ function TabNavigation({ children }) {
     }, [shopId, userId]);
 
     const updateProfileDeatailsHandler = async () => {
-        console.log("profile________________TTTTTTT", profile.profileImage)
         try {
             const formData = new FormData();
 
@@ -78,22 +77,7 @@ function TabNavigation({ children }) {
             formData.append("phone", profile.phone);
             formData.append("gender", profile.gender);
 
-            // if (profile.profileImage) {
-            //     if (profile.profileImage instanceof File) {
-            //         formData.append("profileImage", profile.profileImage);
-
-            //     } else if (typeof profile.profileImage === "string" && profile.profileImage.startsWith("blob:")) {
-
-            //         const res = await fetch(profile.profileImage);
-            //         const blob = await res.blob();
-
-            //         const file = new File([blob], "profile.png", {
-            //             type: blob.type
-            //         });  
-
-            //         formData.append("profileImage", file);
-            //     }
-            // }
+          
 
             const response = await axios.put(
                 `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/update-profile`,
@@ -165,22 +149,7 @@ function TabNavigation({ children }) {
         setSidebarOpen(!sidebarOpen);
     };
 
-    // const menuItems = [
-    //     {
-    //         label: 'Dashboard',
-    //         icon: <DashboardIcon />,
-    //         path: '/consultant-dashboard',
-    //         active: location.pathname === '/consultant-dashboard'
-    //     },
-
-    //     {
-    //         label: 'Chats',
-    //         icon: <ChatIcon />,
-    //         path: '/consultant-chats-section',
-    //         active: location.pathname === '/consultant-chats-section'
-    //     },
-
-    // ];
+    
     const menuItems = [
         {
             label: 'Dashboard',
@@ -206,14 +175,14 @@ function TabNavigation({ children }) {
             active: location.pathname.startsWith('/consultant-dashboard/consultant-wallet-logs'),
             icon: <HiOutlineBanknotes />,
         },
-       
+
         {
             label: 'Withdrawal Request',
             path: '/consultant-dashboard/withdrawal-request-table',
             active: location.pathname.startsWith('/consultant-dashboard/withdrawal-request-table'),
             icon: <HiOutlineArrowDownTray />,
         },
-     
+
     ];
 
 

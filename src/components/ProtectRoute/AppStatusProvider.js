@@ -8,8 +8,14 @@ export const AppStatusProvider = ({ children }) => {
     const [appEnabled, setAppEnabled] = useState(false);
     const params = new URLSearchParams(window.location.search);
     const shop = params.get('shop');
-    console.log("shop", shop);
-    const adminIdLocal = localStorage.getItem('shop_o_Identity');
+    const shop_id = params.get('shopid') 
+    const user_id = params.get('customerId');
+    useEffect(() => {
+        if (shop ||user_id || shop_id) {
+            localStorage.setItem('shop_o_Identity', shop_id);
+            localStorage.setItem('client_u_Identity', user_id);
+        }
+    }, [shop, user_id, shop_id])
 
     useEffect(() => {
         const checkAppStatus = async () => {
@@ -17,7 +23,7 @@ export const AppStatusProvider = ({ children }) => {
                 {
                     params: {
                         shop: shop,
-                        adminIdLocal: adminIdLocal
+                        adminIdLocal: shop_id
                     },
 
                 }

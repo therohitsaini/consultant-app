@@ -251,13 +251,10 @@ function VideoCallingPage() {
 
     useEffect(() => {
         if (!callerId || !receiverId || !channelNameParam || !callType) return;
-
         const callKey = `call_started_${channelNameParam}`;
         console.log("callKey", callKey);
         console.log("effect triggered");
-
         if (sessionStorage.getItem(callKey)) return;
-
         console.log("calling user");
         console.log("effect triggered");
         sessionStorage.setItem(callKey, "true");
@@ -294,10 +291,9 @@ function VideoCallingPage() {
             let isPlaying = false;
             let attempts = 0;
             const maxAttempts = 40;
-
             const checkAndPlayLocalVideo = () => {
                 if (isPlaying) return;
-
+                
                 import('../Redux/slices/callSlice').then((module) => {
                     const track = module.getLocalVideoTrack();
                     if (track && localVideoRef.current) {
