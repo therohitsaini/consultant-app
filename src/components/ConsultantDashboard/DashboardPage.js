@@ -13,9 +13,10 @@ const DashboardPage = () => {
     console.log("consultantOverview________________", consultantOverview)
     console.log("userData________________", userId)
     useEffect(() => {
-        const storedUserId = localStorage.getItem('client_u_Identity');
+        const storedUserId = localStorage.getItem('client_u_Identity__') ;
         setUserId(storedUserId);
-        setShopId(localStorage.getItem('shop_o_Identity'));
+        const storedShopId = localStorage.getItem('shop_o_Identity') ;
+        setShopId(storedShopId);
     }, []);
 
     useEffect(() => {

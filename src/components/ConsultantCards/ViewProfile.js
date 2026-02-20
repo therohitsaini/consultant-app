@@ -15,7 +15,7 @@ function ViewProfile() {
     const shop_id = params.get("shopId");
     const shop = params.get("shop");
     useEffect(() => {
-        setUserId(localStorage.getItem("client_u_Identity"));
+        setUserId(localStorage.getItem("client_u_Identity__"));
 
     }, []);
 

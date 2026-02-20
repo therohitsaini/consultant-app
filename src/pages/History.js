@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import UserTable from "../components/ClientDashbord/UserTable";
 
 const History = () => {
-  const userId = localStorage.getItem("client_u_Identity");
+  const userId = localStorage.getItem("client_u_Identity__");
   const shopId = localStorage.getItem("shop_o_Identity");
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);

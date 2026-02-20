@@ -44,7 +44,7 @@ const ChatsPage = () => {
     console.log("userControlMenu$$$$$$$$$$$$", userControlMenu);
 
     useEffect(() => {
-        const clientId = localStorage.getItem('client_u_Identity');
+        const clientId = localStorage.getItem('client_u_Identity__');
         const shopId = localStorage.getItem('shop_o_Identity');
         setConsultantId(clientId);
         setShopId(shopId);

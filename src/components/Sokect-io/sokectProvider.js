@@ -26,7 +26,7 @@ export default function SocketProvider({ children }) {
 
     useEffect(() => {
         const socket = getSocket();
-        const clientId = localStorage.getItem("client_u_Identity")
+        const clientId = localStorage.getItem("client_u_Identity__") ;
         console.log("Client ID Sokect Provider________________", clientId)
         const onConnect = () => {
             console.log("✅ ____Socket connected");

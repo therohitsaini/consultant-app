@@ -9,7 +9,7 @@ const ConsultantWalletLogs = () => {
     const [shopId, setShopId] = useState(null)
 
     useEffect(() => {
-        const userId = localStorage.getItem('client_u_Identity')
+        const userId = localStorage.getItem('client_u_Identity__')
         setUserId(userId)
         const shopId = localStorage.getItem('shop_o_Identity')
         setShopId(shopId)

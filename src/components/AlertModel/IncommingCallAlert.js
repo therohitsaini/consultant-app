@@ -12,12 +12,12 @@ import axios from "axios";
 export default function IncomingCallAlert() {
     const dispatch = useDispatch();
     const params = new URLSearchParams(window.location.search);
-    const userId = localStorage.getItem('client_u_Identity') || localStorage.getItem('consultant_u_Identity');
+    const userId = localStorage.getItem('client_u_Identity__') || localStorage.getItem('consultant_u_Identity');
     const { incomingCall, callEnded } = useSelector((state) => state.socket);
     const { callAccepted } = useSelector((state) => state.socket);
     const shopId = params.get("shopId");
 
-
+    console.log("userId_____IncomingCallAlert", incomingCall);
     useEffect(() => {
         if (callEnded?.callId) {
             handleReject();
@@ -27,12 +27,12 @@ export default function IncomingCallAlert() {
     if (!incomingCall) return console.log("No incoming call");
 
     const { callerId, callType, channelName, callerName, shop } = incomingCall;
+    console.log("userId_____IncomingCallAlert", callType);
 
-   
     const handleAccept = async () => {
         localStorage.setItem("callAccepted____", JSON.stringify(callAccepted));
         const shopId = localStorage.getItem("shop_o_Identity");
-      
+
         console.log("callAccepted______IncomingCallAlert", callAccepted);
         const hasMicPermission = await checkMicPermission();
         if (!hasMicPermission) {
@@ -59,7 +59,7 @@ export default function IncomingCallAlert() {
 
             const returnUrl = `https://${shop}/apps/consultant-theme/consultant-dashboard`;
             const callUrl =
-                `${"https://del-drugs-attempting-baseline.trycloudflare.com"}/video/calling/page` +
+                `${"https://test-consultation-app.zend-apps.com"}/video/calling/page` +
                 `?callerId=${callerId}` +
                 `&receiverId=${userId}` +
                 `&callType=${callType}` +

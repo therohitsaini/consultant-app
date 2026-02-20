@@ -45,7 +45,7 @@ function CallChatLogs() {
     ]
 
     useEffect(() => {
-        const userId = localStorage.getItem('client_u_Identity')
+        const userId = localStorage.getItem('client_u_Identity__')
         setUserId(userId)
         const shopId = localStorage.getItem('shop_o_Identity')
         setShopId(shopId)
@@ -74,7 +74,7 @@ function CallChatLogs() {
 
     return (
         <UserTable
-            title="Call / Chat Logs"
+            title="Call /- Chat Logs"
             columns={columns}
             data={callChatLogs}
             loading={loading}

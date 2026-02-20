@@ -44,18 +44,18 @@ function VideoCallingPage() {
     const [firstTime, setFirstTime] = useState(false);
     const [isRinging, setIsRinging] = useState(false);
     const [bothUserConnected, setBothUserConnected] = useState(false);
-    useEffect(() => {
-        const handleBeforeUnload = (e) => {
-            e.preventDefault();
-            e.returnValue = "Call is running. Are you sure?";
-        };
+    // useEffect(() => {
+    //     const handleBeforeUnload = (e) => {
+    //         e.preventDefault();
+    //         e.returnValue = "Call is running. Are you sure?";
+    //     };
 
-        window.addEventListener("beforeunload", handleBeforeUnload);
+    //     window.addEventListener("beforeunload", handleBeforeUnload);
 
-        return () => {
-            window.removeEventListener("beforeunload", handleBeforeUnload);
-        };
-    }, []);
+    //     return () => {
+    //         window.removeEventListener("beforeunload", handleBeforeUnload);
+    //     };
+    // }, []);
 
 
     useEffect(() => {
@@ -64,7 +64,7 @@ function VideoCallingPage() {
         setCallAccepted(callAcceptedFromStorage);
     }, [userId]);
     useEffect(() => {
-        const callerIdFromStorage = localStorage.getItem("client_u_Identity");
+        const callerIdFromStorage = localStorage.getItem("client_u_Identity__");
         const finalCallerId = callerIdParam || callerIdFromStorage;
         setCallerId(finalCallerId);
     }, [callerIdParam]);
@@ -124,7 +124,7 @@ function VideoCallingPage() {
 
     useEffect(() => {
         const socket = getSocket();
-        const userId = localStorage.getItem("client_u_Identity");
+        const userId = localStorage.getItem("client_u_Identity__");
 
         if (!socket.connected) {
             socket.connect();
@@ -163,8 +163,8 @@ function VideoCallingPage() {
 
         const handleAutoCallEnd = (data) => {
             console.log("🔥 autoCallEnded-no-balance received:", data);
-            alert("❌ Balance khatam ho gaya, call end ho gayi");
-
+            // alert("❌ Balance khatam ho gaya, call end ho gayi");
+            handleEndCall();
         };
 
         socket.on("autoCallEnded-no-balance", handleAutoCallEnd);
@@ -293,7 +293,7 @@ function VideoCallingPage() {
             const maxAttempts = 40;
             const checkAndPlayLocalVideo = () => {
                 if (isPlaying) return;
-                
+
                 import('../Redux/slices/callSlice').then((module) => {
                     const track = module.getLocalVideoTrack();
                     if (track && localVideoRef.current) {

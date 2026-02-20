@@ -20,7 +20,7 @@ const ProfileSection = () => {
   const walletBalance = userDetails?.data?.walletBalance;
   console.log("userDetails_____ProfileSection", userDetails);
   useEffect(() => {
-    const adminId = localStorage.getItem("client_u_Identity");
+    const adminId = localStorage.getItem("client_u_Identity__");
     const shopId = localStorage.getItem("shop_o_Identity");
     if (adminId && shopId) {
       setUserId(adminId);

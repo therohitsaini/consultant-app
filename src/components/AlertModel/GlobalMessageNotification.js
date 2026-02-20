@@ -9,7 +9,7 @@ export default function GlobalMessageNotification() {
     const [userId, setUserId] = useState(null);
 
     useEffect(() => {
-        const id = localStorage.getItem("client_u_Identity");
+        const id = localStorage.getItem("client_u_Identity__");
         if (id) setUserId(id);
     }, []);
 

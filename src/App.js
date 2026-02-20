@@ -153,6 +153,7 @@ export default function App() {
               <ViewProfile />
             </ProtectStoreFront>
           } />
+          
             <Route path="/consultant-dashboard/*" element={<TabNavigation />}>
               <Route index element={<DashboardPage />} />
               <Route path="dashboard" element={<DashboardPage />} />

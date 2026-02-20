@@ -42,7 +42,7 @@ function ConsultantCards() {
 
     // useEffect(() => {
     //     if (user_id) {
-    //        const user_id = localStorage.setItem('client_u_Identity', user_id);
+    //        const user_id = localStorage.setItem('client_u_Identity__', user_id);
     //        setUserId(user_id);
     //        setShopId(localStorage.getItem('shop_o_Identity', shop_id));
           
@@ -58,7 +58,7 @@ function ConsultantCards() {
     }, []);
   
     useEffect(() => {
-        setUserId(localStorage.getItem('client_u_Identity'));
+        setUserId(localStorage.getItem('client_u_Identity__'));
         setShopId(localStorage.getItem('shop_o_Identity'));
     }, []);
 

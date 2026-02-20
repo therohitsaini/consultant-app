@@ -20,6 +20,7 @@ const LoginForm = () => {
     const params = new URLSearchParams(window.location.search);
     const shop = params.get("shop");
     const host = params.get("host");
+    const userId = params.get("userId");
     console.log("shop", shop);
     console.log("host", host);
 
@@ -62,6 +63,8 @@ const LoginForm = () => {
     const proceedToDashboard = (shop, host) => {
         const targetShop = shop;
         const hostQuery = host ? `?host=${encodeURIComponent(host)}` : "";
+        console.log("userId", userId);
+
         if (targetShop) {
             window.top.location.href = `https://${targetShop}/apps/consultant-theme/consultant-dashboard${hostQuery}`;
         } else {
@@ -71,9 +74,8 @@ const LoginForm = () => {
 
     useEffect(() => {
         const handleMessage = (event) => {
-            // 🔐 Security check (important)
-            if (event.origin !== window.location.origin) return;
 
+            if (event.origin !== window.location.origin) return;
             if (event.data?.tokenGenerated === true) {
                 console.log("✅ Token generated, message received");
                 proceedToDashboard(shop, host);
@@ -84,7 +86,9 @@ const LoginForm = () => {
             window.removeEventListener("message", handleMessage);
         };
     }, []);
+
     //-------------------------- handle submit -------------------
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
@@ -110,14 +114,12 @@ const LoginForm = () => {
                 const host = params.get("host");
                 const userId = userData?._id;
                 const shopId = userData?.shop_id;
-                localStorage.setItem("client_u_Identity", userId);
+                localStorage.setItem("client_u_Identity__", userId);
+                localStorage.setItem("shop_o_Identity__", shopId);
                 localStorage.setItem("shop_o_Identity", shopId);
+
                 localStorage.setItem("varify_tokem", token);
                 openTokenWindow({ userId, shopId });
-                console.log("userId______", userId);
-                console.log("shopId_________", shopId);
-                localStorage.setItem("client_u_Identity", userId);
-                localStorage.setItem("shop_o_Identity", shopId);
                 setIsLoading(false);
             } else {
                 setErrors({ email: "Invalid email or password" });

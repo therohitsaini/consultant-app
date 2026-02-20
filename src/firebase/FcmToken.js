@@ -216,7 +216,7 @@
 
 //                 // Get userId and shopId from URL params (when opened from LoginForm)
 //                 const urlParams = new URLSearchParams(window.location.search);
-//                 const userId = urlParams.get("userId") || localStorage.getItem("client_u_Identity");
+//                 const userId = urlParams.get("userId") || localStorage.getItem("client_u_Identity__");
 //                 const shopId = urlParams.get("shopId");
 
 //                 if (userId) {

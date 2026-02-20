@@ -11,9 +11,10 @@ export const AppStatusProvider = ({ children }) => {
     const shop_id = params.get('shopid') 
     const user_id = params.get('customerId');
     useEffect(() => {
-        if (shop ||user_id || shop_id) {
-            localStorage.setItem('shop_o_Identity', shop_id);
-            localStorage.setItem('client_u_Identity', user_id);
+        if (shop || user_id || shop_id) {
+            if (shop_id) localStorage.setItem('shop_o_Identity', shop_id);
+            // Only set client_u_Identity__ when customerId is in URL; otherwise we would overwrite consultant login with null
+            if (user_id) localStorage.setItem('client_u_Identity__', user_id);
         }
     }, [shop, user_id, shop_id])
 

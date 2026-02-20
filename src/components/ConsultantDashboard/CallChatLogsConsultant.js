@@ -43,9 +43,9 @@ const CallLogsConsultant = () => {
     ]
 
     useEffect(() => {
-        const userId = localStorage.getItem('client_u_Identity')
+        const userId = localStorage.getItem('client_u_Identity__')
         setUserId(userId)
-        const shopId = localStorage.getItem('shop_o_Identity')
+        const shopId = localStorage.getItem('shop_o_Identity__')
         setShopId(shopId)
     }, [])
 

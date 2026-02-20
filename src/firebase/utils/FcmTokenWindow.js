@@ -33,7 +33,6 @@ export default function FcmTokenWindow() {
                         token: fcmToken
                     })
                 });
-                // ✅ Parent window ko inform karo
                 if (window.opener) {
                     window.opener.postMessage(
                         { tokenGenerated: true, },

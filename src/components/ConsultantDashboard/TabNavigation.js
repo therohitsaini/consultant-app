@@ -2,18 +2,11 @@ import React, { useState, useEffect, Fragment } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from '../../components/ConsultantDashboard/TabNavigation.module.css';
-import DashboardPage from './DashboardPage';
-import UsersPage from './UsersPage';
-import ChatsPage from './ChatsPage';
-import VideoCallingPage from './VideoCallingPage';
-import { ChatIcon, DashboardIcon, UsersIcon } from '../FallbackData/FallbackData';
 import { useDispatch, useSelector } from 'react-redux';
 import { connectSocket } from '../Redux/slices/sokectSlice';
 import { fetchConsultantById } from '../Redux/slices/ConsultantSlices';
-import IncomingCallAlert from '../AlertModel/IncommingCallAlert';
 import ConsultantProfileModal from './ConsultantProfileModal';
 import axios from 'axios';
-import { app } from '@shopify/app-bridge/actions/Print';
 import {
     HiOutlineSquares2X2,
     HiOutlineChatBubbleLeftRight,
@@ -22,19 +15,14 @@ import {
     HiOutlineArrowDownTray,
 } from "react-icons/hi2";
 
-// Icon Components - Enhanced with better, professional designs
-
-
-
 
 
 function TabNavigation({ children }) {
     const navigate = useNavigate();
     const location = useLocation();
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [consultantId, setConsultantId] = useState(null);
-    const [userId, setUserId] = useState(null);
-    const [shopId, setShopId] = useState(null);
+    const [userId, setUserId] = useState();
+    const [shopId, setShopId] = useState();
     const [showModal, setShowModal] = useState(false);
     const dispatch = useDispatch();
     const [profile, setProfile] = useState({
@@ -44,12 +32,15 @@ function TabNavigation({ children }) {
         gender: "",
         profileImage: null,
     });
-    console.log("profile________________", profile)
     const { consultantOverview } = useSelector((state) => state.consultants);
-    console.log("consultantOverview________________", consultantOverview)
+    const params = new URLSearchParams(window.location.search);
+    const userId_params = params.get("userId");
+    const shopId_params = params.get("shopId");
+    console.log("userId_params", userId_params);
+    console.log("shopId_params", shopId_params);
     useEffect(() => {
-        setUserId(localStorage.getItem('client_u_Identity') || "69959e1e6caa0dfd3a3f045d");
-        setShopId(localStorage.getItem('shop_o_Identity'));
+        setUserId(localStorage.getItem('client_u_Identity__') );
+        setShopId(localStorage.getItem('shop_o_Identity__'));
     }, []);
 
 
@@ -77,7 +68,7 @@ function TabNavigation({ children }) {
             formData.append("phone", profile.phone);
             formData.append("gender", profile.gender);
 
-          
+
 
             const response = await axios.put(
                 `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/update-profile`,
@@ -149,7 +140,7 @@ function TabNavigation({ children }) {
         setSidebarOpen(!sidebarOpen);
     };
 
-    
+
     const menuItems = [
         {
             label: 'Dashboard',

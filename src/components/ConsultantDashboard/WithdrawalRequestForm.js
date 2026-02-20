@@ -12,7 +12,7 @@ const WithdrawalRequestForm = () => {
     const [note, setNote] = useState("");
     const [loading, setLoading] = useState(false);
     const [showToast, setShowToast] = useState(false);
-    const consultantId = localStorage.getItem("client_u_Identity");
+    const consultantId = localStorage.getItem("client_u_Identity__");
     const shopId = localStorage.getItem("shop_o_Identity");
     const { consultantOverview } = useSelector((state) => state.consultants);
     

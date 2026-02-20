@@ -22,7 +22,7 @@ const UserChat = () => {
     const shop = parms.get('shop');
 
     useEffect(() => {
-        const storedClientId = localStorage.getItem('client_u_Identity');
+        const storedClientId = localStorage.getItem('client_u_Identity__');
         const storedShopId = localStorage.getItem('shop_o_Identity');
         setClientId(storedClientId);
         setShopId(storedShopId);
