@@ -154,8 +154,6 @@ function ConsultantCards() {
         console.log("startCall____ConsultantCards____receiverId", receiverId, type);
         await openCallPage({ receiverId, type, userId, shop });
 
-
-
     };
 
     if (initialLoading || loading) {

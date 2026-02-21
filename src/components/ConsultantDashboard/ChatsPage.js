@@ -134,10 +134,10 @@ const ChatsPage = () => {
     }, [selectedChat]);
 
 
-
     const handleChatSelect = (chatData) => {
         setChaterIds(chatData);
         setChatAccepted(chatData);
+        console.log("chatData")
         const conversation = chatList.find(conv =>
             conv.sender?.id === chatData.userId && conv.shop?.id === chatData.shopId
         );
@@ -424,7 +424,7 @@ const ChatsPage = () => {
                                                 <Fragment>
                                                     <div
                                                         key={conversation.id}
-                                                        // onClick={() => handleChatSelect({ shopId: conversation.shop.id, userId: conversation.sender.id })}
+                                                       
                                                         className={`${styles.conversationItem} ${selectedChat === conversation.id ? styles.conversationItemActive : ''}`}
                                                     >
                                                         <div className={styles.conversationContent}>
@@ -467,6 +467,7 @@ const ChatsPage = () => {
                                                                                 }}
                                                                                 onClick={() => {
                                                                                     updateUser(conversation);
+                                                                                    setShowRequestModal(!showRequestModal)
                                                                                 }}>add</button>
                                                                             <button
                                                                                 type="button"
@@ -481,7 +482,8 @@ const ChatsPage = () => {
                                                                                 <BsThreeDotsVertical />
                                                                             </button>
                                                                         </div>
-                                                                        {userControlMenu === conversation?.chatListId && (
+                                                                        {
+                                                                        userControlMenu === conversation?.chatListId && (
                                                                             <div
                                                                                 className={styles.moreMenu}
                                                                                 onClick={(e) => e.stopPropagation()}

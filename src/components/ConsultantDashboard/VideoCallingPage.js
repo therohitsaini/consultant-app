@@ -57,7 +57,7 @@ function VideoCallingPage() {
     //     };
     // }, []);
 
-
+console.log('-------------------------shopId',shopId)
     useEffect(() => {
         localStorage.setItem("userId", userId);
         const callAcceptedFromStorage = JSON.parse(localStorage.getItem("callAccepted") || null);
@@ -181,6 +181,7 @@ function VideoCallingPage() {
             const startedAt = data?.startedAt;
             startTimer(startedAt != null ? startedAt : undefined);
             localStorage.setItem("endFromClient", JSON.stringify(data?.transactionId));
+            localStorage.setItem("shopId",JSON.stringify(data?.shopId))
             setTransactionId(data?.transactionId);
             socket.emit("user-connected-time-updated", {
                 callerId: callerIdParam,
@@ -206,7 +207,7 @@ function VideoCallingPage() {
 
             const callSession = JSON.parse(localStorage.getItem("callSession"));
             const transactionId_ = callSession?.transtionId;
-
+            console.log("callSession",callSession)
             const socket = getSocket();
 
             socket.emit("user-connected-time-updated", {
@@ -503,6 +504,10 @@ function VideoCallingPage() {
 
     const handleEndCall = () => {
         const endFromClient = localStorage.getItem("endFromClient") || null;
+        const shopIdLocalRaw = localStorage.getItem("shopId")
+            const shopIdLocal = shopIdLocalRaw
+            ? shopIdLocalRaw.replace(/"/g, "")
+            : null;
         if (endFromClient) {
 
             console.log("transactionId", transactionId);
@@ -518,13 +523,14 @@ function VideoCallingPage() {
                         channelName: channelNameParam,
                         callType: callType,
                         transactionId: endFromClient,
-                        shopId: shopId || "69959af26caa0dfd3a3f03f4",
+                        shopId: shopIdLocal ,
                         endby: "user_cut_call"
                     });
             }, 1000);
 
             localStorage.removeItem("endFromClient");
             localStorage.removeItem("callAccepted");
+            localStorage.removeItem("shopId")
             const returnUrl = params.get("returnUrl");
             if (returnUrl) {
                 window.top.location.href = decodeURIComponent(returnUrl);
@@ -541,7 +547,7 @@ function VideoCallingPage() {
                     channelName: channelNameParam,
                     callType: callSession?.callType,
                     // transactionId: callSession?.transtionId,
-                    shopId: "69959af26caa0dfd3a3f03f4",
+                    shopId:callSession.shopId,
                     dtn_: "CUT FROM CONSULTANT SIDE",
                     endby: "consultant_cut_call"
                 });

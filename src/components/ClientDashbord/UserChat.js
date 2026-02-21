@@ -44,12 +44,19 @@ const UserChat = () => {
     const prevIsRunningRef = useRef(null);
     const { userDetails } = useSelector((state) => state.users);
     const { confirmChat } = useSelector((state) => state.socket);
+    const [isLock,seIsLock]= useState(false)
 
     useEffect(() => {
         if (userDetails?.data?.chatLock === "true") {
             setShowChatLock(true);
         }
     }, [userDetails, showChatLock]);
+
+    useEffect(()=> {
+        if(confirmChat){
+            seIsLock(true)
+        }
+    },[confirmChat])
 
 
     useEffect(() => {
@@ -384,15 +391,14 @@ const UserChat = () => {
             userId: clientId,
             consultantId: consultantId
         });
+        seIsLock(true)
         setSeconds(0);
         setRefreshed((prev) => !prev);
-        setShowChatEndToast(true);
+        setShowChatEndToast(false);
         setShowChatLock((prev) => !prev);
         localStorage.removeItem("chatTimer");
         navigate(-1);
     }
-
-
 
     useEffect(() => {
         if (autoChatEnded) {
@@ -404,10 +410,13 @@ const UserChat = () => {
                 userId: clientId,
                 consultantId: consultantId
             });
+            seIsLock(false)
             setSeconds(0);
             setRefreshed((prev) => !prev);
             setShowChatEndToast(true);
             setShowChatLock((prev) => !prev);
+            navigate(-1);
+
         }
     }, [autoChatEnded]);
 
@@ -534,7 +543,7 @@ const UserChat = () => {
                                                     <p>Your chat session has unlocked.</p>
                                                 </div>
                                                 {
-                                                    confirmChat ? <button
+                                                    isLock ? <button
                                                         style={{
                                                             marginLeft: "auto",
                                                             background: "green",

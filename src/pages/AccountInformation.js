@@ -1,15 +1,35 @@
 import { Card, Text, Button, Box, InlineStack, BlockStack, Page } from "@shopify/polaris";
 import { useAppBridge } from "../components/createContext/AppBridgeContext";
 import { Redirect } from "@shopify/app-bridge/actions";
-import { useMemo } from "react";
+import { useMemo,useEffect ,useState} from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAdminDetails } from '../components/Redux/slices/adminSlice';
+
+
 
 export default function AccountInformation() {
-
+    const dispatch = useDispatch();
     const app = useAppBridge();
+    const [adminIdLocal, setAdminIdLocal] = useState(null);
+    const { adminDetails_, loading: adminDetailsLoading } = useSelector((state) => state.admin);
+
+    useEffect(() => {
+        const id = localStorage.getItem('domain_V_id');
+        setAdminIdLocal(id);
+    }, []);
+    console.log("adminIdLocal",adminIdLocal)
     const redirect = useMemo(() => {
         if (!app) return null;
         return Redirect.create(app);
     }, [app]);
+
+    useEffect(()=> {
+        if(adminIdLocal){
+            dispatch(fetchAdminDetails(adminIdLocal,app))
+        }
+    },[adminIdLocal])
+
+    console.log("adminDetails_",adminDetails_)
 
     return (
         <Page
@@ -18,7 +38,7 @@ export default function AccountInformation() {
                 content: 'View Pricing',
                 onAction: () => {
                     if (!redirect) return;
-                    redirect.dispatch(Redirect.Action.REMOTE, "https://admin.shopify.com/store/rohit-12345839/charges/label-node/pricing_plans");
+                    redirect.dispatch(Redirect.Action.REMOTE, "https://admin.shopify.com/store/rohit-12345839/charges/label-node01/pricing_plans");
                 },
             }}
         >
