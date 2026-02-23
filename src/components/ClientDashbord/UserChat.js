@@ -558,6 +558,7 @@ const UserChat = () => {
                                                         }}
                                                         onClick={() => {
                                                             startCHatHandler();
+                                                            setShowChatLock(false);
                                                         }}
                                                     >
                                                         Accept chat

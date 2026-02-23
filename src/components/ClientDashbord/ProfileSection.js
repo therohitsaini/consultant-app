@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { NavLink, Outlet, redirect } from 'react-router-dom';
-import styles from '../../components/ClientDashbord/ProfileSection.module.css';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchUserDetailsByIds } from '../Redux/slices/UserSlices';
-import { FormLayout, TextField } from '@shopify/polaris';
-import axios from 'axios';
-
+import React, { useEffect, useState } from "react";
+import { NavLink, Outlet, redirect } from "react-router-dom";
+import styles from "../../components/ClientDashbord/ProfileSection.module.css";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUserDetailsByIds } from "../Redux/slices/UserSlices";
+import { FormLayout, TextField } from "@shopify/polaris";
+import axios from "axios";
 
 const ProfileSection = () => {
   const [userId, setUserId] = useState(null);
@@ -13,12 +12,12 @@ const ProfileSection = () => {
   const [voucherData, setVoucherData] = useState(null);
   const params = new URLSearchParams(window.location.search);
   const shop = params.get("shop");
-  const loggedInCustomerId = params.get('logged_in_customer_Id');
-  console.log("loggedInCustomerId", loggedInCustomerId);
+  const loggedInCustomerId = params.get("logged_in_customer_Id");
+  const shop_id = params.get("shopId");
+  const userId_params = params.get("userId");
   const dispatch = useDispatch();
   const { userDetails } = useSelector((state) => state.users);
   const walletBalance = userDetails?.data?.walletBalance;
-  console.log("userDetails_____ProfileSection", userDetails);
   useEffect(() => {
     const adminId = localStorage.getItem("client_u_Identity__");
     const shopId = localStorage.getItem("shop_o_Identity");
@@ -28,26 +27,25 @@ const ProfileSection = () => {
     }
   }, []);
   useEffect(() => {
-    dispatch(fetchUserDetailsByIds(userId));
-  }, [userId])
+    dispatch(fetchUserDetailsByIds(userId || userId_params));
+  }, [userId, userId_params]);
   const getVoucher = async (adminId) => {
-    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/users/get/vouchers/${adminId}`, {
-
-    });
+    const response = await axios.get(
+      `${process.env.REACT_APP_BACKEND_HOST}/api/users/get/vouchers/${adminId || shop_id}`,
+      {},
+    );
     console.log("response_____getVoucher", response);
     if (response.status === 200) {
       setVoucherData(response.data.data);
     }
-  }
+  };
   useEffect(() => {
-
     if (shopId) {
       getVoucher(shopId);
     }
   }, [shopId]);
 
-  console.log("vo", voucherData)
-
+  console.log("vo", voucherData);
 
   return (
     <div className={styles.profileSection}>
@@ -56,9 +54,14 @@ const ProfileSection = () => {
         <h1 className={styles.profileTitle}>Profile Settings</h1>
         <div className={styles.profileImageContainer}>
           <div className={styles.profileImage}>
-            <img className='h-100 w-100 object-fit-cover' src={"https://cdn.vectorstock.com/i/250p/12/86/simple-user-icon-profile-avatar-vector-56321286.avif"} alt="profile" />
+            <img
+              className="h-100 w-100 object-fit-cover"
+              src={
+                "https://cdn.vectorstock.com/i/250p/12/86/simple-user-icon-profile-avatar-vector-56321286.avif"
+              }
+              alt="profile"
+            />
           </div>
-
         </div>
         <div className={styles.profileName}>
           <FormLayout>
@@ -76,7 +79,6 @@ const ProfileSection = () => {
               // onChange={handleFieldChange('email')}
               autoComplete="off"
             />
-
           </FormLayout>
         </div>
       </div>
