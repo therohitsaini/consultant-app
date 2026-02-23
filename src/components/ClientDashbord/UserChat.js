@@ -552,7 +552,7 @@ const UserChat = () => {
 
               {/* Messages Area */}
               <div className={styles.messagesArea} ref={messagesAreaRef}>
-                {showChatLock && (
+                {/* {showChatLock && (
                   <div className={styles.chatEndOverlay}>
                     <div className={styles.chatEndBox}>
                       <div
@@ -620,7 +620,7 @@ const UserChat = () => {
                       )}
                     </div>
                   </div>
-                )}
+                )} */}
 
                 {chatMessagesData.length === 0 ? (
                   <div
