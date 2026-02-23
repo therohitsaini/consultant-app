@@ -3,11 +3,12 @@
     display: flex;
     width: 100%;
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
     background: #f8f9fa;
     justify-content: center;
     align-items: center;
-    padding: 0px;
+    padding: 0;
     /* border: 1px solid red; */
 }
 
@@ -17,12 +18,10 @@
     max-width: 100%;
     margin: 0 auto;
     height: 100vh;
-
+    height: 100dvh;
     display: flex;
     flex-direction: column;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    /* border: 1px solid blue; */
-    /* border: 1px solid #1261af; */
 }
 
 .avatarWrapper {
@@ -159,7 +158,7 @@
     min-height: 80vh;
     background: #f0f2f5;
     /* Start scroll at bottom */
-    
+
     scroll-behavior: auto;
     /* border: 1px solid red; */
 }
@@ -190,6 +189,8 @@
     align-items: center;
     justify-content: center;
     z-index: 1200;
+    padding: 16px;
+    box-sizing: border-box;
 }
 
 .chatEndBox {
@@ -201,7 +202,8 @@
     align-items: center;
     gap: 16px;
     max-width: 470px;
-    width: 90%;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .chatEndIcon {
@@ -267,7 +269,38 @@
     color: #6b7280;
 }
 
+.chatEndButtonAccept,
+.chatEndButtonStart {
+    margin-left: auto;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    min-width: 100px;
+    font-family: sans-serif;
+    flex-shrink: 0;
+}
 
+.chatEndButtonAccept {
+    background: green;
+    color: #fff;
+}
+
+.chatEndButtonStart {
+    background: yellow;
+    color: #000;
+}
+
+.chatEndButtonStart.chatEndButtonWaiting {
+    background: gray;
+    color: #fff;
+    cursor: not-allowed;
+}
+
+.chatEndButtonAccept:hover {
+    filter: brightness(1.1);
+}
 
 .chatEndButton:hover {
     background: #0f9f73;
@@ -275,11 +308,7 @@
 
 .messageContainer {
     display: flex;
-    /* border: 1px solid red; */
-    /* height: 80vh !important; */
-    /* border: 1px solid blue; */
-    /* width: 90%; */
-    /* border: 1px solid red; */
+  
 }
 
 .messageContainerLeft {
@@ -439,36 +468,113 @@
 @media (max-width: 768px) {
 
     .user-table-responsive {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
-  
+
     table {
-      min-width: 700px; /* allows horizontal scroll */
+        min-width: 700px;
+        /* allows horizontal scroll */
     }
-  
-    th, td {
-      white-space: nowrap;
-      font-size: 12px;
-      padding: 8px;
+
+    th,
+    td {
+        white-space: nowrap;
+        font-size: 12px;
+        padding: 8px;
     }
-  
+
     h5 {
-      font-size: 16px;
+        font-size: 16px;
     }
-  
+
     .pagination {
-      flex-wrap: wrap;
-      gap: 6px;
+        flex-wrap: wrap;
+        gap: 6px;
     }
-  
+
     .pagination .page-link {
-      font-size: 12px;
-      padding: 4px 8px;
+        font-size: 12px;
+        padding: 4px 8px;
     }
-  
+
     select.form-select {
-      font-size: 12px;
+        font-size: 12px;
     }
-  }
-  
+}
+
+/* Chat end overlay – mobile */
+@media (max-width: 480px) {
+    .chatEndOverlay {
+        padding: 12px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .chatEndBox {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px 16px;
+        width: 100%;
+        max-width: 100%;
+        gap: 12px;
+    }
+
+    .chatEndContent {
+        order: 2;
+        width: 100%;
+    }
+
+    .chatEndContent h4 {
+        font-size: 15px;
+        margin-bottom: 4px;
+    }
+
+    .chatEndContent p {
+        font-size: 13px;
+    }
+
+    .lockIconWrapper {
+        order: 1;
+    }
+
+    .chatEndButtonAccept,
+    .chatEndButtonStart {
+        order: 3;
+        margin-left: 0;
+        width: 100%;
+        min-width: 0;
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 360px) {
+    .chatEndBox {
+        padding: 16px 12px;
+        gap: 10px;
+    }
+
+    .chatEndContent h4 {
+        font-size: 14px;
+    }
+
+    .chatEndContent p {
+        font-size: 12px;
+    }
+
+    .lockIconWrapper {
+        width: 40px;
+        height: 40px;
+    }
+
+    .lockIcon {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+
+    .reverseRing {
+        inset: -4px;
+    }
+}

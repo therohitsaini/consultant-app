@@ -5,6 +5,7 @@ import socketReducer from "../slices/sokectSlice";
 import callReducer from "../slices/callSlice";
 import userBalanceSlice from "../slices/UserSlices";
 import adminReducer from "../slices/adminSlice";
+import authConsultantReducer from "../slices/authConsultantSlice";
 
 export const store = configureStore({
     reducer: {
@@ -14,7 +15,8 @@ export const store = configureStore({
         call: callReducer,
         userBalance: userBalanceSlice,
         admin: adminReducer,
+        authConsultant: authConsultantReducer,
         // deletedConsultant: deletedConsultantReducer,    
 
-    },
+    },  
 });

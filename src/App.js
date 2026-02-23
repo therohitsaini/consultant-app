@@ -41,6 +41,8 @@ import "./App.css";
 import WithdrawalRequestTable from "./components/ConsultantDashboard/WithdrawalRequestTable";
 import AdminPercentage from "./pages/AdminPercentage";
 import RevenuManagement from "./pages/RevenuManagement";
+import { useDispatch } from "react-redux";
+import { verifyToken } from "./components/Redux/slices/authConsultantSlice";
 
 
 
@@ -90,7 +92,7 @@ export default function App() {
 
     window.parent.postMessage(
       {
-        type: "AGORA_IFRAME_HEIGHT",
+        type: "AGORA_IFRAME_HEIGHT", 
         height: getPageHeight(),
       },
       "*"
@@ -110,9 +112,11 @@ export default function App() {
   }, [location]);
 
 
-  // if (installed) {
-  //   return <div>Redirecting to install URL...</div>;
-  // }
+  const dispatch = useDispatch();
+
+  // useEffect(() => {
+  //   dispatch(verifyToken());
+  // }, [dispatch]);
 
   return (
     <Fragment>

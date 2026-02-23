@@ -40,8 +40,9 @@ const ChatsPage = () => {
     const { userInRequest } = useSelector((state) => state.consultants);
     const { chatTimer } = useSelector(state => state.socket);
     const [seconds, setSeconds] = useState(0);
-    console.log("chatTimer____ChatsPage", chatTimer);
-    console.log("userControlMenu$$$$$$$$$$$$", userControlMenu);
+    const [selectChatUser, setSelectChatUser] = useState( );
+    const isActiveChatUser = localStorage.getItem("activeChatUserId");
+    console.log("chatTimer____ChatsPage",chatTimer );
 
     useEffect(() => {
         const clientId = localStorage.getItem('client_u_Identity__');
@@ -49,6 +50,12 @@ const ChatsPage = () => {
         setConsultantId(clientId);
         setShopId(shopId);
     }, []);
+
+    useEffect(() => {
+        if (chatTimer.isRunning ) {
+            localStorage.setItem("activeChatUserId", chatTimer.userId);
+        }
+    }, [chatTimer.isRunning]);
 
     useEffect(() => {
         const checkMobile = () => {
@@ -168,6 +175,11 @@ const ChatsPage = () => {
         conv.sender?.fullname?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    useEffect(() => {
+        if (selectedConversation) {
+            setSelectChatUser(selectedConversation.sender.id);
+        }
+    }, [selectedConversation]);
     const getChatList = async () => {
 
         if (!shopId || !consultantId) return;
@@ -557,7 +569,6 @@ const ChatsPage = () => {
                                                         } else {
                                                             localStorage.removeItem("___U-B");
                                                         }
-
                                                         return (
                                                             <Fragment>
                                                                 <div
@@ -698,7 +709,7 @@ const ChatsPage = () => {
                                                 </div>
                                             </div>
                                             {
-                                                chatTimer.isRunning && (
+                                                chatTimer.isRunning && isActiveChatUser === selectChatUser (
                                                     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", mr: "10px" }}>
                                                         <p> Timer: {minutes}:{remainingSeconds}</p>
                                                         <div>
