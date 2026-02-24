@@ -14,7 +14,7 @@ import {
     HiOutlineBanknotes,
     HiOutlineArrowDownTray,
 } from "react-icons/hi2";
-
+import TopHeader from "./TopHeader"
 
 
 function TabNavigation({ children }) {
@@ -221,8 +221,10 @@ function TabNavigation({ children }) {
                 updateProfileDeatailsHandler={updateProfileDeatailsHandler}
 
             />
+            
             <div className={`${styles.dashboardWrapper} ${isVideoCallPage ? styles.videoCallMode : ''}`}>
-                <button
+                <TopHeader  onMenuToggle={toggleSidebar} isSidebarOpen={sidebarOpen} profile={profile}/>
+                {/* <button
                     className={styles.mobileToggleButton}
                     onClick={toggleSidebar}
                     aria-label="Toggle navigation"
@@ -238,7 +240,7 @@ function TabNavigation({ children }) {
                             </>
                         )}
                     </svg>
-                </button>
+                </button> */}
 
                 {/* Mobile Overlay */}
                 {sidebarOpen && (

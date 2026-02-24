@@ -3,7 +3,7 @@ import IndexTableList from '../components/consultant-list/IndexTableList'
 import { Page, Layout, SkeletonBodyText, Spinner } from '@shopify/polaris'
 import { PlusIcon } from '@shopify/polaris-icons'
 import { IndexTable, Text } from '@shopify/polaris'
-import { fetchActivityHistory } from '../components/Redux/slices/adminSlice'
+import { fetchActivityHistory,fetchAdminDetails } from '../components/Redux/slices/adminSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { useAppBridge } from '../components/createContext/AppBridgeContext'
 import { formatAmountHelper, formatNumber } from '../components/Helper/Helper'
@@ -28,6 +28,7 @@ function RevenuManagement() {
     const app = useAppBridge();
     console.log("app", app);
     const { activityHistory, loading } = useSelector((state) => state.admin);
+    const { adminDetails_, loading: adminDetailsLoading } = useSelector((state) => state.admin);
     const dispatch = useDispatch();
     const [adminIdLocal, setAdminIdLocal] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
@@ -42,6 +43,8 @@ function RevenuManagement() {
     useEffect(() => {
         if (adminIdLocal) {
             dispatch(fetchActivityHistory({ adminIdLocal, page, limit, type, app, searchQuery }));
+            dispatch(fetchAdminDetails({adminIdLocal,app}))
+
         }
     }, [dispatch, adminIdLocal, page, limit, type, searchQuery]);
 
@@ -119,19 +122,19 @@ function RevenuManagement() {
                 </IndexTable.Cell>
                 <IndexTable.Cell>
                     <Text as="span" alignment="center" numeric>
-                        {`$${formatAmountHelper(amount)}`}
+                     {adminDetails_?.currency}{formatAmountHelper(amount)}
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
                     <Text variant="bodyMd" as="span" alignment="center">
                         {
-                            consultantAmount ? `$${formatNumber(consultantAmount)}` : "-"
+                            consultantAmount ? `${adminDetails_?.currency}${formatNumber(consultantAmount)}` : "-"
                         }
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
                     <Text variant="bodyMd" as="span" alignment="center">
-                        {adminAmount ? `$${formatNumber(adminAmount)}` : "-"}
+                        {adminAmount ? `${adminDetails_?.currency}${formatNumber(adminAmount)}` : "-"}
                     </Text>
                 </IndexTable.Cell>
 
@@ -147,7 +150,7 @@ function RevenuManagement() {
 
             </IndexTable.Row >
         )
-    }, [page, limit])
+    }, [page, limit,adminDetails_?.currency])
 
     return (
         <Fragment>

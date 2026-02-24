@@ -3,7 +3,7 @@ import IndexTableList from '../components/consultant-list/IndexTableList'
 import { Page, Layout, Spinner, ButtonGroup, Button, Toast, Badge, InlineStack } from '@shopify/polaris'
 import { DuplicateIcon, EditIcon, PlusIcon } from '@shopify/polaris-icons'
 import { IndexTable, Text } from '@shopify/polaris'
-import { fetchWalletHistory } from '../components/Redux/slices/adminSlice'
+import { fetchWalletHistory,fetchAdminDetails } from '../components/Redux/slices/adminSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { useAppBridge } from '../components/createContext/AppBridgeContext'
 import UpdateUserDetailsModal from './UpdateUserDetailsModal'
@@ -42,6 +42,8 @@ function ManualDebetCreditBlance() {
         amount: '',
         description: '',
     });
+    const { adminDetails_, loading: adminDetailsLoading } = useSelector((state) => state.admin);
+
     const limit = 10;
     const openUpdateWalletModal = (userId, fullname) => {
         setActive(true);
@@ -55,6 +57,8 @@ function ManualDebetCreditBlance() {
 
     useEffect(() => {
         dispatch(fetchWalletHistory({ adminIdLocal, page, limit, app, searchQuery }));
+        dispatch(fetchAdminDetails({adminIdLocal,app}))
+
     }, [dispatch, adminIdLocal, page, limit, refresh, searchQuery]);
 
 
@@ -130,7 +134,7 @@ function ManualDebetCreditBlance() {
                 </IndexTable.Cell>
                 <IndexTable.Cell alignment="center">
                     <Text variant="bodyMd" as="span" alignment="center" numeric>
-                        ${amount ? parseFloat(amount).toFixed(2) : "0.0"}
+                    {adminDetails_?.currency}{amount ? parseFloat(amount).toFixed(2) : "0.0"}
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell alignment="center">
@@ -177,7 +181,7 @@ function ManualDebetCreditBlance() {
 
             </IndexTable.Row>
         )
-    }, [page, limit])
+    }, [page, limit,adminDetails_?.currency])
 
     return (
         <Fragment>

@@ -3,7 +3,7 @@ import IndexTableList from '../components/consultant-list/IndexTableList'
 import { Page, Layout, SkeletonBodyText, Spinner } from '@shopify/polaris'
 import { PlusIcon } from '@shopify/polaris-icons'
 import { IndexTable, Text } from '@shopify/polaris'
-import { fetchActivityHistory } from '../components/Redux/slices/adminSlice'
+import { fetchActivityHistory ,fetchAdminDetails} from '../components/Redux/slices/adminSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { useAppBridge } from '../components/createContext/AppBridgeContext'
 import { formatNumber, formatNumberString } from '../components/Helper/Helper'
@@ -28,6 +28,8 @@ function UserTransHistory() {
     const app = useAppBridge();
     console.log("app", app);
     const { activityHistory, loading } = useSelector((state) => state.admin);
+    const { adminDetails_, loading: adminDetailsLoading } = useSelector((state) => state.admin);
+
     const dispatch = useDispatch();
     const [adminIdLocal, setAdminIdLocal] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
@@ -39,12 +41,18 @@ function UserTransHistory() {
         const id = localStorage.getItem('domain_V_id');
         setAdminIdLocal(id);
     }, []);
+    useEffect(()=> {
+        if(adminIdLocal){
+            dispatch(fetchAdminDetails({adminIdLocal,app}))
+        }
+    },[dispatch, adminIdLocal, page, limit, type,])
     useEffect(() => {
         if (adminIdLocal) {
             dispatch(fetchActivityHistory({ adminIdLocal, page, limit, type, app, searchQuery }));
         }
     }, [dispatch, adminIdLocal, page, limit, type, searchQuery]);
 
+  
 
     const formatDate = (iso) =>
         new Date(iso).toLocaleDateString();
@@ -80,7 +88,7 @@ function UserTransHistory() {
         amount: `${item.amount}`,
         status: item.status
     })) || [];
-    console.log("tableData", tableData);
+    
     const renderTransactionRow = useCallback((transaction, index) => {
         const { id, user, type, date, time, duration, consultant, amount, status } = transaction
         const serialNumber = (page - 1) * limit + index + 1;
@@ -132,7 +140,7 @@ function UserTransHistory() {
 
                 <IndexTable.Cell>
                     <Text as="span" alignment="center" numeric>
-                        {`$${formatNumber(amount, 2)}`}
+                    {adminDetails_?.currency}{formatNumber(amount, 2)}
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
@@ -144,7 +152,7 @@ function UserTransHistory() {
                 </IndexTable.Cell>
             </IndexTable.Row >
         )
-    }, [page, limit])
+    }, [page, limit,adminDetails_?.currency])
 
     return (
         <Fragment>

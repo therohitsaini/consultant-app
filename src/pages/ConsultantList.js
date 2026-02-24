@@ -11,6 +11,7 @@ import { headings, itemStrings, } from '../components/FallbackData/FallbackData'
 import axios from 'axios';
 import { useAppBridge } from '../components/createContext/AppBridgeContext';
 import { Redirect } from '@shopify/app-bridge/actions';
+import {fetchAdminDetails} from '../components/Redux/slices/adminSlice';
 
 
 
@@ -37,6 +38,8 @@ function ConsultantList() {
     const [isRefreshed, setIsRefreshed] = useState(false);
     const [adminIdLocal, setAdminIdLocal] = useState(null);
     const { consultants, loading: consultantLoading } = useSelector((state) => state.consultants);
+    const { adminDetails_, loading: adminDetailsLoading } = useSelector((state) => state.admin);
+
     useEffect(() => {
         const id = localStorage.getItem('domain_V_id');
         setAdminIdLocal(id);
@@ -52,14 +55,11 @@ function ConsultantList() {
         if (!consultantsData) return [];
 
         return consultantsData.filter((consultant) => {
-            // Filter by tab
             let matchesTab = true;
             if (selectedTab !== 0) {
                 const selectedTabLabel = itemStrings[selectedTab].toLowerCase();
                 matchesTab = consultant.type?.toLowerCase() === selectedTabLabel;
             }
-
-            // Filter by search query
             let matchesQuery = true;
             if (queryValue.trim()) {
                 const query = queryValue.toLowerCase();
@@ -115,6 +115,13 @@ function ConsultantList() {
         setConsultantId(_id);
         setIsUserAlertVisible(true);
     }, []);
+   
+            useEffect(()=> {
+                if(adminIdLocal){
+                    dispatch(fetchAdminDetails({ adminIdLocal, app }))
+                }
+            },[adminIdLocal,app])
+         console.log("adminDetails_",adminDetails_)
 
 
     const handleToggle = async (id) => {
@@ -192,17 +199,17 @@ function ConsultantList() {
                 <IndexTable.Cell><Text variant="bodyMd" as="span" alignment="center">{profession}</Text></IndexTable.Cell>
                 <IndexTable.Cell>
                     <Text as="span" alignment="center" numeric>
-                        <Text variant="bodyMd" as="span" alignment="center">${chatPerMinute || "-"}</Text>
+                        <Text variant="bodyMd" as="span" alignment="center">{adminDetails_?.currency}{chatPerMinute || "-"}</Text>
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
                     <Text as="span" alignment="center" numeric>
-                        <Text variant="bodyMd" as="span" alignment="center">${voicePerMinute || "-"}</Text>
+                        <Text variant="bodyMd" as="span" alignment="center">{adminDetails_?.currency} {voicePerMinute || "-"}</Text>
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
                     <Text as="span" alignment="center" numeric>
-                        <Text variant="bodyMd" as="span" alignment="center">${videoPerMinute || "-"}</Text>
+                        <Text variant="bodyMd" as="span" alignment="center">{adminDetails_?.currency}{videoPerMinute || "-"}</Text>
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
@@ -286,7 +293,7 @@ function ConsultantList() {
                 </IndexTable.Cell>
             </IndexTable.Row>
         );
-    }, [handleConsultantClick, handleEdit, handleDeleteClick, isRefreshed]);
+    }, [handleConsultantClick, handleEdit, handleDeleteClick, isRefreshed, adminDetails_?.currency]);
 
 
 

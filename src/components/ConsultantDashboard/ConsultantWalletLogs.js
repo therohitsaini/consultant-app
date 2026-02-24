@@ -75,7 +75,7 @@ const ConsultantWalletLogs = () => {
     }, [userId, shopId])
 
     return (
-        <div style={{ padding: '20px' }}>
+        <div>
             <UserTable
                 title="Consultant Wallet Logs"
                 columns={columns}

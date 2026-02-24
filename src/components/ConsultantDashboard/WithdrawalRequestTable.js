@@ -72,8 +72,8 @@ const WithdrawalRequestTable = () => {
     }, [userId, shopId])
 
     return (
-        <div style={{ padding: '20px', flexDirection: 'column', }}>
-            <div className='d-flex justify-content-end'>
+        <div>
+            <div className='d-flex justify-content-end mb-4'>
                 <button className='btn btn-primary' style={{ fontSize: '12px', backgroundColor: 'black', color: 'white', border: 'none', borderRadius: '5px', padding: '5px 10px' }} onClick={() => navigate('/consultant-dashboard/withdrawal-request')}>Get Withdrawal Request</button>
             </div>
             <UserTable

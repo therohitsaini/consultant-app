@@ -58,10 +58,8 @@ const WithdrawalRequestForm = () => {
     return (
         <Fragment>
             <ReactToast show={showToast} message="Withdrawal request submitted successfully" onClose={() => { setShowToast(false) }} duration={3000} />
-            <div className="coainernt rounded-md d-flex justify-content-center align-items-center" style={{ height: "90vh" }} >
-                <div className=""
-                    style={{ width: "50%" }}
-                >
+            <div className="row">
+                <div className="col-xl-8 col-lg-10 col-md-12 m-auto">
                     <div className="card mb-3 shadow-sm">
                         <div className="card-body text-center">
                             <h6 className="text-muted">Available Balance</h6>
@@ -110,7 +108,6 @@ const WithdrawalRequestForm = () => {
 
                         </div>
                     </div>
-
                 </div>
             </div>
         </Fragment>

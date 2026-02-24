@@ -112,18 +112,18 @@
 /* Side Navigation Tabs - Light Theme */
 .sideNav {
     position: fixed;
-    top: 0;
+    top: 60px;
     left: 0;
     bottom: 0;
     width: 260px;
-    height: 70%;
+    height: 100%;
     background: #f8f9fa;
     color: #212529;
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
     border-radius: 16px 0 0 16px;
-    /* border-right: 1px solid #0e4b89; */
+    border-right: 1px solid #e9ecef;
 }
 
 /* Profile Section */
@@ -146,7 +146,7 @@
     justify-content: center;
     color: #ffffff;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
     border: 3px solid #fdfdfd;
 }
 
@@ -356,20 +356,9 @@
 
 /* Responsive Design - Large Tablet */
 @media (max-width: 1200px) {
-    .dashboardWrapper {
-        padding: 20px;
-    }
 
     .mainContainer {
         gap: 20px;
-    }
-
-    .sideNav {
-        width: 240px;
-        left: 20px;
-        top: 20px;
-        bottom: 20px;
-        height: calc(100vh - 40px);
     }
 
     .contentArea {
@@ -380,20 +369,9 @@
 
 /* Responsive Design - Tablet */
 @media (max-width: 1024px) {
-    .dashboardWrapper {
-        padding: 16px;
-    }
 
     .mainContainer {
         gap: 16px;
-    }
-
-    .sideNav {
-        width: 240px;
-        left: 16px;
-        top: 16px;
-        bottom: 16px;
-        height: calc(100vh - 32px);
     }
 
     .contentArea {
@@ -408,11 +386,6 @@
 
 /* Responsive Design - Mobile */
 @media (max-width: 768px) {
-    .dashboardWrapper {
-        padding: 12px;
-        padding-top: 64px;
-        /* Space for toggle button */
-    }
 
     .mobileToggleButton {
         display: flex;
@@ -425,7 +398,6 @@
     .mainContainer {
         flex-direction: column;
         gap: 0;
-        border-radius: 12px;
     }
 
     .sideNav {
@@ -535,11 +507,6 @@
 
 /* Responsive Design - Small Mobile */
 @media (max-width: 576px) {
-    .dashboardWrapper {
-        padding: 8px;
-        padding-top: 60px;
-        /* Space for toggle button */
-    }
 
     .mobileToggleButton {
         top: 12px;
@@ -605,10 +572,6 @@
     .navTabActive .navTabIcon {
         background: #0d6efd;
         color: white;
-    }
-
-    .mainContainer {
-        border-radius: 8px;
     }
 
     .contentArea {

@@ -40,9 +40,8 @@ const ChatsPage = () => {
     const { userInRequest } = useSelector((state) => state.consultants);
     const { chatTimer } = useSelector(state => state.socket);
     const [seconds, setSeconds] = useState(0);
-    const [selectChatUser, setSelectChatUser] = useState( );
+    const [selectChatUser, setSelectChatUser] = useState(null);
     const isActiveChatUser = localStorage.getItem("activeChatUserId");
-    console.log("chatTimer____ChatsPage",chatTimer );
 
     useEffect(() => {
         const clientId = localStorage.getItem('client_u_Identity__');
@@ -54,6 +53,8 @@ const ChatsPage = () => {
     useEffect(() => {
         if (chatTimer.isRunning ) {
             localStorage.setItem("activeChatUserId", chatTimer.userId);
+          
+           
         }
     }, [chatTimer.isRunning]);
 
@@ -178,6 +179,8 @@ const ChatsPage = () => {
     useEffect(() => {
         if (selectedConversation) {
             setSelectChatUser(selectedConversation.sender.id);
+            localStorage.setItem("___U-B", selectedConversation.sender.id);
+
         }
     }, [selectedConversation]);
     const getChatList = async () => {
@@ -339,11 +342,10 @@ const ChatsPage = () => {
         });
         setSeconds(0);
         setRefreshed(prev => !prev);
-        // Refresh chat list
         getChatList();
-        // Show center pop
         setShowChatEndPop(true);
         localStorage.removeItem("chatTimer");
+        localStorage.removeItem("___U-B");
     }
     const handlerUserControlMenu = (conversation) => {
         setUserControlMenu((prev) =>
@@ -376,7 +378,6 @@ const ChatsPage = () => {
     useEffect(() => {
         if (chatTimer.isRunning) {
             localStorage.setItem("chatTimer", JSON.stringify(chatTimer));
-            console.log("chatTimer____ChatsPage_localstorage", chatTimer);
         }
     }, [chatTimer.isRunning]);
 
@@ -486,9 +487,7 @@ const ChatsPage = () => {
                                                                                 className={styles.unreadBadgeIcon}
                                                                                 onClick={(e) => {
                                                                                     handlerUserControlMenu(conversation);
-                                                                                    // setOpenMenuConversationId(
-                                                                                    //     openMenuConversationId === conversation.id ? null : conversation.id
-                                                                                    // );
+                                                                                   
                                                                                 }}
                                                                             >
                                                                                 <BsThreeDotsVertical />
@@ -564,11 +563,7 @@ const ChatsPage = () => {
                                                             hour12: true
                                                         });
                                                         const isChatAccepted = conversation?.isChatAccepted;
-                                                        if (conversation.sender.id) {
-                                                            localStorage.setItem("___U-B", conversation.sender.id);
-                                                        } else {
-                                                            localStorage.removeItem("___U-B");
-                                                        }
+                                                      
                                                         return (
                                                             <Fragment>
                                                                 <div
@@ -602,10 +597,7 @@ const ChatsPage = () => {
                                                                                         lastMessage
                                                                                     }
                                                                                 </div>
-                                                                                {/* {conversation.unreadCount > 0 && ( */}
-                                                                                {/* <span className={styles.unreadBadge}>
-                                                                                    {"5+"}
-                                                                                </span> */}
+                                                                            
                                                                                 <div className={styles.moreMenuWrapper}>
                                                                                     <button
                                                                                         type="button"
@@ -709,7 +701,7 @@ const ChatsPage = () => {
                                                 </div>
                                             </div>
                                             {
-                                                chatTimer.isRunning && isActiveChatUser === selectChatUser (
+                                                chatTimer.isRunning && isActiveChatUser === selectChatUser  &&(
                                                     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", mr: "10px" }}>
                                                         <p> Timer: {minutes}:{remainingSeconds}</p>
                                                         <div>

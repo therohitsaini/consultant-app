@@ -263,7 +263,7 @@ function Dashboard() {
                                             </div>
                                             <div style={{ flex: 1, }}>
                                                 <Text variant="headingLg" as="h2" fontWeight="bold">
-                                                    ₹{formatAmountHelper(adminDetails?.adminWalletBalance?.$numberDecimal || 0)}
+                                               {adminDetails?.currency}{formatAmountHelper(adminDetails?.adminWalletBalance?.$numberDecimal || 0)}
                                                 </Text>
                                                 <Text variant="bodyMd" as="p" tone="subdued">
                                                     Total Revenue

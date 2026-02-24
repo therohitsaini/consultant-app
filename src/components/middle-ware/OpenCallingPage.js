@@ -67,7 +67,7 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
         const returnUrl = `https://${shop}/apps/consultant-theme`;
         console.log("returnUrl", process.env.REACT_APP_FRONTEND_URL);
         const callUrl =
-            `${"https://arrives-cancellation-status-market.trycloudflare.com"}/video/calling/page` +
+            `${"https://integrity-ultra-outline-plumbing.trycloudflare.com"}/video/calling/page` +
             `?callerId=${userId}` +
             `&receiverId=${receiverId}` +
             `&callType=${type || "voice"}` +

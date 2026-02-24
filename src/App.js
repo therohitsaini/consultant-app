@@ -43,8 +43,7 @@ import AdminPercentage from "./pages/AdminPercentage";
 import RevenuManagement from "./pages/RevenuManagement";
 import { useDispatch } from "react-redux";
 import { verifyToken } from "./components/Redux/slices/authConsultantSlice";
-
-
+ 
 
 
 export default function App() {
@@ -146,7 +145,6 @@ export default function App() {
             <Route path="/admin/revenue-management" element={<RevenuManagement />} />
             <Route path="/faq" element={<Faq />} />
           </Route>
-
           <Route path="/consultant-cards" element={
             <ProtectStoreFront>
               <ConsultantCards />

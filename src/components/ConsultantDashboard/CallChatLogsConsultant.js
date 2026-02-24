@@ -74,8 +74,7 @@ const CallLogsConsultant = () => {
     }, [userId, shopId])
 
     return (
-        <div style={{ padding: '20px' }}>
-
+        <div>
             <UserTable
                 title="Call / Chat Logs"
                 columns={columns}

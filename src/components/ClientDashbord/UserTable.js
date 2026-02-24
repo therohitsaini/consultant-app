@@ -24,7 +24,7 @@ const UserTable = ({ columns, data, title, loading }) => {
 
 
     return (
-        <div className="container mt-4">
+        <div>
             <div className="d-flex justify-content-between align-items-center mb-3">
                 <h5 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '10px' }}>{title}</h5>
                 <select

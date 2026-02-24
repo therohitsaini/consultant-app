@@ -71,7 +71,7 @@ export default function IncomingCallAlert() {
 
       const returnUrl = `https://${shop}/apps/consultant-theme/consultant-dashboard`;
       const callUrl =
-        `${"https://arrives-cancellation-status-market.trycloudflare.com"}/video/calling/page` +
+        `${"https://integrity-ultra-outline-plumbing.trycloudflare.com"}/video/calling/page` +
         `?callerId=${callerId}` +
         `&receiverId=${userId}` +
         `&callType=${callType}` +

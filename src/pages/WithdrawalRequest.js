@@ -2,7 +2,7 @@ import React, { Fragment, useCallback, useContext, useEffect, useState } from 'r
 import IndexTableList from '../components/consultant-list/IndexTableList'
 import { Page, Layout, ButtonGroup, Button, Badge, InlineStack } from '@shopify/polaris'
 import { IndexTable, Text } from '@shopify/polaris'
-import { fetchWithdrawalRequests } from '../components/Redux/slices/adminSlice'
+import { fetchWithdrawalRequests,fetchAdminDetails } from '../components/Redux/slices/adminSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { useAppBridge } from '../components/createContext/AppBridgeContext'
 import axios from 'axios'
@@ -45,6 +45,7 @@ function WithdrawalRequest() {
     const [searchQuery, setSearchQuery] = useState('');
     const [isWidthrawalReqDeclineAlertVisible, setIsWidthrawalReqDeclineAlertVisible] = useState(false);
     const [selectedWithdrawalRequestId, setSelectedWithdrawalRequestId] = useState(null);
+    const { adminDetails_, loading: adminDetailsLoading } = useSelector((state) => state.admin);
     const [updateFormData, setUpdateFormData] = useState({
         userId: '',
         transactionId: '',
@@ -66,6 +67,7 @@ function WithdrawalRequest() {
     }, []);
 
     useEffect(() => {
+        dispatch(fetchAdminDetails({adminIdLocal,app}))
         dispatch(fetchWithdrawalRequests({ adminIdLocal, page, limit, app, searchQuery }));
     }, [dispatch, adminIdLocal, page, limit, refresh, searchQuery]);
 
@@ -173,7 +175,7 @@ function WithdrawalRequest() {
 
                 <IndexTable.Cell alignment="start">
                     <Text variant="bodyMd" as="span" alignment="center" numeric>
-                        ${amount ? parseFloat(amount).toFixed(2) : "0.0"}
+                        {adminDetails_?.currency}{amount ? parseFloat(amount).toFixed(2) : "0.0"}
                     </Text>
                 </IndexTable.Cell>
 
@@ -219,7 +221,7 @@ function WithdrawalRequest() {
 
             </IndexTable.Row>
         )
-    }, [page, limit])
+    }, [page, limit,adminDetails_?.currency])
 
 
     return (
