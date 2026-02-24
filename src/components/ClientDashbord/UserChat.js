@@ -370,7 +370,8 @@ const UserChat = () => {
   const backToViewProfile = () => {
     const targetShop = shop;
     const hostQuery = "";
-    window.top.location.href = `https://${targetShop}/apps/consultant-theme/view-profile?consultantId=${consultantId}&shopId=${shopId}${hostQuery}`;
+    // window.top.location.href = `https://${targetShop}/apps/consultant-theme/view-profile?consultantId=${consultantId}&shopId=${shopId}${hostQuery}`;
+    window.top.location.href = `https://${targetShop}/apps/consultant-theme`;
   };
 
   const { chatTimer } = useSelector((state) => state.socket);
@@ -552,7 +553,7 @@ const UserChat = () => {
 
               {/* Messages Area */}
               <div className={styles.messagesArea} ref={messagesAreaRef}>
-                {/* {showChatLock && (
+                {showChatLock && (
                   <div className={styles.chatEndOverlay}>
                     <div className={styles.chatEndBox}>
                       <div
@@ -620,7 +621,7 @@ const UserChat = () => {
                       )}
                     </div>
                   </div>
-                )} */}
+                )}
 
                 {chatMessagesData.length === 0 ? (
                   <div
