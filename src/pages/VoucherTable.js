@@ -33,8 +33,8 @@ function VoucherTable() {
     const [headings, setHeadings] = useState([
         { title: 'Sr. No.', alignment: 'start' },
         { title: 'Voucher Code', alignment: 'center' },
-        { title: 'Total Coin', alignment: 'center' },
-        { title: 'Extra Coin', alignment: 'center' },
+        { title: 'Total Amount', alignment: 'center' },
+        { title: 'Extra Amount', alignment: 'center' },
         { title: 'Action', alignment: 'center' }
     ])
     const [page, setPage] = useState(1)
@@ -123,12 +123,12 @@ function VoucherTable() {
                 </IndexTable.Cell>
                 <IndexTable.Cell>
                     <Text as="span" alignment="center" numeric>
-                        {totalCoin}
+                        {adminDetails_?.currency}{totalCoin}
                     </Text>
                 </IndexTable.Cell>
                 <IndexTable.Cell>
                     <Text as="span" alignment="center" numeric>
-                        {extraCoin}
+                        {adminDetails_?.currency}{extraCoin}
                     </Text>
                 </IndexTable.Cell>
 
@@ -157,7 +157,7 @@ function VoucherTable() {
                 </IndexTable.Cell>
             </IndexTable.Row>
         );
-    }, []);
+    }, [adminDetails_?.currency]);
 
     return (
         <Fragment>
