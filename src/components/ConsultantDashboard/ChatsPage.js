@@ -175,7 +175,6 @@ const ChatsPage = () => {
     const filteredConversations = chatList.filter(conv =>
         conv.sender?.fullname?.toLowerCase().includes(searchQuery.toLowerCase())
     );
-
     useEffect(() => {
         if (selectedConversation) {
             setSelectChatUser(selectedConversation.sender.id);
@@ -183,6 +182,7 @@ const ChatsPage = () => {
 
         }
     }, [selectedConversation]);
+    
     const getChatList = async () => {
 
         if (!shopId || !consultantId) return;
@@ -193,7 +193,7 @@ const ChatsPage = () => {
                 setChatList(response.data.payload);
                 if (response.data.payload.length > 0) {
                     const firstChat = response.data.payload[0];
-                    setSelectedChat(firstChat.id);
+                    // setSelectedChat(firstChat.id);
                 }
             }
         } catch (error) {
@@ -418,7 +418,8 @@ const ChatsPage = () => {
                                 display: "flex",
                                 justifyContent: "end"
                             }}>
-                                <p onClick={() => setShowRequestModal(!showRequestModal)} style={{ fontSize: "14px", fontWeight: "600", padding: "10px", cursor: "pointer", }}> <span style={{ color: "#63ba77" }}>Request</span> ({isRequestModalOpen.length})</p>
+                            {isRequestModalOpen.length > 0 &&  
+                              <p onClick={() => setShowRequestModal(!showRequestModal)} style={{ fontSize: "14px", fontWeight: "600", padding: "10px", cursor: "pointer", }}> <span style={{ color: "#63ba77" }}>  New Request</span> ({isRequestModalOpen.length})</p>}
                             </div>
                             {
                                 showRequestModal
@@ -447,7 +448,7 @@ const ChatsPage = () => {
                                                                     alt="profile"
                                                                     className={styles.conversationAvatar}
                                                                 />
-                                                                {conversation.isOnline && (
+                                                                {conversation.isActive && (
                                                                     <div className={styles.onlineIndicator}></div>
                                                                 )}
                                                             </div>
@@ -563,7 +564,7 @@ const ChatsPage = () => {
                                                             hour12: true
                                                         });
                                                         const isChatAccepted = conversation?.isChatAccepted;
-                                                      
+                                                      console.log("conversation", conversation);
                                                         return (
                                                             <Fragment>
                                                                 <div
@@ -574,11 +575,11 @@ const ChatsPage = () => {
                                                                     <div className={styles.conversationContent}>
                                                                         <div className={styles.avatarWrapper}>
                                                                             <img
-                                                                                src={isImage ? imageUrl : "../images/team/team1.avif"}
-                                                                                alt="profile"
+                                                                                src={isImage || "https://imgs.search.brave.com/W_YLXhNT3XwZb2G3RPN5rqxKXEP-wceUf5ZHHgMt2mk/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMudmVjdGVlenku/Y29tL3N5c3RlbS9y/ZXNvdXJjZXMvdGh1/bWJuYWlscy8wNDgv/OTI2LzA4NC9zbWFs/bC9zaWx2ZXItbWVt/YmVyc2hpcC1pY29u/LWRlZmF1bHQtYXZh/dGFyLXByb2ZpbGUt/aWNvbi1tZW1iZXJz/aGlwLWljb24tc29j/aWFsLW1lZGlhLXVz/ZXItaW1hZ2UtaWxs/dXN0cmF0aW9uLXZl/Y3Rvci5qcGc"}
+                                                                                alt={selectedConversation?.sender?.fullname}
                                                                                 className={styles.conversationAvatar}
                                                                             />
-                                                                            {conversation.isOnline && (
+                                                                            {conversation.sender.isActive && (
                                                                                 <div className={styles.onlineIndicator}></div>
                                                                             )}
                                                                         </div>
@@ -673,21 +674,18 @@ const ChatsPage = () => {
                                             </button>
                                             <div className={`${styles.chatHeaderInfo} ${styles.flex} ${styles.flexCenter}`}>
                                                 <div className={styles.avatarWrapper}>
-                                                    {
-                                                        selectedConversation?.sender?.profileImage ? (
+                                                    {/* {
+                                                        selectedConversation?.sender?.profileImage ? ( */}
                                                             <img
-                                                                src={`${process.env.REACT_APP_BACKEND_HOST}/${selectedConversation.sender.profileImage.replace("\\", "/")}`}
-                                                                alt={selectedConversation.sender.fullname}
+                                                            src={selectedConversation?.sender?.profileImage  || "https://imgs.search.brave.com/W_YLXhNT3XwZb2G3RPN5rqxKXEP-wceUf5ZHHgMt2mk/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMudmVjdGVlenku/Y29tL3N5c3RlbS9y/ZXNvdXJjZXMvdGh1/bWJuYWlscy8wNDgv/OTI2LzA4NC9zbWFs/bC9zaWx2ZXItbWVt/YmVyc2hpcC1pY29u/LWRlZmF1bHQtYXZh/dGFyLXByb2ZpbGUt/aWNvbi1tZW1iZXJz/aGlwLWljb24tc29j/aWFsLW1lZGlhLXVz/ZXItaW1hZ2UtaWxs/dXN0cmF0aW9uLXZl/Y3Rvci5qcGc"}
+
+                                                                // alt={selectedConversation.sender.fullname}
                                                                 className={styles.chatHeaderAvatar}
                                                                 style={{ borderRadius: '50%', width: '40px', height: '40px', objectFit: 'cover' }}
                                                             />
-                                                        ) : (
-                                                            <div className={styles.chatHeaderAvatar}>
-                                                                {selectedConversation?.sender?.fullname?.charAt(0)?.toUpperCase() || 'U'}
-                                                            </div>
-                                                        )}
+                                                       
                                                     {
-                                                        selectedConversation?.isOnline && (
+                                                        selectedConversation?.sender.isActive && (
                                                             <div className={styles.onlineIndicator}></div>
                                                         )}
                                                 </div>
@@ -695,9 +693,9 @@ const ChatsPage = () => {
                                                     <div className={styles.chatHeaderName}>
                                                         {selectedConversation?.sender?.fullname || 'User'}
                                                     </div>
-                                                    <div className={styles.chatHeaderStatus} style={{ color: selectedConversation?.isOnline ? '#10b981' : '#6c757d' }}>
+                                                    {/* <div className={styles.chatHeaderStatus} style={{ color: selectedConversation?.sender.isActive ? '#10b981' : '#6c757d' }}>
                                                         {selectedConversation?.isOnline ? 'Active now' : selectedConversation?.lastActive || 'Offline'}
-                                                    </div>
+                                                    </div> */}
                                                 </div>
                                             </div>
                                             {
@@ -723,7 +721,7 @@ const ChatsPage = () => {
 
                                                     </div>
                                                 )}
-                                            <div className={styles.chatHeaderActions} style={{ display: 'flex', gap: '8px' }}>
+                                            {/* <div className={styles.chatHeaderActions} style={{ display: 'flex', gap: '8px' }}>
                                                 <button
                                                     className={styles.headerButton}
                                                     title="Video Call"
@@ -741,7 +739,7 @@ const ChatsPage = () => {
                                                         <circle cx="5" cy="12" r="1" />
                                                     </svg>
                                                 </button>
-                                            </div>
+                                            </div> */}
                                         </div>
 
                                         {/* Messages Area */}

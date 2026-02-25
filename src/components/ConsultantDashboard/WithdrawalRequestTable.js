@@ -2,21 +2,27 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import UserTable from '../ClientDashbord/UserTable'
 import axios from 'axios'
-
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchVoucherData } from '../Redux/slices/UserSlices'
 const WithdrawalRequestTable = () => {
     const navigate = useNavigate()
     const [withdrawalRequest, setWithdrawalRequest] = useState([])
     const [loading, setLoading] = useState(false)
     const [userId, setUserId] = useState(null)
     const [shopId, setShopId] = useState(null)
-
+    const dispatch = useDispatch();
+    const { voucherData } = useSelector((state) => state.users);
     useEffect(() => {
         const userId = localStorage.getItem('client_u_Identity__')
         setUserId(userId)
         const shopId = localStorage.getItem('shop_o_Identity')
         setShopId(shopId)
     }, [])
-
+    useEffect(() => {
+        if (shopId) {
+            dispatch(fetchVoucherData(shopId));
+        }
+    }, [shopId])
     console.log("withdrawalRequest", withdrawalRequest)
     const columns = [
 
@@ -28,7 +34,7 @@ const WithdrawalRequestTable = () => {
         {
             label: "Amount",
             key: "amount",
-            render: row => `₹${row.amount.toFixed(2)}`
+            render: row => `${voucherData?.shopCurrency}${row.amount.toFixed(2)}`
         },
         {
             label: "Status",

@@ -4,9 +4,6 @@ import { useEffect, useState } from "react";
 
 export default function InsufficientBalanceModal({ show, setShow, insufficientBalance }) {
 
-
-
-
     const handleClose = () => {
         setShow(false);
         // dispatch(clearError());

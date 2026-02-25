@@ -71,7 +71,7 @@ export default function IncomingCallAlert() {
 
       const returnUrl = `https://${shop}/apps/consultant-theme/consultant-dashboard`;
       const callUrl =
-        `${"https://integrity-ultra-outline-plumbing.trycloudflare.com"}/video/calling/page` +
+        `${"https://gamecube-camp-pond-bids.trycloudflare.com"}/video/calling/page` +
         `?callerId=${callerId}` +
         `&receiverId=${userId}` +
         `&callType=${callType}` +
@@ -198,3 +198,194 @@ export default function IncomingCallAlert() {
     </>
   );
 }
+
+
+// components/IncomingCallAlert.jsx
+// import React, { useEffect, useRef } from "react";
+// import { useSelector, useDispatch } from "react-redux";
+// import { setIncomingCall } from "../Redux/slices/sokectSlice";
+// import { socket } from "../Sokect-io/SokectConfig";
+// import { checkMicPermission } from "../ConsultantCards/ConsultantCards";
+// import TestRingtone from "../../pages/TestRingtone";
+// import axios from "axios";
+
+// export default function IncomingCallAlert() {
+//   const dispatch = useDispatch();
+//   const params = new URLSearchParams(window.location.search);
+
+//   const userId =
+//     localStorage.getItem("client_u_Identity__") ||
+//     localStorage.getItem("consultant_u_Identity");
+
+//   const { incomingCall, callEnded } = useSelector((state) => state.socket);
+//   const { callAccepted } = useSelector((state) => state.socket);
+
+//   const rejectOnceRef = useRef(false);
+
+//   /* =========================
+//      REJECT HANDLER
+//   ========================== */
+//   const handleReject = () => {
+//     if (!incomingCall || rejectOnceRef.current) return;
+
+//     rejectOnceRef.current = true;
+
+//     const { callerId, channelName, callType } = incomingCall;
+
+//     socket.emit("reject-call", {
+//       callerId,
+//       receiverId: userId,
+//       channelName,
+//       callType,
+//     });
+
+//     dispatch(setIncomingCall(null));
+//   };
+
+//   /* =========================
+//      AUTO REJECT ON CALL END
+//   ========================== */
+//   useEffect(() => {
+//     if (callEnded?.callId && incomingCall) {
+//       handleReject();
+//     }
+//   }, [callEnded, incomingCall]);
+
+//   /* =========================
+//      ACCEPT HANDLER
+//   ========================== */
+//   const handleAccept = async () => {
+//     if (!incomingCall) return;
+
+//     localStorage.setItem("callAccepted____", JSON.stringify(callAccepted));
+
+//     const hasMicPermission = await checkMicPermission();
+//     if (!hasMicPermission) {
+//       alert("Please grant microphone permission to start the call");
+//       return;
+//     }
+
+//     const { callerId, channelName, callType, shop } = incomingCall;
+
+//     const uid = Math.floor(Math.random() * 1000000);
+//     const url = `${process.env.REACT_APP_BACKEND_HOST}/api/call/generate-token`;
+
+//     const res = await axios.post(
+//       url,
+//       { channelName, uid },
+//       { headers: { "Content-Type": "application/json" } },
+//     );
+
+//     const data = res.data;
+//     if (!data?.token) return;
+
+//     socket.emit("call-accepted", {
+//       callerId,
+//       receiverId: userId,
+//       channelName,
+//       callType,
+//     });
+
+//     dispatch(setIncomingCall(null));
+
+//     const tokenEncoded = encodeURIComponent(data.token);
+//     const appIdParam = data.appId ? `&appId=${data.appId}` : "";
+//     const returnUrl = `https://${shop}/apps/consultant-theme/consultant-dashboard`;
+
+//     const callUrl =
+//       `https://gamecube-camp-pond-bids.trycloudflare.com/video/calling/page` +
+//       `?callerId=${callerId}` +
+//       `&receiverId=${userId}` +
+//       `&callType=${callType}` +
+//       `&uid=${uid}` +
+//       `&channelName=${channelName}` +
+//       `&token=${tokenEncoded}` +
+//       appIdParam +
+//       `&userId=${userId}` +
+//       `&userType=consultant` +
+//       `&returnUrl=${encodeURIComponent(returnUrl)}`;
+
+//     setTimeout(() => {
+//       window.open(callUrl, "_blank");
+//     }, 800);
+//   };
+
+//   /* =========================
+//      CONDITIONAL RENDER
+//   ========================== */
+//   if (!incomingCall) return null;
+
+//   const { callerName, callType } = incomingCall;
+
+//   return (
+//     <>
+//       <TestRingtone incomingCall={incomingCall} />
+
+//       <div
+//         style={{
+//           position: "fixed",
+//           top: "20px",
+//           right: "20px",
+//           width: "320px",
+//           backgroundColor: "#fff",
+//           boxShadow: "0px 4px 14px rgba(0,0,0,0.15)",
+//           borderRadius: "12px",
+//           zIndex: 1000,
+//           padding: "10px",
+//           fontFamily: "Arial, sans-serif",
+//         }}
+//       >
+//         {/* Header */}
+//         <div style={{ display: "flex", marginBottom: "12px" }}>
+//           <img
+//             src="https://pmpmaker.com/images/landing/headshots/blog_0.jpg"
+//             alt="Caller"
+//             style={{
+//               width: "60px",
+//               height: "60px",
+//               borderRadius: "50%",
+//               marginRight: "12px",
+//             }}
+//           />
+//           <div>
+//             <p style={{ margin: 0, fontWeight: 600 }}>{callType} call</p>
+//             <p style={{ margin: 0 }}>{callerName} is calling you</p>
+//           </div>
+//         </div>
+
+//         {/* Buttons */}
+//         <div style={{ display: "flex", gap: "8px" }}>
+//           <button
+//             onClick={handleAccept}
+//             style={{
+//               flex: 1,
+//               backgroundColor: "#28a745",
+//               color: "#fff",
+//               border: "none",
+//               borderRadius: "8px",
+//               padding: "6px",
+//               cursor: "pointer",
+//             }}
+//           >
+//             Accept
+//           </button>
+
+//           <button
+//             onClick={handleReject}
+//             style={{
+//               flex: 1,
+//               backgroundColor: "#dc3545",
+//               color: "#fff",
+//               border: "none",
+//               borderRadius: "8px",
+//               padding: "6px",
+//               cursor: "pointer",
+//             }}
+//           >
+//             Reject
+//           </button>
+//         </div>
+//       </div>
+//     </>
+//   );
+// }

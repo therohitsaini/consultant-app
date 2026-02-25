@@ -1,5 +1,11 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, useLocation, redirect } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+  redirect,
+} from "react-router-dom";
 
 import LayoutFrame from "./pages/LayoutFrame";
 import Dashboard from "./pages/Dashboard";
@@ -43,8 +49,7 @@ import AdminPercentage from "./pages/AdminPercentage";
 import RevenuManagement from "./pages/RevenuManagement";
 import { useDispatch } from "react-redux";
 import { verifyToken } from "./components/Redux/slices/authConsultantSlice";
- 
-
+import ConsultantProtectedRoute from "./components/ProtectRoute/ConsultantProtectedRoute";
 
 export default function App() {
   const params = new URLSearchParams(window.location.search);
@@ -55,7 +60,6 @@ export default function App() {
 
   useEffect(() => {
     const handleMessage = (event) => {
-
       if (!event.data || !event.data.type) return;
 
       if (event.data.type !== "SHOW_TOAST") return;
@@ -82,7 +86,7 @@ export default function App() {
       document.body.offsetHeight,
       document.documentElement.offsetHeight,
       document.body.clientHeight,
-      document.documentElement.clientHeight
+      document.documentElement.clientHeight,
     );
   };
 
@@ -91,10 +95,10 @@ export default function App() {
 
     window.parent.postMessage(
       {
-        type: "AGORA_IFRAME_HEIGHT", 
+        type: "AGORA_IFRAME_HEIGHT",
         height: getPageHeight(),
       },
-      "*"
+      "*",
     );
   };
 
@@ -110,12 +114,11 @@ export default function App() {
     return () => observer.disconnect();
   }, [location]);
 
-
   const dispatch = useDispatch();
 
-  // useEffect(() => {
-  //   dispatch(verifyToken());
-  // }, [dispatch]);
+  useEffect(() => {
+    dispatch(verifyToken());
+  }, [dispatch]);
 
   return (
     <Fragment>
@@ -123,104 +126,164 @@ export default function App() {
         <GlobalMessageNotification />
         <IncomingCallAlert />
         <Routes>
-          <Route element={
-            <ProtectAdminRoute installed={installed}>
-              <BillingProtectedRoute>
-                <LayoutFrame />
-              </BillingProtectedRoute>
-            </ProtectAdminRoute>
-          }>
+          <Route
+            element={
+              <ProtectAdminRoute installed={installed}>
+                <BillingProtectedRoute>
+                  <LayoutFrame />
+                </BillingProtectedRoute>
+              </ProtectAdminRoute>
+            }
+          >
             <Route path="/not-found" element={<NotFound />} />
             <Route index element={<Dashboard />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/consultant-list" element={<ConsultantList />} />
             <Route path="/add-consultant" element={<AddConsultant />} />
             <Route path="/setting/history" element={<UserTransHistory />} />
-            <Route path="/setting/wallet-management" element={<ManualDebetCreditBlance />} />
+            <Route
+              path="/setting/wallet-management"
+              element={<ManualDebetCreditBlance />}
+            />
             <Route path="/withdrawal-request" element={<WithdrawalRequest />} />
-            <Route path="/account-information" element={<AccountInformation />} />
-            <Route path="/admin-settings/voucher" element={<VoucherSettings />} />
-            <Route path="/admin-settings/voucher-management" element={<VoucherTable />} />
-            <Route path="/admin-settings/admin-percentage" element={<AdminPercentage />} />
-            <Route path="/admin/revenue-management" element={<RevenuManagement />} />
+            <Route
+              path="/account-information"
+              element={<AccountInformation />}
+            />
+            <Route
+              path="/admin-settings/voucher"
+              element={<VoucherSettings />}
+            />
+            <Route
+              path="/admin-settings/voucher-management"
+              element={<VoucherTable />}
+            />
+            <Route
+              path="/admin-settings/admin-percentage"
+              element={<AdminPercentage />}
+            />
+            <Route
+              path="/admin/revenue-management"
+              element={<RevenuManagement />}
+            />
             <Route path="/faq" element={<Faq />} />
           </Route>
-          <Route path="/consultant-cards" element={
-            <ProtectStoreFront>
-              <ConsultantCards />
-            </ProtectStoreFront>
-          } />
-          <Route path="/view-profile" element={
-            <ProtectStoreFront>
-              <ViewProfile />
-            </ProtectStoreFront>
-          } />
-          
-            <Route path="/consultant-dashboard/*" element={<TabNavigation />}>
-              <Route index element={<DashboardPage />} />
-              <Route path="dashboard" element={<DashboardPage />} />
-              <Route path="chats/:chatId?" element={<ChatsPage />} />
-              <Route path="call-chat-logs" element={<CallLogsConsultant />} />
-              <Route path="consultant-wallet-logs" element={<ConsultantWalletLogs />} />
-              <Route path="withdrawal-request" element={<WithdrawalRequestForm />} />
-              <Route path="withdrawal-request-table" element={<WithdrawalRequestTable />} />
-            </Route>
+          <Route
+            path="/consultant-cards"
+            element={
+              <ProtectStoreFront>
+                <ConsultantCards />
+              </ProtectStoreFront>
+            }
+          />
+          <Route
+            path="/view-profile"
+            element={
+              <ProtectStoreFront>
+                <ViewProfile />
+              </ProtectStoreFront>
+            }
+          />
 
-
-         
-          <Route path="/video/calling/page" element={
-            // <ProtectStoreFront>
-            <VideoCallingPage />
-            // </ProtectStoreFront>
-          } />
-          <Route path="/chats" element={
-            <ProtectStoreFront>
-              <UserChat />
-            </ProtectStoreFront>
-          } />
-          <Route path="/login" element={
-            <ProtectStoreFront>
-              <LoginForm />
-            </ProtectStoreFront>
-          } />
-          <Route path="/fcm-token" element={
-            // <ProtectStoreFront>
-            <FcmTokenWindow />
-
-          } />
-          <Route path="/profile" element={
-            <ProtectStoreFront>
-              <ProfileSection />
-            </ProtectStoreFront>
-          }>
-            <Route index element={
-              <ProtectStoreFront>
-                <Voucher />
-              </ProtectStoreFront>
-            } />
-            <Route path="voucher" element={
-              <ProtectStoreFront>
-                <Voucher />
-              </ProtectStoreFront>
-            } />
-            <Route path="history" element={
-              <ProtectStoreFront>
-                <History />
-              </ProtectStoreFront>
-            } />
-            <Route path="call-chat-logs" element={
-              <ProtectStoreFront>
-                <CallChatLogs />
-              </ProtectStoreFront>
-            } />
+          <Route
+            path="/consultant-dashboard/*"
+            element={
+              // <ConsultantProtectedRoute>
+                <TabNavigation />
+            }
+          >
+            <Route index element={<DashboardPage />} />
+            <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="chats/:chatId?" element={<ChatsPage />} />
+            <Route path="call-chat-logs" element={<CallLogsConsultant />} />
+            <Route
+              path="consultant-wallet-logs"
+              element={<ConsultantWalletLogs />}
+            />
+            <Route
+              path="withdrawal-request"
+              element={<WithdrawalRequestForm />}
+            />
+            <Route
+              path="withdrawal-request-table"
+              element={<WithdrawalRequestTable />}
+            />
           </Route>
 
+          <Route
+            path="/video/calling/page"
+            element={
+              // <ProtectStoreFront>
+              <VideoCallingPage />
+              // </ProtectStoreFront>
+            }
+          />
+          <Route
+            path="/chats"
+            element={
+              <ProtectStoreFront>
+                <UserChat />
+              </ProtectStoreFront>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <ProtectStoreFront>
+                <LoginForm />
+              </ProtectStoreFront>
+            }
+          />
+          <Route
+            path="/fcm-token"
+            element={
+              // <ProtectStoreFront>
+              <FcmTokenWindow />
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectStoreFront>
+                <ProfileSection />
+              </ProtectStoreFront>
+            }
+          >
+            <Route
+              index
+              element={
+                <ProtectStoreFront>
+                  <Voucher />
+                </ProtectStoreFront>
+              }
+            />
+            <Route
+              path="voucher"
+              element={
+                <ProtectStoreFront>
+                  <Voucher />
+                </ProtectStoreFront>
+              }
+            />
+            <Route
+              path="history"
+              element={
+                <ProtectStoreFront>
+                  <History />
+                </ProtectStoreFront>
+              }
+            />
+            <Route
+              path="call-chat-logs"
+              element={
+                <ProtectStoreFront>
+                  <CallChatLogs />
+                </ProtectStoreFront>
+              }
+            />
+          </Route>
         </Routes>
       </BrowserRouter>
-    </Fragment >
+    </Fragment>
   );
 }
-
-
-
-

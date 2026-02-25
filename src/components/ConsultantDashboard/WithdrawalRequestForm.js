@@ -5,7 +5,7 @@ import { fetchConsultantById } from "../Redux/slices/ConsultantSlices";
 import { formatAmountHelper } from "../Helper/Helper";
 import { ToastModel } from "../AlertModel/Tost";
 import ReactToast from "../AlertModel/ReactToast";
-
+import { fetchVoucherData } from '../Redux/slices/UserSlices'
 const WithdrawalRequestForm = () => {
     const dispatch = useDispatch();
     const [amount, setAmount] = useState("");
@@ -15,13 +15,17 @@ const WithdrawalRequestForm = () => {
     const consultantId = localStorage.getItem("client_u_Identity__");
     const shopId = localStorage.getItem("shop_o_Identity");
     const { consultantOverview } = useSelector((state) => state.consultants);
-    
+    const { voucherData } = useSelector((state) => state.users);
     useEffect(() => {
         if (shopId && consultantId) {
             dispatch(fetchConsultantById({ shop_id: shopId, consultant_id: consultantId }));
         }
     }, [shopId, consultantId, showToast]);
-
+    useEffect(() => {
+        if (shopId) {
+            dispatch(fetchVoucherData(shopId));
+        }
+    }, [shopId])
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!amount || amount <= 0) {
@@ -63,7 +67,7 @@ const WithdrawalRequestForm = () => {
                     <div className="card mb-3 shadow-sm">
                         <div className="card-body text-center">
                             <h6 className="text-muted">Available Balance</h6>
-                            <h3 className="fw-bold text-success " style={{ fontSize: "24px" }}>₹ {formatAmountHelper(consultantOverview?.consultant?.walletBalance || 0)}</h3>
+                            <h3 className="fw-bold text-success " style={{ fontSize: "24px" }}>{voucherData?.shopCurrency} {formatAmountHelper(consultantOverview?.consultant?.walletBalance || 0)}</h3>
                         </div>
                     </div>
 

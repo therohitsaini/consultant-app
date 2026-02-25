@@ -2,52 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import styles from '../../components/ConsultantDashboard/TopHeadercss.module.css';
 
-const TopHeader = ({ onMenuToggle, isSidebarOpen,profile }) => {
+const TopHeader = ({ onMenuToggle, isSidebarOpen,profile, userName, userEmail }) => {
     const location = useLocation();
     const [searchValue, setSearchValue] = useState('');
     const [profileOpen, setProfileOpen] = useState(false);
     const profileRef = useRef(null);
-    const avatarUrl = 'https://i.pravatar.cc/80?img=47';
-
-    // Derive current section info from route
-    const getPageMeta = (path) => {
-        if (path.startsWith('/users-page')) {
-            return {
-                title: 'Users',
-                subtitle: 'Manage clients & contacts',
-            };
-        }
-
-        if (path.startsWith('/chats')) {
-            return {
-                title: 'Chats',
-                subtitle: 'Conversations with your clients',
-            };
-        }
-
-        if (path.startsWith('/video-call')) {
-            return {
-                title: 'Video Call',
-                subtitle: 'Live consultation in progress',
-            };
-        }
-
-        if (path.startsWith('/consultant-dashboard')) {
-            return {
-                title: 'Dashboard',
-                subtitle: 'Overview of your consultancy',
-            };
-        }
-
-        return {
-            title: 'MyConsultant',
-            subtitle: 'Consultant workspace',
-        };
-    };
-
-    const pageMeta = getPageMeta(location.pathname);
-
-    // Close profile dropdown on outside click
+    
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (profileRef.current && !profileRef.current.contains(event.target)) {
@@ -141,8 +101,8 @@ const TopHeader = ({ onMenuToggle, isSidebarOpen,profile }) => {
                                 <img src={"https://test-online-consultation.zend-apps.com/uploads/consultants/consultant-1771413022444.jpg"} alt="Peter Parkur" className={styles.avatarImage} />
                             </div>
                             <div className={styles.userInfo}>
-                                <span className={styles.userName}>Peter Parkur</span>
-                                <span className={styles.userRole}>Super Admin</span>
+                                <span className={styles.userName}>{userName}</span>
+                                <span className={styles.userRole}>{userEmail}</span>
                             </div>
                         </button>
 
@@ -150,11 +110,11 @@ const TopHeader = ({ onMenuToggle, isSidebarOpen,profile }) => {
                             <div className={styles.profileDropdown}>
                                 <div className={styles.profileDropdownHeader}>
                                     <div className={styles.profileDropdownAvatar}>
-                                        <img src={avatarUrl} alt="Peter Parkur" className={styles.profileDropdownAvatarImage} />
+                                        <img src={profile} alt="Peter Parkur" className={styles.profileDropdownAvatarImage} />
                                     </div>
                                     <div className={styles.profileDropdownInfo}>
-                                        <span className={styles.profileDropdownName}>Peter Parkur</span>
-                                        <span className={styles.profileDropdownRole}>Super Admin</span>
+                                        <span className={styles.profileDropdownName}>{userName}</span>
+                                        <span className={styles.profileDropdownRole}>{userEmail}</span>
                                     </div>
                                 </div>
 

@@ -10,8 +10,6 @@ const DashboardPage = () => {
     const [shopId, setShopId] = useState(null);
     const dispatch = useDispatch();
     const { consultantOverview } = useSelector((state) => state.consultants);
-    console.log("consultantOverview________________", consultantOverview)
-    console.log("userData________________", userId)
     useEffect(() => {
         const storedUserId = localStorage.getItem('client_u_Identity__') ;
         setUserId(storedUserId);
@@ -46,14 +44,9 @@ const DashboardPage = () => {
         if (!userId) return console.log("userId not found")
         try {
             const url = `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/get/consultant/${userId}`;
-            console.log("url________________", url)
             const response = await axios.get(url);
             const data = await response.data;
-            console.log("Latest User Data:", data);
-            // if (response.ok) {
-            console.log("   ", data?.payload)
             setUserData(data?.payload);
-            // }
         } catch (error) {
             return "Consultant";
         }
@@ -72,6 +65,7 @@ const DashboardPage = () => {
         return Number(num.toFixed(2)).toString();
     };
 
+    console.log("userData________________", userData)
 
     return (
         <div className={styles.pageContainer}>
@@ -109,11 +103,11 @@ const DashboardPage = () => {
                         </div>
                         <div className={`${styles.statFooter} ${styles.flex} ${styles.flexCenter}`}>
                             <span className={`${styles.statChange} ${styles.statChangeSuccess}`} style={{ fontSize: '13px', fontWeight: '600' }}>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ display: 'inline', marginRight: '4px' }}>
+                                {/* <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ display: 'inline', marginRight: '4px' }}>
                                     <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
                                     <polyline points="17 6 23 6 23 12" />
                                 </svg>
-                                +12% from last month
+                                +12% from last month */}
                             </span>
                         </div>
                     </div>
@@ -124,10 +118,10 @@ const DashboardPage = () => {
                         <div className={`${styles.statHeader} ${styles.flexBetween} ${styles.flexStart}`}>
                             <div>
                                 <p className={styles.statLabel}>
-                                    Active Consultations
+                                    Active Clients
                                 </p>
                                 <h3 className={styles.statValue}>
-                                    {userData?.filter(consultation => consultation.isActive).length || 0}
+                                    {userData?.filter(consultation => consultation.userId.isActive).length || 0}
                                 </h3>
                             </div>
                             <div className={styles.statIcon} style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
@@ -138,11 +132,11 @@ const DashboardPage = () => {
                         </div>
                         <div className={`${styles.statFooter} ${styles.flex} ${styles.flexCenter}`}>
                             <span className={`${styles.statChange} ${styles.textPrimary}`} style={{ fontSize: '13px', fontWeight: '600' }}>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ display: 'inline', marginRight: '4px' }}>
+                                {/* <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ display: 'inline', marginRight: '4px' }}>
                                     <circle cx="12" cy="12" r="10" />
                                     <polyline points="12 6 12 12 16 14" />
-                                </svg>
-                                8 pending reviews
+                                </svg> */}
+                                {/* 8 pending reviews */}
                             </span>
                         </div>
                     </div>
@@ -153,7 +147,7 @@ const DashboardPage = () => {
                         <div className={`${styles.statHeader} ${styles.flexBetween} ${styles.flexStart}`}>
                             <div>
                                 <p className={styles.statLabel}>
-                                    Monthly Revenue
+                                    Total Revenue
                                 </p>
                                 <h3 className={styles.statValue}>
                                     ${consultantOverview?.consultant?.walletBalance ? formatAmount(consultantOverview?.consultant?.walletBalance) : ""}
@@ -168,11 +162,11 @@ const DashboardPage = () => {
                         </div>
                         <div className={`${styles.statFooter} ${styles.flex} ${styles.flexCenter}`}>
                             <span className={`${styles.statChange} ${styles.statChangeSuccess}`} style={{ fontSize: '13px', fontWeight: '600' }}>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ display: 'inline', marginRight: '4px' }}>
+                                {/* <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ display: 'inline', marginRight: '4px' }}>
                                     <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
                                     <polyline points="17 6 23 6 23 12" />
                                 </svg>
-                                +18% from last month
+                                +18% from last month */}
                             </span>
                         </div>
                     </div>
@@ -236,7 +230,7 @@ const DashboardPage = () => {
                                     <th className={styles.tableHeadCell}>Date</th>
                                     <th className={styles.tableHeadCell}>Status</th>
                                     <th className={`${styles.tableHeadCell} ${styles.tableHeadCellRight}`}>isRequest</th>
-                                    <th className={`${styles.tableHeadCell} ${styles.tableHeadCellRight}`}>Action</th>
+                                    {/* <th className={`${styles.tableHeadCell} ${styles.tableHeadCellRight}`}>Action</th> */}
                                 </tr>
                             </thead>
                             <tbody>
@@ -248,14 +242,14 @@ const DashboardPage = () => {
                                                 <td className={styles.tableCell}>
                                                     <div className={`${styles.userInfo} ${styles.flex} ${styles.flexCenter}`}>
                                                         <div className={styles.userAvatar}>
-                                                            {consultation.fullname
+                                                            {consultation.userId.fullname
                                                                 ?.split(" ")
                                                                 .map((n) => n[0])
                                                                 .join("")}
                                                         </div>
                                                         <div>
                                                             <div className={styles.userName}>
-                                                                {consultation.fullname}
+                                                                {consultation.userId.fullname}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -265,7 +259,7 @@ const DashboardPage = () => {
                                                     className={styles.tableCell}
                                                     style={{ fontSize: "14px", color: "#6c757d" }}
                                                 >
-                                                    {consultation.userType}
+                                                    {consultation.userId.userType}
                                                 </td>
 
                                                 <td
@@ -282,25 +276,25 @@ const DashboardPage = () => {
                                                 <td className={styles.tableCell}>
                                                     <span
                                                         className={`${styles.badge} ${getStatusBadge(
-                                                            consultation.isActive
+                                                            consultation.userId.isActive
                                                         )}`}
                                                     >
                                                         {consultation.
-                                                            isActive ? "Active" : "Inactive"}
+                                                            userId.isActive ? "Active" : "Inactive"}
                                                     </span>
                                                 </td>
 
                                                 <td
                                                     className={`${styles.tableCell} ${styles.tableCellRight} ${styles.amount}`}
                                                 >
-                                                    {consultation?.isRequest ? "Request" : "listed"}
+                                                    {consultation?.userId.isRequest ? "Request" : "listed"}
                                                 </td>
 
-                                                <td
+                                                {/* <td
                                                     className={`${styles.tableCell} ${styles.tableCellRight}`}
                                                 >
                                                     <button className={styles.viewButton}>View</button>
-                                                </td>
+                                                </td> */}
                                             </tr>
                                         );
                                     })

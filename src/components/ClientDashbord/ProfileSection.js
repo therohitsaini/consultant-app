@@ -4,7 +4,7 @@ import styles from "../../components/ClientDashbord/ProfileSection.module.css";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserDetailsByIds } from "../Redux/slices/UserSlices";
 import { FormLayout, TextField } from "@shopify/polaris";
-import axios from "axios";
+
 
 const ProfileSection = () => {
   const [userId, setUserId] = useState(null);
@@ -29,23 +29,10 @@ const ProfileSection = () => {
   useEffect(() => {
     dispatch(fetchUserDetailsByIds(userId || userId_params));
   }, [userId, userId_params]);
-  const getVoucher = async (adminId) => {
-    const response = await axios.get(
-      `${process.env.REACT_APP_BACKEND_HOST}/api/users/get/vouchers/${adminId || shop_id}`,
-      {},
-    );
-    console.log("response_____getVoucher", response);
-    if (response.status === 200) {
-      setVoucherData(response.data.data);
-    }
-  };
-  useEffect(() => {
-    if (shopId) {
-      getVoucher(shopId);
-    }
-  }, [shopId]);
 
-  console.log("vo", voucherData);
+
+
+  console.log("voucherData", voucherData);
 
   return (
     <div className={styles.profileSection}>

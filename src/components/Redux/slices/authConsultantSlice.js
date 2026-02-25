@@ -7,19 +7,19 @@ import axios from "axios";
 export const verifyToken = createAsyncThunk(
   "auth/verifyToken",
   async (_, { rejectWithValue }) => {
-    const token = localStorage.getItem("token");
-
+    const token = localStorage.getItem("varify_token");
+    console.log("token_____verifyToken", token);
     if (!token) {
       return rejectWithValue("No token");
     }
-
     try {
-      const res = await axios.get("/api/auth/verify-token", {
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/auth/verify-token`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      return res.data.user;
+      console.log("res_____verifyToken", res.data);
+      return res.data.data;
     } catch (err) {
       return rejectWithValue("Invalid token");
     }

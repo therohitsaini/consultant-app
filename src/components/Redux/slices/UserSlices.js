@@ -11,6 +11,13 @@ export const fetchUserDetailsByIds = createAsyncThunk("users/fetch-details", asy
     const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/users/shopify/users/${userId}`);
     return response.data;
 });
+
+export const fetchVoucherData = createAsyncThunk("users/fetch-voucher-data", async (shopId) => {
+    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/users/get/vouchers/${shopId}`);
+    console.log("response_____fetchVoucherData", response);
+    return response.data.data;
+});
+
 const userSlice = createSlice({
     name: "users",
     initialState: {
@@ -18,6 +25,7 @@ const userSlice = createSlice({
         loading: false,
         error: null,
         userDetails: null,
+        voucherData: null,
     },
 
     extraReducers: (builder) => {
@@ -41,6 +49,17 @@ const userSlice = createSlice({
                 state.userDetails = action.payload;
             })
             .addCase(fetchUserDetailsByIds.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
+            .addCase(fetchVoucherData.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchVoucherData.fulfilled, (state, action) => {
+                state.loading = false;
+                state.voucherData = action.payload;
+            })
+            .addCase(fetchVoucherData.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
             });

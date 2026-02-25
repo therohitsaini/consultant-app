@@ -2,13 +2,16 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import UserTable from '../ClientDashbord/UserTable'
 import { getDuration } from '../Helper/Helper'
+import { fetchVoucherData } from '../Redux/slices/UserSlices'
+import { useDispatch, useSelector } from 'react-redux'
 
 const CallLogsConsultant = () => {
     const [callLogsConsultant, setCallLogsConsultant] = useState([])
     const [loading, setLoading] = useState(false)
     const [userId, setUserId] = useState(null)
     const [shopId, setShopId] = useState(null)
-    console.log("callLogsConsultant", callLogsConsultant)
+    const dispatch = useDispatch();
+    const { voucherData } = useSelector((state) => state.users);
     const columns = [
         {
             label: "User Name",
@@ -18,7 +21,7 @@ const CallLogsConsultant = () => {
         {
             label: "Amount",
             key: "amount",
-            render: row => `₹${row.consultantAmount.toFixed(2)}`,
+            render: row => `${voucherData?.shopCurrency}${row.consultantAmount.toFixed(2)}`,
         },
         {
             label: "Date & Time",
@@ -48,6 +51,11 @@ const CallLogsConsultant = () => {
         const shopId = localStorage.getItem('shop_o_Identity__')
         setShopId(shopId)
     }, [])
+    useEffect(() => {
+        if (shopId) {
+            dispatch(fetchVoucherData(shopId));
+        }
+    }, [shopId])
 
     useEffect(() => {
         if (userId && shopId) {

@@ -1,19 +1,27 @@
 import React, { useEffect, useState } from 'react'
 import UserTable from '../ClientDashbord/UserTable'
 import axios from 'axios'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchVoucherData } from '../Redux/slices/UserSlices'
 
 const ConsultantWalletLogs = () => {
     const [walletLogs, setWalletLogs] = useState([])
     const [loading, setLoading] = useState(false)
     const [userId, setUserId] = useState(null)
     const [shopId, setShopId] = useState(null)
-
+    const dispatch = useDispatch();
+    const { voucherData } = useSelector((state) => state.users);
     useEffect(() => {
         const userId = localStorage.getItem('client_u_Identity__')
         setUserId(userId)
         const shopId = localStorage.getItem('shop_o_Identity')
         setShopId(shopId)
     }, [])
+    useEffect(() => {
+        if (shopId) {
+            dispatch(fetchVoucherData(shopId));
+        }
+    }, [shopId])
     const columns = [
         {
             label: "Name",
@@ -23,7 +31,7 @@ const ConsultantWalletLogs = () => {
         {
             label: "Amount",
             key: "amount",
-            render: row => `₹${row.amount?.toFixed(2) || "0.00"}`
+            render: row => `${voucherData?.shopCurrency}${row.amount?.toFixed(2) || "0.00"}`
         },
         {
             label: "Type",
@@ -77,7 +85,7 @@ const ConsultantWalletLogs = () => {
     return (
         <div>
             <UserTable
-                title="Consultant Wallet Logs"
+                title="Wallet Management"
                 columns={columns}
                 data={walletLogs}
                 loading={loading}

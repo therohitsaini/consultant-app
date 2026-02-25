@@ -1,76 +1,108 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./Voucher.module.css";
 import axios from "axios";
 import { redirect, useOutletContext } from "react-router-dom";
-
-const rechargeOptions = [
-    { id: 1, amount: "100", extra: " 100 Extra" },
-    { id: 2, amount: " 200", extra: "₹ 200 Extra" },
-    { id: 3, amount: "500", extra: "₹ 200 Extra", badge: "Popular" },
-    { id: 4, amount: "1000", extra: "₹ 200 Extra", badge: "Popular" },
-    { id: 5, amount: "2000", extra: "₹ 200 Extra" },
-    { id: 6, amount: "3000", extra: "₹ 300 Extra" },
-    { id: 7, amount: "4000", extra: "₹ 480 Extra" },
-    { id: 8, amount: "8000", extra: "₹ 960 Extra" },
-    { id: 9, amount: "15000", extra: "₹ 2250 Extra" },
-    { id: 10, amount: "20000", extra: "₹ 3000 Extra" },
-    { id: 11, amount: "50000", extra: "₹ 10000 Extra" },
-    { id: 12, amount: "100000", extra: "₹ 20000 Extra" },
-];
-
-
+import { fetchUserDetailsByIds, fetchVoucherData } from "../components/Redux/slices/UserSlices";
+import { useDispatch, useSelector } from "react-redux";
 
 function Voucher() {
-    const { shop, userId, walletBalance, voucherData } = useOutletContext();
-    const handleRecharge = async (amount) => {
-        const response = await axios.post(`${process.env.REACT_APP_BACKEND_HOST}/api/draft-order/create-draft-order`, {
-            amount: amount,
-            shop: shop,
-            title: "Recharge Amount",
-            userId: userId,
-        });
-        const data = response.data;
-        if (response.status === 200) {
-            redirect(data.invoiceUrl)
-            window.open(data.invoiceUrl, "_blank")
-        } else {
-            console.log("error", response.data)
-        }
+  const dispatch = useDispatch();
+  const [userId, setUserId] = useState(null);
+  const [shopId, setShopId] = useState(null);
+  // const [voucherData, setVoucherData] = useState(null);
+  const params = new URLSearchParams(window.location.search);
+  const shop = params.get("shop");
+  const shop_id = params.get("shopId");
+  const userId_params = params.get("userId");
+  const { userDetails } = useSelector((state) => state.users);
+  const { voucherData, loading } = useSelector((state) => state.users);
+  const walletBalance = userDetails?.data?.walletBalance;
+
+  useEffect(() => {
+    const adminId = localStorage.getItem("client_u_Identity__");
+    const shopId = localStorage.getItem("shop_o_Identity");
+    if (adminId && shopId) {
+      setUserId(adminId);
+      setShopId(shopId);
     }
-    console.log("voucherData", voucherData)
+  }, []);
+  useEffect(() => {
+    dispatch(fetchUserDetailsByIds(userId || userId_params));
+  }, [userId, userId_params]);
 
-    return (
-        <div className={styles.voucherPage}>
-            <h1 className={styles.title}>Add Money to Wallet</h1>
-
-            <div className={styles.balanceSection}>
-                {/* <span className={styles.balanceLabel}>Available balance:</span> */}
-                <span className={styles.balanceValue}>Coins : {walletBalance?.toFixed(2) || "0.0"}</span>
-            </div>
-
-            <div className={styles.sectionHeader}>
-                <h2 className={styles.sectionTitle}>Popular Recharge</h2>
-            </div>
-
-            <div className={styles.cardGrid}>
-                {voucherData?.voucherCode?.map((option) => (
-                    <button
-                        key={option.id}
-                        type="button"
-                        onClick={() => handleRecharge(option.totalCoin)}
-                        className={`${styles.rechargeCard} ${option.badge ? styles.rechargeCardHighlighted : ""
-                            }`}
-                    >
-                        {option.extraCoin && (
-                            <span className={styles.badge}>{option.extraCoin}</span>
-                        )}
-                        <div className={styles.amount}>₹{option.totalCoin}</div>
-                        <div className={styles.extra}>Extra : {option.extraCoin}</div>
-                    </button>
-                ))}
-            </div>
-        </div>
+  const handleRecharge = async (amount) => {
+    const response = await axios.post(
+      `${process.env.REACT_APP_BACKEND_HOST}/api/draft-order/create-draft-order`,
+      {
+        amount: amount,
+        shop: shop,
+        title: "Recharge Amount",
+        userId: userId,
+      },
     );
-};
+    const data = response.data;
+    if (response.status === 200) {
+      redirect(data.invoiceUrl);
+      window.open(data.invoiceUrl, "_blank");
+    } else {
+      console.log("error", response.data);
+    }
+  };
+  // const getVoucher = async (adminId) => {
+  //   const response = await axios.get(
+  //     `${process.env.REACT_APP_BACKEND_HOST}/api/users/get/vouchers/${adminId || shop_id}`,
+  //     {},
+  //   );
+  //   console.log("response_____getVoucher", response);
+  //   if (response.status === 200) {
+  //     setVoucherData(response.data.data);
+  //   }
+  // };
+  useEffect(() => {
+    if (shopId) {
+      dispatch(fetchVoucherData(shopId));
+    }
+  }, [shopId]);
+  console.log("voucherData", voucherData);
+
+  return (
+    <div className={styles.voucherPage}>
+      <h1 className={styles.title}>Add Money to Wallet</h1>
+
+      <div className={styles.balanceSection}>
+        {/* <span className={styles.balanceLabel}>Available balance:</span> */}
+        <span className={styles.balanceValue}>
+          Available Balance : {voucherData?.shopCurrency}{walletBalance?.toFixed(2) || "0.0"}
+        </span>
+      </div>
+
+      <div className={styles.sectionHeader}>
+        <h2 className={styles.sectionTitle}>Popular Recharge</h2>
+      </div>
+
+      <div className={styles.cardGrid}>
+        {voucherData?.voucherCode?.map((option) => {
+          console.log("option", voucherData.shopCurrency);
+          return (
+            <button
+              key={option.id}
+              type="button"
+              onClick={() => handleRecharge(option.totalCoin)}
+              className={`${styles.rechargeCard} ${
+                option.badge ? styles.rechargeCardHighlighted : ""
+              }`}
+            >
+              {option.extraCoin && (
+                <span className={styles.badge}>{option.extraCoin}</span>
+              )}
+              <div className={styles.amount}>{voucherData?.shopCurrency}{option.totalCoin}</div>
+              <div className={styles.extra}>Extra : {voucherData?.shopCurrency}{option.extraCoin}</div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export default Voucher;
