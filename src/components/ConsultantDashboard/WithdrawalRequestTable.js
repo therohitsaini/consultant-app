@@ -12,6 +12,8 @@ const WithdrawalRequestTable = () => {
     const [shopId, setShopId] = useState(null)
     const dispatch = useDispatch();
     const { voucherData } = useSelector((state) => state.users);
+    const token = localStorage.getItem("token");
+    const shop = localStorage.getItem("shop");
     useEffect(() => {
         const userId = localStorage.getItem('client_u_Identity__')
         setUserId(userId)
@@ -60,11 +62,20 @@ const WithdrawalRequestTable = () => {
 
     const getWithdrawalRequest = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/find/consultant/withdrawal/request/${userId}`)
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/find/consultant/withdrawal/request/${userId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
             if (response.status === 200) {
                 setWithdrawalRequest(response.data.data)
             }
         } catch (error) {
+            if (error.response.status === 401) {
+                localStorage.removeItem("token");
+                localStorage.removeItem("shop");
+                window.top.location.href = `https://${shop}/apps/consultant-theme/login`;
+            }
             console.error("Error fetching withdrawal request:", error)
             setWithdrawalRequest([])
         } finally {

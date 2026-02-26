@@ -117,8 +117,9 @@ const LoginForm = () => {
                 localStorage.setItem("client_u_Identity__", userId);
                 localStorage.setItem("shop_o_Identity__", shopId);
                 localStorage.setItem("shop_o_Identity", shopId);
+                localStorage.setItem("shop", shop);
 
-                localStorage.setItem("varify_tokem", token);
+                localStorage.setItem("token", token);
                 openTokenWindow({ userId, shopId });
                 setIsLoading(false);
             } else {

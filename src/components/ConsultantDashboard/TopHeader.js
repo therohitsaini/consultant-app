@@ -1,13 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import styles from '../../components/ConsultantDashboard/TopHeadercss.module.css';
-
-const TopHeader = ({ onMenuToggle, isSidebarOpen,profile, userName, userEmail }) => {
+import { useDispatch } from 'react-redux';
+import { logout } from '../Redux/slices/authConsultantSlice';
+const TopHeader = ({ onMenuToggle, isSidebarOpen,profile, userName, userEmail, shop }) => {
     const location = useLocation();
     const [searchValue, setSearchValue] = useState('');
     const [profileOpen, setProfileOpen] = useState(false);
     const profileRef = useRef(null);
-    
+    const dispatch = useDispatch();
+    const handleLogout = () => {
+        dispatch(logout());
+        localStorage.removeItem("token");
+        window.top.location.href = `https://${"rohit-12345839.myshopify.com"}/apps/consultant-theme/login`;
+    };
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (profileRef.current && !profileRef.current.contains(event.target)) {
@@ -139,7 +145,7 @@ const TopHeader = ({ onMenuToggle, isSidebarOpen,profile, userName, userEmail })
                                         <span className={styles.profileDropdownLabel}>Inbox</span>
                                     </button>
 
-                                    <button type="button" className={styles.profileDropdownItem}>
+                                    <button type="button" className={styles.profileDropdownItem} onClick={handleLogout}>
                                         <span className={`${styles.profileDropdownIcon} ${styles.profileDropdownIconLogout}`}>
                                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />

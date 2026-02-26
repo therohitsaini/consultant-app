@@ -33,15 +33,15 @@ function TabNavigation({ children }) {
   });
   const { consultantOverview } = useSelector((state) => state.consultants);
   const params = new URLSearchParams(window.location.search);
-  const userId_params = params.get("userId");
-  const shopId_params = params.get("shopId");
-  console.log("userId_params", userId_params);
-  console.log("shopId_params", shopId_params);
+  const shop = params.get("shop");
+  const token = localStorage.getItem("token");
+
+
   useEffect(() => {
     setUserId(localStorage.getItem("client_u_Identity__"));
     setShopId(localStorage.getItem("shop_o_Identity__"));
   }, []);
-
+  
   const sendHeight = () => {
     const height = document.documentElement.scrollHeight;
     if (window.parent) {
@@ -66,17 +66,27 @@ function TabNavigation({ children }) {
       const response = await axios.put(
         `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/update-profile`,
         formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       console.log("Profile updated:", response.data);
 
       if (response.data.success) {
         dispatch(
-          fetchConsultantById({ shop_id: shopId, consultant_id: userId }),
+          fetchConsultantById({ shop_id: shopId, consultant_id: userId, token, shop }),
         );
       }
 
       console.log("Profile updated:", response.data);
     } catch (error) {
+      if (error.response.status === 401) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("shop");
+        window.top.location.href = `https://${shop}/apps/consultant-theme/login`;
+      }
       console.error("Error updating profile details:", error);
     }
   };
@@ -213,6 +223,7 @@ function TabNavigation({ children }) {
           profile={imageUrl}
           userName={consultantOverview?.consultant?.fullname}
           userEmail={consultantOverview?.consultant?.email}
+          shop={shop}
         />
         {/* Mobile Overlay */}
         {sidebarOpen && (
@@ -284,23 +295,9 @@ function TabNavigation({ children }) {
 
           <div className={styles.contentArea}>
             <main className={styles.content}>
-              <Outlet />
+              <Outlet context={{ shop }} />
             </main>
 
-            {/* <main className={styles.content}>
-                            {(() => {
-                                const path = location.pathname;
-                                if (path === '/users-page' || path.startsWith('/users-page')) {
-                                    return <UsersPage />;
-                                } else if (path === '/consulant-chats' || path.startsWith('/consulant-chats')) {
-                                    return <ChatsPage />;
-                                } else if (path === '/video-call' || path.startsWith('/video-call')) {
-                                    return <VideoCallingPage />;
-                                } else {
-                                    return <DashboardPage />;
-                                }
-                            })()}
-                        </main> */}
           </div>
         </div>
       </div>

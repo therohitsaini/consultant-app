@@ -18,8 +18,12 @@ export const fetchConsultants = createAsyncThunk(
 /**
  * get consultant with shop id and consultant id
  */
-export const fetchConsultantById = createAsyncThunk("consultants/fetchById", async ({ shop_id, consultant_id }) => {
-    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/consultant-by-shop-id-and-consultant-id/${shop_id}/${consultant_id}`);
+export const fetchConsultantById = createAsyncThunk("consultants/fetchById", async ({ shop_id, consultant_id,token, shop }) => {
+    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/consultant-by-shop-id-and-consultant-id/${shop_id}/${consultant_id}`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    },);
     return response.data;
 });
 
@@ -37,8 +41,12 @@ export const deleteConsultantById = createAsyncThunk("consultants/delete", async
     return response.data;
 });
 
-export const updateUserRequestById = createAsyncThunk("consultants/updateUserRequestById", async ({ shopId, userId, consultantId }) => {
-    const response = await axios.put(`${process.env.REACT_APP_BACKEND_HOST}/api/chat/update-user-request/${shopId}/${userId}/${consultantId}`);
+export const updateUserRequestById = createAsyncThunk("consultants/updateUserRequestById", async ({ shopId, userId, consultantId, token, shop    }) => {
+    const response = await axios.put(`${process.env.REACT_APP_BACKEND_HOST}/api/chat/update-user-request/${shopId}/${userId}/${consultantId}`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    },);
     return response.data;
 });
 

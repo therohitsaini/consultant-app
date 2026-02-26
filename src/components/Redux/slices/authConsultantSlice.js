@@ -7,7 +7,7 @@ import axios from "axios";
 export const verifyToken = createAsyncThunk(
   "auth/verifyToken",
   async (_, { rejectWithValue }) => {
-    const token = localStorage.getItem("varify_tokem");
+    const token = localStorage.getItem("token");
     console.log("token_____verifyToken", token);
     if (!token) {
       return rejectWithValue("No token");

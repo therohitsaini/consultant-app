@@ -16,6 +16,8 @@ const WithdrawalRequestForm = () => {
     const shopId = localStorage.getItem("shop_o_Identity");
     const { consultantOverview } = useSelector((state) => state.consultants);
     const { voucherData } = useSelector((state) => state.users);
+    const token = localStorage.getItem("token");
+    const shop = localStorage.getItem("shop");
     useEffect(() => {
         if (shopId && consultantId) {
             dispatch(fetchConsultantById({ shop_id: shopId, consultant_id: consultantId }));
@@ -23,7 +25,7 @@ const WithdrawalRequestForm = () => {
     }, [shopId, consultantId, showToast]);
     useEffect(() => {
         if (shopId) {
-            dispatch(fetchVoucherData(shopId));
+            dispatch(fetchVoucherData(shopId, token, shop));
         }
     }, [shopId])
     const handleSubmit = async (e) => {
@@ -38,6 +40,11 @@ const WithdrawalRequestForm = () => {
                 {
                     amount,
                     note,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 }
             );
             console.log("res", res);
@@ -50,6 +57,11 @@ const WithdrawalRequestForm = () => {
             }
 
         } catch (error) {
+            if (error.response.status === 401) {
+                localStorage.removeItem("token");
+                localStorage.removeItem("shop");
+                window.top.location.href = `https://${shop}/apps/consultant-theme/login`;
+            }
             console.error(error);
             alert(error?.response?.data?.message || "Failed to submit");
 

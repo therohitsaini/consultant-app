@@ -12,9 +12,12 @@ export const fetchUserDetailsByIds = createAsyncThunk("users/fetch-details", asy
     return response.data;
 });
 
-export const fetchVoucherData = createAsyncThunk("users/fetch-voucher-data", async (shopId) => {
-    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/users/get/vouchers/${shopId}`);
-    console.log("response_____fetchVoucherData", response);
+export const fetchVoucherData = createAsyncThunk("users/fetch-voucher-data", async (shopId, token, shop) => {
+    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/users/get/vouchers/${shopId}`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
     return response.data.data;
 });
 

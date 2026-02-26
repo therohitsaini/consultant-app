@@ -56,17 +56,26 @@ function CallChatLogs() {
 
   useEffect(() => {
     if (shopId) {
+      
       dispatch(fetchVoucherData(shopId));
     }
   }, [shopId]);
   useEffect(() => {
     if (userId && shopId) {
+      const token = localStorage.getItem("token");
+      console.log("token", token);
       const getCallChatLogs = async () => {
         try {
           setLoading(true);
           const response = await axios.get(
             `${process.env.REACT_APP_BACKEND_HOST}/api/users/find-user-logs-history/${userId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
           );
+
           setCallChatLogs(response.data.data || []);
         } catch (error) {
           console.error("Error fetching call/chat logs:", error);

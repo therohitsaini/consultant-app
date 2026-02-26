@@ -11,6 +11,8 @@ const ConsultantWalletLogs = () => {
     const [shopId, setShopId] = useState(null)
     const dispatch = useDispatch();
     const { voucherData } = useSelector((state) => state.users);
+    const token = localStorage.getItem("token");
+    const shop = localStorage.getItem("shop");
     useEffect(() => {
         const userId = localStorage.getItem('client_u_Identity__')
         setUserId(userId)
@@ -19,7 +21,7 @@ const ConsultantWalletLogs = () => {
     }, [])
     useEffect(() => {
         if (shopId) {
-            dispatch(fetchVoucherData(shopId));
+            dispatch(fetchVoucherData(shopId, token, shop));
         }
     }, [shopId])
     const columns = [
@@ -64,12 +66,20 @@ const ConsultantWalletLogs = () => {
 
     const getWalletLogs = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/find-coonsultant/wallet/history/${userId}/${shopId}`)
-            console.log("response__________", response)
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/find-consultant/wallet/history/${userId}/${shopId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
             if (response.status === 200) {
                 setWalletLogs(response.data.data)
             }
         } catch (error) {
+            if (error.response.status === 401) {
+                localStorage.removeItem("token");
+                localStorage.removeItem("shop");
+                window.top.location.href = `https://${shop}/apps/consultant-theme/login`;
+            }
             console.error("Error fetching wallet logs:", error)
             setWalletLogs([])
         } finally {
