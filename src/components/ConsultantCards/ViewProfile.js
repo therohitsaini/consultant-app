@@ -5,6 +5,7 @@ import '../../components/ConsultantCards/ConsultantCards.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchConsultantById } from '../Redux/slices/ConsultantSlices';
 import { checkUserBalance, openCallPage } from '../middle-ware/OpenCallingPage';
+import { fetchVoucherData } from '../Redux/slices/UserSlices';
 
 function ViewProfile() {
     const navigate = useNavigate();
@@ -21,9 +22,12 @@ function ViewProfile() {
 
 
     const { consultantOverview, loading } = useSelector((state) => state.consultants);
+    const { voucherData } = useSelector((state) => state.users);
     useEffect(() => {
         dispatch(fetchConsultantById({ shop_id, consultant_id }));
-    }, [dispatch, shop_id, consultant_id]);
+        dispatch(fetchVoucherData(shop_id));
+    }, [dispatch, shop_id, consultant_id, ]);
+
 
     useEffect(() => {
         window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
@@ -81,7 +85,7 @@ function ViewProfile() {
         );
     };
 
-
+console.log("consultant", consultant);
 
     const startChat = async (consultantView) => {
         const balance = await checkUserBalance({ userId, consultantId: consultantView, type: 'chat' });
@@ -188,7 +192,7 @@ function ViewProfile() {
                                             </svg>
                                             <span className="calling-option-label">Chat</span>
                                         </div>
-                                        <span className="calling-option-price">Coins {consultantView?.chatPerMinute} per min</span>
+                                        <span className="calling-option-price">{voucherData?.shopCurrency}{consultantView?.chatPerMinute} per min</span>
                                     </button>
                                     <button
                                         className="calling-option-btn audio-btn"
@@ -202,7 +206,7 @@ function ViewProfile() {
                                             </svg>
                                             <span className="calling-option-label">Voice Call</span>
                                         </div>
-                                        <span className="calling-option-price">INR {consultantView?.voicePerMinute}</span>
+                                        <span className="calling-option-price">{voucherData?.shopCurrency}{consultantView?.voicePerMinute}</span>
                                     </button>
                                     <button
                                         className="calling-option-btn video-btn"
@@ -217,7 +221,7 @@ function ViewProfile() {
                                             </svg>
                                             <span className="calling-option-label">Video</span>
                                         </div>
-                                        <span className="calling-option-price">INR {consultantView?.videoPerMinute}</span>
+                                        <span className="calling-option-price">{voucherData?.shopCurrency}{consultantView?.videoPerMinute}</span>
                                     </button>
                                 </div>
                             </div>

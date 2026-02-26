@@ -188,8 +188,9 @@ export default function App() {
           <Route
             path="/consultant-dashboard/*"
             element={
-              // <ConsultantProtectedRoute>
+              <ConsultantProtectedRoute>
                 <TabNavigation />
+              </ConsultantProtectedRoute>
             }
           >
             <Route index element={<DashboardPage />} />

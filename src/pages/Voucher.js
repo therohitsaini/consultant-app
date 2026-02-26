@@ -63,7 +63,6 @@ function Voucher() {
       dispatch(fetchVoucherData(shopId));
     }
   }, [shopId]);
-  console.log("voucherData", voucherData);
 
   return (
     <div className={styles.voucherPage}>
