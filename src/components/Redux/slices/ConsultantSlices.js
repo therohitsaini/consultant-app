@@ -19,6 +19,7 @@ export const fetchConsultants = createAsyncThunk(
  * get consultant with shop id and consultant id
  */
 export const fetchConsultantById = createAsyncThunk("consultants/fetchById", async ({ shop_id, consultant_id,token, shop }) => {
+    console.log("token", token);
     const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api-consultant/consultant-by-shop-id-and-consultant-id/${shop_id}/${consultant_id}`, {
         headers: {
             Authorization: `Bearer ${token}`,

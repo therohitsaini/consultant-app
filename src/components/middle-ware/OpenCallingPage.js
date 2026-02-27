@@ -67,7 +67,7 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
         const returnUrl = `https://${shop}/apps/consultant-theme`;
         console.log("returnUrl", process.env.REACT_APP_FRONTEND_URL);
         const callUrl =
-            `${"https://test-consultation-app.zend-apps.com"}/video/calling/page` +
+            `${"https://ads-achieving-sheet-tail.trycloudflare.com"}/video/calling/page` +
             `?callerId=${userId}` +
             `&receiverId=${receiverId}` +
             `&callType=${type || "voice"}` +
@@ -77,7 +77,6 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
             `&userId=${userId}` +
             `&userType=${"client"}` +
             `&returnUrl=${encodeURIComponent(returnUrl)}`;
-
         // window.top.location.href = callUrl;
         window.open(callUrl, "_blank");
 

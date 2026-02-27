@@ -11,9 +11,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { addMessage } from "../Redux/slices/sokectSlice";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import ReactToast from "../AlertModel/ReactToast";
+import { toast } from "react-toastify";
 
 const ChatsPage = () => {
-  const navigate = useNavigate();
   const [selectedChat, setSelectedChat] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [showChatView, setShowChatView] = useState(false);
@@ -60,6 +60,8 @@ const ChatsPage = () => {
       localStorage.setItem("activeChatUserId", chatTimer.userId);
     }
   }, [chatTimer.isRunning]);
+
+  console.log("chatTimer", chatTimer);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -310,13 +312,6 @@ const ChatsPage = () => {
         conv.shop?.id === chatData.shopId,
     );
 
-    // useEffect(() => {
-    //   if (isRequestModalClose) {
-    //     console.log("isRequestModalClose");
-    //     handleChatSelect();
-    //   }
-    // }, [isRequestModalClose]);
-
     if (conversation) {
       setSelectedChat(conversation.id);
       if (isMobile) {
@@ -355,7 +350,7 @@ const ChatsPage = () => {
 
   useEffect(() => {
     if (!chatTimer.isRunning || !chatTimer.startTime) return;
-
+    console.log("chatTimer", chatTimer);
     const interval = setInterval(() => {
       const diff = Math.floor(
         (Date.now() - new Date(chatTimer.startTime)) / 1000,
@@ -364,6 +359,7 @@ const ChatsPage = () => {
     }, 1000);
     if (chatTimer?.isRunning === false) {
       setChatAccepted((prev) => !prev);
+      localStorage.removeItem("activeChatUserId");
     }
 
     return () => clearInterval(interval);
@@ -412,6 +408,7 @@ const ChatsPage = () => {
       setShowChatEndToast(true);
       getChatList();
       setShowChatEndPop(true);
+      localStorage.removeItem("activeChatUserId");
     }
     prevIsRunningRef.current = chatTimer.isRunning;
   }, [chatTimer.isRunning]);
@@ -421,6 +418,12 @@ const ChatsPage = () => {
       localStorage.setItem("chatTimer", JSON.stringify(chatTimer));
     }
   }, [chatTimer.isRunning]);
+
+  const currentUserId = localStorage.getItem("activeChatUserId");
+
+  const hasMatchedUser = isRequestModalClose?.some(
+    (conv) => conv?.sender?.id === currentUserId,
+  );
 
   return (
     <Fragment>
@@ -514,7 +517,9 @@ const ChatsPage = () => {
                           <div className={styles.avatarWrapper}>
                             <img
                               src={
-                                isImage ? imageUrl : "../images/team/team1.avif"
+                                isImage
+                                  ? imageUrl
+                                  : "https://imgs.search.brave.com/W_YLXhNT3XwZb2G3RPN5rqxKXEP-wceUf5ZHHgMt2mk/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMudmVjdGVlenku/Y29tL3N5c3RlbS9y/ZXNvdXJjZXMvdGh1/bWJuYWlscy8wNDgv/OTI2LzA4NC9zbWFs/bC9zaWx2ZXItbWVt/YmVyc2hpcC1pY29u/LWRlZmF1bHQtYXZh/dGFyLXByb2ZpbGUt/aWNvbi1tZW1iZXJz/aGlwLWljb24tc29j/aWFsLW1lZGlhLXVz/ZXItaW1hZ2UtaWxs/dXN0cmF0aW9uLXZl/Y3Rvci5qcGc"
                               }
                               alt="profile"
                               className={styles.conversationAvatar}
@@ -668,18 +673,26 @@ const ChatsPage = () => {
                       });
                       const isChatAccepted = conversation?.isChatAccepted;
                       console.log("conversation", conversation);
+                      const isMatchedUser =
+                        conversation?.sender?.id === currentUserId;
+
+                      const shouldDisable = hasMatchedUser && !isMatchedUser;
                       return (
                         <Fragment>
                           <div
                             key={conversation.id}
-                            onClick={() =>
+                            onClick={() => {
+                              if (shouldDisable) return;
                               handleChatSelect({
                                 shopId: conversation.shop.id,
                                 userId: conversation.sender.id,
-                                isChatAccepted: isChatAccepted,
-                              })
-                            }
-                            className={`${styles.conversationItem} ${selectedChat === conversation.id ? styles.conversationItemActive : ""}`}
+                                isChatAccepted: conversation.isChatAccepted,
+                              });
+                            }}
+                            className={`${styles.conversationItem} 
+                            ${shouldDisable ? styles.disabledItem : ""}
+                            ${isMatchedUser ? styles.conversationItemActive : ""}
+                          `}
                           >
                             <div className={styles.conversationContent}>
                               <div className={styles.avatarWrapper}>
@@ -868,25 +881,6 @@ const ChatsPage = () => {
                           </div>
                         </div>
                       )}
-                    {/* <div className={styles.chatHeaderActions} style={{ display: 'flex', gap: '8px' }}>
-                                                <button
-                                                    className={styles.headerButton}
-                                                    title="Video Call"
-                                                    onClick={() => navigate('/video/calling/page', { state: { conversation: selectedConversation } })}
-                                                >
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                                        <path d="M23 7l-7 5 7 5V7z" />
-                                                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-                                                    </svg>
-                                                </button>
-                                                <button className={styles.headerButton} title="More Options">
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                                        <circle cx="12" cy="12" r="1" />
-                                                        <circle cx="19" cy="12" r="1" />
-                                                        <circle cx="5" cy="12" r="1" />
-                                                    </svg>
-                                                </button>
-                                            </div> */}
                   </div>
 
                   {/* Messages Area */}

@@ -4,7 +4,7 @@ import UserTable from "../ClientDashbord/UserTable";
 import { getDuration } from "../Helper/Helper";
 import { fetchVoucherData } from "../Redux/slices/UserSlices";
 import { useDispatch, useSelector } from "react-redux";
-import { useOutletContext } from "react-router-dom";
+import { useLocation, useOutletContext } from "react-router-dom";
 
 const CallLogsConsultant = () => {
   const [callLogsConsultant, setCallLogsConsultant] = useState([]);
@@ -15,6 +15,14 @@ const CallLogsConsultant = () => {
   const { voucherData } = useSelector((state) => state.users);
   const { shop } = useOutletContext();
   console.log("Shop domain:", shop);
+  const location = useLocation();
+  useEffect(() => {
+    setTimeout(() => {
+      if (window.parentIFrame) {
+        window.parentIFrame.size();
+      }
+    }, 300);
+  }, [location.pathname,voucherData]);
   const columns = [
     {
       label: "User Name",

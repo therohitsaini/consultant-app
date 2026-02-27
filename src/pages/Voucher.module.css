@@ -41,8 +41,9 @@
 
 .cardGrid {
     display: grid;
-    grid-template-columns: repeat(5, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fill, 160px);
     gap: 16px;
+    justify-content: start; /* left align */
 }
 
 .rechargeCard {
@@ -111,10 +112,6 @@
 @media (max-width: 768px) {
     .voucherPage {
         gap: 16px;
-    }
-
-    .cardGrid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 

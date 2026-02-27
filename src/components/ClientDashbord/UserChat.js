@@ -23,6 +23,7 @@ const UserChat = () => {
   const parms = new URLSearchParams(window.location.search);
   const consultantId = parms.get("consultantId");
   const shop = parms.get("shop");
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const storedClientId = localStorage.getItem("client_u_Identity__");
@@ -82,7 +83,12 @@ const UserChat = () => {
 
   useEffect(() => {
     dispatch(
-      fetchConsultantById({ shop_id: shopId, consultant_id: consultantId }),
+      fetchConsultantById({
+        shop_id: shopId,
+        consultant_id: consultantId,
+        token: token,
+        shop: shop,
+      }),
     );
   }, [shopId, consultantId]);
 
@@ -114,7 +120,7 @@ const UserChat = () => {
     }
   }, [chatHistory, show]);
 
-  console.log("chatHistory____UserChat", chatHistory);
+  console.log("consultantOverview", consultantOverview);
 
   useEffect(() => {
     if (!clientId || !consultantId || !shopId) {

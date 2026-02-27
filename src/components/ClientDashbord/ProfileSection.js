@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { NavLink, Outlet, redirect } from "react-router-dom";
+import { NavLink, Outlet, redirect, useLocation } from "react-router-dom";
 import styles from "../../components/ClientDashbord/ProfileSection.module.css";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserDetailsByIds } from "../Redux/slices/UserSlices";
 import { FormLayout, TextField } from "@shopify/polaris";
-
 
 const ProfileSection = () => {
   const [userId, setUserId] = useState(null);
@@ -30,8 +29,21 @@ const ProfileSection = () => {
     dispatch(fetchUserDetailsByIds(userId || userId_params));
   }, [userId, userId_params]);
 
+  const location = useLocation();
 
+  useEffect(() => {
+    const sendHeight = () => {
+      const height = document.documentElement.scrollHeight;
 
+      if (window.parent) {
+        window.parent.postMessage({ type: "AGORA_IFRAME_HEIGHT", height }, "*");
+      }
+    };
+
+    const id = setTimeout(sendHeight, 300);
+
+    return () => clearTimeout(id);
+  }, [location.pathname]);
   console.log("voucherData", voucherData);
 
   return (

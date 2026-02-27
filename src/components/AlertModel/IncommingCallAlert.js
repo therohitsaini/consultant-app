@@ -71,7 +71,7 @@ export default function IncomingCallAlert() {
 
       const returnUrl = `https://${shop}/apps/consultant-theme/consultant-dashboard`;
       const callUrl =
-        `${"https://test-consultation-app.zend-apps.com"}/video/calling/page` +
+        `${"https://ads-achieving-sheet-tail.trycloudflare.com"}/video/calling/page` +
         `?callerId=${callerId}` +
         `&receiverId=${userId}` +
         `&callType=${callType}` +

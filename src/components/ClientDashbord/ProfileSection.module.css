@@ -1,35 +1,27 @@
 .profileSection {
-    /* padding: 64px; */
-    padding: 64px 100px;
-    display: flex;
-    gap: 24px;
-    height: 100vh;
-    box-sizing: border-box;
-    background-color: #fafafa;
+  padding: 64px 100px;
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;   /* IMPORTANT */
+  /* background-color: #fafafa; */
 }
 
 .profileRight {
-    flex: 1;
-    padding: 20px 24px;
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
-    display: flex;
-    flex-direction: column;
+  flex: 1;
+  padding: 20px 24px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  display: block;   /* 🔥 remove column flex */
 }
-
 .profileSectionHeader {
-
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
-    width: 300px;
-    height: 380px;
-    background-color: #ffffff;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+  width: 300px;
+  flex-shrink: 0;
+  padding: 20px 24px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  display: block;
 }
+
 
 .profileImageContainer {
     display: flex;
@@ -57,6 +49,7 @@
 .profileNav {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap; 
     margin-bottom: 16px;
     border-bottom: 1px solid #e5e7eb;
     padding-bottom: 8px;
@@ -85,9 +78,9 @@
     color: #f6f6f6;
 }
 
+
 .profileContent {
-    flex: 1;
-    padding-top: 8px;
+  margin-top: 16px;
 }
 
 
@@ -113,17 +106,6 @@
       width: 100%;
       padding: 16px;
       margin-top: 12px;
-    }
-  
-    .profileNav {
-      flex-direction: column;
-      gap: 8px;
-    }
-  
-    .profileNavButton {
-      width: 100%;
-      text-align: center;
-      padding: 12px;
     }
   
     .profileContent {

@@ -47,3 +47,6 @@ html, body, #root {
 .consultant-dashboard {
   height: 100vh;
 }
+.site-footer {
+  margin-top: 0;
+}
