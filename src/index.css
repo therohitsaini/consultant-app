@@ -39,3 +39,11 @@ body > div[style*="position: fixed"]:has-text("WebSocket") {
 script[src*="react-refresh"] {
   display: none;
 }
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+.consultant-dashboard {
+  height: 100vh;
+}
