@@ -24,7 +24,7 @@ const UserChat = () => {
   const consultantId = parms.get("consultantId");
   const shop = parms.get("shop");
   const token = localStorage.getItem("token");
-
+console.log("token", token);
   useEffect(() => {
     const storedClientId = localStorage.getItem("client_u_Identity__");
     const storedShopId = localStorage.getItem("shop_o_Identity");

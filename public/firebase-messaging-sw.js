@@ -54,43 +54,6 @@ async function makeRoundedImageBase64(url, size = 128) {
 messaging.onBackgroundMessage(async function (payload) {
   const data = payload.data || {};
 
-  // if (data.type === "CALL") {
-
-  //     const title = `Incoming ${data.callType} call`;
-  //     const body = `${data.callerName} is calling you`;
-
-  //     const avatarUrl =
-  //         data.avatar ||
-  //         "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=128&h=128";
-
-  //     const roundedBase64 = await makeRoundedImageBase64(avatarUrl, 128);
-
-  //     const options = {
-  //         body,
-  //         icon: roundedBase64,
-  //         badge: defaultBadge,
-  //         vibrate: [300, 200, 300, 200, 300],
-  //         requireInteraction: true,
-  //         data,
-
-  //         actions: [
-  //             {
-  //                 action: "ACCEPT_CALL",
-  //                 title: "Accept",
-  //                 icon: "/icons/accept.png"
-  //             },
-  //             {
-  //                 action: "DECLINE_CALL",
-  //                 title: "Decline",
-  //                 icon: "/icons/decline.png"
-  //             }
-  //         ]
-  //     };
-
-  //     self.registration.showNotification(title, options);
-  //     return;
-  // }
-
   const title = payload.notification?.title || "New message";
   const body = data.body || "No text";
 
