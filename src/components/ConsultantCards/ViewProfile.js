@@ -85,7 +85,6 @@ function ViewProfile() {
         );
     };
 
-console.log("consultant", consultant);
 
     const startChat = async (consultantView) => {
         const balance = await checkUserBalance({ userId, consultantId: consultantView, type: 'chat' });
@@ -192,7 +191,7 @@ console.log("consultant", consultant);
                                             </svg>
                                             <span className="calling-option-label">Chat</span>
                                         </div>
-                                        <span className="calling-option-price">{voucherData?.shopCurrency}{consultantView?.chatPerMinute} per min</span>
+                                        <span className="calling-option-price">{voucherData?.shopCurrency}{consultantView?.chatPerMinute} </span>
                                     </button>
                                     <button
                                         className="calling-option-btn audio-btn"

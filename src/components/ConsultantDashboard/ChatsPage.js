@@ -677,9 +677,17 @@ const ChatsPage = () => {
                         conversation?.sender?.id === currentUserId;
 
                       const shouldDisable = hasMatchedUser && !isMatchedUser;
+                      console.log("shouldDisable", shouldDisable);
                       return (
                         <Fragment>
                           <div
+                            style={{
+                              backgroundColor: shouldDisable
+                                ? "transparent"
+                                : "rgba(74, 144, 226, 0.1)",
+                              margin: "4px",
+                              borderRadius: "11px",
+                            }}
                             key={conversation.id}
                             onClick={() => {
                               if (shouldDisable) return;

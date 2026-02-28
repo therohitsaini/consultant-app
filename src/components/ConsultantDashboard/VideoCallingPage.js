@@ -59,20 +59,23 @@ function VideoCallingPage() {
   const [bothUserConnected, setBothUserConnected] = useState(false);
   const [isCallActive, setIsCallActive] = useState(false);
 
-  // useEffect(() => {
-  //   const handleBeforeUnload = (event) => {
-  //     if (!isCallActive) return; // ✅ call end → no alert
+  const [callActive, setCallActive] = useState(true);
 
-  //     event.preventDefault();
-  //     event.returnValue = "";
-  //   };
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (callActive) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
 
-  //   window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("beforeunload", handleBeforeUnload);
 
-  //   return () => {
-  //     window.removeEventListener("beforeunload", handleBeforeUnload);
-  //   };
-  // }, [isCallActive]);
+    // Cleanup important hai
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [callActive]);
 
   useEffect(() => {
     localStorage.setItem("userId", userId);
@@ -176,6 +179,7 @@ function VideoCallingPage() {
 
     const handleAutoCallEnd = (data) => {
       console.log("🔥 autoCallEnded-no-balance received:", data);
+      setCallActive(false);
       // alert("❌ Balance khatam ho gaya, call end ho gayi");
       handleEndCall();
     };
@@ -534,13 +538,13 @@ function VideoCallingPage() {
   };
 
   const handleEndCall = () => {
+    setCallActive(false);
     const endFromClient = localStorage.getItem("endFromClient") || null;
     const shopIdLocalRaw = localStorage.getItem("shopId");
     const shopIdLocal = shopIdLocalRaw
       ? shopIdLocalRaw.replace(/"/g, "")
       : null;
     if (endFromClient) {
-      console.log("transactionId", transactionId);
       stopTimer();
       dispatch(endCall());
       setCallSessionEnded(true);
@@ -617,6 +621,7 @@ function VideoCallingPage() {
   useEffect(() => {
     if (callEnded?.callId) {
       handleEndCall();
+      setCallActive(false);
     }
   }, [callEnded]);
 
@@ -626,6 +631,7 @@ function VideoCallingPage() {
   useEffect(() => {
     const onRemoteLeft = (e) => {
       console.log("🔥 Remote user left — ending call immediately", e?.detail);
+      setCallActive(false);
       handleEndCall();
     };
 
