@@ -84,7 +84,7 @@ function ConsultantCards() {
           }
         }
         if (!Array.isArray(languages)) {
-          languages = ["English"];
+          languages =languages;
         }
       } catch (e) {
         languages = ["English"];
@@ -151,7 +151,6 @@ function ConsultantCards() {
    */
 
   const startCall = async ({ receiverId, type }) => {
-    console.log("startCall____ConsultantCards____receiverId", receiverId, type);
     await openCallPage({ receiverId, type, userId, shop });
   };
 
@@ -189,6 +188,8 @@ function ConsultantCards() {
     window.top.location.href = `https://${shop}/apps/consultant-theme/chats-c?consultantId=${consultantView}${hostQuery}`;
   };
 
+
+  
   return (
     <>
       <div className="container py-4">
@@ -464,17 +465,7 @@ function ConsultantCards() {
                           <p className="mb-2 consultant-profession">
                             {consultant.profession}
                           </p>
-                          <div className="flex align-items-center gap-2 flex-wrap">
-                            <div className="rating-stars">
-                              {renderStars(consultant.rating)}
-                            </div>
-                            <span className="rating-text">
-                              {consultant.rating}
-                            </span>
-                            <span className="testimonials-text">
-                              ({consultant.testimonials} testimonials)
-                            </span>
-                          </div>
+                        
                         </div>
                       </div>
 

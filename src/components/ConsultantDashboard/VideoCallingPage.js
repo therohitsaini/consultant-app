@@ -282,7 +282,6 @@ function VideoCallingPage() {
     if (callStartedRef.current) return;
     if (token && channelNameParam && uidParam) {
       const appId = appIdParam;
-      // || "656422a01e774a4ba5b2dc0ac12e5fe5";
       callStartedRef.current = true;
       dispatch(
         startCall({
@@ -470,7 +469,6 @@ function VideoCallingPage() {
     };
   }, []);
 
-  // When user turns camera ON, play local video on the element
   useEffect(() => {
     if (isVideoCall && videoEnabled && localVideoRef.current) {
       import("../Redux/slices/callSlice").then((module) => {
@@ -489,7 +487,6 @@ function VideoCallingPage() {
     }
   }, [isVideoCall, videoEnabled]);
 
-  // Reset remote video state when call ends
   useEffect(() => {
     if (!inCall) setHasRemoteVideo(false);
   }, [inCall]);
@@ -579,7 +576,6 @@ function VideoCallingPage() {
           receiverId: receiverId,
           channelName: channelNameParam,
           callType: callSession?.callType,
-          // transactionId: callSession?.transtionId,
           shopId: callSession.shopId,
           dtn_: "CUT FROM CONSULTANT SIDE",
           endby: "consultant_cut_call",
@@ -625,8 +621,7 @@ function VideoCallingPage() {
     }
   }, [callEnded]);
 
-  console.log("callEnded", callEnded);
-  console.log("callerDetails", callerDetails);
+
 
   useEffect(() => {
     const onRemoteLeft = (e) => {
@@ -729,7 +724,6 @@ function VideoCallingPage() {
     };
   }, [userType, callerIdParam, receiverId, channelNameParam, callType]);
 
-  // play ringtone when call is accepted, rejected, or ended
   useEffect(() => {
     if (userType === "client" && !bothUserConnected) {
       initRingtone();
@@ -738,7 +732,6 @@ function VideoCallingPage() {
     }
   }, [userType, bothUserConnected]);
 
-  // stop ringtone when call is accepted, rejected, or ended
   useEffect(() => {
     if (userType === "client" && bothUserConnected) {
       stopRingtone();
@@ -780,7 +773,6 @@ function VideoCallingPage() {
                   : callerDetails?.caller?.fullname}
               </div>
               <div className={styles.callStatus}>
-                {/* {conversation.isOnline ? 'Online' : 'Offline'} */}
               </div>
             </div>
           </div>

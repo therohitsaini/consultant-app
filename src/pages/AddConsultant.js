@@ -126,19 +126,39 @@ function AddConsultant() {
         }
     }, [consultantId]);
 
+    // const handleFieldChange = useCallback((fieldName) => {
+    //     return (value) => {
+    //         setDirty(true);
+    //         setErrors((prev) => ({
+    //             ...prev,
+    //             [fieldName]: '',
+    //         }));
+    //         setFormData((prev) => ({
+    //             ...prev,
+    //             [fieldName]: value,
+    //         }));
+    //     };
+    // }, []);
     const handleFieldChange = useCallback((fieldName) => {
         return (value) => {
-            setDirty(true);
-            setErrors((prev) => ({
-                ...prev,
-                [fieldName]: '',
-            }));
-            setFormData((prev) => ({
-                ...prev,
-                [fieldName]: value,
-            }));
+          let updatedValue = value;
+          if (fieldName === "pancardNumber") {
+            updatedValue = value.toUpperCase().slice(0, 10);
+          }
+      
+          setDirty(true);
+      
+          setErrors((prev) => ({
+            ...prev,
+            [fieldName]: "",
+          }));
+      
+          setFormData((prev) => ({
+            ...prev,
+            [fieldName]: updatedValue,
+          }));
         };
-    }, []);
+      }, []);
 
     const handleFileInputChange = useCallback(
         (event) => {
@@ -636,7 +656,7 @@ function AddConsultant() {
                                         {/* Phone Number */}
                                         <TextField
                                             label="Phone Number"
-                                            type="tel"
+                                            type="number"
                                             value={formData.phoneNumber}
                                             onChange={handleFieldChange('phoneNumber')}
                                             autoComplete="off"
@@ -681,6 +701,7 @@ function AddConsultant() {
                                     {/* Year of Experience */}
                                     <TextField
                                         label="Year of Experience"
+                                         type="number"
                                         value={formData.yearOfExperience}
                                         onChange={handleFieldChange('yearOfExperience')}
                                         autoComplete="off"
