@@ -784,7 +784,6 @@ function VideoCallingPage() {
               </div>
             </div>
           </div>
-          <div style={{ fontSize: "12px", color: "white" }}> Voice Call</div>
         </div>
 
         {bothUserConnected && (
