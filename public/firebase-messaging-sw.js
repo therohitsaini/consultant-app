@@ -129,7 +129,7 @@ messaging.onBackgroundMessage(async function (payload) {
     body = `${data.callerName} is calling you`;
 
     finalUrl =
-      `https://conference-municipality-emily-complications.trycloudflare.com/push-call-incoming` +
+      `https://test-consultation-app.zend-apps.com/push-call-incoming` +
       `?callerId=${data.callerId}` +
       `&channelName=${data.channelName}` +
       `&callType=${data.callType}` +
