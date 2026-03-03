@@ -129,17 +129,16 @@ messaging.onBackgroundMessage(async function (payload) {
     body = `${data.callerName} is calling you`;
 
     finalUrl =
-      `https://test-consultation-app.zend-apps.com ` +
+      `https://conference-municipality-emily-complications.trycloudflare.com/push-call-incoming` +
       `?callerId=${data.callerId}` +
       `&channelName=${data.channelName}` +
       `&callType=${data.callType}` +
-      `&shop=${data.shop}`;
+      `&shop=${data.shop ||"rohit-1234567890.myshopify.com`"}`;
   } else {
     title = data.senderName || "New Message";
     body = data.message || "You received a new message";
     finalUrl = `https://${data.shop}/apps/consultant-theme/consultant-dashboard`;
   }
-console.log("🔥 SW VERSION 6 - Edge Test");
 
   self.registration.showNotification(title, {
     body,

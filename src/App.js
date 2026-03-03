@@ -50,6 +50,7 @@ import RevenuManagement from "./pages/RevenuManagement";
 import { useDispatch } from "react-redux";
 import { verifyToken } from "./components/Redux/slices/authConsultantSlice";
 import ConsultantProtectedRoute from "./components/ProtectRoute/ConsultantProtectedRoute";
+import PushCallIncoming from "./components/AlertModel/PushCallIncoming";
 
 export default function App() {
   const params = new URLSearchParams(window.location.search);
@@ -184,6 +185,7 @@ export default function App() {
               </ProtectStoreFront>
             }
           />
+          <Route path="/push-call-incoming" element={<PushCallIncoming />} />
 
           <Route
             path="/consultant-dashboard/*"
