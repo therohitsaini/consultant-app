@@ -140,10 +140,13 @@ export default function App() {
             <Route index element={<Dashboard />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/consultant-list" element={<ConsultantList />} />
-            <Route path="/add-consultant" element={<AddConsultant />} />
-            <Route path="/setting/history" element={<UserTransHistory />} />
             <Route
-              path="/setting/wallet-management"
+              path="/consultant-list/add-consultant"
+              element={<AddConsultant />}
+            />
+            <Route path="/history" element={<UserTransHistory />} />
+            <Route
+              path="/wallet-management"
               element={<ManualDebetCreditBlance />}
             />
             <Route path="/withdrawal-request" element={<WithdrawalRequest />} />
@@ -152,21 +155,12 @@ export default function App() {
               element={<AccountInformation />}
             />
             <Route
-              path="/admin-settings/voucher"
+              path="/voucher-management/voucher"
               element={<VoucherSettings />}
             />
-            <Route
-              path="/admin-settings/voucher-management"
-              element={<VoucherTable />}
-            />
-            <Route
-              path="/admin-settings/admin-percentage"
-              element={<AdminPercentage />}
-            />
-            <Route
-              path="/admin/revenue-management"
-              element={<RevenuManagement />}
-            />
+            <Route path="/voucher-management" element={<VoucherTable />} />
+            <Route path="/admin-percentage" element={<AdminPercentage />} />
+            <Route path="/revenue-management" element={<RevenuManagement />} />
             <Route path="/faq" element={<Faq />} />
           </Route>
           <Route

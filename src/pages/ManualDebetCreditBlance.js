@@ -187,7 +187,7 @@ function ManualDebetCreditBlance() {
         <Fragment>
             <UpdateUserDetailsModal open={active} onClose={() => setActive(false)} userDetails={userDetails} updateFormData={updateFormData} setUpdateFormData={setUpdateFormData} updateWallet={updateWallet} />
             <Page
-                title="Wallet History"
+                title="Wallet Management"
             >
                 <Layout>
                     <Layout.Section>

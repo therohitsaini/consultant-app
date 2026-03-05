@@ -118,11 +118,11 @@ const LoginForm = () => {
                 localStorage.setItem("shop_o_Identity__", shopId);
                 localStorage.setItem("shop_o_Identity", shopId);
                 localStorage.setItem("shop", shop);
-
                 localStorage.setItem("token", token);
                 openTokenWindow({ userId, shopId });
                 setIsLoading(false);
             } else {
+                setIsLoading(false);
                 setErrors({ email: "Invalid email or password" });
             }
         } catch (err) {
@@ -215,7 +215,6 @@ const LoginForm = () => {
                         </div>
                     )}
 
-                    {/* Submit Button */}
                     <button
                         type="submit"
                         className={`${styles.submitButton} ${isLoading ? styles.buttonLoading : ''}`}

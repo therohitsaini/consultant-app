@@ -23,7 +23,7 @@ function VoucherTable() {
 
     const goToAddVoucher = () => {
         if (!redirect) return;
-        redirect.dispatch(Redirect.Action.APP, '/admin-settings/voucher');
+        redirect.dispatch(Redirect.Action.APP, '/voucher-management/voucher');
     }
     const updateVoucherPlan = (id, totalCoin, extraCoin) => {
         if (!redirect) return;
@@ -170,7 +170,7 @@ function VoucherTable() {
                 loading={loading}
             />
             <Page
-                title="Voucher Table"
+                title="Voucher Management"
                 primaryAction={{
                     icon: PlusIcon,
                     content: 'Add Voucher',

@@ -103,7 +103,7 @@ function AdminPercentage({ currentPercentage }) {
 
 
             <Page
-                backAction={{ content: 'Back', onAction: () => Router.back() }}
+                // backAction={{ content: 'Back', onAction: () => Router.back() }}
                 title=" Admin Percentage" > <Layout> <Layout.Section>
                     <LegacyCard title=" Admin Percentage" sectioned>
                         <Form onSubmit={handleSubmit}>

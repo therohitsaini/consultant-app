@@ -57,11 +57,13 @@ function VoucherSettings() {
     }, [totalCoin, extraCoin])
 
     const handleFieldChange = useCallback((fieldName) => {
+     
         return (value) => {
             setFormData((prev) => ({
                 ...prev,
                 [fieldName]: value,
             }));
+            setDirty(true);
             // Clear errors when user starts typing
             if (submitError) {
                 setSubmitError('');
@@ -177,6 +179,7 @@ function VoucherSettings() {
                 />
             )}
         <Page
+        disableScroll={dirty}
             backAction={{ content: 'Voucher Management', onAction: backToVoucherManagement }}
             title={voucherId ? 'Update Voucher Settings' : 'Voucher Management'}
 

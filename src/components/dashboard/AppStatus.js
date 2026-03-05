@@ -18,9 +18,7 @@ export function AppStatus({ enabled, handleToggle, adminDetailsLoading, appStatu
     const descriptionId = 'app-status-description-uuid';
 
     const { mdDown } = useBreakpoints();
-
     const badgeStatus = enabled ? 'success' : 'critical';
-
     const badgeContent = enabled ? 'Enabled' : 'Disabled';
 
     const title = 'App Status';

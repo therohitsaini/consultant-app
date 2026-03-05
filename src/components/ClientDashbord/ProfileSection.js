@@ -6,17 +6,26 @@ import { fetchUserDetailsByIds } from "../Redux/slices/UserSlices";
 import { FormLayout, TextField } from "@shopify/polaris";
 
 const ProfileSection = () => {
+  const location = useLocation();
   const [userId, setUserId] = useState(null);
   const [shopId, setShopId] = useState(null);
   const [voucherData, setVoucherData] = useState(null);
   const params = new URLSearchParams(window.location.search);
   const shop = params.get("shop");
-  const loggedInCustomerId = params.get("logged_in_customer_Id");
   const shop_id = params.get("shopId");
   const userId_params = params.get("userId");
   const dispatch = useDispatch();
   const { userDetails } = useSelector((state) => state.users);
   const walletBalance = userDetails?.data?.walletBalance;
+
+  useEffect(() => {
+    if (userId_params && shop_id) {
+      localStorage.setItem("client_u_Identity__", userId_params);
+      localStorage.setItem("shop_o_Identity", shop_id);
+   
+    }
+  }, [userId_params, shop_id]);
+
   useEffect(() => {
     const adminId = localStorage.getItem("client_u_Identity__");
     const shopId = localStorage.getItem("shop_o_Identity");
@@ -29,7 +38,6 @@ const ProfileSection = () => {
     dispatch(fetchUserDetailsByIds(userId || userId_params));
   }, [userId, userId_params]);
 
-  const location = useLocation();
 
   useEffect(() => {
     const sendHeight = () => {
@@ -44,7 +52,6 @@ const ProfileSection = () => {
 
     return () => clearTimeout(id);
   }, [location.pathname]);
-  console.log("voucherData", voucherData);
 
   return (
     <div className={styles.profileSection}>
@@ -68,14 +75,12 @@ const ProfileSection = () => {
               label="Full Name"
               type="text"
               value={userDetails?.data?.fullname}
-              // onChange={handleFieldChange('email')}
               autoComplete="off"
             />
             <TextField
               label="Email"
               type="text"
               value={userDetails?.data?.email}
-              // onChange={handleFieldChange('email')}
               autoComplete="off"
             />
           </FormLayout>
