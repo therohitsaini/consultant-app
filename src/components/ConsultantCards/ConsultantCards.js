@@ -199,7 +199,7 @@ function ConsultantCards() {
 
   return (
     <>
-      <div className="container py-4">
+      <div className="container py-4" style={{display: "flex",  alignItems: "center", justifyContent: "center"}}>
         {/* <div className="hero-section mb-5"> */}
           {/* <div className="hero-content" style={{border: "1px solid red"}}> */}
             {/* <div className="hero-badge mb-3">
