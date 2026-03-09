@@ -200,8 +200,8 @@ function ConsultantCards() {
   return (
     <>
       <div className="container py-4">
-        <div className="hero-section mb-5">
-          <div className="hero-content" style={{border: "1px solid red"}}>
+        {/* <div className="hero-section mb-5"> */}
+          {/* <div className="hero-content" style={{border: "1px solid red"}}> */}
             {/* <div className="hero-badge mb-3">
               <span className="hero-badge-icon">⭐</span>
               <span onClick={() => playRingtone()}>Trusted by Thousands</span>
@@ -399,8 +399,8 @@ function ConsultantCards() {
                 <span className="hero-filter-tag">Numerology</span>
               </div>
             </div> */}
-          </div>
-        </div>
+          {/* </div> */}
+        {/* </div> */}
 
         <div className="row" style={{ gap: "1.5rem" }}>
           {mappedConsultants.length === 0 ? (
