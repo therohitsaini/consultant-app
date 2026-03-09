@@ -10,8 +10,6 @@ import { Provider } from 'react-redux';
 import { store } from './components/Redux/store/store';
 import { AppBridgeProvider } from './components/createContext/AppBridgeContext';
 import SocketProvider from './components/Sokect-io/sokectProvider';
-import ErrorBoundary from './components/ErrorBoundary';
-import { AdminMenu } from './pages/AdminMenu';
 import { AppStatusProvider } from './components/ProtectRoute/AppStatusProvider';
 import { AppStatusBillingProvider } from './components/ProtectRoute/AppStatusBillingProvider';
 import ToastProvider from './components/AlertModel/ToastProvider';
@@ -33,7 +31,6 @@ const AppWrapper = ({ children }) => {
   }
   return <>{children}</>; // store frontend → no AppBridge
 };
-console.log("___________INDEX MAIN FILE IS RENDERED");  
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 

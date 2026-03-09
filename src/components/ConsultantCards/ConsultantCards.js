@@ -35,7 +35,6 @@ function ConsultantCards() {
   const shop_id = params.get("shopid") || localStorage.getItem("domain_V_id");
   const [initialLoading, setInitialLoading] = useState(true);
 
-
   useEffect(() => {
     const timer = setTimeout(() => {
       setInitialLoading(false);
@@ -84,7 +83,7 @@ function ConsultantCards() {
           }
         }
         if (!Array.isArray(languages)) {
-          languages =languages;
+          languages = languages;
         }
       } catch (e) {
         languages = ["English"];
@@ -102,8 +101,8 @@ function ConsultantCards() {
         testimonials: 0,
         isActive: consultant.isActive || false,
         chatPrice: `${voucherData?.shopCurrency}${parseInt(consultant?.chatPerMinute) || 0}`,
-      audioPrice: `${voucherData?.shopCurrency}${parseInt(consultant?.voicePerMinute) || 0}`,
-      videoPrice: `${voucherData?.shopCurrency}${parseInt(consultant?.videoPerMinute) || 0}`,
+        audioPrice: `${voucherData?.shopCurrency}${parseInt(consultant?.voicePerMinute) || 0}`,
+        videoPrice: `${voucherData?.shopCurrency}${parseInt(consultant?.videoPerMinute) || 0}`,
         isBusy: consultant?.isBusy,
       };
     });
@@ -171,12 +170,17 @@ function ConsultantCards() {
   };
 
   const viewChatsPage = async (consultantView) => {
+    console.log("user_id", userId);
+    if (!userId) {
+      alert("Please login to chat with this consultant");
+      window.top.location.href = `https://${shop}/account/login`;
+      return;
+    }
     const balance = await checkUserBalance({
       userId,
       consultantId: consultantView,
       type: "chat",
     });
-    console.log("balance", balance);
     if (!balance.userBalance) {
       alert("You have insufficient balance to chat with this consultant");
       const hostQuery = "";
@@ -188,19 +192,16 @@ function ConsultantCards() {
     window.top.location.href = `https://${shop}/apps/consultant-theme/chats-c?consultantId=${consultantView}${hostQuery}`;
   };
 
-
-  
   return (
     <>
       <div className="container py-4">
-        {/* Hero Section */}
         <div className="hero-section mb-5">
           <div className="hero-content">
-            <div className="hero-badge mb-3">
+            {/* <div className="hero-badge mb-3">
               <span className="hero-badge-icon">⭐</span>
               <span onClick={() => playRingtone()}>Trusted by Thousands</span>
-            </div>
-            <h1 className="hero-title">
+            </div> */}
+            {/* <h1 className="hero-title">
               Find Your Perfect{" "}
               <span className="hero-title-highlight">Consultant</span>
             </h1>
@@ -208,10 +209,9 @@ function ConsultantCards() {
               Connect with experienced professionals for guidance, support, and
               expert advice. Choose from our verified consultantsData and start
               your journey today.
-            </p>
+            </p> */}
 
-            {/* Search Bar */}
-            <div className="hero-search-container mt-4 mb-4">
+            {/* <div className="hero-search-container mt-4 mb-4">
               <div className="hero-search-box">
                 <svg
                   className="hero-search-icon"
@@ -245,10 +245,10 @@ function ConsultantCards() {
                 />
                 <button className="hero-search-btn">Search</button>
               </div>
-            </div>
+            </div> */}
 
             {/* Stats */}
-            <div className="hero-stats flex justify-content-center gap-4 flex-wrap mt-4">
+            {/* <div className="hero-stats flex justify-content-center gap-4 flex-wrap mt-4">
               <div className="hero-stat-item">
                 <div className="hero-stat-icon">
                   <svg
@@ -323,11 +323,7 @@ function ConsultantCards() {
                   </svg>
                 </div>
                 <div className="hero-stat-number">
-                  {mappedConsultants.reduce(
-                    (sum, c) => sum + c.testimonials,
-                    0,
-                  )}
-                  +
+                 
                 </div>
                 <div className="hero-stat-label">Happy Clients</div>
               </div>
@@ -359,7 +355,7 @@ function ConsultantCards() {
                   </svg>
                 </div>
                 <div className="hero-stat-number">
-                  {mappedConsultants.filter((c) => c.isActive).length}
+                
                 </div>
                 <div className="hero-stat-label">Available Now</div>
               </div>
@@ -382,23 +378,13 @@ function ConsultantCards() {
                   </svg>
                 </div>
                 <div className="hero-stat-number">
-                  {mappedConsultants.length > 0
-                    ? Math.round(
-                        (mappedConsultants.reduce(
-                          (sum, c) => sum + c.rating,
-                          0,
-                        ) /
-                          mappedConsultants.length) *
-                          10,
-                      ) / 10
-                    : 0}
+                
                 </div>
                 <div className="hero-stat-label">Average Rating</div>
               </div>
-            </div>
+            </div> */}
 
-            {/* Quick Filters */}
-            <div className="hero-quick-filters mt-4">
+            {/* <div className="hero-quick-filters mt-4">
               <span className="hero-filter-label">Quick Filters:</span>
               <div className="hero-filter-tags">
                 <span className="hero-filter-tag">All</span>
@@ -407,7 +393,7 @@ function ConsultantCards() {
                 <span className="hero-filter-tag">Vedic</span>
                 <span className="hero-filter-tag">Numerology</span>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -465,7 +451,6 @@ function ConsultantCards() {
                           <p className="mb-2 consultant-profession">
                             {consultant.profession}
                           </p>
-                        
                         </div>
                       </div>
 
@@ -553,7 +538,7 @@ function ConsultantCards() {
                                 </span>
                               </div>
                               <span className="calling-option-price">
-                                 {consultant.audioPrice.toLocaleString()}
+                                {consultant.audioPrice.toLocaleString()}
                               </span>
                             </button>
                             <button
@@ -595,7 +580,7 @@ function ConsultantCards() {
                                 </span>
                               </div>
                               <span className="calling-option-price">
-                                 {consultant.videoPrice.toLocaleString()}
+                                {consultant.videoPrice.toLocaleString()}
                               </span>
                             </button>
                           </div>
