@@ -298,6 +298,7 @@ import ConsultantProtectedRoute from "./components/ProtectRoute/ConsultantProtec
 import { BillingProtectedRoute } from "./components/ProtectRoute/BillingProtectedRoute";
 
 import "./App.css";
+import { Spinner } from "@shopify/polaris";
 
 /* ---------- Lazy Loaded Pages ---------- */
 
@@ -447,7 +448,7 @@ export default function App() {
   return (
     <Fragment>
       <BrowserRouter>
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}><Spinner size="large" /></div>}>
           <GlobalMessageNotification />
           <IncomingCallAlert />
 
