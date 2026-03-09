@@ -199,14 +199,14 @@ function ConsultantCards() {
 
   return (
     <>
-      <div className="container py-10 my-10" >
+      <div className="container " style={{ marginTop: "20px" }}>
         {/* <div className="hero-section mb-5"> */}
-          {/* <div className="hero-content" style={{border: "1px solid red"}}> */}
-            {/* <div className="hero-badge mb-3">
+        {/* <div className="hero-content" style={{border: "1px solid red"}}> */}
+        {/* <div className="hero-badge mb-3">
               <span className="hero-badge-icon">⭐</span>
               <span onClick={() => playRingtone()}>Trusted by Thousands</span>
             </div> */}
-            {/* <h1 className="hero-title">
+        {/* <h1 className="hero-title">
               Find Your Perfect{" "}
               <span className="hero-title-highlight">Consultant</span>
             </h1>
@@ -216,7 +216,7 @@ function ConsultantCards() {
               your journey today.
             </p> */}
 
-            {/* <div className="hero-search-container mt-4 mb-4">
+        {/* <div className="hero-search-container mt-4 mb-4">
               <div className="hero-search-box">
                 <svg
                   className="hero-search-icon"
@@ -252,8 +252,8 @@ function ConsultantCards() {
               </div>
             </div> */}
 
-            {/* Stats */}
-            {/* <div className="hero-stats flex justify-content-center gap-4 flex-wrap mt-4">
+        {/* Stats */}
+        {/* <div className="hero-stats flex justify-content-center gap-4 flex-wrap mt-4">
               <div className="hero-stat-item">
                 <div className="hero-stat-icon">
                   <svg
@@ -389,7 +389,7 @@ function ConsultantCards() {
               </div>
             </div> */}
 
-            {/* <div className="hero-quick-filters mt-4">
+        {/* <div className="hero-quick-filters mt-4">
               <span className="hero-filter-label">Quick Filters:</span>
               <div className="hero-filter-tags">
                 <span className="hero-filter-tag">All</span>
@@ -399,7 +399,7 @@ function ConsultantCards() {
                 <span className="hero-filter-tag">Numerology</span>
               </div>
             </div> */}
-          {/* </div> */}
+        {/* </div> */}
         {/* </div> */}
 
         <div className="row" style={{ gap: "1.5rem" }}>
