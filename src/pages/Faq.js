@@ -154,30 +154,31 @@ function Faq() {
             <li>Log in to your Shopify Admin panel.</li>
 
             <li>
-              From the left menu, go to <b>Online Store → Navigation</b>.
+              From the left menu, go to <b style={{ fontSize: "14px" }}>Content → Menus</b>.
             </li>
 
             <li>
-              Click on <b>Main menu</b> (or Footer menu if you prefer).
+              Click on <b style={{ fontSize: "14px" }}>Create menu</b> (or Footer menu if you prefer).
             </li>
 
             <li>
-              Click <b>Add menu item</b>.
+              Click <b style={{ fontSize: "14px" }}>Add menu item</b>.
             </li>
 
             <li>
-              Enter a name for the menu (for example: <b>Consult Now</b>,{" "}
-              <b>Consultant Login</b>, or <b>Profile</b>).
+              Enter a name for the menu (for example: <b style={{ fontSize: "14px" }}>Consult Now</b>,{" "}
+              <b style={{ fontSize: "14px" }}>Consultant Login</b>, or <b style={{ fontSize: "14px" }}>Profile</b>).
             </li>
 
             <li>
-              In the Link field, paste your store URL using one of the formats
+              In the Link field, paste your store URL using the format
               below:
               <br />
               <br />
-              <b>Storefront Home Page:</b>
+              <b style={{ fontSize: "14px" }}>Storefront Home Page:</b>
               <br />
               <a
+                style={{ fontSize: "14px" }}
                 href={`https://${adminDetails_.shop}/apps/consultant-theme`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -186,9 +187,10 @@ function Faq() {
               </a>
               <br />
               <br />
-              <b>User Profile Page:</b>
+              <b style={{ fontSize: "14px" }}>User Profile Page:</b>
               <br />
               <a
+                style={{ fontSize: "14px" }}
                 href={`https://${adminDetails_.shop}/apps/consultant-theme`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -197,9 +199,10 @@ function Faq() {
               </a>
               <br />
               <br />
-              <b>Consultant Login Page:</b>
+              <b style={{ fontSize: "14px" }}>Consultant Login Page:</b>
               <br />
               <a
+                style={{ fontSize: "14px" }}
                 href={`https://${adminDetails_.shop}/apps/consultant-theme`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -211,16 +214,16 @@ function Faq() {
             </li>
 
             <li>
-              Click <b>Save</b>.
+              Click <b style={{ fontSize: "14px" }}>Save</b>.
             </li>
 
             <li>
-              Repeat the same steps to add multiple menu items (Home, Login,
-              Profile) if required.
+              Repeat the same steps to add multiple menu items (Consult Now, Consultant Login,
+              User Profile) if required.
             </li>
 
             <li>
-              Go to <b>Online Store → Themes → Customize</b>.
+              Go to <b style={{ fontSize: "14px" }}>Online Store → Themes → Customize</b>.
             </li>
 
             <li>Make sure the menu is visible in your header or footer.</li>

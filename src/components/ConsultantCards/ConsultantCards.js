@@ -64,31 +64,28 @@ function ConsultantCards() {
   const consultantsList = Array.isArray(consultants?.findConsultant)
     ? consultants.findConsultant
     : [];
+  console.log("consultantsList", consultantsList);
 
   const mappedConsultants =
     consultantsList &&
     consultantsList.map((consultant) => {
+      console.log("consultant___", consultant);
       let languages = [];
+
       try {
         if (typeof consultant.language === "string") {
           languages = JSON.parse(consultant.language);
         } else if (Array.isArray(consultant.language)) {
-          if (
-            consultant.language.length > 0 &&
-            typeof consultant.language[0] === "string"
-          ) {
-            languages = JSON.parse(consultant.language[0]);
-          } else {
-            languages = consultant.language;
-          }
+          languages = consultant.language;
         }
+
         if (!Array.isArray(languages)) {
-          languages = languages;
+          languages = ["English"];
         }
       } catch (e) {
         languages = ["English"];
       }
-
+      console.log("languages", languages);
       return {
         id: consultant._id || consultant.id,
         name: consultant.displayName || consultant.fullname || "Consultant",

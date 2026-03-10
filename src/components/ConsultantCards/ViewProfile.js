@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchConsultantById } from "../Redux/slices/ConsultantSlices";
 import { checkUserBalance, openCallPage } from "../middle-ware/OpenCallingPage";
 import { fetchVoucherData } from "../Redux/slices/UserSlices";
+import defaultImage from "../../assets/avatar-or-person-sign-profile-picture-portrait-icon-user-profile-symbol.webp";
 
 function ViewProfile() {
   const navigate = useNavigate();
@@ -34,7 +35,6 @@ function ViewProfile() {
 
   const consultantView = consultantOverview?.consultant;
   const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${consultantView?.profileImage?.replace("\\", "/")}`;
-  console.log("consultantView____ViewProfile", consultantView);
   const consultant = {
     id: "691dbba35e388352e3203b0b",
     name: "Arlene McCoy",
@@ -163,12 +163,10 @@ function ViewProfile() {
               {/* Profile Image */}
               <div className="me-4 position-relative flex-shrink-0">
                 <img
-                  src={imageUrl}
+                  src={consultantView?.profileImage ? imageUrl : defaultImage }
                   alt={consultantView?.fullname}
                   className="rounded-circle profile-image profile-image-large"
-                  onError={(e) => {
-                    e.target.src = "/images/teamdefault.png";
-                  }}
+                 
                 />
                 {consultantView?.isActive && (
                   <span className="active-status-dot active-status-dot-large"></span>
@@ -196,7 +194,7 @@ function ViewProfile() {
 
             <div className="mb-0">
               <p className="mb-2 consultant-info">
-                <strong className="ml-2">Speaks:</strong> 
+                <strong className="ml-2">Speaks:</strong>
                 {consultantView?.language?.map((lang) => {
                   return <span key={lang}>{lang} , </span>;
                 })}
@@ -368,7 +366,6 @@ function ViewProfile() {
                   <button
                     className="calling-option-btn chat-btn"
                     onClick={() => startChat(consultantView?._id)}
-                    title={`Chat - INR ${consultant.chatPrice.toLocaleString()}`}
                   >
                     <svg
                       width="24"
@@ -394,7 +391,6 @@ function ViewProfile() {
                         type: "voice",
                       })
                     }
-                    title={`Audio Call - INR ${consultant.audioPrice.toLocaleString()}`}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -419,7 +415,6 @@ function ViewProfile() {
                         type: "video",
                       })
                     }
-                    title={`Video Call - INR ${consultant.videoPrice.toLocaleString()}`}
                   >
                     <svg
                       width="24"

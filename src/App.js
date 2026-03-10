@@ -375,10 +375,9 @@ const IncomingCallAlert = lazy(
 const PushCallIncoming = lazy(
   () => import("./components/AlertModel/PushCallIncoming"),
 );
-
 const FcmTokenWindow = lazy(() => import("./firebase/utils/FcmTokenWindow"));
 
-/* ---------- App ---------- */
+
 
 export default function App() {
   const dispatch = useDispatch();
@@ -389,14 +388,13 @@ export default function App() {
   const app = useAppBridge();
   const { installed } = UseAppInstall(shop, app);
 
-  /* Verify token */
+
   useEffect(() => {
     if (localStorage.getItem("token")) {
       dispatch(verifyToken());
     }
   }, [dispatch]);
 
-  /* iframe message listener */
 
   useEffect(() => {
     const handleMessage = (event) => {
@@ -415,8 +413,6 @@ export default function App() {
 
     return () => window.removeEventListener("message", handleMessage);
   }, []);
-
-  /* iframe auto height */
 
   const getPageHeight = () =>
     Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);

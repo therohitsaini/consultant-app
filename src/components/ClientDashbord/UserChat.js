@@ -11,6 +11,7 @@ import {
 import InsufficientBalanceModal from "../AlertModel/InsuffientBalance";
 import ReactToast from "../AlertModel/ReactToast";
 import { fetchUserDetailsByIds } from "../Redux/slices/UserSlices";
+import defaultImage from "../../assets/avatar-or-person-sign-profile-picture-portrait-icon-user-profile-symbol.webp";
 
 const UserChat = () => {
   const [text, setText] = useState();
@@ -24,7 +25,6 @@ const UserChat = () => {
   const consultantId = parms.get("consultantId");
   const shop = parms.get("shop");
   const token = localStorage.getItem("token");
-console.log("token", token);
   useEffect(() => {
     const storedClientId = localStorage.getItem("client_u_Identity__");
     const storedShopId = localStorage.getItem("shop_o_Identity");
@@ -35,7 +35,7 @@ console.log("token", token);
   const { consultantOverview } = useSelector((state) => state.consultants);
   const { chatHistory } = useSelector((state) => state.consultants);
   const { messages: socketMessages } = useSelector((state) => state.socket);
-  const imageUrl = `${process.env.REACT_APP_BACKEND_HOST}/${consultantOverview?.consultant?.profileImage?.replace("\\", "/")}`;
+  const imageUrl = consultantOverview?.consultant?.profileImage ? `${process.env.REACT_APP_BACKEND_HOST}/${consultantOverview?.consultant?.profileImage?.replace("\\", "/")}` : defaultImage;
   const [chatMessagesData, setChatMessagesData] = useState([]);
   const lastProcessedMessageId = useRef(null);
   const messagesAreaRef = useRef(null);
@@ -120,7 +120,6 @@ console.log("token", token);
     }
   }, [chatHistory, show]);
 
-  console.log("consultantOverview", consultantOverview);
 
   useEffect(() => {
     if (!clientId || !consultantId || !shopId) {
@@ -182,7 +181,7 @@ console.log("token", token);
           return [...prev, message];
         });
       } else {
-        console.log("UserChat -  Message doesn't belong to current chat");
+        return;
       }
     });
   }, [socketMessages, clientId, consultantId, shopId]);
@@ -256,7 +255,6 @@ console.log("token", token);
       setChatMessagesData((prev) => [...prev, optimisticMessage]);
 
       socket.emit("sendMessage", messageData);
-      console.log("Message sent via socket:", messageData);
       setText("");
 
       shouldAutoScrollRef.current = true;
