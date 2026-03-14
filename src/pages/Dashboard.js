@@ -13,6 +13,7 @@ import { useMemo } from 'react';
 import { formatAmountHelper } from '../components/Helper/Helper';
 
 
+
 // Component to display animated count with motion
 function AnimatedCount({ value }) {
 
@@ -131,7 +132,7 @@ function Dashboard() {
                 <TitleBar title="" />
             )}
             <Page
-                title="vc-consultant app"
+                title="Consultly"
             // primaryAction={<LanguageSelector />}
 
             >

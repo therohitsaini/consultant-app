@@ -365,6 +365,7 @@ function AddConsultant() {
         setTextFieldValue("");
         setProfileFile(null);
         setProfileImageUrl(null);
+        setDirty(false);
         goToAddConsultant();
       } else {
         if (responseData?.missingFields) {
@@ -436,7 +437,9 @@ function AddConsultant() {
       const responseData = await response.json();
       if (response.ok) {
         showToast(responseData?.message);
+        setDirty(false);
         goToAddConsultant();
+
       } else {
         showToast(responseData?.missingFields, true);
       }
@@ -976,7 +979,11 @@ function AddConsultant() {
                     />
                   </FormLayout.Group>
                 </FormLayout>
-                <div
+              
+              </LegacyCard>
+            </Layout.Section>
+          </Layout>
+          <div
                   style={{
                     marginTop: "20px",
                     display: "flex",
@@ -1004,10 +1011,8 @@ function AddConsultant() {
                     </Button>
                   )}
                 </div>
-              </LegacyCard>
-            </Layout.Section>
-          </Layout>
         </Page>
+        
       </Box>
     </Fragment>
   );

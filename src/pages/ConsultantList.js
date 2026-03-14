@@ -66,6 +66,7 @@ function ConsultantList() {
   const { adminDetails_, loading: adminDetailsLoading } = useSelector(
     (state) => state.admin,
   );
+  console.log("consultants", consultants);
 
   useEffect(() => {
     const id = localStorage.getItem("domain_V_id");

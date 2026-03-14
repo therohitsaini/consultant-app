@@ -101,6 +101,7 @@ function ConsultantCards() {
         audioPrice: `${voucherData?.shopCurrency}${parseInt(consultant?.voicePerMinute) || 0}`,
         videoPrice: `${voucherData?.shopCurrency}${parseInt(consultant?.videoPerMinute) || 0}`,
         isBusy: consultant?.isBusy,
+        consultantStatus: consultant?.consultantStatus,
       };
     });
 
@@ -197,208 +198,6 @@ function ConsultantCards() {
   return (
     <>
       <div className="container " style={{ marginTop: "150px" }}>
-        {/* <div className="hero-section mb-5"> */}
-        {/* <div className="hero-content" style={{border: "1px solid red"}}> */}
-        {/* <div className="hero-badge mb-3">
-              <span className="hero-badge-icon">⭐</span>
-              <span onClick={() => playRingtone()}>Trusted by Thousands</span>
-            </div> */}
-        {/* <h1 className="hero-title">
-              Find Your Perfect{" "}
-              <span className="hero-title-highlight">Consultant</span>
-            </h1>
-            <p className="hero-description">
-              Connect with experienced professionals for guidance, support, and
-              expert advice. Choose from our verified consultantsData and start
-              your journey today.
-            </p> */}
-
-        {/* <div className="hero-search-container mt-4 mb-4">
-              <div className="hero-search-box">
-                <svg
-                  className="hero-search-icon"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle
-                    cx="11"
-                    cy="11"
-                    r="8"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="m21 21-4.35-4.35"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                <input
-                  type="text"
-                  className="hero-search-input"
-                  placeholder="Search by name, profession, or expertise..."
-                />
-                <button className="hero-search-btn">Search</button>
-              </div>
-            </div> */}
-
-        {/* Stats */}
-        {/* <div className="hero-stats flex justify-content-center gap-4 flex-wrap mt-4">
-              <div className="hero-stat-item">
-                <div className="hero-stat-icon">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <circle
-                      cx="9"
-                      cy="7"
-                      r="4"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M23 21v-2a4 4 0 0 0-3-3.87"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M16 3.13a4 4 0 0 1 0 7.75"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-                <div className="hero-stat-number">
-                  {mappedConsultants.length}+
-                </div>
-                <div className="hero-stat-label">Expert Consultants</div>
-              </div>
-              <div className="hero-stat-item">
-                <div className="hero-stat-icon">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <circle
-                      cx="12"
-                      cy="7"
-                      r="4"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-                <div className="hero-stat-number">
-                 
-                </div>
-                <div className="hero-stat-label">Happy Clients</div>
-              </div>
-              <div className="hero-stat-item">
-                <div className="hero-stat-icon">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <polyline
-                      points="12 6 12 12 16 14"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-                <div className="hero-stat-number">
-                
-                </div>
-                <div className="hero-stat-label">Available Now</div>
-              </div>
-              <div className="hero-stat-item">
-                <div className="hero-stat-icon">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <polygon
-                      points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-                <div className="hero-stat-number">
-                
-                </div>
-                <div className="hero-stat-label">Average Rating</div>
-              </div>
-            </div> */}
-
-        {/* <div className="hero-quick-filters mt-4">
-              <span className="hero-filter-label">Quick Filters:</span>
-              <div className="hero-filter-tags">
-                <span className="hero-filter-tag">All</span>
-                <span className="hero-filter-tag">Available Now</span>
-                <span className="hero-filter-tag">Psychology</span>
-                <span className="hero-filter-tag">Vedic</span>
-                <span className="hero-filter-tag">Numerology</span>
-              </div>
-            </div> */}
-        {/* </div> */}
-        {/* </div> */}
-
         <div className="row" style={{ gap: "1.5rem" }}>
           {mappedConsultants.length === 0 ? (
             <div className="col-12 text-center py-5">
@@ -406,6 +205,7 @@ function ConsultantCards() {
             </div>
           ) : (
             mappedConsultants.map((consultant) => {
+              if (!consultant.consultantStatus) return null;
               const shop_id = shopId;
               const consultant_id = consultant.id;
               console.log("consultant", consultant);
