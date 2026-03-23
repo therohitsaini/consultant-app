@@ -19,7 +19,6 @@ export const AppStatusBillingProvider = ({ children }) => {
 
         const fetchBillingStatus = async () => {
             const token = await getAppBridgeToken(app);
-            console.log("token", token);
             try {
                 const response = await axios.get(
                     `${process.env.REACT_APP_BACKEND_HOST}/api/admin/shop/billing-status/${adminId}`

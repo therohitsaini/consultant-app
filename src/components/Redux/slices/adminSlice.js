@@ -7,13 +7,11 @@ import { getAppBridgeToken } from '../../../utils/getAppBridgeToken'
 
 export const fetchAdminDetails = createAsyncThunk("admin/fetchAdminDetails", async ({ adminIdLocal, app }) => {
     const token = await getAppBridgeToken(app);
-    console.log("token_____fetchAdminDetails", token);
     const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/admin/${adminIdLocal}`, {
         headers: {
             Authorization: `Bearer ${token}`
         }
     })
-    console.log("response_____fetchAdminDetails", response.data);
     return response.data?.data
 })
 
@@ -30,7 +28,6 @@ export const fetchActivityHistory = createAsyncThunk("admin/fetchActivityHistory
             searchQuery
         }
     })
-    console.log("fetchActivityHistory", response.data);
     return response.data
 })
 

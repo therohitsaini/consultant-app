@@ -18,7 +18,6 @@ export const AppBridgeProvider = ({ children }) => {
     let host = urlParams.get("host");
     const shop = urlParams.get("shop");
     const adminId = urlParams.get("adminId");
-    console.log("adminId___________", adminId);
     if (adminId) {
       localStorage.setItem("domain_V_id", adminId);
     }
@@ -65,7 +64,6 @@ export const AppBridgeProvider = ({ children }) => {
       });
 
 
-      console.log("✅ App Bridge initialized successfully with host:", host);
       return appInstance;
     } catch (error) {
       console.error("❌ Error initializing App Bridge:", error);
@@ -75,17 +73,7 @@ export const AppBridgeProvider = ({ children }) => {
 
   useEffect(() => {
     if (host && apiKey) {
-      console.log("App Bridge Debug:", {
-        host: host,
-        apiKey: "SET",
-        appInitialized: app !== null,
-      });
     } else {
-      console.warn("App Bridge Debug:", {
-        host: host || "NOT FOUND",
-        apiKey: apiKey ? "SET" : "NOT SET",
-        message: "App Bridge will not work without host and API key",
-      });
       <Navigate to="/not-found" />
     }
   }, [host, apiKey, app]);

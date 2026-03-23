@@ -27,15 +27,12 @@ export default function SocketProvider({ children }) {
     useEffect(() => {
         const socket = getSocket();
         const clientId = localStorage.getItem("client_u_Identity__") ;
-        console.log("Client ID Sokect Provider________________", clientId)
         const onConnect = () => {
-            console.log("✅ ____Socket connected");
             socket.emit("register", clientId);
             dispatch(setConnected(true));
         };
 
         const onDisconnect = () => {
-            console.log("❌ Socket disconnected");
             dispatch(setConnected(false));
         };
         if (!socket.connected) socket.connect();
@@ -94,8 +91,6 @@ export default function SocketProvider({ children }) {
     );
 
     return () => {
-        console.log("🧹 Cleaning socket listeners");
-
         socket.off("connect", onConnect);
         socket.off("disconnect", onDisconnect);
         socket.off("activeUsers");

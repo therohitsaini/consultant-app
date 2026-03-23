@@ -27,7 +27,6 @@ export default function AccountInformation() {
   if (shop.includes(".myshopify.com")) {
     displayDomain = shop.replace(".myshopify.com", "");
   }
-  console.log("displayDomain", displayDomain);
   useEffect(() => {
     const id = localStorage.getItem("domain_V_id");
     setAdminIdLocal(id);

@@ -9,10 +9,8 @@ export const BillingProtectedRoute = ({ children }) => {
     const params = new URLSearchParams(window.location.search);
     const shop = params.get("shop");
 
-    console.log("shop", shop);
     const match = shop?.match(/^([a-z0-9-]+)\.myshopify\.com$/);
     const store = match ? match[1] : null;
-    console.log("store", store);
     useEffect(() => {
         if (!billing || billing.loading) return;
         if (!billing.isPaid) {
