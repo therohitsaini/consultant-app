@@ -29,7 +29,6 @@ export const AppStatusProvider = ({ children }) => {
 
                 }
             );
-            console.log("response", response);
 
             setAppEnabled(response.data.data);
             setLoading(false);
