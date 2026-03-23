@@ -9,10 +9,11 @@ const TopHeader = ({ onMenuToggle, isSidebarOpen,profile, userName, userEmail, s
     const [profileOpen, setProfileOpen] = useState(false);
     const profileRef = useRef(null);
     const dispatch = useDispatch();
+    const domain = localStorage.getItem("shop");
     const handleLogout = () => {
         dispatch(logout());
         localStorage.removeItem("token");
-        window.top.location.href = `https://${"rohit-12345839.myshopify.com"}/apps/consultant-theme/login`;
+        window.top.location.href = `https://${domain}/apps/consultant-theme/login`;
     };
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -104,7 +105,7 @@ const TopHeader = ({ onMenuToggle, isSidebarOpen,profile, userName, userEmail, s
                             aria-expanded={profileOpen}
                         >
                             <div className={styles.avatar}>
-                                <img src={"https://test-online-consultation.zend-apps.com/uploads/consultants/consultant-1771413022444.jpg"} alt="Peter Parkur" className={styles.avatarImage} />
+                                <img src={profile} alt="Peter Parkur" className={styles.avatarImage} />
                             </div>
                             <div className={styles.userInfo}>
                                 <span className={styles.userName}>{userName}</span>

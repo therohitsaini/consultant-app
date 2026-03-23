@@ -27,7 +27,7 @@ function VoucherTable() {
     }
     const updateVoucherPlan = (id, totalCoin, extraCoin) => {
         if (!redirect) return;
-        redirect.dispatch(Redirect.Action.APP, `/admin-settings/voucher?id=${id}&totalCoin=${totalCoin}&extraCoin=${extraCoin}`);
+        redirect.dispatch(Redirect.Action.APP, `/voucher-management/voucher?id=${id}&totalCoin=${totalCoin}&extraCoin=${extraCoin}`);
     }
     const [data, setData] = useState([])
     const [headings, setHeadings] = useState([

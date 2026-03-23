@@ -15,6 +15,7 @@ import {
   HiOutlineArrowDownTray,
 } from "react-icons/hi2";
 import TopHeader from "./TopHeader";
+import defaultImage from "../../assets/5987811.webp";
 
 function TabNavigation({ children }) {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ function TabNavigation({ children }) {
   const [userId, setUserId] = useState();
   const [shopId, setShopId] = useState();
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const [profile, setProfile] = useState({
     name: "",
@@ -36,12 +38,11 @@ function TabNavigation({ children }) {
   const shop = params.get("shop");
   const token = localStorage.getItem("token");
 
-
   useEffect(() => {
     setUserId(localStorage.getItem("client_u_Identity__"));
     setShopId(localStorage.getItem("shop_o_Identity__"));
   }, []);
-  
+
   const sendHeight = () => {
     const height = document.documentElement.scrollHeight;
     if (window.parent) {
@@ -53,16 +54,16 @@ function TabNavigation({ children }) {
   }, [shopId, userId]);
 
   const updateProfileDeatailsHandler = async () => {
+    setLoading(true);
     try {
       const formData = new FormData();
-
       formData.append("consultantId", userId);
       formData.append("shopId", shopId);
       formData.append("name", profile.name);
       formData.append("email", profile.email);
       formData.append("phone", profile.phone);
       formData.append("gender", profile.gender);
-
+      formData.append("profileImage", profile.profileImage);
       const response = await axios.put(
         `${process.env.REACT_APP_BACKEND_HOST}/api-consultant/update-profile`,
         formData,
@@ -70,14 +71,21 @@ function TabNavigation({ children }) {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       console.log("Profile updated:", response.data);
 
       if (response.data.success) {
         dispatch(
-          fetchConsultantById({ shop_id: shopId, consultant_id: userId, token, shop }),
+          fetchConsultantById({
+            shop_id: shopId,
+            consultant_id: userId,
+            token,
+            shop,
+          }),
         );
+        setLoading(false);
+        setShowModal(false);
       }
 
       console.log("Profile updated:", response.data);
@@ -88,6 +96,7 @@ function TabNavigation({ children }) {
         window.top.location.href = `https://${shop}/apps/consultant-theme/login`;
       }
       console.error("Error updating profile details:", error);
+      setLoading(false);
     }
   };
 
@@ -212,6 +221,7 @@ function TabNavigation({ children }) {
         profile={profile}
         setProfile={setProfile}
         updateProfileDeatailsHandler={updateProfileDeatailsHandler}
+        loading={loading}
       />
 
       <div
@@ -238,10 +248,7 @@ function TabNavigation({ children }) {
               <div className={styles.profileSection}>
                 <div className={styles.profileImage}>
                   <img
-                    src={
-                      imageUrl ||
-                      "https://imgs.search.brave.com/9rELSNB2JEASiZPQlCef36aaHliToZj5fynVvObLBKg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4t/aWNvbnMtcG5nLmZs/YXRpY29uLmNvbS8x/MjgvNTk4Ny81OTg3/ODExLnBuZw"
-                    }
+                    src={imageUrl ? imageUrl : defaultImage}
                     alt={consultantOverview?.consultant?.fullname}
                   />
                 </div>
@@ -297,7 +304,6 @@ function TabNavigation({ children }) {
             <main className={styles.content}>
               <Outlet context={{ shop }} />
             </main>
-
           </div>
         </div>
       </div>

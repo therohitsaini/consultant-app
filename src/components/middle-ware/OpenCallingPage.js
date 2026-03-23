@@ -1,6 +1,7 @@
 import axios from "axios";
 import { checkMicPermission } from "../ConsultantCards/ConsultantCards";
 import { socket } from "../Sokect-io/SokectConfig";
+import { checkUserStatus } from "./CheckUserStatus";
 
 
 export const checkUserBalance = async ({ userId, consultantId, type, shop }) => {
@@ -30,6 +31,11 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
         const balance = await checkUserBalance({ userId, consultantId: receiverId, type, shop });
         if (!balance) {
             alert("You have insufficient balance");
+            return;
+        }
+        const userStatus = await checkUserStatus(receiverId, shop);
+        if (!userStatus) {
+            alert("This user is not available to talk with you");
             return;
         }
         const hasMicPermission = await checkMicPermission();

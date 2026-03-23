@@ -51,71 +51,7 @@ async function makeRoundedImageBase64(url, size = 128) {
   }
 }
 
-// messaging.onBackgroundMessage(async function (payload) {
-//   const data = payload.data || {};
-//   console.log("data", data);
-//   console.log("payload", payload);
-//   const title = payload.notification?.title || "New message_______";
-//   const body = data.body || "No text";
-//   const shop_Domain = data.shop_domain || "No shop domain";
 
-//   const roundedBase64 = await makeRoundedImageBase64(
-//     data.avatar ||
-//       "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=128&h=128",
-//     128,
-//   );
-
-//   self.registration.showNotification(title, {
-//     body,
-//     icon: roundedBase64,
-//     badge: defaultBadge,
-//     data: {
-//       ...data,
-//       url: `https://${shop_Domain}/apps/consultant-theme/consultant-dashboard`,
-//     },
-//   });
-// });
-
-// self.addEventListener("notificationclick", function (event) {
-//   event.notification.close();
-
-//   const urlToOpen =
-//     event.notification.data?.url ||
-//     `https://${shop_Domain}/apps/consultant-theme/consultant-dashboard`;
-
-//   event.waitUntil(clients.openWindow(urlToOpen));
-// });
-
-// last usesage code
-
-// messaging.onBackgroundMessage(async function (payload) {
-//   const data = payload.data || {};
-//   console.log("data", data);
-//   console.log("payload", payload);
-
-//   const title = data.title || "New message";
-//   const body = data.body || "No text";
-//   const shop_Domain = data.shopDomain || "";
-
-//   const roundedBase64 = await makeRoundedImageBase64(
-//     data.avatar ||
-//       "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=128&h=128",
-//     128,
-//   );
-
-//   const finalUrl = shop_Domain
-//     ? `https://${shop_Domain}/apps/consultant-theme`
-//     : "/";
-
-//   self.registration.showNotification(title, {
-//     body,
-//     icon: roundedBase64,
-//     badge: defaultBadge,
-//     data: {
-//       url: finalUrl, // ✅ only store final url
-//     },
-//   });
-// });
 
 messaging.onBackgroundMessage(async function (payload) {
   const data = payload.data || {};

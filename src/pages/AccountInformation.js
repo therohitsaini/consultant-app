@@ -21,11 +21,17 @@ export default function AccountInformation() {
     (state) => state.admin,
   );
 
+  const params = new URLSearchParams(window.location.search);
+  const shop = params.get("shop");
+  let displayDomain = shop;
+  if (shop.includes(".myshopify.com")) {
+    displayDomain = shop.replace(".myshopify.com", "");
+  }
+  console.log("displayDomain", displayDomain);
   useEffect(() => {
     const id = localStorage.getItem("domain_V_id");
     setAdminIdLocal(id);
   }, []);
-  console.log("adminIdLocal", adminIdLocal);
   const redirect = useMemo(() => {
     if (!app) return null;
     return Redirect.create(app);
@@ -36,8 +42,6 @@ export default function AccountInformation() {
       dispatch(fetchAdminDetails({ adminIdLocal, app }));
     }
   }, [adminIdLocal]);
-  console.log("adminDetailsLoading", adminIdLocal);
-  console.log("adminDetails_", adminDetails_);
 
   return (
     <Page
@@ -48,7 +52,7 @@ export default function AccountInformation() {
           if (!redirect) return;
           redirect.dispatch(
             Redirect.Action.REMOTE,
-            "https://admin.shopify.com/store/rohit-12345839/charges/label-node01/pricing_plans",
+            `https://admin.shopify.com/store/${displayDomain}/charges/label-node01/pricing_plans`,
           );
         },
       }}
@@ -73,8 +77,8 @@ export default function AccountInformation() {
             <InlineStack align="space-between">
               <Text>Plan Amount</Text>
               <Text fontWeight="bold">
-                {adminDetails_.accountPlanInfo?.[0]?.planAmount} 
-                 {adminDetails_.accountPlanInfo?.[0]?.currency}
+                {adminDetails_.accountPlanInfo?.[0]?.planAmount}
+                {adminDetails_.accountPlanInfo?.[0]?.currency}
               </Text>
             </InlineStack>
           </BlockStack>

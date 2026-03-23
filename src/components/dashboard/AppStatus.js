@@ -104,9 +104,9 @@ export function AppStatus({
 
   return (
     <Card>
-      <BlockStack gap={{ xs: "400", sm: "500" }}>
+      <BlockStack gap={{ xs: "200", sm: "300" }}>
         <Box width="100%">
-          <BlockStack gap={{ xs: "200", sm: "400" }}>
+          <BlockStack gap={{ xs: "100", sm: "200" }}>
             {headerMarkup}
             {descriptionMarkup}
           </BlockStack>

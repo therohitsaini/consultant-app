@@ -9,6 +9,7 @@ import { checkUserBalance, openCallPage } from "../middle-ware/OpenCallingPage";
 import TestRingtone from "../../pages/TestRingtone";
 import { playRingtone } from "../ringTone/ringingTune";
 import { fetchVoucherData } from "../Redux/slices/UserSlices";
+import { checkUserStatus } from "../middle-ware/CheckUserStatus";
 
 export const checkMicPermission = async () => {
   try {
@@ -121,27 +122,7 @@ function ConsultantCards() {
     }
   }, [loading, mappedConsultants.length]);
 
-  const renderStars = (rating) => {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
-    return (
-      <>
-        {Array.from({ length: fullStars }, (_, index) => (
-          <span key={`full-${index}`} className="star-full">
-            ★
-          </span>
-        ))}
-        {hasHalfStar && <span className="star-half">★</span>}
-        {Array.from({ length: emptyStars }, (_, index) => (
-          <span key={`empty-${index}`} className="star-empty">
-            ★
-          </span>
-        ))}
-      </>
-    );
-  };
 
   /**
    * Start Voice Call and Video Call
@@ -153,6 +134,7 @@ function ConsultantCards() {
       window.top.location.href = `https://${shop}/account/login`;
       return;
     }
+  
     await openCallPage({ receiverId, type, userId, shop });
   };
 

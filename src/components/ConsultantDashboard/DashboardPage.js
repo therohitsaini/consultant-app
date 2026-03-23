@@ -128,11 +128,7 @@ const DashboardPage = () => {
                 className={`${styles.statChange} ${styles.statChangeSuccess}`}
                 style={{ fontSize: "13px", fontWeight: "600" }}
               >
-                {/* <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ display: 'inline', marginRight: '4px' }}>
-                                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-                                    <polyline points="17 6 23 6 23 12" />
-                                </svg>
-                                +12% from last month */}
+               
               </span>
             </div>
           </div>
@@ -177,11 +173,7 @@ const DashboardPage = () => {
                 className={`${styles.statChange} ${styles.textPrimary}`}
                 style={{ fontSize: "13px", fontWeight: "600" }}
               >
-                {/* <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ display: 'inline', marginRight: '4px' }}>
-                                    <circle cx="12" cy="12" r="10" />
-                                    <polyline points="12 6 12 12 16 14" />
-                                </svg> */}
-                {/* 8 pending reviews */}
+             
               </span>
             </div>
           </div>
@@ -230,79 +222,13 @@ const DashboardPage = () => {
                 className={`${styles.statChange} ${styles.statChangeSuccess}`}
                 style={{ fontSize: "13px", fontWeight: "600" }}
               >
-                {/* <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ display: 'inline', marginRight: '4px' }}>
-                                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-                                    <polyline points="17 6 23 6 23 12" />
-                                </svg>
-                                +18% from last month */}
+              
               </span>
             </div>
           </div>
         </div>
 
-        <div className={styles.statCard}>
-          <div className={styles.statCardBody}>
-            <div
-              className={`${styles.statHeader} ${styles.flexBetween} ${styles.flexStart}`}
-            >
-              <div>
-                <p className={styles.statLabel}>Average Rating</p>
-                <h3 className={styles.statValue}>{stats.averageRating}</h3>
-              </div>
-              <div
-                className={styles.statIcon}
-                style={{
-                  background:
-                    "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
-                }}
-              >
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                >
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                </svg>
-              </div>
-            </div>
-            <div
-              className={`${styles.statFooter} ${styles.flex} ${styles.flexCenter}`}
-            >
-              <div className={styles.flex}>
-                {[...Array(5)].map((_, i) => (
-                  <svg
-                    key={i}
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill={
-                      i < Math.floor(stats.averageRating)
-                        ? "#ffc107"
-                        : "#e9ecef"
-                    }
-                    stroke={
-                      i < Math.floor(stats.averageRating)
-                        ? "#ffc107"
-                        : "#e9ecef"
-                    }
-                    style={{ marginRight: "2px" }}
-                  >
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                  </svg>
-                ))}
-              </div>
-              <span
-                className={styles.textMuted}
-                style={{ fontSize: "13px", marginLeft: "8px" }}
-              >
-                Based on 89 reviews
-              </span>
-            </div>
-          </div>
-        </div>
+     
       </div>
 
       {/* Recent Consultations */}
