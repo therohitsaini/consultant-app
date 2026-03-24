@@ -10,7 +10,6 @@ export function VoucherDeleteAlert({ isUserAlertVisible, setIsUserAlertVisible, 
     const handleConfirmDelete = () => {
         handleDelete(voucherId);
         handleClose();
-        console.log("---------------------------------")
     };
 
     return (
@@ -21,6 +20,7 @@ export function VoucherDeleteAlert({ isUserAlertVisible, setIsUserAlertVisible, 
             primaryAction={{
                 variant: "primary",
                 icon: DeleteIcon,
+                tone: "critical",
                 content: "Delete",
                 loading: loading,
                 onAction: handleConfirmDelete,
