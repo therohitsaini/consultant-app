@@ -14,7 +14,6 @@ import { formatAmountHelper } from '../components/Helper/Helper';
 
 
 
-// Component to display animated count with motion
 function AnimatedCount({ value }) {
 
     const targetValue = value || 0;
@@ -83,11 +82,6 @@ function Dashboard() {
     const { adminDetails_, loading: adminDetailsLoading } = useSelector((state) => state.admin);
 
 
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("adminId");
-    const host = params.get("host");
-
-    console.log("adminDetails_T", adminDetails_, adminDetails);
     useEffect(() => {
         const id = localStorage.getItem('domain_V_id');
         setAdminIdLocal(id);

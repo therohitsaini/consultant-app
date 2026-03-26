@@ -43,8 +43,14 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
     }
     const userStatus = await checkUserStatus(receiverId, shop);
     console.log("userStatus", userStatus);
-    if (!userStatus) {
-      alert("This user is not available to talk with you");
+    if (!userStatus?.success) {
+      if (userStatus?.isBusy) {
+        alert(userStatus?.message || "User is busy with another call");
+      } else if (userStatus?.message) {
+        alert(userStatus.message);
+      } else {
+        alert("This user is not available to talk with you");
+      }
       return;
     }
     const hasMicPermission = await checkMicPermission();
@@ -86,7 +92,7 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
     const returnUrl = `https://${shop}/apps/consultant-theme`;
     console.log("returnUrl", process.env.REACT_APP_FRONTEND_URL);
     const callUrl =
-      `${"https://test-consultation-app.zend-apps.com"}/video/calling/page` +
+      `${process.env.REACT_APP_FRONTEND_URL}/video/calling/page` +
       `?callerId=${userId}` +
       `&receiverId=${receiverId}` +
       `&callType=${type || "voice"}` +
@@ -97,6 +103,7 @@ export const openCallPage = async ({ receiverId, type, userId, shop }) => {
       `&userType=${"client"}` +
       `&returnUrl=${encodeURIComponent(returnUrl)}`;
     // window.top.location.href = callUrl;
+    console.log("callUrl", callUrl);
     window.open(callUrl, "_blank");
   } catch (error) {
     console.error("🔥 API ERROR:", error.message);

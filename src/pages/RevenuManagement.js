@@ -26,7 +26,6 @@ const transactionItemStrings = ['All', 'Chat', 'Voice Call', 'Video Call',]
 
 function RevenuManagement() {
     const app = useAppBridge();
-    console.log("app", app);
     const { activityHistory, loading } = useSelector((state) => state.admin);
     const { adminDetails_, loading: adminDetailsLoading } = useSelector((state) => state.admin);
     const dispatch = useDispatch();
@@ -35,7 +34,6 @@ function RevenuManagement() {
     const [page, setPage] = useState(1);
     const [type, setType] = useState(0);
     const limit = 10;
-    console.log("searchQuery", searchQuery);
     useEffect(() => {
         const id = localStorage.getItem('domain_V_id');
         setAdminIdLocal(id);
@@ -85,7 +83,6 @@ function RevenuManagement() {
         consultantAmount: `${item.consultantAmount}`,
         adminAmount: `${item.adminAmount}`
     })) || [];
-    console.log("tableData", tableData);
     const renderTransactionRow = useCallback((transaction, index) => {
         const { id, user, type, date, time, duration, consultantAmount, adminAmount, consultant, amount, } = transaction
         const serialNumber = (page - 1) * limit + index + 1;

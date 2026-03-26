@@ -556,8 +556,6 @@ function AddConsultant() {
           imagePath = imagePath.replace(/^\//, "");
           imagePath = `${baseUrl}/${imagePath}`;
         }
-
-        console.log("Profile image URL:", imagePath);
         setProfileImageUrl(imagePath);
         setProfileImagePreview(imagePath);
       }

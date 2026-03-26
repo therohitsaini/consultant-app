@@ -68,7 +68,6 @@ function ManualDebetCreditBlance() {
      */
     const updateWallet = async () => {
         const token = await getAppBridgeToken(app);
-        console.log("token", token);
         try {
             const response = await axios.post(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/update-wallet/${adminIdLocal}`, {
                 ...updateFormData, userId: userDetails.userId,

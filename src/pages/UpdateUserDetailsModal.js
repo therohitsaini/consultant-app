@@ -14,7 +14,6 @@ export default function UpdateUserDetailsModal({ open, onClose, userDetails, upd
     const [user, setUser] = useState('');
 
 
-    console.log("updateFormData", updateFormData);
 
     const handleChange = (field) => {
         return (value) => {

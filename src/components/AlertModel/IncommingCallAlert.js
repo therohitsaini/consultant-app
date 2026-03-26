@@ -1,8 +1,8 @@
 // components/IncomingCallAlert.jsx
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {  setIncomingCall } from "../Redux/slices/sokectSlice";
-import {  socket } from "../Sokect-io/SokectConfig";
+import { setIncomingCall } from "../Redux/slices/sokectSlice";
+import { socket } from "../Sokect-io/SokectConfig";
 import { checkMicPermission } from "../ConsultantCards/ConsultantCards";
 import TestRingtone from "../../pages/TestRingtone";
 import axios from "axios";
@@ -63,7 +63,7 @@ export default function IncomingCallAlert() {
 
       const returnUrl = `https://${shop}/apps/consultant-theme/consultant-dashboard`;
       const callUrl =
-        `${"https://test-consultation-app.zend-apps.com"}/video/calling/page` +
+        `${process.env.REACT_APP_FRONTEND_URL}/video/calling/page` +
         `?callerId=${callerId}` +
         `&receiverId=${userId}` +
         `&callType=${callType}` +

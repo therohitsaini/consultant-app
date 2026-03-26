@@ -17,7 +17,7 @@ export const checkMicPermission = async () => {
       name: "microphone",
     });
 
-    return result.state; // granted | denied | prompt
+    return result.state; 
   } catch {
     return "prompt";
   }
@@ -31,7 +31,6 @@ function ConsultantCards() {
   const { voucherData } = useSelector((state) => state.users);
   const params = new URLSearchParams(window.location.search);
   const shop = params.get("shop");
-  console.log("shop", shop);
   const user_id = params.get("customerId");
   const shop_id = params.get("shopid") || localStorage.getItem("domain_V_id");
   const [initialLoading, setInitialLoading] = useState(true);
@@ -61,16 +60,13 @@ function ConsultantCards() {
   useEffect(() => {
     dispatch(connectSocket(user_id));
   }, [user_id]);
-  console.log("voucherData", voucherData);
   const consultantsList = Array.isArray(consultants?.findConsultant)
     ? consultants.findConsultant
     : [];
-  console.log("consultantsList", consultantsList);
 
   const mappedConsultants =
     consultantsList &&
     consultantsList.map((consultant) => {
-      console.log("consultant___", consultant);
       let languages = [];
 
       try {
@@ -86,7 +82,6 @@ function ConsultantCards() {
       } catch (e) {
         languages = ["English"];
       }
-      console.log("languages", languages);
       return {
         id: consultant._id || consultant.id,
         name: consultant.displayName || consultant.fullname || "Consultant",

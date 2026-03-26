@@ -66,7 +66,6 @@ function ConsultantList() {
   const { adminDetails_, loading: adminDetailsLoading } = useSelector(
     (state) => state.admin,
   );
-  console.log("consultants", consultants);
 
   useEffect(() => {
     const id = localStorage.getItem("domain_V_id");
@@ -132,7 +131,6 @@ function ConsultantList() {
   }, [filteredConsultants, sortValue]);
 
   const handleConsultantClick = useCallback((_id) => {
-    console.log("consultant _id", _id);
   }, []);
 
   const handleEdit = useCallback(
@@ -153,7 +151,6 @@ function ConsultantList() {
       dispatch(fetchAdminDetails({ adminIdLocal, app }));
     }
   }, [adminIdLocal, app]);
-  console.log("adminDetails_", adminDetails_);
 
   const handleToggle = async (id) => {
     try {
@@ -287,9 +284,7 @@ function ConsultantList() {
               <input
                 type="checkbox"
                 checked={consultantStatus}
-                onChange={() => {
-                  console.log("Clicked ID:", _id);
-                }}
+               
                 style={{
                   opacity: 0,
                   width: 0,

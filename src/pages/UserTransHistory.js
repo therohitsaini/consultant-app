@@ -26,7 +26,6 @@ const transactionItemStrings = ['All', 'Chat', 'Voice Call', 'Video Call',]
 
 function UserTransHistory() {
     const app = useAppBridge();
-    console.log("app", app);
     const { activityHistory, loading } = useSelector((state) => state.admin);
     const { adminDetails_, loading: adminDetailsLoading } = useSelector((state) => state.admin);
 

@@ -10,8 +10,17 @@ export const checkUserStatus = async (receiverId, shop) => {
         },
       },
     );
-    return response.data.data;
+    return response.data;
   } catch (error) {
-    return false;
+    if (error.response?.data) {
+      return {
+        ...error.response.data,
+        statusCode: error.response.status,
+      };
+    }
+    return {
+      success: false,
+      message: "Unable to check user status",
+    };
   }
 };
