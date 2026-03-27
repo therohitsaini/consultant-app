@@ -176,6 +176,8 @@ function AddConsultant() {
     if (file) {
       setProfileImageUrl(URL.createObjectURL(file));
       setProfileFile(file);
+      setDirty(true);
+
     }
   }, []);
   const handleDropZoneDrop = useCallback(

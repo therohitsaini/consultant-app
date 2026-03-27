@@ -185,7 +185,6 @@ function ConsultantCards() {
               if (!consultant.consultantStatus) return null;
               const shop_id = shopId;
               const consultant_id = consultant.id;
-              console.log("consultant", consultant);
               return (
                 <div
                   key={consultant.id}
