@@ -24,6 +24,7 @@ export const headings = [
     { title: 'Chats', alignment: 'center' },
     { title: 'Voice Calls', alignment: 'center' },
     { title: 'Video Calls', alignment: 'center' },
+    { title: 'Wallet Balance', alignment: 'center' },
     { title: 'Status', alignment: 'center' },
     { title: 'Action', alignment: 'center' },
 ];

@@ -9,7 +9,7 @@ import {
   BlockStack,
 } from "@shopify/polaris";
 import { ChevronUpIcon, ChevronDownIcon } from "@shopify/polaris-icons";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { fetchAdminDetails } from "../components/Redux/slices/adminSlice";
 import { useDispatch } from "react-redux";
@@ -28,7 +28,6 @@ function Faq() {
       dispatch(fetchAdminDetails({ adminIdLocal, app }));
     }
   }, [dispatch]);
-  console.log("adminDetails_", adminDetails_);
   const ACCORDION_ITEMS = [
     {
       id: 0,

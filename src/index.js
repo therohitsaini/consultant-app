@@ -1,22 +1,22 @@
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import '@shopify/polaris/build/esm/styles.css';
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "@shopify/polaris/build/esm/styles.css";
 
-import { AppProvider as PolarisAppProvider } from '@shopify/polaris';
+import { AppProvider as PolarisAppProvider } from "@shopify/polaris";
 import en from "@shopify/polaris/locales/en.json";
-import { Provider } from 'react-redux';
-import { store } from './components/Redux/store/store';
-import { AppBridgeProvider } from './components/createContext/AppBridgeContext';
-import SocketProvider from './components/Sokect-io/sokectProvider';
-import { AppStatusProvider } from './components/ProtectRoute/AppStatusProvider';
-import { AppStatusBillingProvider } from './components/ProtectRoute/AppStatusBillingProvider';
-import ToastProvider from './components/AlertModel/ToastProvider';
+import { Provider } from "react-redux";
+import { store } from "./components/Redux/store/store";
+import { AppBridgeProvider } from "./components/createContext/AppBridgeContext";
+import SocketProvider from "./components/Sokect-io/sokectProvider";
+import { AppStatusProvider } from "./components/ProtectRoute/AppStatusProvider";
+import { AppStatusBillingProvider } from "./components/ProtectRoute/AppStatusBillingProvider";
+import ToastProvider from "./components/AlertModel/ToastProvider";
 
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/firebase-messaging-sw.js")
-    .then((reg) => console.log("Service worker registered:", reg.scope))
+  navigator.serviceWorker
+    .register("/firebase-messaging-sw.js")
     .catch((err) => console.error("SW registration failed:", err));
 }
 const isShopifyAdmin = () => {
@@ -49,33 +49,36 @@ root.render(
         </Provider>
       </ToastProvider>
     </PolarisAppProvider>
-  </AppWrapper>
+  </AppWrapper>,
 );
 
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === "development") {
   const hideErrorOverlay = () => {
-    const overlay = document.getElementById('react-error-overlay');
+    const overlay = document.getElementById("react-error-overlay");
     if (overlay) {
-      overlay.style.display = 'none';
+      overlay.style.display = "none";
       overlay.remove();
     }
 
     const iframe = document.querySelector('iframe[id*="webpack-dev-server"]');
     if (iframe) {
-      iframe.style.display = 'none';
+      iframe.style.display = "none";
     }
 
-    const errorDivs = document.querySelectorAll('div');
-    errorDivs.forEach(div => {
-      if (div.textContent && div.textContent.includes('Uncaught runtime errors')) {
-        div.style.display = 'none';
+    const errorDivs = document.querySelectorAll("div");
+    errorDivs.forEach((div) => {
+      if (
+        div.textContent &&
+        div.textContent.includes("Uncaught runtime errors")
+      ) {
+        div.style.display = "none";
         div.remove();
       }
     });
   };
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', hideErrorOverlay);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", hideErrorOverlay);
   } else {
     hideErrorOverlay();
   }
@@ -86,7 +89,7 @@ if (process.env.NODE_ENV === 'development') {
 
   observer.observe(document.body, {
     childList: true,
-    subtree: true
+    subtree: true,
   });
 
   // Also check periodically

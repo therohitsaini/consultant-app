@@ -1,34 +1,18 @@
 import {
-  Banner,
   Layout,
   Page,
-  BlockStack,
-  Grid,
-  LegacyCard,
   Text,
-  ButtonGroup,
   Button,
   Thumbnail,
-  Spinner,
   InlineStack,
   Box,
 } from "@shopify/polaris";
-import {
-  ConfettiIcon,
-  ExternalIcon,
-  PlusIcon,
-  EditIcon,
-  DuplicateIcon,
-  DeleteIcon,
-} from "@shopify/polaris-icons";
+import { PlusIcon, EditIcon, DeleteIcon } from "@shopify/polaris-icons";
 import { useEffect, useState, useCallback, useMemo, Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import IndexTableList from "../components/consultant-list/IndexTableList";
 import { IndexTable } from "@shopify/polaris";
-import {
-  deleteConsultantById,
-  fetchConsultants,
-} from "../components/Redux/slices/ConsultantSlices";
+import { fetchConsultants } from "../components/Redux/slices/ConsultantSlices";
 import { useDispatch, useSelector } from "react-redux";
 import { UserAlert } from "../components/AlertModel/UserAlert";
 import { headings, itemStrings } from "../components/FallbackData/FallbackData";
@@ -37,6 +21,7 @@ import { useAppBridge } from "../components/createContext/AppBridgeContext";
 import { Redirect } from "@shopify/app-bridge/actions";
 import { fetchAdminDetails } from "../components/Redux/slices/adminSlice";
 import { usePolarisToast } from "../components/AlertModel/PolariesTostContext";
+import { ImageThumbnail } from "../components/Helper/ImageThumbnail";
 
 function ConsultantList() {
   const app = useAppBridge();
@@ -60,12 +45,11 @@ function ConsultantList() {
   const [isRefreshed, setIsRefreshed] = useState(false);
   const [adminIdLocal, setAdminIdLocal] = useState(null);
   const { showToast } = usePolarisToast();
+  const [loading, setLoading] = useState(true);
   const { consultants, loading: consultantLoading } = useSelector(
     (state) => state.consultants,
   );
-  const { adminDetails_, loading: adminDetailsLoading } = useSelector(
-    (state) => state.admin,
-  );
+  const { adminDetails_ } = useSelector((state) => state.admin);
 
   useEffect(() => {
     const id = localStorage.getItem("domain_V_id");
@@ -78,6 +62,7 @@ function ConsultantList() {
   }, [dispatch, isRefreshed, adminIdLocal, app]);
 
   const consultantsData = consultants?.findConsultant || [];
+  console.log("consultantsData", consultantsData);
   const filteredConsultants = useMemo(() => {
     if (!consultantsData) return [];
 
@@ -130,8 +115,7 @@ function ConsultantList() {
     return sorted;
   }, [filteredConsultants, sortValue]);
 
-  const handleConsultantClick = useCallback((_id) => {
-  }, []);
+  const handleConsultantClick = useCallback((_id) => {}, []);
 
   const handleEdit = useCallback(
     (_id) => {
@@ -140,7 +124,6 @@ function ConsultantList() {
     [navigate],
   );
 
-  // Handle delete confirmation
   const handleDeleteClick = useCallback((_id) => {
     setConsultantId(_id);
     setIsUserAlertVisible(true);
@@ -199,11 +182,11 @@ function ConsultantList() {
         _id,
         fullname,
         profession,
-        experience,
         chatPerMinute,
         consultantStatus,
         voicePerMinute,
         videoPerMinute,
+        walletBalance,
       } = consultant;
 
       return (
@@ -221,18 +204,13 @@ function ConsultantList() {
           </IndexTable.Cell>
           <IndexTable.Cell alignment="center">
             <InlineStack align="center">
-              <div
-                style={{ width: "40px", height: "40px", objectFit: "cover" }}
-              >
-                <Thumbnail
-                  source={
-                    consultant?.profileImage
-                      ? consultant.profileImage.replace(/\\/g, "/")
-                      : "/images/flag/teamdefault.png"
-                  }
-                  size="large"
-                />
-              </div>
+              <ImageThumbnail
+                src={
+                  consultant?.profileImage
+                    ? consultant.profileImage.replace(/\\/g, "/")
+                    : "/images/flag/teamdefault.png"
+                }
+              />
             </InlineStack>
           </IndexTable.Cell>
           <IndexTable.Cell alignment="center">
@@ -270,6 +248,14 @@ function ConsultantList() {
             </Text>
           </IndexTable.Cell>
           <IndexTable.Cell>
+            <Text as="span" alignment="center" numeric>
+              <Text variant="bodyMd" as="span" alignment="center">
+                {adminDetails_?.currency}
+                {walletBalance ? parseFloat(walletBalance).toFixed(2) : "0.00"}
+              </Text>
+            </Text>
+          </IndexTable.Cell>
+          <IndexTable.Cell>
             <label
               onClick={() => handleToggle(_id)}
               style={{
@@ -284,7 +270,6 @@ function ConsultantList() {
               <input
                 type="checkbox"
                 checked={consultantStatus}
-               
                 style={{
                   opacity: 0,
                   width: 0,
