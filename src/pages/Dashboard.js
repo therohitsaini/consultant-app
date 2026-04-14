@@ -11,7 +11,6 @@ import { fetchAdminDetails, fetchShopAllConsultants, fetchShopAllUsers, manageAp
 import { Redirect } from '@shopify/app-bridge/actions';
 import { useMemo } from 'react';
 import { formatAmountHelper } from '../components/Helper/Helper';
-import BlankModalSetupGuide from '../components/dashboard/BlankModalSetupGuide';
 
 
 
@@ -81,7 +80,6 @@ function Dashboard() {
     const [enabled, setEnabled] = useState(null);
     const appStatus = useSelector((state) => state.admin.appStatus);
     const { adminDetails_, loading: adminDetailsLoading } = useSelector((state) => state.admin);
-    const [openSetupGuide, setOpenSetupGuide] = useState(true);
 
 
 
@@ -125,7 +123,6 @@ function Dashboard() {
 
     return (
         <>
-        <BlankModalSetupGuide open={openSetupGuide} onClose={() => setOpenSetupGuide(false)} />
             {app && (
                 <TitleBar title="" />
             )}

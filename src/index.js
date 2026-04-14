@@ -13,6 +13,7 @@ import SocketProvider from "./components/Sokect-io/sokectProvider";
 import { AppStatusProvider } from "./components/ProtectRoute/AppStatusProvider";
 import { AppStatusBillingProvider } from "./components/ProtectRoute/AppStatusBillingProvider";
 import ToastProvider from "./components/AlertModel/ToastProvider";
+import { SetupGuideProvider } from "./components/ProtectRoute/SetupGuideProvider";
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
@@ -42,7 +43,9 @@ root.render(
           <SocketProvider>
             <AppStatusProvider>
               <AppStatusBillingProvider>
+                <SetupGuideProvider>
                 <App />
+                </SetupGuideProvider>
               </AppStatusBillingProvider>
             </AppStatusProvider>
           </SocketProvider>

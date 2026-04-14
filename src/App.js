@@ -12,6 +12,7 @@ import { BillingProtectedRoute } from "./components/ProtectRoute/BillingProtecte
 
 import "./App.css";
 import { Spinner } from "@shopify/polaris";
+import SetupGuideProtectRoutes from "./components/ProtectRoute/setupGuideProtectRoutes";
 
 /* ---------- Lazy Loaded Pages ---------- */
 
@@ -168,7 +169,9 @@ export default function App() {
               element={
                 <ProtectAdminRoute installed={installed}>
                   <BillingProtectedRoute>
-                    <LayoutFrame />
+                    <SetupGuideProtectRoutes>
+                      <LayoutFrame />
+                    </SetupGuideProtectRoutes>
                   </BillingProtectedRoute>
                 </ProtectAdminRoute>
               }
