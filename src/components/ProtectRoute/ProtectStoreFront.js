@@ -1,6 +1,5 @@
 import { Navigate } from 'react-router-dom';
 import { useAppStatus } from '../ProtectRoute/AppStatusProvider';
-import { Spinner } from 'react-bootstrap';
 
 const ProtectStoreFront = ({ children }) => {
     const { loading, appEnabled } = useAppStatus();

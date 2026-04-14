@@ -16,7 +16,6 @@ export const UseAppInstall = (shop, app) => {
                 return;
             }
             const token = await getAppBridgeToken(app);
-            console.log("working >...........")
             try {
                 const response = await fetch(
                     `${process.env.REACT_APP_BACKEND_HOST}/app/install/${shop}`
