@@ -32,7 +32,7 @@ export const SetupGuideProvider = ({ children }) => {
           },
         );
 
-        console.log("response", response.data.menuSetupComplete);
+       
         if (response.data.menuSetupComplete === true || response.data.menuSetupComplete === "true") {
             setShowSetupGuide(true);
             console.log("showSetupGuide", showSetupGuide);

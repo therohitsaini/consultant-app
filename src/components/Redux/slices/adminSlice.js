@@ -107,6 +107,17 @@ export const fetchWithdrawalRequests = createAsyncThunk("admin/fetchWithdrawalRe
     return response.data
 })
 
+export const fetchSetupGuideWarning = createAsyncThunk("admin/fetchSetupGuideWarning", async ({ adminIdLocal, app }) => {
+    const token = await getAppBridgeToken(app);
+    const response = await axios.get(`${process.env.REACT_APP_BACKEND_HOST}/api/admin/menu/${adminIdLocal}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+    console.log("response", response.data);
+    return response.data
+})
+
 
 
 const adminSlice = createSlice({
@@ -122,6 +133,7 @@ const adminSlice = createSlice({
         appStatus: null,
         deletedVoucher: null,
         withdrawalRequests: [],
+        menuSetupComplete: null,
     },
     extraReducers: (builder) => {
         builder
@@ -210,6 +222,17 @@ const adminSlice = createSlice({
                 state.withdrawalRequests = action.payload;
             })
             .addCase(fetchWithdrawalRequests.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
+            .addCase(fetchSetupGuideWarning.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchSetupGuideWarning.fulfilled, (state, action) => {
+                state.loading = false;
+                state.menuSetupComplete = action.payload;
+            })
+            .addCase(fetchSetupGuideWarning.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
             })
