@@ -15,7 +15,7 @@ const SetupGuideProtectRoutes = ({ children }) => {
 
   const handleClose = () => {
     setOpen(false);
-    setShowSetupGuide(false); // ✅ THIS IS THE KEY FIX
+    setShowSetupGuide(false); 
   };
 
   if (showSetupGuide === true && open) {

@@ -24,7 +24,7 @@ export const SetupGuideProvider = ({ children }) => {
         const token = await getAppBridgeToken(app);
 
         const response = await axios.get(
-          `${process.env.REACT_APP_BACKEND_HOST}/api/admin/menu/${adminId}`,
+          `${process.env.REACT_APP_BACKEND_HOST}/api/admin/is-setup-guide-open/${adminId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
